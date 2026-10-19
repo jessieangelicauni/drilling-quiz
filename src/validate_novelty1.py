@@ -24,6 +24,13 @@ and aggregates the result instead of asserting a smoke-test pass/fail:
   3. Solver round-trip key-acceptance rate -- check (c) from
      solver_check.py: a model blind to the key still picks it.
 
+Every generated item's actual content (stem, every option, which one is
+correct, which are distractors, what the solver picked) is kept too --
+both printed as examples (--n-examples per skill, default 2) and saved
+in full for every item in the output JSON -- not just the pass/fail
+counts, so there's something to quote as a concrete example item and
+something to inspect if a number looks wrong.
+
 Deliberately NOT reported: solver_check.py's check (b), "is this
 distractor ALSO a correct answer" -- its docstring records a confirmed
 yes-bias on Qwen3-4B (tested on 6 known cases, wrong in both reasoning
@@ -62,6 +69,7 @@ def run(n_per_skill: int, seed: int) -> dict:
     for skill_id in SKILLS:
         attempts = successes = key_accepted = solved = 0
         critic_attempts_before, critic_recoveries_before = provider.critic_attempts, provider.critic_recoveries
+        items = []
 
         for _ in range(n_per_skill):
             attempts += 1
@@ -74,6 +82,23 @@ def run(n_per_skill: int, seed: int) -> dict:
             solved += 1
             key_accepted += int(result.key_accepted)
 
+            # Full item content, not just pass/fail -- a reader (or the
+            # paper's own example figure) needs to see the actual
+            # question and which option is correct/wrong, not only an
+            # aggregate count.
+            items.append({
+                "stem": item.stem,
+                "blank_marker": item.blank_marker,
+                "options": item.options,
+                "correct_answer": item.answer,
+                "correct_option_text": item.options[item.answer],
+                "distractor_options": {
+                    label: text for label, text in item.options.items() if label != item.answer
+                },
+                "solver_picked": result.picked,
+                "solver_key_accepted": result.key_accepted,
+            })
+
         per_skill[skill_id] = {
             "attempts": attempts,
             "generation_pass": successes,
@@ -81,6 +106,7 @@ def run(n_per_skill: int, seed: int) -> dict:
             "critic_recoveries": provider.critic_recoveries - critic_recoveries_before,
             "solver_checked": solved,
             "solver_key_accepted": key_accepted,
+            "items": items,
         }
 
     total_attempts = sum(v["attempts"] for v in per_skill.values())
@@ -100,6 +126,20 @@ def run(n_per_skill: int, seed: int) -> dict:
         ),
         "overall_solver_key_accept_rate": total_key_accepted / total_solved if total_solved else None,
     }
+
+
+def print_examples(overall: dict, n_examples: int) -> None:
+    if n_examples <= 0:
+        return
+    print("--- example items (question / options / correct vs. wrong) ---\n")
+    for skill_id, v in overall["per_skill"].items():
+        for item in v["items"][:n_examples]:
+            status = "solver got it right" if item["solver_key_accepted"] else "solver MISSED the key"
+            print(f"[{skill_id}] {item['stem']}")
+            for label, text in item["options"].items():
+                tag = "CORRECT" if label == item["correct_answer"] else "distractor"
+                print(f"    {label}: {text}  ({tag})")
+            print(f"    solver picked: {item['solver_picked']}  ({status})\n")
 
 
 def print_report(overall: dict) -> None:
@@ -129,9 +169,13 @@ if __name__ == "__main__":
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--out", default="novelty1_validation_results.json",
                          help="where to write the full results as JSON")
+    parser.add_argument("--n-examples", type=int, default=2,
+                         help="example items to print per skill (full question + options + "
+                              "correct/wrong labels); all items are saved to --out regardless")
     args = parser.parse_args()
 
     overall = run(args.n_per_skill, args.seed)
+    print_examples(overall, args.n_examples)
     print_report(overall)
 
     with open(args.out, "w", encoding="utf-8") as f:
