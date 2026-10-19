@@ -654,6 +654,65 @@ tidak dikerjakan sekarang, bukan dilupakan** — sama gaya keputusan
 seperti infra ditunda di §9.3. Fokus pindah ke gap aplikasi yang
 masih nol: admin/LMS CRUD atau EXP/leaderboard (§9.4).
 
+### 9.11 Skill kedelapan (di luar kerangka KAGAS): `subj_topic` — meninjau ulang keputusan lama dengan bukti baru
+
+Setelah §9.10 memutuskan berhenti mengejar cakupan KAGAS, user
+eksplisit bertanya: dari 7 skill yang ada, adakah yang harus dihapus
+karena tidak penting, atau skill penting lain yang belum dikerjakan?
+Jawabannya: tidak ada yang perlu dihapus (ketujuhnya materi TOPIK I-II
+yang nyata dan umum), tapi ditemukan satu kandidat kuat yang BUKAN
+ide baru — **이/가 (subjek, JKS) vs 은/는 (topik, JX)**, kemungkinan
+kesalahan pembelajar Korea paling terkenal, sudah pernah **ditolak
+eksplisit** di §9.6 (catatan `time_range`) dengan alasan "ambigu tanpa
+konteks". Alasan penolakan itu sendiri yang sudah usang: `time_range`
+KEMUDIAN berhasil menyelesaikan masalah ambiguitas yang identik lewat
+template berpasangan — jadi penolakan lama ini layak ditinjau ulang
+dengan bukti baru itu, sesuai prinsip kerja proyek ini sendiri (lihat
+bagian awal dokumen).
+
+**Pengujian morfologi: bersih total, tidak ada bug ditemukan** (baru
+pertama kali dalam seri 8 skill ini) — termasuk kontraksi tak-beraturan
+ganti-kata-ganti (`저+가→제가`, `나+가→내가`) yang ditangani sempurna
+oleh `kiwi.join()`. Juga ditemukan: `이/가` (tag `JKS`) dan `은/는`
+(tag `JX`) punya tag kiwipiepy yang BERBEDA — beda dari
+`particle_loc`/`honorific` yang dua opsinya satu tag sama. Bahkan
+alomorf salah (`책가`, seharusnya `책이`) langsung di-parse ulang
+kiwipiepy jadi kata lain sama sekali (`가` dibaca sebagai kata kerja
+"pergi") — sinyal validasi yang sangat kuat.
+
+**Tapi masalah inti yang membuatnya ditolak dari awal TETAP ada,
+cuma sekarang ditangani secara jujur, bukan dihindari:** tidak seperti
+7 skill lain, `이/가` vs `은/는` **keduanya selalu gramatikal benar**
+di hampir semua kalimat — perbedaannya murni pragmatik (topik vs
+fokus/informasi-baru), bukan benar-salah tata bahasa. Dipilih
+mekanisme pemaksa: pola tanya-jawab `누가` ("siapa") — konvensi
+textbook standar bahwa jawaban atas pertanyaan `누가` memakai fokus-
+subjek `이/가` (informasi baru), bukan topik `은/는`. **Ini KONVENSI
+PEDAGOGIS, bukan hukum sintaksis keras** seperti 7 skill lain (yang
+semuanya dijamin benar/salah secara struktural atau by construction)
+— ditandai eksplisit dengan level keyakinan lebih rendah, didiskusikan
+dan disetujui user sebelum dikerjakan, bukan diklaim setara dengan
+skill lain.
+
+Dibangun `validate_postnominal_tag()` di `distractor_validator.py` —
+kebalikan `validate_prenominal_tag`: cek tag morfem tepat SETELAH kata
+tertentu (di sini: lemma kata ganti `저`/`나`), bukan sebelum. Diperlukan
+karena opsi di sini adalah satu unit kata-ganti+partikel yang
+terkontraksi (`제가`), sama seperti `adj_relativizer` butuh validator
+baru untuk posisi blank yang berbeda.
+
+Tidak ada panggilan LLM — 4 pasangan (kata ganti, predikat) dikurasi
+langsung. `correct_form` dan `distractor_form` SAMA-SAMA dibangun lewat
+`kiwi.join()` (bukan concatenation string manual) — ini sengaja,
+untuk menghindari jebakan menempel stem terkontraksi `제` (cuma valid
+sebelum `가`) ke `는`, yang akan menghasilkan `*제는` yang salah.
+
+Hasil: 5/5 berhasil. Total sekarang **8 skill grammar**. Ini skill
+terakhir yang ditambahkan dengan alasan kuat (nilai pedagogis tinggi +
+biaya rendah + peninjauan ulang keputusan lama) — bukan untuk mengejar
+checklist apa pun. Fokus berikutnya sungguh-sungguh pindah ke gap
+aplikasi yang masih nol: admin/LMS CRUD atau EXP/leaderboard (§9.4).
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

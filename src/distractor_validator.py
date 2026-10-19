@@ -169,6 +169,28 @@ def validate_prenominal_tag(sentence: str, following_word: str, expected_tag: st
     return ValidationResult(False, f"morpheme {form!r} right before {following_word!r} parses as {tag}, not {expected_tag}")
 
 
+def validate_postnominal_tag(sentence: str, preceding_word: str, expected_tag: str) -> ValidationResult:
+    """Does the morpheme immediately AFTER `preceding_word` carry
+    `expected_tag`? The mirror image of validate_prenominal_tag.
+
+    Needed for `subj_topic` (이/가 vs 은/는, §9.11): the blank is a whole
+    pronoun+particle unit (제가/저는, 내가/나는) where an irregular
+    contraction changes the PRONOUN's own surface form depending on which
+    particle attaches (저+가 -> 제가, not "저가") -- kiwipiepy still
+    represents the underlying lemma as "저" regardless of the surface
+    contraction, so `preceding_word` is the lemma (e.g. "저"), not the
+    surface string, and this checks the particle token right after it.
+    """
+    tokens = all_morph_tags(sentence)
+    idx = next((i for i, (form, tag) in enumerate(tokens) if form == preceding_word), None)
+    if idx is None or idx + 1 >= len(tokens):
+        return ValidationResult(False, f"{preceding_word!r} not found as a token with a following morpheme")
+    form, tag = tokens[idx + 1]
+    if tag == expected_tag:
+        return ValidationResult(True, f"morpheme {form!r} right after {preceding_word!r} parses as {expected_tag}")
+    return ValidationResult(False, f"morpheme {form!r} right after {preceding_word!r} parses as {tag}, not {expected_tag}")
+
+
 def adj_relativizer_ending(adj_stem: str) -> str:
     """은 after a consonant-final (batchim) adjective stem, the combining
     jongseong NIEUN (U+11AB, NOT the standalone letter ㄴ U+3134 -- a real
@@ -316,5 +338,15 @@ if __name__ == "__main__":
     assert pren_ok.valid, "은/ᆫ relativizer right before a noun must validate structurally"
     pren_bad = validate_prenominal_tag("저는 매운 음식을 좋아해요.", "없는단어", "ETM")
     assert not pren_bad.valid, "a noun that doesn't appear in the sentence must fail, not silently pass"
+
+    assert _KIWI.join([("저", "NP"), ("가", "JKS")]) == "제가", "irregular pronoun+subject contraction"
+    assert _KIWI.join([("나", "NP"), ("가", "JKS")]) == "내가", "irregular pronoun+subject contraction"
+    assert _KIWI.join([("저", "NP"), ("는", "JX")]) == "저는", "no contraction for the topic particle"
+    postn_subj = validate_postnominal_tag("제가 커피를 마셔요?", "저", "JKS")
+    assert postn_subj.valid, "the particle right after 저 (surfaced as 제가) must validate as JKS"
+    postn_topic = validate_postnominal_tag("저는 커피를 마셔요?", "저", "JX")
+    assert postn_topic.valid, "the particle right after 저 (저는, no contraction) must validate as JX"
+    postn_bad = validate_postnominal_tag("제가 커피를 마셔요?", "저", "JX")
+    assert not postn_bad.valid, "제가's particle is JKS, must not pass a JX check"
 
     print("all smoke tests passed")

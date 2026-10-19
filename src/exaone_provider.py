@@ -74,6 +74,7 @@ from distractor_validator import (
     harmony_positive,
     honorific_ending,
     validate_cloze_option,
+    validate_postnominal_tag,
     validate_prenominal_tag,
     validate_sentence_final_tag,
 )
@@ -258,6 +259,38 @@ SKILL_SPECS = {
             ("비싸다", "시계"),  # regular, no batchim: 비싼, not *비싸는
         ),
     },
+    "subj_topic": {
+        # 이/가 (subject, JKS) vs 은/는 (topic, JX) -- §9.11. Revisited from
+        # an earlier rejection (time_range's note, §9.6): bare "[noun]___"
+        # is genuinely ambiguous between subject and topic reading without
+        # context, the same trap that blocked time_range before the
+        # paired-template fix was found. Unlike every structural skill so
+        # far, correctness here is NOT syntactically forced -- both
+        # particles are grammatical in nearly any sentence; the forcing
+        # mechanism is a PEDAGOGICAL convention, not a hard rule: a 누가
+        # ("who") question-answer frame, where textbook Korean teaches that
+        # the answer takes subject-focus 이/가 (new information), not topic
+        # 은/는. Documented explicitly in PRD §9.11 as a softer confidence
+        # tier than the other 7 skills -- a textbook convention, not
+        # guaranteed by construction.
+        #
+        # No LLM call: a small curated set of (pronoun, predicate) pairs.
+        # kiwi.join() handles the irregular pronoun+가 contraction
+        # correctly by construction (저+가->제가, 나+가->내가) -- the
+        # DISTRACTOR (저는/나는) is also built via kiwi.join(), not string
+        # concatenation, specifically to avoid the trap of literally
+        # gluing "제" (the contracted stem, only valid before 가) onto "는"
+        # and producing the invalid "*제는".
+        "kind": "subj_topic",
+        "tag": "JKS",
+        "distractor_tag": "JX",
+        "pairs": (
+            ("저", "커피를 마셔요"),
+            ("저", "책을 읽어요"),
+            ("나", "학교에 가요"),
+            ("나", "밥을 먹어요"),
+        ),
+    },
 }
 
 
@@ -406,6 +439,39 @@ class ExaoneGrammarProvider:
         self.items[item_id] = GeneratedItem(skill_id, template, "___", options, answer_label)
         return item_id
 
+    def _build_subj_topic_item(self, skill_id: str, spec: dict,
+                                pair: tuple[str, str]) -> str | None:
+        """subj_topic: correct_form is always the subject-marked (JKS)
+        answer to a 누가 question, built via kiwi.join() so the irregular
+        pronoun+가 contraction (저+가->제가) happens correctly; distractor
+        is the topic-marked (JX) form, also via kiwi.join() to avoid
+        gluing the wrong pronoun stem onto 는.
+        """
+        pronoun, predicate = pair
+        try:
+            subj_form = _KIWI.join([(pronoun, "NP"), ("가", "JKS")])
+            topic_form = _KIWI.join([(pronoun, "NP"), ("는", "JX")])
+        except Exception:
+            return None
+        if subj_form == topic_form:
+            return None
+
+        template = f"A: 누가 {predicate}? B: ___ {predicate}"
+        for form, tag in ((subj_form, spec["tag"]), (topic_form, spec["distractor_tag"])):
+            filled = template.replace("___", form, 1)
+            if not validate_postnominal_tag(filled, pronoun, tag).valid:
+                return None
+
+        labels = ["A", "B"]
+        self.rng.shuffle(labels)
+        answer_label, distractor_label = labels
+        options = {answer_label: subj_form, distractor_label: topic_form}
+
+        item_id = f"grammar-{skill_id}-{self._counter}"
+        self._counter += 1
+        self.items[item_id] = GeneratedItem(skill_id, template, "___", options, answer_label)
+        return item_id
+
     def _build_paired_particle_item(self, skill_id: str, spec: dict,
                                      pair: tuple[str, str, str]) -> str | None:
         """time_range-style skills: the second half of the pair ("...까지")
@@ -452,6 +518,10 @@ class ExaoneGrammarProvider:
         if spec.get("kind") == "adj_relativizer":
             pair = self.rng.choice(spec["pairs"])
             return self._build_adj_item(skill_id, spec, pair)
+
+        if spec.get("kind") == "subj_topic":
+            pair = self.rng.choice(spec["pairs"])
+            return self._build_subj_topic_item(skill_id, spec, pair)
 
         slot = self.rng.choice(spec["slots"])
         verb_lemma = spec["verb_lookup"].get(slot) or self._pick_verb_lemma(spec["verb_prompt"], slot)
@@ -505,7 +575,7 @@ if __name__ == "__main__":
     provider = ExaoneGrammarProvider(seed=0)
 
     for skill_id in ("particle_loc", "particle_obj", "honorific", "time_range", "tense_past",
-                     "irregular_conj", "adj_relativizer"):
+                     "irregular_conj", "adj_relativizer", "subj_topic"):
         successes = 0
         for _ in range(5):
             item_id = provider.next_new_grammar_item(skill_id)
@@ -541,6 +611,13 @@ if __name__ == "__main__":
                         f"the distractor must be the verb-pattern '는' overgeneralization, got {item}")
                     assert item.options[item.answer] in ("매운", "작은", "큰", "긴", "예쁜", "비싼"), (
                         f"the correctly-contracted adjective form must be correct, got {item}")
+                if skill_id == "subj_topic":
+                    distractor_label = next(l for l in item.options if l != item.answer)
+                    assert item.options[item.answer] != item.options[distractor_label]
+                    assert item.options[item.answer] in ("제가", "내가"), (
+                        f"the subject-marked (JKS) form must be the correct answer to a 누가 question, got {item}")
+                    assert item.options[distractor_label] in ("저는", "나는"), (
+                        f"the topic-marked (JX) form must be the distractor, got {item}")
         print(f"{skill_id}: {successes}/5 generations succeeded")
         assert successes >= 4, f"{skill_id}: expected the validated pipeline to succeed reliably, got {successes}/5"
 
