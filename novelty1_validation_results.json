@@ -1,0 +1,73 @@
+{
+  "n_per_skill": 20,
+  "seed": 0,
+  "per_skill": {
+    "particle_loc": {
+      "attempts": 20,
+      "generation_pass": 20,
+      "critic_attempts": 0,
+      "critic_recoveries": 0,
+      "solver_checked": 20,
+      "solver_key_accepted": 17
+    },
+    "particle_obj": {
+      "attempts": 20,
+      "generation_pass": 20,
+      "critic_attempts": 0,
+      "critic_recoveries": 0,
+      "solver_checked": 20,
+      "solver_key_accepted": 19
+    },
+    "honorific": {
+      "attempts": 20,
+      "generation_pass": 20,
+      "critic_attempts": 0,
+      "critic_recoveries": 0,
+      "solver_checked": 20,
+      "solver_key_accepted": 20
+    },
+    "time_range": {
+      "attempts": 20,
+      "generation_pass": 20,
+      "critic_attempts": 0,
+      "critic_recoveries": 0,
+      "solver_checked": 20,
+      "solver_key_accepted": 13
+    },
+    "tense_past": {
+      "attempts": 20,
+      "generation_pass": 20,
+      "critic_attempts": 0,
+      "critic_recoveries": 0,
+      "solver_checked": 20,
+      "solver_key_accepted": 20
+    },
+    "irregular_conj": {
+      "attempts": 20,
+      "generation_pass": 20,
+      "critic_attempts": 0,
+      "critic_recoveries": 0,
+      "solver_checked": 20,
+      "solver_key_accepted": 1
+    },
+    "adj_relativizer": {
+      "attempts": 20,
+      "generation_pass": 20,
+      "critic_attempts": 0,
+      "critic_recoveries": 0,
+      "solver_checked": 20,
+      "solver_key_accepted": 20
+    },
+    "subj_topic": {
+      "attempts": 20,
+      "generation_pass": 20,
+      "critic_attempts": 0,
+      "critic_recoveries": 0,
+      "solver_checked": 20,
+      "solver_key_accepted": 7
+    }
+  },
+  "overall_generation_pass_rate": 1.0,
+  "overall_critic_recovery_rate": null,
+  "overall_solver_key_accept_rate": 0.73125
+}
