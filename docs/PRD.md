@@ -791,6 +791,105 @@ kerja berikutnya yang lebih bernilai riset daripada admin/LMS CRUD/
 EXP/leaderboard — tapi itu pun sudah soal prioritas berikutnya, bukan
 pekerjaan sesi ini.
 
+### 9.13 Eksperimen §3.1 dikerjakan — hasil TIDAK sesuai klaim di bawah Urnings, tapi menjelaskan KENAPA, dan memperkuat keputusan Urnings dari sudut baru
+
+Dikerjakan tepat setelah §9.12: bukti minimal yang diminta §3.1
+("encoder prior konvergen lebih cepat ke rating sebenarnya dibanding
+prior seragam"). Tiga simulasi berurutan, masing-masing dibangun di
+atas temuan simulasi sebelumnya — bukan satu eksperimen tunggal yang
+langsung berhasil, dicatat apa adanya termasuk jalan buntu dan bug
+yang ditemukan sendiri di tengah jalan.
+
+**Simulasi 1 — `src/simulate_item_prior.py`, pool tetap (pola
+`simulate_trackers.py`: 400 item, 120.000 respons, ~300 respons/item).**
+Hasil pertama (1 seed) terlihat prior encoder justru memperburuk RMSE —
+ternyata ada *confound* nyata di desain sendiri: `sigma_hat2` yang
+tetap (mengikuti perilaku asli `difficulty_heuristic.py`, yang memang
+sengaja tidak pernah mengubah keyakinannya) membuat urn item ber-prior
+selalu berukuran n=26, BEDA dari baseline netral yang n=32 — jadi yang
+awalnya kelihatan "prior encoder tidak membantu" sebagian cuma efek
+"urn lebih kecil = lebih tidak stabil", bukan soal posisi prior itu
+sendiri. Diperbaiki dengan kondisi "position only" (prior encoder,
+tapi n dipaksa 32 sama seperti baseline) + diulang 8 kali (bukan 1
+seed) karena satu draw YANG SUDAH TERBUKTI terlalu berisik (lihat
+§9.12). Hasil setelah diperbaiki: **tidak ada keunggulan jelas di
+RMSE@2000 maupun RMSE@final untuk kualitas sinyal manapun (korelasi
+0.96/0.78/0.47 terhadap beta sebenarnya) — semua kondisi overlap dalam
+rentang noise satu sama lain, baseline netral sedikit lebih baik di
+RMSE@final.**
+
+**Simulasi 2 — `src/simulate_item_coldstart.py`, pool TUMBUH
+(bukan tetap).** Dugaan: regime pool-tetap tidak mewakili aplikasi
+nyata — item di sini terus-menerus baru digenerate (`exaone_provider.py`
++ `question_bank.py`), rata-rata respons per item jauh lebih sedikit
+daripada 300. Dibangun regime baru: pool mulai dari 20 item, +1 item
+baru tiap 20 respons, berakhir di ~6020 item (~20 respons/item
+rata-rata) — lebih dekat ke kondisi nyata. Hasil: **pola TIDAK
+monoton dan membingungkan** — sinyal LEMAH (noise_std=2.0, nyaris
+tidak informatif) justru RMSE@final-nya PALING BAIK (0.51), mengalahkan
+baik netral (0.61) maupun sinyal KUAT (0.63). Dicurigai (belum
+dikonfirmasi penuh) ini efek saturasi: noise besar mendorong lebih
+banyak item ke k0 ekstrem (0 atau 32) lewat transformasi
+sigmoid+pembulatan+clipping, yang berinteraksi secara tidak terduga
+dengan `pick_adaptive`.
+
+**Simulasi 3 — `src/simulate_item_coldstart_elo.py`, regime sama,
+tracker Elo/Parallel Elo.** User eksplisit mengangkat pertanyaan yang
+tepat: apakah pola membingungkan di Urnings itu soal mekanisme
+ball-exchange Urnings secara spesifik (lihat temuan §9.12: arah
+pergerakan per-langkah Urnings memang berlawanan intuisi), bukan soal
+"apakah prior-injection berguna" secara umum — diuji langsung,
+bukan diasumsikan. Injeksi prior ke Elo jauh lebih langsung (bh0 =
+beta prediksi, angka kontinu, tanpa transformasi sigmoid/pembulatan
+Urnings). Hasil **jelas dan monoton, beda total dari Urnings:**
+
+| Tracker | Kondisi | RMSE@2000 | RMSE@final |
+|---|---|---|---|
+| Elo | netral | 0.7747 | **0.6029** |
+| Elo | kuat (noise=0.3) | **0.7369** | 0.6248 |
+| Elo | sedang (noise=0.8) | 0.7447 | 0.8489 |
+| Elo | lemah (noise=2.0) | 0.7524 | **2.0871** |
+| Parallel Elo | netral | 0.8503 | **0.3125** |
+| Parallel Elo | kuat | **0.8203** | 0.3903 |
+| Parallel Elo | sedang | 0.8309 | 0.5936 |
+| Parallel Elo | lemah | 0.8282 | **1.7693** |
+
+Prior yang BAGUS memang membantu konvergensi awal di Elo, jelas dan
+monoton (sesuai intuisi/klaim §3.1) — tapi prior yang SALAH (bahkan
+cuma "lemah", bukan ekstrem) membuat RMSE akhir MELEDAK jauh lebih
+buruk daripada mulai netral sama sekali (1.77–2.09 vs 0.31–0.60).
+**Penjelasan:** Elo tidak punya mekanisme "seberapa percaya diri" —
+tiap item di-update dengan langkah tetap (`K=0.3`) terlepas dari
+apakah tebakan awalnya meyakinkan atau kasar; item yang salah
+kalibrasi ikut merusak estimasi SETIAP siswa yang menjawabnya sampai
+cukup banyak data mengoreksinya. Urnings punya `sigma_hat2` yang
+secara eksplisit mengecilkan urn (bobot prior) kalau tidak yakin —
+itulah yang membuat perilakunya "datar"/tidak dramatis di Simulasi
+1 & 2: bukan gagal memanfaatkan prior bagus, tapi SENGAJA membatasi
+seberapa besar pengaruh prior (bagus ATAUPUN jelek).
+
+**Kesimpulan jujur (bukan klaim sukses, bukan juga klaim gagal
+total):** bukti minimal §3.1 ("prior encoder konvergen lebih cepat")
+**TIDAK terbukti untuk Urnings** pada regime yang diuji — ini dicatat
+apa adanya, tidak ditutupi. TAPI eksperimen Elo menjelaskan KENAPA,
+dan sekaligus memberi alasan baru dan independen untuk tetap pakai
+Urnings (terlepas dari alasan Novelty 1/3 yang sudah ada di §2.1/§8):
+karena `difficulty_heuristic.py` sendiri eksplisit "tidak terkalibrasi
+ke skala kesulitan nyata manapun", meng-inject prior yang BELUM
+TENTU akurat ini lewat mekanisme Urnings jauh lebih aman (risiko
+kecil kalau prior ternyata salah) dibanding lewat mekanisme Elo
+(risiko BESAR, terbukti meledak di simulasi). Urnings dipertahankan
+BUKAN karena manfaat besar yang terbukti, tapi karena sifat
+"aman-terhadap-prior-yang-salah" yang baru terbukti konkret lewat
+perbandingan ini — klaim §3.1 di PRD/paper perlu direvisi melunak
+jadi ini (robustness, bukan speedup konvergensi tervalidasi), bukan
+dibiarkan mengklaim manfaat yang belum terbukti.
+
+**Belum dikerjakan (dicatat, bukan diabaikan):** pola non-monoton di
+Simulasi 2 (dugaan efek saturasi k0 ekstrem) belum dikonfirmasi akar
+penyebabnya secara pasti. Critic loop Novelty 2 masih murni narasi
+paper, belum disentuh.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
