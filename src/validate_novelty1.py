@@ -167,7 +167,7 @@ if __name__ == "__main__":
     parser.add_argument("--n-per-skill", type=int, default=20,
                          help="generation attempts per skill (default: 20, i.e. 160 total)")
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--out", default="novelty1_validation_results.json",
+    parser.add_argument("--out", default="1_validation_results.json",
                          help="where to write the full results as JSON")
     parser.add_argument("--n-examples", type=int, default=2,
                          help="example items to print per skill (full question + options + "
