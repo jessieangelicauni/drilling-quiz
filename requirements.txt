@@ -1,0 +1,13 @@
+numpy==2.5.4
+fsrs==6.3.2
+matplotlib==3.11.2
+python-docx==1.2.0
+
+# content generation / validation (PRD §2.3, §3.2) -- torch needs CUDA 12.4
+# wheels: pip install torch --index-url https://download.pytorch.org/whl/cu124
+torch==2.6.0+cu124
+transformers==5.20.1
+accelerate==1.15.0
+safetensors==0.8.0
+kiwipiepy==0.24.0
+kiwipiepy_model==0.24.0

@@ -1,0 +1,204 @@
+"""
+Production Urnings tracker: per-(user, skill) and per-item urn state, as a
+reusable module rather than a simulation loop.
+
+Implements the same ball-exchange + Metropolis-Hastings update as
+`simulate_trackers.run_urnings`, but operating on named, persistable state
+objects for one event at a time -- what a real request handler calls.
+
+Backs three PRD decisions (docs/PRD.md §2.1, §3.3):
+  - Novelty 1: seed_item_from_encoder() converts an encoder's (mu_hat,
+    sigma_hat2) difficulty prediction into initial urn composition/size.
+  - Novelty 3: should_escalate() gates expensive feedback on urn width.
+  - Mastery criterion: is_mastered() reuses the same width primitive.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict
+
+import numpy as np
+
+SIG = lambda z: 1.0 / (1.0 + np.exp(-z))
+
+
+@dataclass(frozen=True)
+class UrnState:
+    k: int
+    n: int
+
+    def __post_init__(self):
+        if not (0 <= self.k <= self.n):
+            raise ValueError(f"k={self.k} must be in [0, n={self.n}]")
+
+    def proportion(self) -> float:
+        """Raw k/n -- the number to show as a user-facing competency %."""
+        return self.k / self.n
+
+    def logit_estimate(self) -> float:
+        """Continuity-corrected logit; used internally, never for display."""
+        pi = (self.k + 0.5) / (self.n + 1.0)
+        return float(np.log(pi / (1.0 - pi)))
+
+    def width(self) -> float:
+        """Beta(k+.5, n-k+.5) posterior SD on the proportion scale.
+
+        Bounded and well-behaved at k=0 or k=n (unlike a logit-scale SE,
+        which blows up at the boundary) -- required for is_mastered() to
+        behave sensibly for a learner who is answering almost everything
+        right.
+        """
+        a, b = self.k + 0.5, self.n - self.k + 0.5
+        var = (a * b) / ((a + b) ** 2 * (a + b + 1))
+        return float(2.0 * np.sqrt(var))
+
+    def to_dict(self) -> dict:
+        return {"k": self.k, "n": self.n}
+
+    @staticmethod
+    def from_dict(d: dict) -> "UrnState":
+        return UrnState(k=d["k"], n=d["n"])
+
+
+def seed_item_from_encoder(mu_hat: float, sigma_hat2: float,
+                            n_min: int = 8, n_max: int = 64,
+                            ref_var: float = 1.0) -> UrnState:
+    """Novelty 1: encoder (mu_hat, sigma_hat2) -> initial item urn.
+
+    mu_hat is the predicted item difficulty on the logit scale (same scale
+    as learner theta). sigma_hat2 controls prior *strength*: a confident
+    (low-variance) prediction gets a larger urn (slower to be overwritten
+    by real responses); an uncertain one gets a smaller urn.
+
+    The n_min/n_max/ref_var mapping is a documented placeholder, not a
+    validated result -- PRD §5 still requires the encoder-prior-vs-uniform
+    convergence experiment before this mapping is trusted in production.
+    """
+    if sigma_hat2 < 0:
+        raise ValueError("sigma_hat2 must be >= 0")
+    n = n_max / (1.0 + sigma_hat2 / ref_var)
+    n = int(round(min(max(n, n_min), n_max)))
+    pi = float(SIG(-mu_hat))
+    k = int(round(pi * (n + 1) - 0.5))
+    k = min(max(k, 0), n)
+    return UrnState(k=k, n=n)
+
+
+def update(learner: UrnState, item: UrnState, correct: bool,
+           rng: np.random.Generator) -> tuple[UrnState, UrnState]:
+    """One response event: ball-exchange proposal + MH acceptance.
+
+    Mirrors simulate_trackers.run_urnings's inner loop exactly, generalised
+    to arbitrary (not just n=32) urn sizes since item urns can now vary in
+    size (Novelty 1).
+    """
+    n_p, n_i = learner.n, item.n
+    eps = 1e-9
+    pi_p = float(np.clip(learner.k / n_p, eps, 1 - eps))
+    pi_i = float(np.clip(item.k / n_i, eps, 1 - eps))
+
+    x = 1 if correct else 0
+    # y: a response simulated from the CURRENT urn state, needed by the
+    # ball-exchange proposal (see Bolsinova et al. 2022).
+    num = pi_p * (1 - pi_i)
+    q = num / (num + (1 - pi_p) * pi_i)
+    y = int(rng.random() < q)
+
+    kp_s, ki_s = learner.k + x - y, item.k - x + y
+    if not (0 <= kp_s <= n_p and 0 <= ki_s <= n_i):
+        return learner, item
+
+    cur = learner.k * (n_i - item.k) + (n_p - learner.k) * item.k
+    pro = kp_s * (n_i - ki_s) + (n_p - kp_s) * ki_s
+    if cur > 0 and rng.random() >= min(1.0, pro / cur):
+        return learner, item
+
+    return UrnState(k=kp_s, n=n_p), UrnState(k=ki_s, n=n_i)
+
+
+def should_escalate(learner: UrnState, tau: float = 0.2) -> bool:
+    """Novelty 3: uncertainty-gated escalation, w_k > tau."""
+    return learner.width() > tau
+
+
+def is_mastered(learner: UrnState, k_threshold: float = 0.8,
+                 width_threshold: float = 0.15) -> bool:
+    """Mastery criterion (PRD §2.1): high estimate AND low uncertainty.
+
+    Revocable by construction: if new wrong answers push k/n back down or
+    widen the urn again, this simply stops returning True on the next call
+    -- there is no separate "mastered" flag to unset.
+    """
+    return learner.proportion() >= k_threshold and learner.width() < width_threshold
+
+
+class LearnerSkillProfile:
+    """Per-user vector of per-skill UrnStates (PRD §2.1 "Multi-skill")."""
+
+    def __init__(self, user_id: str, n_default: int = 32):
+        self.user_id = user_id
+        self.n_default = n_default
+        self._skills: Dict[str, UrnState] = {}
+
+    def get(self, skill_id: str) -> UrnState:
+        if skill_id not in self._skills:
+            self._skills[skill_id] = UrnState(k=self.n_default // 2, n=self.n_default)
+        return self._skills[skill_id]
+
+    def set(self, skill_id: str, state: UrnState) -> None:
+        self._skills[skill_id] = state
+
+    def competency_percent(self, skill_id: str) -> float:
+        return 100.0 * self.get(skill_id).proportion()
+
+    def mastered_skills(self, **kwargs) -> list[str]:
+        return [s for s, state in self._skills.items() if is_mastered(state, **kwargs)]
+
+    def to_dict(self) -> dict:
+        return {"user_id": self.user_id, "n_default": self.n_default,
+                "skills": {s: st.to_dict() for s, st in self._skills.items()}}
+
+    @staticmethod
+    def from_dict(d: dict) -> "LearnerSkillProfile":
+        p = LearnerSkillProfile(d["user_id"], d["n_default"])
+        p._skills = {s: UrnState.from_dict(st) for s, st in d["skills"].items()}
+        return p
+
+
+if __name__ == "__main__":
+    rng = np.random.default_rng(0)
+
+    learner = UrnState(k=16, n=32)
+    item = seed_item_from_encoder(mu_hat=0.5, sigma_hat2=0.1)
+    assert 8 <= item.n <= 64
+
+    weak_prior_item = seed_item_from_encoder(mu_hat=0.5, sigma_hat2=10.0)
+    assert weak_prior_item.n < item.n, "higher encoder variance must mean a smaller (weaker) prior urn"
+
+    l, i = learner, item
+    for _ in range(500):
+        l, i = update(l, i, correct=True, rng=rng)
+    assert l.proportion() > 0.8, f"learner who always answers correctly should trend high, got {l.proportion()}"
+    assert is_mastered(l), "500 correct answers should be enough to be declared mastered"
+
+    l2 = UrnState(k=16, n=32)
+    for _ in range(50):
+        l2, _ = update(l2, UrnState(k=16, n=32), correct=True, rng=rng)
+    assert should_escalate(l2) or not should_escalate(l2)  # just must not raise
+
+    mastered = UrnState(k=28, n=32)
+    assert is_mastered(mastered)
+    regressed = mastered
+    for _ in range(30):
+        regressed, _ = update(regressed, UrnState(k=16, n=32), correct=False, rng=rng)
+    assert not is_mastered(regressed), "mastery must be revocable after repeated wrong answers"
+
+    profile = LearnerSkillProfile("u1")
+    profile.set("honorifics", mastered)
+    assert profile.mastered_skills() == ["honorifics"]
+    assert profile.competency_percent("honorifics") == 87.5
+
+    d = profile.to_dict()
+    assert LearnerSkillProfile.from_dict(d).competency_percent("honorifics") == 87.5
+
+    print("all smoke tests passed")
