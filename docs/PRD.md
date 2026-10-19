@@ -582,6 +582,78 @@ Hasil: 5/5 berhasil (`불러요`/`부르어요`, `몰라요`/`모르어요`,
 **3 dari 7 kode kelas-POS relevan** (PART, END, CONJ) — sisa: **VERB,
 ADJ, NOUN, MOD**.
 
+### 9.10 Skill ketujuh: `adj_relativizer` — kategori ADJ, lalu KEPUTUSAN: berhenti mengejar cakupan 7 kode penuh
+
+Ditambahkan skill ke-7, target: **ADJ** — akhiran relativiser
+`-(으)ㄴ` pada adjektiva (형용사), mis. `맵다→매운` (bukan `*맵는`),
+dikontraskan dengan kesalahan umum pembelajar: memakai akhiran
+bergaya-verba `-는` pada stem adjektiva.
+
+**Pertama kali blank-nya BUKAN di akhir kalimat** — semua skill
+sebelumnya (`honorific`, `tense_past`) punya blank di akhir kalimat
+(`validate_sentence_final_tag` cukup). Di sini blank ada di TENGAH
+kalimat, mengubah kata benda yang mengikutinya (`"___ 음식을
+좋아해요"`) — butuh validator baru, `validate_prenominal_tag()` di
+`distractor_validator.py` (cek tag morfem tepat sebelum kata benda
+tertentu, bukan tag morfem akhir kalimat).
+
+**Bug nyata ditemukan sebelum kode final** (diuji empiris langsung di
+kiwipiepy terinstal, bukan diasumsikan dari dokumentasi): akhiran
+`-(으)ㄴ` pada stem tanpa batchim direpresentasikan kiwipiepy sebagai
+**karakter jongseong gabung** (U+11AB, tercetak `ᆫ`), BUKAN huruf
+`ㄴ` mandiri (U+3134) yang terlihat identik secara visual tapi
+codepoint berbeda. Percobaan pertama pakai `ㄴ` mandiri menghasilkan
+`kiwi.join()` yang diam-diam GAGAL — bukan error, tapi sekadar
+menempel dua karakter jadi string rusak (`"크ㄴ"`, bukan `"큰"`).
+Baru ketahuan setelah membandingkan langsung dengan morfem yang
+diekstrak dari `kiwi.analyze()` pada bentuk yang sudah diketahui
+benar. Setelah pakai codepoint yang benar: `kiwi.join()` menangani
+SEMUA tak-beraturan dengan benar (ㅂ-irregular `맵다→매운`,
+ㄹ-irregular `길다→긴`, stem-`으` `크다→큰`/`예쁘다→예쁜`) — juga diuji
+dan dikonfirmasi: tag `VA` vs `VA-I` (bentuk tak-beraturan) TIDAK
+mempengaruhi hasil `kiwi.join()` sama sekali, jadi tidak perlu deteksi
+tak-beraturan eksplisit (simplifikasi yang sama seperti tag `VV`
+seragam untuk verba di skill lain).
+
+Tidak ada panggilan LLM — 6 pasangan (adjektiva, kata benda yang
+cocok secara semantik) dikurasi langsung, sama seperti `irregular_conj`.
+Hasil: 5/5 berhasil.
+
+**Keputusan setelah skill ini: BERHENTI mengejar "7 dari 7 kode
+KAGAS lengkap".** Dibahas eksplisit dengan user (bukan diputuskan
+sepihak) — kesimpulannya:
+1. Klaim paper (Novelty 2) cuma butuh taksonomi yang dipakai memang
+   kode KAGAS asli (sudah benar sejak §9.8), BUKAN klaim cakupan
+   lengkap semua kode — jadi tidak ada keharusan akademik untuk
+   menyelesaikan VERB/NOUN/MOD.
+2. `adj_relativizer` menambah pola struktural baru yang genuinely
+   belum ada (blank di tengah kalimat, bukan di akhir) — nilai nyata
+   untuk klaim generalisasi paper. VERB/NOUN/MOD TIDAK akan menambah
+   pola struktural baru — ketiganya soal pemilihan kata/leksikal
+   (semantik), bukan soal bentuk/morfologi seperti 7 skill yang sudah
+   ada. Validator deterministik yang terbukti (cek tag, aturan
+   batchim, `kiwi.join()`) tidak otomatis nyambung ke "apakah pilihan
+   kata ini masuk akal secara makna" — itu butuh baik kurasi
+   pasangan-kata closed-set (nilai tambah kecil, pola sama seperti
+   `irregular_conj`) ATAU critic-loop LLM-as-judge yang sudah
+   DIDESAIN di §3.2 tapi BELUM diimplementasikan sama sekali
+   (investasi jauh lebih besar).
+3. Alternatif "pakai yang sudah pretrained/korpus existing" (model
+   GEC terlatih, atau korpus KAGAS asli Kor-Learner/Kor-Native/
+   Kor-Lang8) dipertimbangkan dan ditolak untuk tahap ini: model GEC
+   menyelesaikan tugas TERBALIK (memperbaiki, bukan membangun
+   distractor terkontrol); korpus KAGAS asli berlisensi riset-saja
+   (NIKL, bukan untuk pemakaian produksi) dan errornya "ditemukan apa
+   adanya" dari esai bebas, bukan pasangan pilihan-ganda bersih yang
+   dibutuhkan tracking per-skill Urnings.
+
+**Status akhir cakupan KAGAS (TIDAK akan ditambah lagi tanpa alasan
+baru):** 7 skill menutupi **4 dari 7 kode kelas-POS relevan** (PART,
+END, CONJ, ADJ). VERB/NOUN/MOD dicatat eksplisit sebagai **diputuskan
+tidak dikerjakan sekarang, bukan dilupakan** — sama gaya keputusan
+seperti infra ditunda di §9.3. Fokus pindah ke gap aplikasi yang
+masih nol: admin/LMS CRUD atau EXP/leaderboard (§9.4).
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

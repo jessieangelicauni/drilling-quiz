@@ -69,10 +69,12 @@ from kiwipiepy import Kiwi
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from distractor_validator import (
+    adj_relativizer_ending,
     expected_object_particle,
     harmony_positive,
     honorific_ending,
     validate_cloze_option,
+    validate_prenominal_tag,
     validate_sentence_final_tag,
 )
 
@@ -221,6 +223,41 @@ SKILL_SPECS = {
             ("노래를", "부르다"),
         ),
     },
+    "adj_relativizer": {
+        # KAGAS category ADJ (§9.8/§9.10): errors specific to adjectives
+        # (형용사/VA), as opposed to honorific/tense_past which are both
+        # verb-ending (END) errors. The blank here is the -(으)ㄴ
+        # adjective-relativizer ending ("매운 음식" = spicy food), modifying
+        # a FOLLOWING noun -- structurally new vs every skill so far, whose
+        # blank was either a single particle or a whole word at the
+        # SENTENCE'S END. validate_sentence_final_tag doesn't apply; this
+        # uses the new validate_prenominal_tag instead.
+        #
+        # No LLM call: like irregular_conj, the adjective itself is a
+        # small curated closed set here (not a vocabulary-choice task), so
+        # each (adjective, matching noun) pair is hand-picked for semantic
+        # plausibility ("매운 음식" makes sense, "매운 가방" doesn't).
+        #
+        # Correctness comes entirely from construction, not from a tag
+        # difference: the common learner error (는, the VERB-pattern
+        # relativizer wrongly generalized onto an adjective stem) parses
+        # as the SAME tag (ETM) as the correct 은/ᆫ form -- verified
+        # empirically (kiwipiepy's tagger doesn't discriminate stem class
+        # here, same permissiveness noted elsewhere in this codebase).
+        # correct_form is always built via kiwi.join() (which applies
+        # ㅂ/ㄹ/으 irregular contractions correctly by construction);
+        # distractor_form is always the hand-built stem+는 concatenation.
+        "kind": "adj_relativizer",
+        "tag": "ETM",
+        "pairs": (
+            ("맵다", "음식"),    # ㅂ-irregular: 매운, not *맵는
+            ("작다", "가방"),    # regular batchim: 작은, not *작는
+            ("크다", "집"),      # 으-stem, no batchim: 큰, not *크는
+            ("길다", "머리"),    # ㄹ-irregular: 긴, not *길는
+            ("예쁘다", "옷"),    # 으-stem, no batchim: 예쁜, not *예쁘는
+            ("비싸다", "시계"),  # regular, no batchim: 비싼, not *비싸는
+        ),
+    },
 }
 
 
@@ -332,6 +369,43 @@ class ExaoneGrammarProvider:
         template = f"저는 {obj} ___."
         return self._build_whole_word_item(skill_id, spec, template, correct_form, distractor_form)
 
+    def _build_adj_item(self, skill_id: str, spec: dict,
+                         pair: tuple[str, str]) -> str | None:
+        """adj_relativizer: correctness comes from kiwi.join()'s irregular
+        contraction (always right, by construction, same division of
+        responsibility as irregular_conj) vs a hand-built verb-style "는"
+        ending wrongly generalized onto an adjective stem. The blank
+        modifies a FOLLOWING noun, not the sentence's end, so this uses
+        validate_prenominal_tag instead of _build_whole_word_item's
+        validate_sentence_final_tag.
+        """
+        adj_lemma, noun = pair
+        stem = adj_lemma[:-1]
+        try:
+            correct_form = _KIWI.join([(stem, "VA"), (adj_relativizer_ending(stem), "ETM")])
+        except Exception:
+            return None
+        distractor_form = stem + "는"
+        if correct_form == distractor_form:
+            return None
+
+        particle = expected_object_particle(noun)
+        template = f"저는 ___ {noun}{particle} 좋아해요."
+        for form in (correct_form, distractor_form):
+            filled = template.replace("___", form, 1)
+            if not validate_prenominal_tag(filled, noun, spec["tag"]).valid:
+                return None
+
+        labels = ["A", "B"]
+        self.rng.shuffle(labels)
+        answer_label, distractor_label = labels
+        options = {answer_label: correct_form, distractor_label: distractor_form}
+
+        item_id = f"grammar-{skill_id}-{self._counter}"
+        self._counter += 1
+        self.items[item_id] = GeneratedItem(skill_id, template, "___", options, answer_label)
+        return item_id
+
     def _build_paired_particle_item(self, skill_id: str, spec: dict,
                                      pair: tuple[str, str, str]) -> str | None:
         """time_range-style skills: the second half of the pair ("...까지")
@@ -374,6 +448,10 @@ class ExaoneGrammarProvider:
         if spec.get("kind") == "irregular_conj":
             pair = self.rng.choice(spec["pairs"])
             return self._build_irregular_conj_item(skill_id, spec, pair)
+
+        if spec.get("kind") == "adj_relativizer":
+            pair = self.rng.choice(spec["pairs"])
+            return self._build_adj_item(skill_id, spec, pair)
 
         slot = self.rng.choice(spec["slots"])
         verb_lemma = spec["verb_lookup"].get(slot) or self._pick_verb_lemma(spec["verb_prompt"], slot)
@@ -426,7 +504,8 @@ class ExaoneGrammarProvider:
 if __name__ == "__main__":
     provider = ExaoneGrammarProvider(seed=0)
 
-    for skill_id in ("particle_loc", "particle_obj", "honorific", "time_range", "tense_past", "irregular_conj"):
+    for skill_id in ("particle_loc", "particle_obj", "honorific", "time_range", "tense_past",
+                     "irregular_conj", "adj_relativizer"):
         successes = 0
         for _ in range(5):
             item_id = provider.next_new_grammar_item(skill_id)
@@ -455,6 +534,13 @@ if __name__ == "__main__":
                     assert item.options[item.answer] != item.options[distractor_label]
                     assert item.options[item.answer] in ("잘라요", "몰라요", "불러요"), (
                         f"the irregular-contracted form must be correct, got {item}")
+                if skill_id == "adj_relativizer":
+                    distractor_label = next(l for l in item.options if l != item.answer)
+                    assert item.options[item.answer] != item.options[distractor_label]
+                    assert item.options[distractor_label].endswith("는"), (
+                        f"the distractor must be the verb-pattern '는' overgeneralization, got {item}")
+                    assert item.options[item.answer] in ("매운", "작은", "큰", "긴", "예쁜", "비싼"), (
+                        f"the correctly-contracted adjective form must be correct, got {item}")
         print(f"{skill_id}: {successes}/5 generations succeeded")
         assert successes >= 4, f"{skill_id}: expected the validated pipeline to succeed reliably, got {successes}/5"
 

@@ -134,6 +134,58 @@ def validate_sentence_final_tag(sentence: str, expected_tag: str) -> ValidationR
     return ValidationResult(False, f"sentence-final morpheme {form!r} parses as {tag}, not {expected_tag}")
 
 
+def validate_prenominal_tag(sentence: str, following_word: str, expected_tag: str) -> ValidationResult:
+    """Does the morpheme immediately before `following_word` (a noun the
+    option is modifying) carry `expected_tag`?
+
+    Needed for KAGAS's ADJ category (§9.10): the adjective-relativizer
+    blank ("___ 음식을 좋아해요") isn't at the sentence's end like every
+    other whole-word skill so far (honorific, tense_past) -- it's in the
+    middle, modifying a following noun -- so validate_sentence_final_tag
+    doesn't apply. Mirrors that function's approach (check a tag at a
+    structural position, not a literal string match, since the option
+    spans multiple morphemes) but anchored to the following noun instead
+    of the end of the sentence.
+
+    Note: both the correct form (은/ᆫ) and the common learner error (는,
+    the verb-style ending wrongly generalized onto an adjective stem) tag
+    as ETM here -- kiwipiepy's tagger is permissive about which stem class
+    an ETM attaches to (same permissiveness documented in
+    correct_korean_conjugation's docstring). This validator only catches a
+    structurally broken option (e.g. not a relativizer at all); it cannot
+    and is not meant to distinguish adjective-correct from verb-pattern-
+    wrong by tag alone -- that correctness comes from which bucket the
+    caller puts a form in (built via kiwi.join() vs hand-built), the same
+    division of responsibility as irregular_conj's correct/distractor pair.
+    """
+    tokens = all_morph_tags(sentence)
+    idx = next((i for i, (form, tag) in enumerate(tokens)
+                if form == following_word and tag.startswith("NN")), None)
+    if idx is None or idx == 0:
+        return ValidationResult(False, f"{following_word!r} not found as a noun token with a preceding morpheme")
+    form, tag = tokens[idx - 1]
+    if tag == expected_tag:
+        return ValidationResult(True, f"morpheme {form!r} right before {following_word!r} parses as {expected_tag}")
+    return ValidationResult(False, f"morpheme {form!r} right before {following_word!r} parses as {tag}, not {expected_tag}")
+
+
+def adj_relativizer_ending(adj_stem: str) -> str:
+    """은 after a consonant-final (batchim) adjective stem, the combining
+    jongseong NIEUN (U+11AB, NOT the standalone letter ㄴ U+3134 -- a real
+    bug caught empirically: kiwi.join() silently fails to merge the
+    standalone letter into the preceding syllable, producing garbage like
+    "크ㄴ" instead of "큰") after a vowel-final one. Same batchim rule as
+    expected_object_particle/honorific_ending, applied to the -(으)ㄴ
+    adjective-relativizer ending. kiwi.join() then applies irregular-stem
+    contractions (ㅂ-irregular 맵다->매운, ㄹ-elision 길다->긴, 으-drop
+    예쁘다->예쁜) correctly regardless of whether the stem's tag is passed
+    as VA or VA-I -- verified empirically, so callers don't need to detect
+    irregularity themselves, same simplification already relied on for
+    verb tags elsewhere in this codebase.
+    """
+    return "은" if has_batchim(adj_stem) else "ᆫ"
+
+
 def honorific_ending(verb_stem: str) -> str:
     """으세요 after a consonant-final verb stem, 세요 after a vowel-final
     one -- same batchim rule as expected_object_particle, applied to a
@@ -242,5 +294,27 @@ if __name__ == "__main__":
     assert honorific_ending("가") == "세요", "가 ends in a vowel"
     assert _KIWI.join([("읽", "VV"), (honorific_ending("읽"), "EF")]) == "읽으세요"
     assert _KIWI.join([("가", "VV"), (honorific_ending("가"), "EF")]) == "가세요"
+
+    assert adj_relativizer_ending("작") == "은", "작 ends in a consonant batchim"
+    assert adj_relativizer_ending("크") == "ᆫ", "크 ends in a vowel"
+    assert _KIWI.join([("맵", "VA"), (adj_relativizer_ending("맵"), "ETM")]) == "매운", (
+        "ㅂ-irregular: must contract, not just concatenate"
+    )
+    assert _KIWI.join([("길", "VA"), (adj_relativizer_ending("길"), "ETM")]) == "긴", (
+        "ㄹ-irregular: must elide ㄹ before ETM, not just concatenate"
+    )
+    assert _KIWI.join([("예쁘", "VA"), (adj_relativizer_ending("예쁘"), "ETM")]) == "예쁜", (
+        "으-stem: must drop 으, not just concatenate"
+    )
+    assert _KIWI.join([("작", "VA"), (adj_relativizer_ending("작"), "ETM")]) == "작은"
+    # The real bug this guards against: using the standalone letter ㄴ (U+3134)
+    # instead of the combining jongseong NIEUN (U+11AB) silently fails to merge.
+    broken = _KIWI.join([("크", "VA"), ("ㄴ", "ETM")])
+    assert broken != "큰", "sanity check: confirms the wrong codepoint really does produce garbage, not 큰"
+
+    pren_ok = validate_prenominal_tag("저는 매운 음식을 좋아해요.", "음식", "ETM")
+    assert pren_ok.valid, "은/ᆫ relativizer right before a noun must validate structurally"
+    pren_bad = validate_prenominal_tag("저는 매운 음식을 좋아해요.", "없는단어", "ETM")
+    assert not pren_bad.valid, "a noun that doesn't appear in the sentence must fail, not silently pass"
 
     print("all smoke tests passed")
