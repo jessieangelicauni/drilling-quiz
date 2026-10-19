@@ -41,16 +41,25 @@ def particle_tags(sentence: str) -> list[tuple[str, str]]:
     return [(t.form, t.tag) for t in analysis if t.tag in PARTICLE_TAGS]
 
 
+def all_morph_tags(sentence: str) -> list[tuple[str, str]]:
+    """[(surface_form, tag), ...] for every morpheme, not just particles --
+    needed for skills whose blank is a verb ending (EF/EP), not a particle.
+    """
+    analysis = _KIWI.analyze(sentence)[0][0]
+    return [(t.form, t.tag) for t in analysis]
+
+
 def validate_cloze_option(stem_with_blank: str, blank_marker: str, option: str,
                            expected_tag: str) -> ValidationResult:
     """Does substituting `option` into the blank parse as `expected_tag`
-    (e.g. "JKB") at that position? Catches an option that isn't even the
-    right kind of particle for the grammar point being tested.
+    (e.g. "JKB", or "EF" for a verb-ending skill) at that position? Catches
+    an option that isn't even the right kind of morpheme for the grammar
+    point being tested.
     """
     if blank_marker not in stem_with_blank:
         raise ValueError(f"{blank_marker!r} not found in stem")
     filled = stem_with_blank.replace(blank_marker, option, 1)
-    tags_at_option = [tag for form, tag in particle_tags(filled) if form == option]
+    tags_at_option = [tag for form, tag in all_morph_tags(filled) if form == option]
     if expected_tag in tags_at_option:
         return ValidationResult(True, f"{option!r} parses as {expected_tag}, as expected")
     found = set(tags_at_option) or {"not analysed as a particle at all"}
@@ -83,6 +92,41 @@ def has_batchim(syllable: str) -> bool:
 def expected_object_particle(preceding_text: str) -> str:
     """을 after a consonant-final noun, 를 after a vowel-final one."""
     return "을" if has_batchim(preceding_text.strip()[-1]) else "를"
+
+
+def validate_sentence_final_tag(sentence: str, expected_tag: str) -> ValidationResult:
+    """Does the sentence's final predicate morpheme (the one right before
+    sentence-final punctuation, if any) carry `expected_tag`?
+
+    For options that are a WHOLE conjugated word (e.g. an honorific vs
+    plain verb ending), not a single particle: validate_cloze_option can't
+    be reused as-is, because it looks for a token whose FORM exactly
+    equals the option string, and kiwipiepy decomposes a conjugated verb
+    into multiple morphemes (stem + ending) -- no single token's form ever
+    equals the whole word. Checking the sentence-final morpheme's tag
+    instead works regardless of how many syllables the option spans.
+    """
+    tokens = all_morph_tags(sentence)
+    content = [t for t in tokens if t[1] != "SF"]
+    if not content:
+        return ValidationResult(False, "sentence has no content morphemes to check")
+    form, tag = content[-1]
+    if tag == expected_tag:
+        return ValidationResult(True, f"sentence-final morpheme {form!r} parses as {expected_tag}, as expected")
+    return ValidationResult(False, f"sentence-final morpheme {form!r} parses as {tag}, not {expected_tag}")
+
+
+def honorific_ending(verb_stem: str) -> str:
+    """으세요 after a consonant-final verb stem, 세요 after a vowel-final
+    one -- same batchim rule as expected_object_particle, applied to a
+    verb stem instead of a noun. kiwipiepy represents these as single
+    fused EF morphemes (not stem+EP"시"+EF"어요"), which is also why this
+    is the right pair to build with kiwi.join(), not the EP-insertion
+    route: join([(stem,"VV"),("시","EP"),("어요","EF")]) produces the
+    archaic/formal "셔요" contraction instead of the modern-standard
+    "세요" actually taught in TOPIK materials.
+    """
+    return "으세요" if has_batchim(verb_stem) else "세요"
 
 
 _HANGUL_SPAN = re.compile(r"[가-힣](?:[가-힣\s]*[가-힣])?[.!?]?")
@@ -162,5 +206,15 @@ if __name__ == "__main__":
             f"must be idempotent on already-correct text, got a change for {already_ok!r}")
     mixed = '**"저는 학교에서 수업을 듣어요"** (I have class at the school).'
     assert "들어요" in correct_korean_conjugation(mixed), "must fix Korean embedded inside English/markdown prose"
+
+    hon_check = validate_sentence_final_tag("선생님께서 가르치세요.", "EF")
+    assert hon_check.valid, "a whole conjugated verb ending in EF must validate via sentence-final tag"
+    bad_check = validate_sentence_final_tag("선생님께서 가르치는.", "EF")
+    assert not bad_check.valid, "a non-EF sentence-final morpheme must fail"
+
+    assert honorific_ending("읽") == "으세요", "읽 ends in a consonant batchim"
+    assert honorific_ending("가") == "세요", "가 ends in a vowel"
+    assert _KIWI.join([("읽", "VV"), (honorific_ending("읽"), "EF")]) == "읽으세요"
+    assert _KIWI.join([("가", "VV"), (honorific_ending("가"), "EF")]) == "가세요"
 
     print("all smoke tests passed")

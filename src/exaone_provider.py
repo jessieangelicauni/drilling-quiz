@@ -68,7 +68,12 @@ import torch
 from kiwipiepy import Kiwi
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from distractor_validator import expected_object_particle, validate_cloze_option
+from distractor_validator import (
+    expected_object_particle,
+    honorific_ending,
+    validate_cloze_option,
+    validate_sentence_final_tag,
+)
 
 _MODEL_NAME = "LGAI-EXAONE/EXAONE-4.0-1.2B"
 _KIWI = Kiwi()
@@ -82,6 +87,11 @@ _VERB_PROMPT_LOC = (
 _VERB_PROMPT_OBJ = (
     '"{slot}"와 자연스럽게 어울리는 한국어 동사(기본형, "다"로 끝나는 형태) 딱 하나만 써줘.\n'
     '예시: 입력 "밥" -> 출력 "먹다"\n'
+    "다른 설명 없이 동사 기본형만 출력해."
+)
+_VERB_PROMPT_HONORIFIC = (
+    '"{slot}"가 자주 하는 자연스러운 한국어 동사(기본형, "다"로 끝나는 형태) 딱 하나만 써줘.\n'
+    '예시: 입력 "선생님" -> 출력 "가르치다"\n'
     "다른 설명 없이 동사 기본형만 출력해."
 )
 
@@ -117,6 +127,25 @@ SKILL_SPECS = {
             "영화": "보다", "빵": "먹다", "라면": "먹다",
         },
     },
+    "honorific": {
+        # Structurally different from the particle skills above: the
+        # blank covers the WHOLE verb (honorific_ending()'s "으세요"/"세요"
+        # vs plain "어요"-style), not a single inserted particle. Both
+        # options share tag EF -- kiwipiepy's tagger can't discriminate
+        # honorific-correct from plain-wrong by tag alone here, same as
+        # particle_loc's two options both being genuine JKB particles;
+        # correctness comes entirely from the curated subject list below
+        # (these nouns are honorific-worthy by social convention, not by
+        # any rule kiwipiepy or an LLM could derive) plus the batchim rule.
+        "kind": "verb_ending",
+        "tag": "EF",
+        "slots": ("선생님", "할머니", "교수님", "사장님", "의사선생님"),
+        "verb_prompt": _VERB_PROMPT_HONORIFIC,
+        "verb_lookup": {
+            "선생님": "가르치다", "할머니": "쉬다", "교수님": "연구하다",
+            "사장님": "일하다", "의사선생님": "진료하다",
+        },
+    },
 }
 
 
@@ -149,6 +178,36 @@ class ExaoneGrammarProvider:
             return verb
         return None  # not a usable dictionary-form verb; caller retries/skips
 
+    def _build_verb_ending_item(self, skill_id: str, spec: dict, slot: str,
+                                 verb_lemma: str) -> str | None:
+        """honorific-style skills: blank covers the whole verb (two full
+        conjugated forms as options), not a single inserted particle.
+        """
+        stem_syllables = verb_lemma[:-1]
+        try:
+            honorific_form = _KIWI.join([(stem_syllables, "VV"), (honorific_ending(stem_syllables), "EF")])
+            plain_form = _KIWI.join([(stem_syllables, "VV"), ("어요", "EF")])
+        except Exception:
+            return None
+        if honorific_form == plain_form:
+            return None  # degenerate; shouldn't happen but guard anyway
+
+        sentence_stem = f"{slot}께서 ___."
+        for form in (honorific_form, plain_form):
+            filled = sentence_stem.replace("___", form, 1)
+            if not validate_sentence_final_tag(filled, spec["tag"]).valid:
+                return None
+
+        labels = ["A", "B"]
+        self.rng.shuffle(labels)
+        answer_label, distractor_label = labels
+        options = {answer_label: honorific_form, distractor_label: plain_form}
+
+        item_id = f"grammar-{skill_id}-{self._counter}"
+        self._counter += 1
+        self.items[item_id] = GeneratedItem(skill_id, sentence_stem, "___", options, answer_label)
+        return item_id
+
     def next_new_grammar_item(self, skill_id: str) -> str | None:
         spec = SKILL_SPECS.get(skill_id)
         if spec is None:
@@ -158,6 +217,9 @@ class ExaoneGrammarProvider:
         verb_lemma = spec["verb_lookup"].get(slot) or self._pick_verb_lemma(spec["verb_prompt"], slot)
         if verb_lemma is None:
             return None
+
+        if spec.get("kind") == "verb_ending":
+            return self._build_verb_ending_item(skill_id, spec, slot, verb_lemma)
 
         try:
             conjugated = _KIWI.join([(verb_lemma[:-1], "VV"), ("어요", "EF")])
@@ -200,7 +262,7 @@ class ExaoneGrammarProvider:
 if __name__ == "__main__":
     provider = ExaoneGrammarProvider(seed=0)
 
-    for skill_id in ("particle_loc", "particle_obj"):
+    for skill_id in ("particle_loc", "particle_obj", "honorific"):
         successes = 0
         for _ in range(5):
             item_id = provider.next_new_grammar_item(skill_id)
@@ -211,6 +273,9 @@ if __name__ == "__main__":
                 assert item.blank_marker in item.stem
                 assert item.answer in item.options
                 assert len(item.options) in (2, 3, 4)
+                if skill_id == "honorific":
+                    assert "세요" in item.options[item.answer], (
+                        "the honorific form, never the plain one, must be the correct answer")
         print(f"{skill_id}: {successes}/5 generations succeeded")
         assert successes >= 4, f"{skill_id}: expected the validated pipeline to succeed reliably, got {successes}/5"
 

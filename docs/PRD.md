@@ -416,6 +416,39 @@ pemisahannya dari tracker, tapi akumulasi EXP dan ranking per-topik belum
 diimplementasikan sebagai modul), dan skill grammar KAGAS lain di luar
 `particle_loc`/`particle_obj` (baru 2 dari 14 tipe).
 
+### 9.5 Skill ketiga: `honorific` — kategori gramatikal berbeda struktur, bukan novelty baru
+
+Ditambahkan skill `honorific` (`-(으)세요` vs bentuk polos) ke
+`exaone_provider.py`. **Bukan novelty ke-4** — tetap instance dari
+Novelty 2, cuma bukti tambahan bahwa pendekatan Generator→Validator→
+koreksi-deterministik general ke kategori gramatikal yang **secara
+struktural beda** (infleksi morfologis honorifik, bukan substitusi
+partikel seperti dua skill sebelumnya) — ini poin evaluasi yang sah
+ditambahkan di Section V paper, bukan novelty terpisah.
+
+**Dua temuan nyata selama membangunnya:**
+
+1. **`kiwi.join([(stem,'VV'),('시','EP'),('어요','EF')])` menghasilkan
+   `셔요` (kontraksi arkais/formal), bukan `세요` yang jadi standar modern
+   di materi TOPIK.** `kiwipiepy` sebenarnya menyimpan `세요`/`으세요`
+   sebagai morfem EF tunggal yang sudah terfusi, bukan EP+EF terurai —
+   begitu dipakai langsung (`honorific_ending()`, aturan batchim yang
+   sama dengan `expected_object_particle`), hasilnya benar
+   (`읽으세요`, `가세요`, `가르치세요`, dst). Pelajaran: alat yang "benar
+   secara gramatikal" (kiwi.join menghasilkan bentuk yang valid) belum
+   tentu "benar secara konvensi pembelajaran" — perlu dicek eksplisit
+   terhadap standar yang diajarkan, bukan cuma terhadap gramatikalitas.
+
+2. **`validate_cloze_option` gagal total (0/5) untuk skill ini** — fungsi
+   itu mengecek apakah SATU morfem (token tunggal) sama dengan teks opsi;
+   opsi di skill ini adalah kata kerja terkonjugasi utuh (multi-morfem:
+   stem+EF), jadi tidak pernah ada satu token pun yang form-nya persis
+   sama dengan string penuh opsi. Dibangun `validate_sentence_final_tag()`
+   di `distractor_validator.py` — cek tag morfem terakhir kalimat
+   (sebelum SF), bukan cocok-string literal. Setelah fix: 5/5 berhasil,
+   semua jawaban benar menyebut bentuk honorifik (`가르치세요`,
+   `연구하세요`, `쉬세요`), tidak ada yang tertukar dengan bentuk polos.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
