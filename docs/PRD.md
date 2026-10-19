@@ -966,6 +966,54 @@ benar" dan (c) "round-trip solver" (§9.12) juga masih belum
 diimplementasikan sebagai pengecekan umum — kedua ini masih open
 item terpisah.
 
+### 9.15 Novelty 1's "Select" — ternyata juga belum tersambung, ditemukan dari deskripsi fitur user sendiri
+
+User menjelaskan perilaku yang diinginkan tanpa menyebut "Novelty 1"
+sama sekali: kalau satu siswa anggap soal gampang, soal berikutnya
+harus menyesuaikan jadi lebih susah untuk DIA; siswa lain yang anggap
+sulit harus dapat yang lebih mudah — yaitu seleksi soal adaptif
+per-individu. Dicek langsung ke kode (bukan diasumsikan ada/tidak
+ada): **memang belum ada sama sekali.** `ContentProvider.next_new_grammar_item`
+cuma terima `skill_id`, tidak ada info kemampuan siswa; `BankContentProvider`
+(§9.7) cuma `self.rng.choice(candidates)` — pilih acak dari item yang
+APPROVED untuk skill itu, tidak peduli kesulitan item maupun kemampuan
+siswa sama sekali.
+
+Ini persis bagian **"Select"** dari nama novelty-nya sendiri
+("Generate–**Calibrate**–**Select** Loop") — §9.12 memperbaiki
+"Calibrate" (urn item di-seed dari estimasi kesulitan), tapi estimasi
+itu TIDAK PERNAH dipakai untuk MEMILIH soal mana yang disajikan.
+Ditemukan murni dari user menjelaskan fitur yang diinginkan, bukan
+dari audit sistematis — sama persis pola `subj_topic`/Novelty 1 lain:
+gap nyata yang baru ketahuan setelah ditanya dengan cara yang
+berbeda.
+
+**Diperbaiki:** protokol `ContentProvider.next_new_grammar_item`
+(`daily_drill.py`) sekarang terima `learner_urn` (urn kemampuan siswa
+untuk skill itu) dan `exclude` (item yang sudah dipakai di drill yang
+sama, supaya tidak dobel). `BankContentProvider` sekarang pakai ini:
+urutkan kandidat berdasarkan `|kesulitan_item - kemampuan_siswa|`
+(prinsip yang sama seperti `pick_adaptive` di `simulate_trackers.py`,
+target ~50% peluang benar), lalu pilih acak dari 3 kandidat terdekat
+(bukan selalu yang PERSIS terdekat — satu `item_urn` estimasi tunggal
+itu masih noisy, apalagi baru di-seed). `ExaoneGrammarProvider` dan
+`CombinedContentProvider` menerima parameter baru ini untuk
+kompatibilitas protokol tapi tidak memakainya — generasi langsung
+(bukan dari bank) menghasilkan SATU item baru per panggilan, tidak
+ada kandidat untuk dipilih-pilih; seleksi adaptif cuma relevan untuk
+jalur bank (item sudah di-batch + approve duluan).
+
+**Diuji:** dibuat urn item buatan tangan merentang dari sangat mudah
+sampai sangat sulit, dikonfirmasi siswa lemah (urn rendah) konsisten
+dapat himpunan item yang lebih mudah, siswa kuat dapat yang lebih
+sulit, dan keduanya TIDAK dapat himpunan yang sama. `exclude` dikonfirmasi
+mencegah pengulangan item dalam satu sesi perakitan drill.
+
+**Masih belum (dicatat, bukan diabaikan):** seleksi adaptif baru
+berjalan untuk jalur bank (`BankContentProvider`) — jalur live-generation
+(`ExaoneGrammarProvider`) tidak punya konsep "pilih dari kandidat" sama
+sekali karena cuma generate satu item per panggilan.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

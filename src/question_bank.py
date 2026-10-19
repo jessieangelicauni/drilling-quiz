@@ -112,16 +112,43 @@ class BankContentProvider:
     from already-APPROVED entries -- no live LLM call, no GPU, at request
     time. This is the fix for "starts from zero every time": the bank is
     filled by batch_generate() ahead of time, separately from serving.
+
+    next_new_grammar_item is also where Novelty 1's "Select" step actually
+    happens now (PRD §9.15): §9.12 wired item_urn seeding/persistence in,
+    but nothing used it to pick WHICH item to serve until this -- before,
+    an item's calibration existed but had zero effect on the learner's
+    actual experience. Found directly from the user's own description of
+    the behaviour they expected (an easy-for-you item should adapt harder
+    next, a hard-for-your-friend item should adapt easier), which is
+    standard adaptive-item-selection and was simply never connected.
     """
     def __init__(self, bank: QuestionBank, seed: int | None = None):
         self.bank = bank
         self.rng = random.Random(seed)
 
-    def next_new_grammar_item(self, skill_id: str) -> str | None:
-        candidates = self.bank.approved_ids(skill_id)
+    def next_new_grammar_item(self, skill_id: str, learner_urn: UrnState | None = None,
+                               exclude: set[str] = frozenset()) -> str | None:
+        candidates = [iid for iid in self.bank.approved_ids(skill_id) if iid not in exclude]
         if not candidates:
-            return None  # bank empty for this skill -- batch_generate() needs to run
-        return self.rng.choice(candidates)
+            return None  # bank empty (or exhausted by exclude) for this skill
+        if learner_urn is None:
+            return self.rng.choice(candidates)  # no ability info -- fall back to uniform
+
+        # Adaptive selection: same "target ~50% success" principle as
+        # simulate_trackers.pick_adaptive (Fig. 5's already-validated
+        # simulation), applied to real served content instead of
+        # simulated data. item_urn's logit, negated, is the item's
+        # implied difficulty (same sign convention as
+        # simulate_trackers.run_urnings's beta_hat = -_logit_urn(...)).
+        theta = learner_urn.logit_estimate()
+        candidates.sort(key=lambda iid: abs(-self.bank.entries[iid].item_urn.logit_estimate() - theta))
+        # Pick randomly among the closest few, not always the single best
+        # match -- a single best-match item_urn estimate is noisy (small
+        # urn, possibly just seeded), and always returning the literal
+        # closest would also make repeated calls for the same learner+
+        # skill in one drill degenerate without relying on `exclude` alone.
+        pool = candidates[:min(3, len(candidates))]
+        return self.rng.choice(pool)
 
     def next_new_vocab_item(self, user_id: str, exclude: set[str]) -> str | None:
         raise NotImplementedError("vocab items come from the admin-maintained curriculum, not this bank")
@@ -183,6 +210,44 @@ if __name__ == "__main__":
         "a much longer/more complex edited stem must seed a lower (harder) item urn, "
         f"got {urn_after_edit} vs original {urn_before_edit}"
     )
+
+    # Novelty 1's "Select" step (§9.15): adaptive item selection must
+    # actually match item difficulty to the learner's ability, not serve
+    # uniformly at random once a learner_urn is given. Hand-constructed
+    # entries (bypassing the LLM) for precise control over item_urn.
+    adapt_bank = QuestionBank()
+    adapt_provider = BankContentProvider(adapt_bank, seed=0)
+    difficulty_spread = [
+        ("easy-1", UrnState(k=28, n=32)),   # very easy item (high k/n)
+        ("easy-2", UrnState(k=24, n=32)),
+        ("medium", UrnState(k=16, n=32)),
+        ("hard-1", UrnState(k=8, n=32)),
+        ("hard-2", UrnState(k=4, n=32)),    # very hard item (low k/n)
+    ]
+    for label, item_urn in difficulty_spread:
+        item = GeneratedItem(skill_id="adapt_test", stem=f"stem-{label}", blank_marker="___",
+                              options={"A": "x", "B": "y"}, answer="A")
+        adapt_bank.entries[label] = BankEntry(item=item, status=ReviewStatus.APPROVED, item_urn=item_urn)
+
+    weak_learner, strong_learner = UrnState(k=4, n=32), UrnState(k=28, n=32)
+    weak_picks = {adapt_provider.next_new_grammar_item("adapt_test", learner_urn=weak_learner)
+                  for _ in range(20)}
+    strong_picks = {adapt_provider.next_new_grammar_item("adapt_test", learner_urn=strong_learner)
+                    for _ in range(20)}
+    assert weak_picks <= {"easy-1", "easy-2", "medium"}, f"a weak learner must be served easier items, got {weak_picks}"
+    assert strong_picks <= {"hard-1", "hard-2", "medium"}, f"a strong learner must be served harder items, got {strong_picks}"
+    assert weak_picks != strong_picks, "weak and strong learners must not get the same item distribution"
+
+    seen = set()
+    for _ in range(5):
+        iid = adapt_provider.next_new_grammar_item("adapt_test", learner_urn=weak_learner, exclude=seen)
+        assert iid is not None and iid not in seen
+        seen.add(iid)
+    assert adapt_provider.next_new_grammar_item("adapt_test", learner_urn=weak_learner, exclude=seen) is None, (
+        "once every candidate is excluded, must return None, not repeat")
+
+    assert adapt_provider.next_new_grammar_item("adapt_test") in dict(difficulty_spread), (
+        "no learner_urn given must still fall back to a valid (uniform) choice")
 
     print(f"batch_generate added {added}/5 for particle_loc")
     print("all smoke tests passed")

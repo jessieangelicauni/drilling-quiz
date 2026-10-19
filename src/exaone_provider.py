@@ -563,7 +563,14 @@ class ExaoneGrammarProvider:
         self.items[item_id] = GeneratedItem(skill_id, stem, "___", options, answer_label)
         return item_id
 
-    def next_new_grammar_item(self, skill_id: str) -> str | None:
+    def next_new_grammar_item(self, skill_id: str, learner_urn=None,
+                               exclude: set[str] = frozenset()) -> str | None:
+        # learner_urn/exclude accepted for daily_drill.ContentProvider protocol
+        # compatibility (§9.15) but unused here: this provider GENERATES one
+        # fresh item per call rather than selecting among existing candidates,
+        # so there's nothing to adaptively choose between -- adaptive
+        # selection is BankContentProvider's job (question_bank.py), once
+        # generated items have been batched and approved into the bank.
         spec = SKILL_SPECS.get(skill_id)
         if spec is None:
             return None
