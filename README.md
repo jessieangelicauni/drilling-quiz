@@ -37,6 +37,7 @@ actual system, built directly on the decisions in `docs/PRD.md`:
 | `src/exaone_provider.py` | Real `ContentProvider` for grammar items — EXAONE-4.0-1.2B generation, gated by `distractor_validator.py`, wired and tested through `daily_drill.py` end-to-end |
 | `src/vocab_provider.py` | Vocab `ContentProvider` — words/meanings from an admin-maintained curriculum, not generation; distractors are other curriculum meanings |
 | `src/content_provider.py` | Combines the two into the single provider `daily_drill.py` actually needs once `vocab_ratio` mixes both types |
+| `src/answer_processing.py` | The other half of the daily-drill lifecycle: processes a submitted answer — updates the Urnings skill urn, checks escalation, calls `qwen_feedback`, updates the FSRS card, records streak completion |
 | `src/qwen_feedback.py` | Fast + detailed (escalation-gated) wrong-answer feedback via Qwen3-1.7B — English-only by tested decision, not a TODO (see below) |
 | `src/difficulty_heuristic.py` | Deterministic difficulty proxy (morpheme count + grammatical complexity) standing in for the KLUE-RoBERTa regression head, which is blocked by a missing calibration dataset |
 

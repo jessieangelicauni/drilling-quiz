@@ -311,5 +311,80 @@ Daftar lengkap 41 referensi: `paper/KO-DRILL_IEEE.docx` → References.
 
 ---
 
+## 9. Status Implementasi & Scope Produksi (2026-10-19)
+
+**Tujuan proyek dikonfirmasi ulang:** production-grade, bukan sekadar
+prototipe riset — metode yang dipakai harus yang paling tepat secara
+teknis, bukan yang "cukup jalan". Implementasi dilanjutkan di cloud
+session berikutnya berdasarkan dokumen ini.
+
+### 9.1 Audit metode final — tidak ada yang berubah sejak §2–§3
+
+Tidak ada metode yang statusnya terbalik sejak audit-audit sebelumnya di
+dokumen ini. Ringkasan akhir, jujur soal level keyakinan (bukan klaim
+100% di mana pun kecuali satu baris pertama):
+
+| Metode | Status | Level keyakinan |
+|---|---|---|
+| Aturan batchim Hangul (`distractor_validator.has_batchim`) | ✅ | Mendekati 100% — fakta encoding Unicode, bukan model |
+| Urnings (tracker ability) | ✅ | Tinggi — 2 simulasi independen (statis + drift) + alasan produk; bukan data pelajar sungguhan |
+| Partikel & konjugasi EXAONE (deterministik) | ✅ | Sangat tinggi secara struktural (dijamin benar by construction), diuji di sampel kecil (5-10 kasus) |
+| `correct_korean_conjugation()` | ✅ (sempit) | Menangkap satu pola error spesifik yang sudah ditemukan, bukan pengecek gramatikal umum |
+| FSRS | ✅ | Tinggi untuk domain spaced-repetition umum; belum diuji dengan data pengguna aplikasi ini |
+| kiwipiepy | ✅ | Tinggi, tapi terbukti punya gap (itulah alasan validator di atas dibangun) |
+| Qwen3-4B (feedback, EN+ID, 2 jalur) | ✅ | Diuji 4/4 per kasus di beberapa konfigurasi — sampel kecil |
+| `difficulty_heuristic.py` | ✅ sebagai proxy | Diklaim lemah secara eksplisit — urutan benar, akurasi absolut tidak diklaim |
+| `MASTERED_RECHECK_DAYS=30` | ⚠️ | Satu-satunya yang genuinely menunggu data pemakaian nyata — sudah dicoba diturunkan dari matematika FSRS, gagal secara prinsip (bukan teknis), instrumentasi (`RecheckOutcomeLog`) sudah terpasang untuk tuning nanti |
+
+Confidence di atas baris batchim HANYA bisa naik lewat data skala
+produksi nyata, bukan lewat audit kode lebih lanjut — titik ini sudah
+mencapai batas yang bisa dibuktikan lewat investigasi dan pengujian kode.
+
+### 9.2 Modul aplikasi — lengkap untuk satu siklus penuh
+
+Ditemukan dan ditutup satu gap nyata: `daily_drill.py` menyusun soal
+tapi **tidak pernah ada logika memproses jawaban** — separuh siklus
+aplikasi. Dibangun `src/answer_processing.py`:
+- `submit_grammar_answer()` — update urn skill pelajar (Urnings), cek
+  eskalasi (`should_escalate`), panggil `qwen_feedback` jalur
+  cepat/detail sesuai hasil cek, catat ke `practice_log`.
+- `submit_vocab_answer()` — update kartu FSRS.
+- `complete_drill_session()` — update streak, dipanggil sekali per hari
+  (bukan per soal).
+
+Keputusan desain: **urn item tidak dipersist.** Item dari
+`exaone_provider` dibuat unik per kejadian (tidak dipakai ulang antar
+pelajar atau antar sesi), jadi tidak ada eksposur berulang untuk urn
+item mengakumulasi bukti — beda dari urn SKILL pelajar yang memang
+terakumulasi lintas semua item skill itu. Urn item netral/sekali-pakai
+dipakai hanya supaya matematika `update()` yang simetris punya dua sisi
+untuk dioperasikan; hanya hasil sisi pelajar yang disimpan.
+
+Smoke test `answer_processing.py` langsung menangkap bug nyata saat
+pertama ditulis: feedback salah menyebut label opsi (`"A"`) bukan teks
+partikel sungguhan (`"에"`) — ditemukan dan diperbaiki lewat pengujian,
+bukan diasumsikan benar dari desain.
+
+### 9.3 Infra produksi — keputusan diambil, implementasi DITUNDA
+
+Atas permintaan eksplisit: fokus ke application layer dulu, infra nanti.
+Keputusan yang SUDAH diambil untuk cloud session berikutnya (bukan untuk
+didebat ulang, tinggal diimplementasikan):
+
+| Keputusan | Pilihan |
+|---|---|
+| Database | **PostgreSQL** |
+| Serving model EXAONE/Qwen3 | **Dedicated inference server** (vLLM atau TGI) — dikonfirmasi `vllm` versi terbaru mendukung arsitektur `exaone4` dan `qwen3` secara native (dicek langsung di model registry-nya, bukan diasumsikan — pelajaran dari insiden `transformers`+EXAONE-3.5 sebelumnya) |
+| Target deployment | **Satu VM cloud dengan GPU**, cukup untuk skala 50-180 pengguna |
+
+**Belum dikerjakan** (menunggu cloud session): skema database, migrasi,
+endpoint API, konfigurasi vLLM/TGI, job scheduler batch harian, Docker
+Compose, observability, keamanan (rate limiting, validasi input). Semua
+modul `src/*.py` saat ini masih state in-memory, dipanggil langsung
+sebagai fungsi Python — benar secara metode, belum siap produksi secara
+infra.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
