@@ -517,7 +517,17 @@ class ExaoneGrammarProvider:
         if subj_form == topic_form:
             return None
 
-        template = f"A: 누가 {predicate}? B: ___ {predicate}"
+        # "질문"/"답", not "A"/"B": found empirically (validate_novelty1.py,
+        # 20/skill run) that labelling the dialogue turns "A:"/"B:" collides
+        # with the MCQ option labels "A:"/"B:" rendered right after it --
+        # the solver picked "B" in 20/20 trials regardless of content,
+        # which a per-sentence breakdown ruled out as a content-based
+        # pattern (unlike irregular_conj's genuine, content-tracking
+        # failure, see its own comment). The same two-"B:" stem is shown to
+        # a real learner too, so this was a stem-formatting defect, not
+        # only an artifact of the solver check -- fixing it here, at the
+        # source, rather than only in the solver's prompt.
+        template = f"질문: 누가 {predicate}? 답: ___ {predicate}"
         for form, tag in ((subj_form, spec["tag"]), (topic_form, spec["distractor_tag"])):
             filled = template.replace("___", form, 1)
             if not validate_postnominal_tag(filled, pronoun, tag).valid:

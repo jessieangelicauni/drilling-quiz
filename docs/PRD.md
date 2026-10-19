@@ -1324,5 +1324,54 @@ eksplisit dikonfirmasi di kode saat ini, §9.9/§9.10), bukan ditebak.
 
 ---
 
+### 9.20 Run pertama `validate_novelty1.py` (N=20/skill, user punya GPU) — dua akar masalah berbeda ditemukan, cuma satu yang di-fix
+
+User menjalankan skrip §9.19 di mesin GPU sendiri, hasil dibawa balik
+sebagai `1_validation_results.json`. Overall solver key-accept rate
+73.1% (117/160) — tapi dipecah per skill, dua skill jatuh jauh di bawah
+yang lain: `irregular_conj` 1/20 (5%) dan `subj_topic` 7/20 (35%). Dicek
+isi soal aslinya (bukan cuma angka agregat), ketemu dua akar masalah
+yang BERBEDA SAMA SEKALI:
+
+- **`subj_topic` — bug format, bukan keterbatasan model.** Distribusi
+  pilihan solver: **pilih "B" di 20/20 trial, tanpa kecuali**, independen
+  dari isi soal maupun dari label jawaban benarnya. Ditelusuri ke
+  `_build_subj_topic_item` (exaone_provider.py): template stem-nya
+  `f"A: 누가 {predicate}? B: ___ {predicate}"` — label giliran dialog
+  "A:"/"B:" bertabrakan dengan label pilihan MCQ "A:"/"B:" yang
+  dirender tepat sesudahnya oleh `solver_check.py`. Prompt yang dilihat
+  solver literally punya dua "A:" dan dua "B:" dengan arti berbeda.
+  **Di-fix di sumbernya** (bukan cuma di prompt solver): label dialog
+  diganti jadi "질문:"/"답:" (non-Latin, tidak bertabrakan dengan opsi
+  A/B/C/D manapun) — karena stem yang sama juga akan ditampilkan ke
+  siswa asli, jadi ini cacat konten, bukan cuma artefak evaluasi.
+- **`irregular_conj` — keterbatasan genuine judge model, BUKAN di-fix.**
+  Pilihan solver **mengikuti isi kalimat** (bukan posisi label):
+  konsisten pilih bentuk tak-terkontraksi yang salah (자르어요, bukan
+  잘라요) 19/20 kali, persis mengonfirmasi temuan sampel-kecil yang
+  sudah tercatat di docstring `solver_check.py`. Sengaja TIDAK
+  diperbaiki dengan menambah contoh few-shot ke prompt solver yang
+  mengajarkan pola 르-irregular — itu akan membuat solver "benar" karena
+  disuapi jawaban, bukan karena soalnya memang tidak ambigu, yaitu
+  circular validity yang merusak gunanya check ini sebagai bukti
+  independen. Dilaporkan jujur sebagai limitasi judge, sama persis
+  filosofi check (b) yang yes-bias di `solver_check.py` sendiri.
+- **`time_range` (65%) dipecah per kalimat** juga mengungkap satu
+  template spesifik ("아침___저녁까지 운동해요") gagal 0/5 independen dari
+  posisi label, sementara 4 template lain 80-100% — kemungkinan solver
+  bingung karena "아침"/"저녁" bukan angka waktu seperti template lain.
+  Belum diputuskan perlu di-fix atau cukup dilaporkan sebagai limitasi
+  sempit — lihat apakah berulang di run selanjutnya setelah fix
+  `subj_topic` di atas.
+
+**Belum diverifikasi ulang** — fix `subj_topic` di atas butuh run ulang
+`validate_novelty1.py` di mesin GPU user untuk konfirmasi bias "selalu
+pilih B" benar-benar hilang, bukan diasumsikan beres. `1_validation_results.json`
+yang sudah ada di repo sekarang merepresentasikan state SEBELUM fix ini
+— nilai historis (before/after), bukan dihapus, tapi tidak lagi
+menggambarkan kode saat ini untuk `subj_topic`.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
