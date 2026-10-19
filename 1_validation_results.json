@@ -788,244 +788,23 @@
       "critic_attempts": 0,
       "critic_recoveries": 0,
       "solver_checked": 20,
-      "solver_key_accepted": 20,
+      "solver_key_accepted": 16,
       "items": [
         {
           "stem": "교수님께서 ___.",
           "blank_marker": "___",
           "options": {
-            "A": "연구하세요",
-            "B": "연구해요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "연구하세요",
-          "distractor_options": {
-            "B": "연구해요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "할머니께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "쉬세요",
-            "A": "쉬어요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "쉬세요",
-          "distractor_options": {
-            "A": "쉬어요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "의사선생님께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "진료하세요",
-            "B": "진료해요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "진료하세요",
-          "distractor_options": {
-            "B": "진료해요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "선생님께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "가르치세요",
-            "A": "가르쳐요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "가르치세요",
-          "distractor_options": {
-            "A": "가르쳐요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "사장님께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "일하세요",
-            "A": "일해요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "일하세요",
-          "distractor_options": {
-            "A": "일해요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "교수님께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "연구하세요",
-            "B": "연구해요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "연구하세요",
-          "distractor_options": {
-            "B": "연구해요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "사장님께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "일하세요",
-            "A": "일해요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "일하세요",
-          "distractor_options": {
-            "A": "일해요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "할머니께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "쉬세요",
-            "A": "쉬어요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "쉬세요",
-          "distractor_options": {
-            "A": "쉬어요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "할머니께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "쉬세요",
-            "A": "쉬어요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "쉬세요",
-          "distractor_options": {
-            "A": "쉬어요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "교수님께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "연구하세요",
-            "B": "연구해요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "연구하세요",
-          "distractor_options": {
-            "B": "연구해요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "선생님께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "가르치세요",
-            "B": "가르쳐요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "가르치세요",
-          "distractor_options": {
-            "B": "가르쳐요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "할머니께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "쉬세요",
-            "A": "쉬어요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "쉬세요",
-          "distractor_options": {
-            "A": "쉬어요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "사장님께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "일하세요",
-            "B": "일해요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "일하세요",
-          "distractor_options": {
-            "B": "일해요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "의사선생님께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "진료하세요",
-            "B": "진료해요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "진료하세요",
-          "distractor_options": {
-            "B": "진료해요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "교수님께서 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "연구하세요",
-            "B": "연구해요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "연구하세요",
-          "distractor_options": {
-            "B": "연구해요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "교수님께서 ___.",
-          "blank_marker": "___",
-          "options": {
             "B": "연구하세요",
-            "A": "연구해요"
+            "C": "연구해요",
+            "A": "학교",
+            "D": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "연구하세요",
           "distractor_options": {
-            "A": "연구해요"
+            "C": "연구해요",
+            "A": "학교",
+            "D": "사과"
           },
           "solver_picked": "B",
           "solver_key_accepted": true
@@ -1035,12 +814,16 @@
           "blank_marker": "___",
           "options": {
             "B": "진료하세요",
-            "A": "진료해요"
+            "C": "진료해요",
+            "A": "학교",
+            "D": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "진료하세요",
           "distractor_options": {
-            "A": "진료해요"
+            "C": "진료해요",
+            "A": "학교",
+            "D": "사과"
           },
           "solver_picked": "B",
           "solver_key_accepted": true
@@ -1049,30 +832,95 @@
           "stem": "사장님께서 ___.",
           "blank_marker": "___",
           "options": {
-            "B": "일하세요",
-            "A": "일해요"
+            "A": "일하세요",
+            "C": "일해요",
+            "D": "학교",
+            "B": "사과"
           },
-          "correct_answer": "B",
+          "correct_answer": "A",
           "correct_option_text": "일하세요",
           "distractor_options": {
-            "A": "일해요"
+            "C": "일해요",
+            "D": "학교",
+            "B": "사과"
           },
-          "solver_picked": "B",
+          "solver_picked": "A",
           "solver_key_accepted": true
         },
         {
-          "stem": "교수님께서 ___.",
+          "stem": "사장님께서 ___.",
           "blank_marker": "___",
           "options": {
-            "B": "연구하세요",
-            "A": "연구해요"
+            "D": "일하세요",
+            "A": "일해요",
+            "C": "학교",
+            "B": "사과"
           },
-          "correct_answer": "B",
-          "correct_option_text": "연구하세요",
+          "correct_answer": "D",
+          "correct_option_text": "일하세요",
           "distractor_options": {
-            "A": "연구해요"
+            "A": "일해요",
+            "C": "학교",
+            "B": "사과"
           },
-          "solver_picked": "B",
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "선생님께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "가르치세요",
+            "D": "가르쳐요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "가르치세요",
+          "distractor_options": {
+            "D": "가르쳐요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "의사선생님께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "D": "진료하세요",
+            "B": "진료해요",
+            "A": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "진료하세요",
+          "distractor_options": {
+            "B": "진료해요",
+            "A": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "할머니께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "D": "쉬세요",
+            "C": "쉬어요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "쉬세요",
+          "distractor_options": {
+            "C": "쉬어요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "D",
           "solver_key_accepted": true
         },
         {
@@ -1080,12 +928,244 @@
           "blank_marker": "___",
           "options": {
             "A": "진료하세요",
-            "B": "진료해요"
+            "B": "진료해요",
+            "D": "학교",
+            "C": "사과"
           },
           "correct_answer": "A",
           "correct_option_text": "진료하세요",
           "distractor_options": {
-            "B": "진료해요"
+            "B": "진료해요",
+            "D": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "사장님께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "B": "일하세요",
+            "D": "일해요",
+            "A": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "일하세요",
+          "distractor_options": {
+            "D": "일해요",
+            "A": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "사장님께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "일하세요",
+            "D": "일해요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "일하세요",
+          "distractor_options": {
+            "D": "일해요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "의사선생님께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "B": "진료하세요",
+            "D": "진료해요",
+            "A": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "진료하세요",
+          "distractor_options": {
+            "D": "진료해요",
+            "A": "학교",
+            "C": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "사장님께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "일하세요",
+            "B": "일해요",
+            "D": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "일하세요",
+          "distractor_options": {
+            "B": "일해요",
+            "D": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "교수님께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "연구하세요",
+            "D": "연구해요",
+            "C": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "연구하세요",
+          "distractor_options": {
+            "D": "연구해요",
+            "C": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "사장님께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "B": "일하세요",
+            "A": "일해요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "일하세요",
+          "distractor_options": {
+            "A": "일해요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "선생님께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "가르치세요",
+            "D": "가르쳐요",
+            "C": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "가르치세요",
+          "distractor_options": {
+            "D": "가르쳐요",
+            "C": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "할머니께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "쉬세요",
+            "D": "쉬어요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "쉬세요",
+          "distractor_options": {
+            "D": "쉬어요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "사장님께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "일하세요",
+            "B": "일해요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "일하세요",
+          "distractor_options": {
+            "B": "일해요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "의사선생님께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "B": "진료하세요",
+            "A": "진료해요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "진료하세요",
+          "distractor_options": {
+            "A": "진료해요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "할머니께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "쉬세요",
+            "B": "쉬어요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "쉬세요",
+          "distractor_options": {
+            "B": "쉬어요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "할머니께서 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "쉬세요",
+            "B": "쉬어요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "쉬세요",
+          "distractor_options": {
+            "B": "쉬어요",
+            "C": "학교",
+            "D": "사과"
           },
           "solver_picked": "A",
           "solver_key_accepted": true
@@ -1098,156 +1178,120 @@
       "critic_attempts": 0,
       "critic_recoveries": 0,
       "solver_checked": 20,
-      "solver_key_accepted": 13,
+      "solver_key_accepted": 11,
       "items": [
         {
-          "stem": "두 시___ 네 시까지 회의해요.",
-          "blank_marker": "___",
-          "options": {
-            "B": "부터",
-            "A": "까지"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "부터",
-          "distractor_options": {
-            "A": "까지"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "아침___ 저녁까지 운동해요.",
-          "blank_marker": "___",
-          "options": {
-            "A": "부터",
-            "B": "까지"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "부터",
-          "distractor_options": {
-            "B": "까지"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
-        },
-        {
           "stem": "3월___ 5월까지 여행해요.",
           "blank_marker": "___",
           "options": {
-            "A": "부터",
-            "B": "까지"
+            "C": "부터",
+            "B": "까지",
+            "D": "에",
+            "A": "에게"
           },
-          "correct_answer": "A",
+          "correct_answer": "C",
           "correct_option_text": "부터",
           "distractor_options": {
-            "B": "까지"
+            "B": "까지",
+            "D": "에",
+            "A": "에게"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "월요일___ 금요일까지 일해요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "부터",
+            "A": "까지",
+            "B": "에",
+            "C": "에게"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "부터",
+          "distractor_options": {
+            "A": "까지",
+            "B": "에",
+            "C": "에게"
           },
           "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "월요일___ 금요일까지 일해요.",
-          "blank_marker": "___",
-          "options": {
-            "B": "부터",
-            "A": "까지"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "부터",
-          "distractor_options": {
-            "A": "까지"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "월요일___ 금요일까지 일해요.",
-          "blank_marker": "___",
-          "options": {
-            "A": "부터",
-            "B": "까지"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "부터",
-          "distractor_options": {
-            "B": "까지"
-          },
-          "solver_picked": "B",
           "solver_key_accepted": false
         },
         {
           "stem": "아침___ 저녁까지 운동해요.",
           "blank_marker": "___",
           "options": {
-            "B": "부터",
-            "A": "까지"
+            "D": "부터",
+            "A": "까지",
+            "C": "에",
+            "B": "에게"
           },
-          "correct_answer": "B",
+          "correct_answer": "D",
           "correct_option_text": "부터",
           "distractor_options": {
-            "A": "까지"
+            "A": "까지",
+            "C": "에",
+            "B": "에게"
           },
           "solver_picked": "A",
           "solver_key_accepted": false
-        },
-        {
-          "stem": "아홉 시___ 열 시까지 공부해요.",
-          "blank_marker": "___",
-          "options": {
-            "B": "부터",
-            "A": "까지"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "부터",
-          "distractor_options": {
-            "A": "까지"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "월요일___ 금요일까지 일해요.",
-          "blank_marker": "___",
-          "options": {
-            "B": "부터",
-            "A": "까지"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "부터",
-          "distractor_options": {
-            "A": "까지"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
         },
         {
           "stem": "두 시___ 네 시까지 회의해요.",
           "blank_marker": "___",
           "options": {
+            "D": "부터",
+            "C": "까지",
+            "B": "에",
+            "A": "에게"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "부터",
+          "distractor_options": {
+            "C": "까지",
+            "B": "에",
+            "A": "에게"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "월요일___ 금요일까지 일해요.",
+          "blank_marker": "___",
+          "options": {
             "B": "부터",
-            "A": "까지"
+            "C": "까지",
+            "D": "에",
+            "A": "에게"
           },
           "correct_answer": "B",
           "correct_option_text": "부터",
           "distractor_options": {
-            "A": "까지"
+            "C": "까지",
+            "D": "에",
+            "A": "에게"
           },
-          "solver_picked": "B",
-          "solver_key_accepted": true
+          "solver_picked": "A",
+          "solver_key_accepted": false
         },
         {
-          "stem": "아침___ 저녁까지 운동해요.",
+          "stem": "아홉 시___ 열 시까지 공부해요.",
           "blank_marker": "___",
           "options": {
-            "A": "부터",
-            "B": "까지"
+            "B": "부터",
+            "C": "까지",
+            "D": "에",
+            "A": "에게"
           },
-          "correct_answer": "A",
+          "correct_answer": "B",
           "correct_option_text": "부터",
           "distractor_options": {
-            "B": "까지"
+            "C": "까지",
+            "D": "에",
+            "A": "에게"
           },
-          "solver_picked": "B",
+          "solver_picked": null,
           "solver_key_accepted": false
         },
         {
@@ -1255,29 +1299,132 @@
           "blank_marker": "___",
           "options": {
             "A": "부터",
-            "B": "까지"
+            "C": "까지",
+            "D": "에",
+            "B": "에게"
           },
           "correct_answer": "A",
           "correct_option_text": "부터",
           "distractor_options": {
-            "B": "까지"
+            "C": "까지",
+            "D": "에",
+            "B": "에게"
           },
-          "solver_picked": "A",
+          "solver_picked": "C",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "두 시___ 네 시까지 회의해요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "부터",
+            "C": "까지",
+            "B": "에",
+            "A": "에게"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "부터",
+          "distractor_options": {
+            "C": "까지",
+            "B": "에",
+            "A": "에게"
+          },
+          "solver_picked": "D",
           "solver_key_accepted": true
         },
         {
           "stem": "아홉 시___ 열 시까지 공부해요.",
           "blank_marker": "___",
           "options": {
-            "A": "부터",
-            "B": "까지"
+            "D": "부터",
+            "C": "까지",
+            "B": "에",
+            "A": "에게"
           },
-          "correct_answer": "A",
+          "correct_answer": "D",
           "correct_option_text": "부터",
           "distractor_options": {
-            "B": "까지"
+            "C": "까지",
+            "B": "에",
+            "A": "에게"
           },
-          "solver_picked": "A",
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "아홉 시___ 열 시까지 공부해요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "부터",
+            "B": "까지",
+            "A": "에",
+            "C": "에게"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "부터",
+          "distractor_options": {
+            "B": "까지",
+            "A": "에",
+            "C": "에게"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "아홉 시___ 열 시까지 공부해요.",
+          "blank_marker": "___",
+          "options": {
+            "C": "부터",
+            "A": "까지",
+            "D": "에",
+            "B": "에게"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "부터",
+          "distractor_options": {
+            "A": "까지",
+            "D": "에",
+            "B": "에게"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "아홉 시___ 열 시까지 공부해요.",
+          "blank_marker": "___",
+          "options": {
+            "C": "부터",
+            "B": "까지",
+            "D": "에",
+            "A": "에게"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "부터",
+          "distractor_options": {
+            "B": "까지",
+            "D": "에",
+            "A": "에게"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "3월___ 5월까지 여행해요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "부터",
+            "A": "까지",
+            "B": "에",
+            "C": "에게"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "부터",
+          "distractor_options": {
+            "A": "까지",
+            "B": "에",
+            "C": "에게"
+          },
+          "solver_picked": "D",
           "solver_key_accepted": true
         },
         {
@@ -1285,12 +1432,54 @@
           "blank_marker": "___",
           "options": {
             "A": "부터",
-            "B": "까지"
+            "B": "까지",
+            "C": "에",
+            "D": "에게"
           },
           "correct_answer": "A",
           "correct_option_text": "부터",
           "distractor_options": {
-            "B": "까지"
+            "B": "까지",
+            "C": "에",
+            "D": "에게"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "아침___ 저녁까지 운동해요.",
+          "blank_marker": "___",
+          "options": {
+            "B": "부터",
+            "A": "까지",
+            "D": "에",
+            "C": "에게"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "부터",
+          "distractor_options": {
+            "A": "까지",
+            "D": "에",
+            "C": "에게"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "두 시___ 네 시까지 회의해요.",
+          "blank_marker": "___",
+          "options": {
+            "A": "부터",
+            "B": "까지",
+            "C": "에",
+            "D": "에게"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "부터",
+          "distractor_options": {
+            "B": "까지",
+            "C": "에",
+            "D": "에게"
           },
           "solver_picked": "A",
           "solver_key_accepted": true
@@ -1299,28 +1488,36 @@
           "stem": "아홉 시___ 열 시까지 공부해요.",
           "blank_marker": "___",
           "options": {
-            "B": "부터",
-            "A": "까지"
+            "C": "부터",
+            "D": "까지",
+            "A": "에",
+            "B": "에게"
           },
-          "correct_answer": "B",
+          "correct_answer": "C",
           "correct_option_text": "부터",
           "distractor_options": {
-            "A": "까지"
+            "D": "까지",
+            "A": "에",
+            "B": "에게"
           },
-          "solver_picked": "B",
-          "solver_key_accepted": true
+          "solver_picked": "D",
+          "solver_key_accepted": false
         },
         {
-          "stem": "아침___ 저녁까지 운동해요.",
+          "stem": "월요일___ 금요일까지 일해요.",
           "blank_marker": "___",
           "options": {
-            "B": "부터",
-            "A": "까지"
+            "D": "부터",
+            "A": "까지",
+            "B": "에",
+            "C": "에게"
           },
-          "correct_answer": "B",
+          "correct_answer": "D",
           "correct_option_text": "부터",
           "distractor_options": {
-            "A": "까지"
+            "A": "까지",
+            "B": "에",
+            "C": "에게"
           },
           "solver_picked": "A",
           "solver_key_accepted": false
@@ -1329,76 +1526,39 @@
           "stem": "월요일___ 금요일까지 일해요.",
           "blank_marker": "___",
           "options": {
-            "B": "부터",
-            "A": "까지"
+            "C": "부터",
+            "B": "까지",
+            "D": "에",
+            "A": "에게"
           },
-          "correct_answer": "B",
+          "correct_answer": "C",
           "correct_option_text": "부터",
           "distractor_options": {
-            "A": "까지"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "아침___ 저녁까지 운동해요.",
-          "blank_marker": "___",
-          "options": {
-            "A": "부터",
-            "B": "까지"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "부터",
-          "distractor_options": {
-            "B": "까지"
+            "B": "까지",
+            "D": "에",
+            "A": "에게"
           },
           "solver_picked": "B",
           "solver_key_accepted": false
         },
         {
-          "stem": "3월___ 5월까지 여행해요.",
-          "blank_marker": "___",
-          "options": {
-            "B": "부터",
-            "A": "까지"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "부터",
-          "distractor_options": {
-            "A": "까지"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "아홉 시___ 열 시까지 공부해요.",
+          "stem": "두 시___ 네 시까지 회의해요.",
           "blank_marker": "___",
           "options": {
             "A": "부터",
-            "B": "까지"
+            "D": "까지",
+            "C": "에",
+            "B": "에게"
           },
           "correct_answer": "A",
           "correct_option_text": "부터",
           "distractor_options": {
-            "B": "까지"
+            "D": "까지",
+            "C": "에",
+            "B": "에게"
           },
           "solver_picked": "A",
           "solver_key_accepted": true
-        },
-        {
-          "stem": "월요일___ 금요일까지 일해요.",
-          "blank_marker": "___",
-          "options": {
-            "A": "부터",
-            "B": "까지"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "부터",
-          "distractor_options": {
-            "B": "까지"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
         }
       ]
     },
@@ -1408,111 +1568,44 @@
       "critic_attempts": 0,
       "critic_recoveries": 0,
       "solver_checked": 20,
-      "solver_key_accepted": 20,
+      "solver_key_accepted": 17,
       "items": [
-        {
-          "stem": "저는 어제 커피를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "마셨어요",
-            "A": "마셔요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "마셨어요",
-          "distractor_options": {
-            "A": "마셔요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 어제 커피를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "마셨어요",
-            "A": "마셔요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "마셨어요",
-          "distractor_options": {
-            "A": "마셔요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 어제 숙제를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "했어요",
-            "A": "해요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "했어요",
-          "distractor_options": {
-            "A": "해요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 어제 영화를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "봤어요",
-            "A": "봐요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "봤어요",
-          "distractor_options": {
-            "A": "봐요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 어제 커피를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "마셨어요",
-            "B": "마셔요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "마셨어요",
-          "distractor_options": {
-            "B": "마셔요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
         {
           "stem": "저는 어제 책을 ___.",
           "blank_marker": "___",
           "options": {
             "B": "읽었어요",
-            "A": "읽어요"
+            "A": "읽어요",
+            "C": "학교",
+            "D": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "읽었어요",
           "distractor_options": {
-            "A": "읽어요"
+            "A": "읽어요",
+            "C": "학교",
+            "D": "사과"
           },
           "solver_picked": "B",
           "solver_key_accepted": true
         },
         {
-          "stem": "저는 어제 영화를 ___.",
+          "stem": "저는 어제 책을 ___.",
           "blank_marker": "___",
           "options": {
-            "B": "봤어요",
-            "A": "봐요"
+            "C": "읽었어요",
+            "D": "읽어요",
+            "B": "학교",
+            "A": "사과"
           },
-          "correct_answer": "B",
-          "correct_option_text": "봤어요",
+          "correct_answer": "C",
+          "correct_option_text": "읽었어요",
           "distractor_options": {
-            "A": "봐요"
+            "D": "읽어요",
+            "B": "학교",
+            "A": "사과"
           },
-          "solver_picked": "B",
+          "solver_picked": "C",
           "solver_key_accepted": true
         },
         {
@@ -1520,42 +1613,16 @@
           "blank_marker": "___",
           "options": {
             "B": "먹었어요",
-            "A": "먹어요"
+            "D": "먹어요",
+            "A": "학교",
+            "C": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "먹었어요",
           "distractor_options": {
-            "A": "먹어요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 어제 영화를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "봤어요",
-            "A": "봐요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "봤어요",
-          "distractor_options": {
-            "A": "봐요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 어제 숙제를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "했어요",
-            "A": "해요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "했어요",
-          "distractor_options": {
-            "A": "해요"
+            "D": "먹어요",
+            "A": "학교",
+            "C": "사과"
           },
           "solver_picked": "B",
           "solver_key_accepted": true
@@ -1565,89 +1632,94 @@
           "blank_marker": "___",
           "options": {
             "A": "읽었어요",
-            "B": "읽어요"
+            "C": "읽어요",
+            "B": "학교",
+            "D": "사과"
           },
           "correct_answer": "A",
           "correct_option_text": "읽었어요",
           "distractor_options": {
-            "B": "읽어요"
+            "C": "읽어요",
+            "B": "학교",
+            "D": "사과"
           },
           "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 어제 영화를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "봤어요",
-            "A": "봐요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "봤어요",
-          "distractor_options": {
-            "A": "봐요"
-          },
-          "solver_picked": "B",
           "solver_key_accepted": true
         },
         {
           "stem": "저는 어제 커피를 ___.",
           "blank_marker": "___",
           "options": {
-            "A": "마셨어요",
-            "B": "마셔요"
+            "C": "마셨어요",
+            "B": "마셔요",
+            "D": "학교",
+            "A": "사과"
           },
-          "correct_answer": "A",
+          "correct_answer": "C",
           "correct_option_text": "마셨어요",
           "distractor_options": {
-            "B": "마셔요"
+            "B": "마셔요",
+            "D": "학교",
+            "A": "사과"
           },
-          "solver_picked": "A",
+          "solver_picked": "C",
           "solver_key_accepted": true
         },
         {
-          "stem": "저는 어제 밥을 ___.",
+          "stem": "저는 어제 커피를 ___.",
           "blank_marker": "___",
           "options": {
-            "B": "먹었어요",
-            "A": "먹어요"
+            "D": "마셨어요",
+            "A": "마셔요",
+            "B": "학교",
+            "C": "사과"
           },
-          "correct_answer": "B",
-          "correct_option_text": "먹었어요",
+          "correct_answer": "D",
+          "correct_option_text": "마셨어요",
           "distractor_options": {
-            "A": "먹어요"
+            "A": "마셔요",
+            "B": "학교",
+            "C": "사과"
           },
-          "solver_picked": "B",
+          "solver_picked": "D",
           "solver_key_accepted": true
         },
         {
-          "stem": "저는 어제 책을 ___.",
+          "stem": "저는 어제 커피를 ___.",
           "blank_marker": "___",
           "options": {
-            "A": "읽었어요",
-            "B": "읽어요"
+            "D": "마셨어요",
+            "B": "마셔요",
+            "C": "학교",
+            "A": "사과"
           },
-          "correct_answer": "A",
-          "correct_option_text": "읽었어요",
+          "correct_answer": "D",
+          "correct_option_text": "마셨어요",
           "distractor_options": {
-            "B": "읽어요"
+            "B": "마셔요",
+            "C": "학교",
+            "A": "사과"
           },
-          "solver_picked": "A",
+          "solver_picked": "D",
           "solver_key_accepted": true
         },
         {
-          "stem": "저는 어제 밥을 ___.",
+          "stem": "저는 어제 커피를 ___.",
           "blank_marker": "___",
           "options": {
-            "A": "먹었어요",
-            "B": "먹어요"
+            "D": "마셨어요",
+            "C": "마셔요",
+            "B": "학교",
+            "A": "사과"
           },
-          "correct_answer": "A",
-          "correct_option_text": "먹었어요",
+          "correct_answer": "D",
+          "correct_option_text": "마셨어요",
           "distractor_options": {
-            "B": "먹어요"
+            "C": "마셔요",
+            "B": "학교",
+            "A": "사과"
           },
-          "solver_picked": "A",
+          "solver_picked": "D",
           "solver_key_accepted": true
         },
         {
@@ -1655,12 +1727,16 @@
           "blank_marker": "___",
           "options": {
             "A": "봤어요",
-            "B": "봐요"
+            "D": "봐요",
+            "C": "학교",
+            "B": "사과"
           },
           "correct_answer": "A",
           "correct_option_text": "봤어요",
           "distractor_options": {
-            "B": "봐요"
+            "D": "봐요",
+            "C": "학교",
+            "B": "사과"
           },
           "solver_picked": "A",
           "solver_key_accepted": true
@@ -1670,14 +1746,113 @@
           "blank_marker": "___",
           "options": {
             "B": "먹었어요",
-            "A": "먹어요"
+            "C": "먹어요",
+            "D": "학교",
+            "A": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "먹었어요",
           "distractor_options": {
-            "A": "먹어요"
+            "C": "먹어요",
+            "D": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 어제 영화를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "봤어요",
+            "D": "봐요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "봤어요",
+          "distractor_options": {
+            "D": "봐요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 어제 밥을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "먹었어요",
+            "B": "먹어요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "먹었어요",
+          "distractor_options": {
+            "B": "먹어요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 어제 커피를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "B": "마셨어요",
+            "A": "마셔요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "마셨어요",
+          "distractor_options": {
+            "A": "마셔요",
+            "C": "학교",
+            "D": "사과"
           },
           "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 어제 커피를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "마셨어요",
+            "D": "마셔요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "마셨어요",
+          "distractor_options": {
+            "D": "마셔요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 어제 책을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "읽었어요",
+            "A": "읽어요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "읽었어요",
+          "distractor_options": {
+            "A": "읽어요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "C",
           "solver_key_accepted": true
         },
         {
@@ -1685,12 +1860,35 @@
           "blank_marker": "___",
           "options": {
             "B": "읽었어요",
-            "A": "읽어요"
+            "C": "읽어요",
+            "D": "학교",
+            "A": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "읽었어요",
           "distractor_options": {
-            "A": "읽어요"
+            "C": "읽어요",
+            "D": "학교",
+            "A": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 어제 숙제를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "B": "했어요",
+            "A": "해요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "했어요",
+          "distractor_options": {
+            "A": "해요",
+            "C": "학교",
+            "D": "사과"
           },
           "solver_picked": "B",
           "solver_key_accepted": true
@@ -1699,15 +1897,57 @@
           "stem": "저는 어제 밥을 ___.",
           "blank_marker": "___",
           "options": {
-            "B": "먹었어요",
-            "A": "먹어요"
+            "A": "먹었어요",
+            "C": "먹어요",
+            "B": "학교",
+            "D": "사과"
           },
-          "correct_answer": "B",
+          "correct_answer": "A",
           "correct_option_text": "먹었어요",
           "distractor_options": {
-            "A": "먹어요"
+            "C": "먹어요",
+            "B": "학교",
+            "D": "사과"
           },
-          "solver_picked": "B",
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 어제 영화를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "B": "봤어요",
+            "C": "봐요",
+            "D": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "봤어요",
+          "distractor_options": {
+            "C": "봐요",
+            "D": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 어제 밥을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "먹었어요",
+            "C": "먹어요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "먹었어요",
+          "distractor_options": {
+            "C": "먹어요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "A",
           "solver_key_accepted": true
         }
       ]
@@ -1718,19 +1958,42 @@
       "critic_attempts": 0,
       "critic_recoveries": 0,
       "solver_checked": 20,
-      "solver_key_accepted": 1,
+      "solver_key_accepted": 2,
       "items": [
         {
+          "stem": "저는 답을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "몰라요",
+            "D": "모르어요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "몰라요",
+          "distractor_options": {
+            "D": "모르어요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": false
+        },
+        {
           "stem": "저는 머리를 ___.",
           "blank_marker": "___",
           "options": {
             "A": "잘라요",
-            "B": "자르어요"
+            "B": "자르어요",
+            "C": "학교",
+            "D": "사과"
           },
           "correct_answer": "A",
           "correct_option_text": "잘라요",
           "distractor_options": {
-            "B": "자르어요"
+            "B": "자르어요",
+            "C": "학교",
+            "D": "사과"
           },
           "solver_picked": "B",
           "solver_key_accepted": false
@@ -1740,12 +2003,16 @@
           "blank_marker": "___",
           "options": {
             "A": "불러요",
-            "B": "부르어요"
+            "B": "부르어요",
+            "C": "학교",
+            "D": "사과"
           },
           "correct_answer": "A",
           "correct_option_text": "불러요",
           "distractor_options": {
-            "B": "부르어요"
+            "B": "부르어요",
+            "C": "학교",
+            "D": "사과"
           },
           "solver_picked": "B",
           "solver_key_accepted": false
@@ -1755,12 +2022,16 @@
           "blank_marker": "___",
           "options": {
             "B": "몰라요",
-            "A": "모르어요"
+            "A": "모르어요",
+            "C": "학교",
+            "D": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "몰라요",
           "distractor_options": {
-            "A": "모르어요"
+            "A": "모르어요",
+            "C": "학교",
+            "D": "사과"
           },
           "solver_picked": "A",
           "solver_key_accepted": false
@@ -1769,88 +2040,74 @@
           "stem": "저는 노래를 ___.",
           "blank_marker": "___",
           "options": {
-            "A": "불러요",
-            "B": "부르어요"
+            "C": "불러요",
+            "D": "부르어요",
+            "A": "학교",
+            "B": "사과"
           },
-          "correct_answer": "A",
+          "correct_answer": "C",
           "correct_option_text": "불러요",
           "distractor_options": {
-            "B": "부르어요"
+            "D": "부르어요",
+            "A": "학교",
+            "B": "사과"
           },
-          "solver_picked": "B",
+          "solver_picked": "D",
           "solver_key_accepted": false
         },
         {
           "stem": "저는 노래를 ___.",
           "blank_marker": "___",
           "options": {
-            "A": "불러요",
-            "B": "부르어요"
+            "D": "불러요",
+            "A": "부르어요",
+            "B": "학교",
+            "C": "사과"
           },
-          "correct_answer": "A",
+          "correct_answer": "D",
           "correct_option_text": "불러요",
           "distractor_options": {
-            "B": "부르어요"
+            "A": "부르어요",
+            "B": "학교",
+            "C": "사과"
           },
-          "solver_picked": "B",
+          "solver_picked": "A",
           "solver_key_accepted": false
         },
         {
           "stem": "저는 노래를 ___.",
           "blank_marker": "___",
           "options": {
-            "A": "불러요",
-            "B": "부르어요"
+            "C": "불러요",
+            "A": "부르어요",
+            "D": "학교",
+            "B": "사과"
           },
-          "correct_answer": "A",
+          "correct_answer": "C",
           "correct_option_text": "불러요",
           "distractor_options": {
-            "B": "부르어요"
+            "A": "부르어요",
+            "D": "학교",
+            "B": "사과"
           },
-          "solver_picked": "B",
+          "solver_picked": "A",
           "solver_key_accepted": false
         },
         {
           "stem": "저는 답을 ___.",
           "blank_marker": "___",
           "options": {
-            "B": "몰라요",
-            "A": "모르어요"
+            "A": "몰라요",
+            "B": "모르어요",
+            "D": "학교",
+            "C": "사과"
           },
-          "correct_answer": "B",
+          "correct_answer": "A",
           "correct_option_text": "몰라요",
           "distractor_options": {
-            "A": "모르어요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "저는 머리를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "잘라요",
-            "B": "자르어요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "잘라요",
-          "distractor_options": {
-            "B": "자르어요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "저는 노래를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "불러요",
-            "B": "부르어요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "불러요",
-          "distractor_options": {
-            "B": "부르어요"
+            "B": "모르어요",
+            "D": "학교",
+            "C": "사과"
           },
           "solver_picked": "B",
           "solver_key_accepted": false
@@ -1860,14 +2117,56 @@
           "blank_marker": "___",
           "options": {
             "B": "잘라요",
-            "A": "자르어요"
+            "D": "자르어요",
+            "C": "학교",
+            "A": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "잘라요",
           "distractor_options": {
-            "A": "자르어요"
+            "D": "자르어요",
+            "C": "학교",
+            "A": "사과"
           },
-          "solver_picked": "A",
+          "solver_picked": "D",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 머리를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "D": "잘라요",
+            "C": "자르어요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "잘라요",
+          "distractor_options": {
+            "C": "자르어요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 답을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "D": "몰라요",
+            "C": "모르어요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "몰라요",
+          "distractor_options": {
+            "C": "모르어요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "C",
           "solver_key_accepted": false
         },
         {
@@ -1875,29 +2174,18 @@
           "blank_marker": "___",
           "options": {
             "A": "잘라요",
-            "B": "자르어요"
+            "D": "자르어요",
+            "C": "학교",
+            "B": "사과"
           },
           "correct_answer": "A",
           "correct_option_text": "잘라요",
           "distractor_options": {
-            "B": "자르어요"
+            "D": "자르어요",
+            "C": "학교",
+            "B": "사과"
           },
-          "solver_picked": "B",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "저는 답을 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "몰라요",
-            "B": "모르어요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "몰라요",
-          "distractor_options": {
-            "B": "모르어요"
-          },
-          "solver_picked": "B",
+          "solver_picked": "D",
           "solver_key_accepted": false
         },
         {
@@ -1905,89 +2193,18 @@
           "blank_marker": "___",
           "options": {
             "B": "몰라요",
-            "A": "모르어요"
+            "A": "모르어요",
+            "C": "학교",
+            "D": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "몰라요",
           "distractor_options": {
-            "A": "모르어요"
+            "A": "모르어요",
+            "C": "학교",
+            "D": "사과"
           },
           "solver_picked": "A",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "저는 답을 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "몰라요",
-            "A": "모르어요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "몰라요",
-          "distractor_options": {
-            "A": "모르어요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "저는 머리를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "잘라요",
-            "B": "자르어요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "잘라요",
-          "distractor_options": {
-            "B": "자르어요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "저는 머리를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "B": "잘라요",
-            "A": "자르어요"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "잘라요",
-          "distractor_options": {
-            "A": "자르어요"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "저는 노래를 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "불러요",
-            "B": "부르어요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "불러요",
-          "distractor_options": {
-            "B": "부르어요"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "저는 답을 ___.",
-          "blank_marker": "___",
-          "options": {
-            "A": "몰라요",
-            "B": "모르어요"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "몰라요",
-          "distractor_options": {
-            "B": "모르어요"
-          },
-          "solver_picked": "B",
           "solver_key_accepted": false
         },
         {
@@ -1995,29 +2212,132 @@
           "blank_marker": "___",
           "options": {
             "B": "불러요",
-            "A": "부르어요"
+            "D": "부르어요",
+            "C": "학교",
+            "A": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "불러요",
           "distractor_options": {
-            "A": "부르어요"
+            "D": "부르어요",
+            "C": "학교",
+            "A": "사과"
           },
-          "solver_picked": "B",
+          "solver_picked": "D",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 노래를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "불러요",
+            "B": "부르어요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "불러요",
+          "distractor_options": {
+            "B": "부르어요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
           "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 노래를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "불러요",
+            "C": "부르어요",
+            "B": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "불러요",
+          "distractor_options": {
+            "C": "부르어요",
+            "B": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 노래를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "D": "불러요",
+            "C": "부르어요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "불러요",
+          "distractor_options": {
+            "C": "부르어요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 노래를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "불러요",
+            "C": "부르어요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "불러요",
+          "distractor_options": {
+            "C": "부르어요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": false
         },
         {
           "stem": "저는 답을 ___.",
           "blank_marker": "___",
           "options": {
-            "B": "몰라요",
-            "A": "모르어요"
+            "D": "몰라요",
+            "C": "모르어요",
+            "B": "학교",
+            "A": "사과"
           },
-          "correct_answer": "B",
+          "correct_answer": "D",
           "correct_option_text": "몰라요",
           "distractor_options": {
-            "A": "모르어요"
+            "C": "모르어요",
+            "B": "학교",
+            "A": "사과"
           },
-          "solver_picked": "A",
+          "solver_picked": "C",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 답을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "몰라요",
+            "C": "모르어요",
+            "B": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "몰라요",
+          "distractor_options": {
+            "C": "모르어요",
+            "B": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
           "solver_key_accepted": false
         }
       ]
@@ -2028,36 +2348,63 @@
       "critic_attempts": 0,
       "critic_recoveries": 0,
       "solver_checked": 20,
-      "solver_key_accepted": 20,
+      "solver_key_accepted": 13,
       "items": [
         {
-          "stem": "저는 ___ 머리를 좋아해요.",
+          "stem": "저는 ___ 음식을 좋아해요.",
           "blank_marker": "___",
           "options": {
-            "B": "긴",
-            "A": "길는"
+            "D": "매운",
+            "A": "맵는",
+            "C": "학교",
+            "B": "사과"
           },
-          "correct_answer": "B",
-          "correct_option_text": "긴",
+          "correct_answer": "D",
+          "correct_option_text": "매운",
           "distractor_options": {
-            "A": "길는"
+            "A": "맵는",
+            "C": "학교",
+            "B": "사과"
           },
-          "solver_picked": "B",
+          "solver_picked": "A",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 가방을 좋아해요.",
+          "blank_marker": "___",
+          "options": {
+            "A": "작은",
+            "B": "작는",
+            "D": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "작은",
+          "distractor_options": {
+            "B": "작는",
+            "D": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "A",
           "solver_key_accepted": true
         },
         {
           "stem": "저는 ___ 음식을 좋아해요.",
           "blank_marker": "___",
           "options": {
-            "A": "매운",
-            "B": "맵는"
+            "D": "매운",
+            "C": "맵는",
+            "B": "학교",
+            "A": "사과"
           },
-          "correct_answer": "A",
+          "correct_answer": "D",
           "correct_option_text": "매운",
           "distractor_options": {
-            "B": "맵는"
+            "C": "맵는",
+            "B": "학교",
+            "A": "사과"
           },
-          "solver_picked": "A",
+          "solver_picked": "D",
           "solver_key_accepted": true
         },
         {
@@ -2065,117 +2412,16 @@
           "blank_marker": "___",
           "options": {
             "B": "작은",
-            "A": "작는"
+            "A": "작는",
+            "C": "학교",
+            "D": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "작은",
           "distractor_options": {
-            "A": "작는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 ___ 집을 좋아해요.",
-          "blank_marker": "___",
-          "options": {
-            "A": "큰",
-            "B": "크는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "큰",
-          "distractor_options": {
-            "B": "크는"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 ___ 집을 좋아해요.",
-          "blank_marker": "___",
-          "options": {
-            "A": "큰",
-            "B": "크는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "큰",
-          "distractor_options": {
-            "B": "크는"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 ___ 머리를 좋아해요.",
-          "blank_marker": "___",
-          "options": {
-            "B": "긴",
-            "A": "길는"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "긴",
-          "distractor_options": {
-            "A": "길는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 ___ 음식을 좋아해요.",
-          "blank_marker": "___",
-          "options": {
-            "A": "매운",
-            "B": "맵는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "매운",
-          "distractor_options": {
-            "B": "맵는"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 ___ 머리를 좋아해요.",
-          "blank_marker": "___",
-          "options": {
-            "A": "긴",
-            "B": "길는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "긴",
-          "distractor_options": {
-            "B": "길는"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 ___ 집을 좋아해요.",
-          "blank_marker": "___",
-          "options": {
-            "B": "큰",
-            "A": "크는"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "큰",
-          "distractor_options": {
-            "A": "크는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 ___ 머리를 좋아해요.",
-          "blank_marker": "___",
-          "options": {
-            "B": "긴",
-            "A": "길는"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "긴",
-          "distractor_options": {
-            "A": "길는"
+            "A": "작는",
+            "C": "학교",
+            "D": "사과"
           },
           "solver_picked": "B",
           "solver_key_accepted": true
@@ -2185,89 +2431,56 @@
           "blank_marker": "___",
           "options": {
             "A": "비싼",
-            "B": "비싸는"
+            "C": "비싸는",
+            "D": "학교",
+            "B": "사과"
           },
           "correct_answer": "A",
           "correct_option_text": "비싼",
           "distractor_options": {
-            "B": "비싸는"
+            "C": "비싸는",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 음식을 좋아해요.",
+          "blank_marker": "___",
+          "options": {
+            "A": "매운",
+            "C": "맵는",
+            "B": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "매운",
+          "distractor_options": {
+            "C": "맵는",
+            "B": "학교",
+            "D": "사과"
           },
           "solver_picked": "A",
           "solver_key_accepted": true
         },
         {
-          "stem": "저는 ___ 머리를 좋아해요.",
+          "stem": "저는 ___ 음식을 좋아해요.",
           "blank_marker": "___",
           "options": {
-            "B": "긴",
-            "A": "길는"
+            "C": "매운",
+            "D": "맵는",
+            "B": "학교",
+            "A": "사과"
           },
-          "correct_answer": "B",
-          "correct_option_text": "긴",
+          "correct_answer": "C",
+          "correct_option_text": "매운",
           "distractor_options": {
-            "A": "길는"
+            "D": "맵는",
+            "B": "학교",
+            "A": "사과"
           },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 ___ 집을 좋아해요.",
-          "blank_marker": "___",
-          "options": {
-            "A": "큰",
-            "B": "크는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "큰",
-          "distractor_options": {
-            "B": "크는"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 ___ 시계를 좋아해요.",
-          "blank_marker": "___",
-          "options": {
-            "B": "비싼",
-            "A": "비싸는"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "비싼",
-          "distractor_options": {
-            "A": "비싸는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 ___ 가방을 좋아해요.",
-          "blank_marker": "___",
-          "options": {
-            "A": "작은",
-            "B": "작는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "작은",
-          "distractor_options": {
-            "B": "작는"
-          },
-          "solver_picked": "A",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "저는 ___ 시계를 좋아해요.",
-          "blank_marker": "___",
-          "options": {
-            "B": "비싼",
-            "A": "비싸는"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "비싼",
-          "distractor_options": {
-            "A": "비싸는"
-          },
-          "solver_picked": "B",
+          "solver_picked": "C",
           "solver_key_accepted": true
         },
         {
@@ -2275,29 +2488,56 @@
           "blank_marker": "___",
           "options": {
             "B": "매운",
-            "A": "맵는"
+            "D": "맵는",
+            "C": "학교",
+            "A": "사과"
           },
           "correct_answer": "B",
           "correct_option_text": "매운",
           "distractor_options": {
-            "A": "맵는"
+            "D": "맵는",
+            "C": "학교",
+            "A": "사과"
           },
           "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 시계를 좋아해요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "비싼",
+            "B": "비싸는",
+            "A": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "비싼",
+          "distractor_options": {
+            "B": "비싸는",
+            "A": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "D",
           "solver_key_accepted": true
         },
         {
           "stem": "저는 ___ 가방을 좋아해요.",
           "blank_marker": "___",
           "options": {
-            "B": "작은",
-            "A": "작는"
+            "C": "작은",
+            "A": "작는",
+            "B": "학교",
+            "D": "사과"
           },
-          "correct_answer": "B",
+          "correct_answer": "C",
           "correct_option_text": "작은",
           "distractor_options": {
-            "A": "작는"
+            "A": "작는",
+            "B": "학교",
+            "D": "사과"
           },
-          "solver_picked": "B",
+          "solver_picked": "C",
           "solver_key_accepted": true
         },
         {
@@ -2305,30 +2545,190 @@
           "blank_marker": "___",
           "options": {
             "A": "매운",
-            "B": "맵는"
+            "B": "맵는",
+            "C": "학교",
+            "D": "사과"
           },
           "correct_answer": "A",
           "correct_option_text": "매운",
           "distractor_options": {
-            "B": "맵는"
+            "B": "맵는",
+            "C": "학교",
+            "D": "사과"
           },
-          "solver_picked": "A",
+          "solver_picked": "B",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 시계를 좋아해요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "비싼",
+            "B": "비싸는",
+            "C": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "비싼",
+          "distractor_options": {
+            "B": "비싸는",
+            "C": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "D",
           "solver_key_accepted": true
         },
         {
-          "stem": "저는 ___ 음식을 좋아해요.",
+          "stem": "저는 ___ 가방을 좋아해요.",
           "blank_marker": "___",
           "options": {
-            "B": "매운",
-            "A": "맵는"
+            "C": "작은",
+            "A": "작는",
+            "B": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "작은",
+          "distractor_options": {
+            "A": "작는",
+            "B": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 옷을 좋아해요.",
+          "blank_marker": "___",
+          "options": {
+            "C": "예쁜",
+            "D": "예쁘는",
+            "A": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "예쁜",
+          "distractor_options": {
+            "D": "예쁘는",
+            "A": "학교",
+            "B": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 머리를 좋아해요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "긴",
+            "B": "길는",
+            "A": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "긴",
+          "distractor_options": {
+            "B": "길는",
+            "A": "학교",
+            "C": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 집을 좋아해요.",
+          "blank_marker": "___",
+          "options": {
+            "B": "큰",
+            "C": "크는",
+            "D": "학교",
+            "A": "사과"
           },
           "correct_answer": "B",
-          "correct_option_text": "매운",
+          "correct_option_text": "큰",
           "distractor_options": {
-            "A": "맵는"
+            "C": "크는",
+            "D": "학교",
+            "A": "사과"
           },
           "solver_picked": "B",
           "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 머리를 좋아해요.",
+          "blank_marker": "___",
+          "options": {
+            "B": "긴",
+            "D": "길는",
+            "A": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "긴",
+          "distractor_options": {
+            "D": "길는",
+            "A": "학교",
+            "C": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 가방을 좋아해요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "작은",
+            "B": "작는",
+            "C": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "작은",
+          "distractor_options": {
+            "B": "작는",
+            "C": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 옷을 좋아해요.",
+          "blank_marker": "___",
+          "options": {
+            "B": "예쁜",
+            "D": "예쁘는",
+            "A": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "예쁜",
+          "distractor_options": {
+            "D": "예쁘는",
+            "A": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 머리를 좋아해요.",
+          "blank_marker": "___",
+          "options": {
+            "B": "긴",
+            "C": "길는",
+            "A": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "긴",
+          "distractor_options": {
+            "C": "길는",
+            "A": "학교",
+            "D": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
         }
       ]
     },
@@ -2338,312 +2738,392 @@
       "critic_attempts": 0,
       "critic_recoveries": 0,
       "solver_checked": 20,
-      "solver_key_accepted": 7,
+      "solver_key_accepted": 2,
       "items": [
         {
-          "stem": "A: 누가 밥을 먹어요? B: ___ 밥을 먹어요",
+          "stem": "질문: 누가 밥을 먹어요? 답: ___ 밥을 먹어요",
           "blank_marker": "___",
           "options": {
-            "A": "내가",
-            "B": "나는"
+            "C": "내가",
+            "B": "나는",
+            "D": "도",
+            "A": "만"
           },
-          "correct_answer": "A",
+          "correct_answer": "C",
           "correct_option_text": "내가",
           "distractor_options": {
-            "B": "나는"
+            "B": "나는",
+            "D": "도",
+            "A": "만"
           },
           "solver_picked": "B",
           "solver_key_accepted": false
         },
         {
-          "stem": "A: 누가 밥을 먹어요? B: ___ 밥을 먹어요",
+          "stem": "질문: 누가 책을 읽어요? 답: ___ 책을 읽어요",
           "blank_marker": "___",
           "options": {
-            "A": "내가",
-            "B": "나는"
+            "D": "제가",
+            "C": "저는",
+            "B": "도",
+            "A": "만"
           },
-          "correct_answer": "A",
+          "correct_answer": "D",
+          "correct_option_text": "제가",
+          "distractor_options": {
+            "C": "저는",
+            "B": "도",
+            "A": "만"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "질문: 누가 밥을 먹어요? 답: ___ 밥을 먹어요",
+          "blank_marker": "___",
+          "options": {
+            "D": "내가",
+            "C": "나는",
+            "B": "도",
+            "A": "만"
+          },
+          "correct_answer": "D",
           "correct_option_text": "내가",
           "distractor_options": {
-            "B": "나는"
+            "C": "나는",
+            "B": "도",
+            "A": "만"
           },
-          "solver_picked": "B",
+          "solver_picked": "C",
           "solver_key_accepted": false
         },
         {
-          "stem": "A: 누가 책을 읽어요? B: ___ 책을 읽어요",
+          "stem": "질문: 누가 학교에 가요? 답: ___ 학교에 가요",
           "blank_marker": "___",
           "options": {
-            "A": "제가",
-            "B": "저는"
+            "C": "내가",
+            "D": "나는",
+            "B": "도",
+            "A": "만"
           },
-          "correct_answer": "A",
-          "correct_option_text": "제가",
+          "correct_answer": "C",
+          "correct_option_text": "내가",
           "distractor_options": {
-            "B": "저는"
+            "D": "나는",
+            "B": "도",
+            "A": "만"
           },
-          "solver_picked": "B",
+          "solver_picked": "D",
           "solver_key_accepted": false
         },
         {
-          "stem": "A: 누가 커피를 마셔요? B: ___ 커피를 마셔요",
-          "blank_marker": "___",
-          "options": {
-            "A": "제가",
-            "B": "저는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "제가",
-          "distractor_options": {
-            "B": "저는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "A: 누가 책을 읽어요? B: ___ 책을 읽어요",
-          "blank_marker": "___",
-          "options": {
-            "A": "제가",
-            "B": "저는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "제가",
-          "distractor_options": {
-            "B": "저는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "A: 누가 책을 읽어요? B: ___ 책을 읽어요",
-          "blank_marker": "___",
-          "options": {
-            "A": "제가",
-            "B": "저는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "제가",
-          "distractor_options": {
-            "B": "저는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "A: 누가 책을 읽어요? B: ___ 책을 읽어요",
-          "blank_marker": "___",
-          "options": {
-            "A": "제가",
-            "B": "저는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "제가",
-          "distractor_options": {
-            "B": "저는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "A: 누가 커피를 마셔요? B: ___ 커피를 마셔요",
+          "stem": "질문: 누가 커피를 마셔요? 답: ___ 커피를 마셔요",
           "blank_marker": "___",
           "options": {
             "B": "제가",
-            "A": "저는"
+            "A": "저는",
+            "D": "도",
+            "C": "만"
           },
           "correct_answer": "B",
           "correct_option_text": "제가",
           "distractor_options": {
-            "A": "저는"
+            "A": "저는",
+            "D": "도",
+            "C": "만"
           },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "A: 누가 커피를 마셔요? B: ___ 커피를 마셔요",
-          "blank_marker": "___",
-          "options": {
-            "A": "제가",
-            "B": "저는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "제가",
-          "distractor_options": {
-            "B": "저는"
-          },
-          "solver_picked": "B",
+          "solver_picked": "A",
           "solver_key_accepted": false
         },
         {
-          "stem": "A: 누가 책을 읽어요? B: ___ 책을 읽어요",
-          "blank_marker": "___",
-          "options": {
-            "B": "제가",
-            "A": "저는"
-          },
-          "correct_answer": "B",
-          "correct_option_text": "제가",
-          "distractor_options": {
-            "A": "저는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": true
-        },
-        {
-          "stem": "A: 누가 밥을 먹어요? B: ___ 밥을 먹어요",
-          "blank_marker": "___",
-          "options": {
-            "A": "내가",
-            "B": "나는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "내가",
-          "distractor_options": {
-            "B": "나는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "A: 누가 학교에 가요? B: ___ 학교에 가요",
+          "stem": "질문: 누가 학교에 가요? 답: ___ 학교에 가요",
           "blank_marker": "___",
           "options": {
             "B": "내가",
-            "A": "나는"
+            "D": "나는",
+            "A": "도",
+            "C": "만"
           },
           "correct_answer": "B",
           "correct_option_text": "내가",
           "distractor_options": {
-            "A": "나는"
+            "D": "나는",
+            "A": "도",
+            "C": "만"
           },
           "solver_picked": "B",
           "solver_key_accepted": true
         },
         {
-          "stem": "A: 누가 커피를 마셔요? B: ___ 커피를 마셔요",
+          "stem": "질문: 누가 책을 읽어요? 답: ___ 책을 읽어요",
           "blank_marker": "___",
           "options": {
             "B": "제가",
-            "A": "저는"
+            "D": "저는",
+            "A": "도",
+            "C": "만"
           },
           "correct_answer": "B",
           "correct_option_text": "제가",
           "distractor_options": {
-            "A": "저는"
+            "D": "저는",
+            "A": "도",
+            "C": "만"
           },
-          "solver_picked": "B",
-          "solver_key_accepted": true
+          "solver_picked": "D",
+          "solver_key_accepted": false
         },
         {
-          "stem": "A: 누가 책을 읽어요? B: ___ 책을 읽어요",
+          "stem": "질문: 누가 책을 읽어요? 답: ___ 책을 읽어요",
           "blank_marker": "___",
           "options": {
             "B": "제가",
-            "A": "저는"
+            "C": "저는",
+            "D": "도",
+            "A": "만"
           },
           "correct_answer": "B",
           "correct_option_text": "제가",
           "distractor_options": {
-            "A": "저는"
+            "C": "저는",
+            "D": "도",
+            "A": "만"
           },
-          "solver_picked": "B",
-          "solver_key_accepted": true
+          "solver_picked": null,
+          "solver_key_accepted": false
         },
         {
-          "stem": "A: 누가 책을 읽어요? B: ___ 책을 읽어요",
+          "stem": "질문: 누가 커피를 마셔요? 답: ___ 커피를 마셔요",
+          "blank_marker": "___",
+          "options": {
+            "D": "제가",
+            "A": "저는",
+            "B": "도",
+            "C": "만"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "제가",
+          "distractor_options": {
+            "A": "저는",
+            "B": "도",
+            "C": "만"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "질문: 누가 책을 읽어요? 답: ___ 책을 읽어요",
+          "blank_marker": "___",
+          "options": {
+            "C": "제가",
+            "D": "저는",
+            "A": "도",
+            "B": "만"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "제가",
+          "distractor_options": {
+            "D": "저는",
+            "A": "도",
+            "B": "만"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "질문: 누가 커피를 마셔요? 답: ___ 커피를 마셔요",
           "blank_marker": "___",
           "options": {
             "A": "제가",
-            "B": "저는"
+            "C": "저는",
+            "B": "도",
+            "D": "만"
           },
           "correct_answer": "A",
           "correct_option_text": "제가",
           "distractor_options": {
-            "B": "저는"
+            "C": "저는",
+            "B": "도",
+            "D": "만"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "질문: 누가 책을 읽어요? 답: ___ 책을 읽어요",
+          "blank_marker": "___",
+          "options": {
+            "C": "제가",
+            "B": "저는",
+            "D": "도",
+            "A": "만"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "제가",
+          "distractor_options": {
+            "B": "저는",
+            "D": "도",
+            "A": "만"
           },
           "solver_picked": "B",
           "solver_key_accepted": false
         },
         {
-          "stem": "A: 누가 밥을 먹어요? B: ___ 밥을 먹어요",
+          "stem": "질문: 누가 학교에 가요? 답: ___ 학교에 가요",
           "blank_marker": "___",
           "options": {
             "A": "내가",
-            "B": "나는"
+            "C": "나는",
+            "B": "도",
+            "D": "만"
           },
           "correct_answer": "A",
           "correct_option_text": "내가",
           "distractor_options": {
-            "B": "나는"
+            "C": "나는",
+            "B": "도",
+            "D": "만"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "질문: 누가 학교에 가요? 답: ___ 학교에 가요",
+          "blank_marker": "___",
+          "options": {
+            "D": "내가",
+            "A": "나는",
+            "C": "도",
+            "B": "만"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "내가",
+          "distractor_options": {
+            "A": "나는",
+            "C": "도",
+            "B": "만"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "질문: 누가 커피를 마셔요? 답: ___ 커피를 마셔요",
+          "blank_marker": "___",
+          "options": {
+            "D": "제가",
+            "B": "저는",
+            "A": "도",
+            "C": "만"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "제가",
+          "distractor_options": {
+            "B": "저는",
+            "A": "도",
+            "C": "만"
           },
           "solver_picked": "B",
           "solver_key_accepted": false
         },
         {
-          "stem": "A: 누가 책을 읽어요? B: ___ 책을 읽어요",
+          "stem": "질문: 누가 책을 읽어요? 답: ___ 책을 읽어요",
           "blank_marker": "___",
           "options": {
-            "B": "제가",
-            "A": "저는"
+            "C": "제가",
+            "D": "저는",
+            "A": "도",
+            "B": "만"
           },
-          "correct_answer": "B",
+          "correct_answer": "C",
           "correct_option_text": "제가",
           "distractor_options": {
-            "A": "저는"
+            "D": "저는",
+            "A": "도",
+            "B": "만"
           },
-          "solver_picked": "B",
-          "solver_key_accepted": true
+          "solver_picked": "D",
+          "solver_key_accepted": false
         },
         {
-          "stem": "A: 누가 밥을 먹어요? B: ___ 밥을 먹어요",
+          "stem": "질문: 누가 책을 읽어요? 답: ___ 책을 읽어요",
+          "blank_marker": "___",
+          "options": {
+            "C": "제가",
+            "D": "저는",
+            "A": "도",
+            "B": "만"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "제가",
+          "distractor_options": {
+            "D": "저는",
+            "A": "도",
+            "B": "만"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "질문: 누가 학교에 가요? 답: ___ 학교에 가요",
           "blank_marker": "___",
           "options": {
             "B": "내가",
-            "A": "나는"
+            "A": "나는",
+            "C": "도",
+            "D": "만"
           },
           "correct_answer": "B",
           "correct_option_text": "내가",
           "distractor_options": {
-            "A": "나는"
+            "A": "나는",
+            "C": "도",
+            "D": "만"
           },
-          "solver_picked": "B",
+          "solver_picked": "A",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "질문: 누가 책을 읽어요? 답: ___ 책을 읽어요",
+          "blank_marker": "___",
+          "options": {
+            "C": "제가",
+            "D": "저는",
+            "B": "도",
+            "A": "만"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "제가",
+          "distractor_options": {
+            "D": "저는",
+            "B": "도",
+            "A": "만"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "질문: 누가 커피를 마셔요? 답: ___ 커피를 마셔요",
+          "blank_marker": "___",
+          "options": {
+            "A": "제가",
+            "C": "저는",
+            "D": "도",
+            "B": "만"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "제가",
+          "distractor_options": {
+            "C": "저는",
+            "D": "도",
+            "B": "만"
+          },
+          "solver_picked": "A",
           "solver_key_accepted": true
-        },
-        {
-          "stem": "A: 누가 밥을 먹어요? B: ___ 밥을 먹어요",
-          "blank_marker": "___",
-          "options": {
-            "A": "내가",
-            "B": "나는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "내가",
-          "distractor_options": {
-            "B": "나는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
-        },
-        {
-          "stem": "A: 누가 밥을 먹어요? B: ___ 밥을 먹어요",
-          "blank_marker": "___",
-          "options": {
-            "A": "내가",
-            "B": "나는"
-          },
-          "correct_answer": "A",
-          "correct_option_text": "내가",
-          "distractor_options": {
-            "B": "나는"
-          },
-          "solver_picked": "B",
-          "solver_key_accepted": false
         }
       ]
     }
   },
   "overall_generation_pass_rate": 1.0,
   "overall_critic_recovery_rate": null,
-  "overall_solver_key_accept_rate": 0.73125
+  "overall_solver_key_accept_rate": 0.60625
 }
