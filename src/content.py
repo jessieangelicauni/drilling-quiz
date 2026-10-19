@@ -28,8 +28,7 @@ ABSTRACT = (
     "specifically unsuited here; in a simulation of 120,000 responses we reproduce its "
     "documented failure, with the spread of learner ratings inflating to 2.7 against a true "
     "value of 1.0 and still rising, while the Urnings algorithm remains calibrated at 1.1. "
-    "Third, we propose three novelties: a Generate–Calibrate–Select loop that makes a newly "
-    "generated item immediately usable by seeding its psychometric prior from a text encoder; "
+    "Third, we propose two novelties: "
     "misconception-conditioned distractors that turn each wrong answer into a specific "
     "diagnosis rather than an undifferentiated error; and an uncertainty-gated escalation "
     "policy that spends expensive model capacity only where measurement is least certain. "
@@ -98,8 +97,8 @@ BODY = [
 ("L", "A simulation, also in Section III, showing concretely that the Elo rating system—the "
       "most widely deployed tracker in adaptive practice platforms—fails in exactly the "
       "regime a generative item pool creates, and quantifying how badly."),
-("L", "Three architectural novelties, set out in Section IV, that together address the "
-      "calibration, diagnosis, and cost problems that the gap analysis identifies."),
+("L", "Two architectural novelties, set out in Section IV, that together address the "
+      "diagnosis and cost problems that the gap analysis identifies."),
 ("L", "A pre-registered experimental design, in Section V, capable of distinguishing the "
       "contribution of each component rather than only evaluating the system as a whole."),
 
@@ -135,7 +134,7 @@ BODY = [
       "think is more useful: what does the choice of a particular wrong answer tell us about "
       "the learner? A parallel line of work uses LLMs not to generate educational content but "
       "to judge it, as Li et al. do for student-generated material in learnersourcing [14]; "
-      "this is closer to the verification role we describe in Section IV-C, though it has not "
+      "this is closer to the verification role we describe in Section IV-B, though it has not "
       "been applied to checking the grammatical validity of generated distractors."),
 
 ("H2", "B. Estimating How Difficult an Item Is"),
@@ -292,32 +291,25 @@ BODY = [
 ("H2", "F. Research Gaps"),
 
 ("P", "Reading these literatures together, including the deployed systems just discussed, "
-      "four gaps stand out. They are not independent; each follows from the one before, and "
+      "three gaps stand out. They are not independent; each follows from the one before, and "
       "the last is precisely the gap that large-scale systems sidestep by not generating "
       "items at all."),
 
-("P", "G1. Generation and calibration are studied separately. The item generation "
-      "literature produces items and evaluates their surface quality [5], [6], [10]. The "
-      "psychometric literature calibrates items and assumes they already exist [11], [13]. "
-      "No published system treats generation and calibration as a single loop, which is what "
-      "an on-demand item pool requires. The consequence is that generative systems either "
-      "fall back on the LLM's own unreliable difficulty judgement [12] or forgo adaptivity."),
-
-("P", "G2. Wrong answers are wasted. Distractors are optimised to be plausible [10], not to "
+("P", "G1. Wrong answers are wasted. Distractors are optimised to be plausible [10], not to "
       "be informative. When a learner selects a particular wrong answer they have revealed "
       "something quite specific about their internal model of the grammar, and current "
       "systems discard that signal, recording only a binary outcome. Cognitive diagnosis "
       "models would make use of it [22], [23], but they require a pre-specified mapping from "
       "items to skills that generated items do not come with."),
 
-("P", "G3. Rating systems are used outside their validity conditions. Elo is deployed in "
+("P", "G2. Rating systems are used outside their validity conditions. Elo is deployed in "
       "adaptive platforms [18] in the one configuration where its measurement properties "
       "break down—simultaneous adaptive item selection and dynamic item calibration—and this "
       "has only recently been characterised precisely [15]. A generative item pool forces "
       "exactly that configuration, because items must be calibrated as they are used. We "
       "are not aware of any language learning system that uses Urnings."),
 
-("P", "G4. Feedback is generated uniformly, and its benefits are not. Lin et al., studying "
+("P", "G3. Feedback is generated uniformly, and its benefits are not. Lin et al., studying "
       "on-demand LLM explanatory feedback across seven lessons with 885 learners, found "
       "statistically significant benefits in only two of them, with effect sizes of 0.28 and "
       "0.33 after adjusting for learners' propensity to request feedback [29]. Feedback is "
@@ -395,7 +387,7 @@ BODY = [
 ("P", "To confirm that this matters at realistic scale rather than only in principle, we "
       "simulated 120,000 responses from 300 learners against a pool of 400 items under a "
       "Rasch generating model, with adaptive selection and simultaneous item updating. "
-      "Fig. 5 shows the result. The standard deviation of Elo learner ratings grows "
+      "Fig. 4 shows the result. The standard deviation of Elo learner ratings grows "
       "monotonically to 2.69 against a true value of 1.04 and is still rising when the "
       "simulation ends; root mean squared error against true ability likewise grows, from a "
       "minimum of 0.44 at around 15,000 responses to 1.70 at the end. The system becomes "
@@ -429,7 +421,7 @@ BODY = [
       "but Korean proficiency is not one thing. A learner may handle particles well and "
       "honorifics poorly. Collapsing this into a scalar discards the structure that makes "
       "personalisation worthwhile. Urnings extends naturally to tracking many abilities "
-      "simultaneously [16], which is what the diagnostic scheme in Section IV-C requires."),
+      "simultaneously [16], which is what the diagnostic scheme in Section IV-B requires."),
 
 ("H2", "C. Which Models for Which Role?"),
 
@@ -443,7 +435,7 @@ BODY = [
       "English-centric tokenisers—the same consideration that motivates KRongBERT's "
       "morphological factorisation [26]. And its hybrid design, offering both a fast "
       "non-reasoning mode and a slower reasoning mode, maps unusually well onto the "
-      "escalation policy we describe in Section IV-D. The main caveat is licensing: EXAONE "
+      "escalation policy we describe in Section IV-C. The main caveat is licensing: EXAONE "
       "is released under terms restricting commercial use, which is unproblematic for "
       "research but must be disclosed, and which is a reason to retain a permissively "
       "licensed fallback."),
@@ -464,7 +456,8 @@ BODY = [
       "not emit a point estimate. It should emit a mean and a variance, because that "
       "distribution becomes the prior for the psychometric tracker, and an item the encoder "
       "is unsure about should enter the pool with correspondingly wide uncertainty rather "
-      "than with false confidence. This is the hinge on which the first novelty turns."),
+      "than with false confidence. This feeds directly into the adaptive selection policy "
+      "described in Section IV-D."),
 
 ("H1", "IV. Proposed Method: KO-DRILL"),
 
@@ -484,51 +477,10 @@ BODY = [
 
 ("EQ", "P(X_{pi} = 1 | θ_{p}, β_{i}) = σ(θ_{p} − β_{i})\t(1)"),
 
-("H2", "B. Novelty 1: The Generate–Calibrate–Select Loop"),
+("H2", "B. Novelty 1: Misconception-Conditioned Diagnostic Distractors"),
 
-("P", "The first novelty addresses gap G1: that a newly generated item has no difficulty "
-      "estimate and therefore cannot be used adaptively. Our solution is to give it one "
-      "before it is ever served, and to make that estimate honest about its own uncertainty. "
-      "Fig. 2 shows the loop."),
-
-("P", "A fine-tuned KLUE-RoBERTa encoder f_{φ} maps the text of item i to a predicted "
-      "difficulty and a predicted variance,"),
-
-("EQ", "(μ̂_{i}, σ̂_{i}^{2}) = f_{φ}(text_{i})\t(2)"),
-
-("P", "trained with a heteroscedastic Gaussian negative log-likelihood so that the variance "
-      "head is meaningful rather than decorative. This distribution is then converted "
-      "directly into the item's initial urn. An Urnings item urn holds n_{i} balls of which k_{i} "
-      "are green; we set"),
-
-("EQ", "k_{i}^{(0)} = round(n_{i} · σ(−μ̂_{i})),   n_{i} = clip(c / σ̂_{i}^{2}, n_{min}, n_{max})\t(3)"),
-
-("P", "The interpretation is direct. The proportion of green balls encodes the predicted "
-      "difficulty, and the number of balls encodes how much the system trusts that "
-      "prediction: a confident prediction yields a large urn that real responses will move "
-      "only slowly, while an uncertain prediction yields a small urn that observed data will "
-      "quickly dominate. The prior is thus not merely an initialisation but a weight, and it "
-      "decays automatically as evidence accumulates. Standard Urnings updates then proceed "
-      "unchanged, exchanging balls between the learner's urn and the item's urn on each "
-      "response:"),
-
-("EQ", "k_{p}* = k_{p} + X − Y,   k_{i}* = k_{i} − X + Y\t(4)"),
-
-("P", "where X is the observed response and Y a response simulated from the current urn "
-      "states, with a Metropolis–Hastings step accepting or rejecting the proposal."),
-
-("P", "The loop closes with periodic re-distillation. Once items have accumulated real "
-      "responses, their Urnings posteriors constitute ground-truth difficulty labels; the "
-      "encoder is retrained on them, so its priors for genuinely unseen items sharpen over "
-      "time. The system bootstraps its own calibration data. To our knowledge no existing "
-      "system treats item generation and psychometric calibration as a single closed loop in "
-      "this way; the closest analogues either generate without calibrating [5], [10] or "
-      "calibrate a fixed bank without generating [13]."),
-
-("H2", "C. Novelty 2: Misconception-Conditioned Diagnostic Distractors"),
-
-("P", "The second novelty addresses gap G2: that wrong answers currently carry no "
-      "information. Fig. 3 shows the design."),
+("P", "The first novelty addresses gap G1: that wrong answers currently carry no "
+      "information. Fig. 2 shows the design."),
 
 ("P", "Rather than inventing a project-specific error scheme, we ground the taxonomy ℳ in "
       "KAGAS, the 14-category Korean Automatic Grammatical error Annotation System [24], "
@@ -570,10 +522,10 @@ BODY = [
       "verification fails, in exchange for converging on a valid item faster than blind "
       "resampling does."),
 
-("H2", "D. Novelty 3: Uncertainty-Gated Escalation"),
+("H2", "C. Novelty 2: Uncertainty-Gated Escalation"),
 
-("P", "The third novelty addresses gap G4: that feedback is generated uniformly although its "
-      "benefits are not [29]. Fig. 4 shows the policy."),
+("P", "The second novelty addresses gap G3: that feedback is generated uniformly although its "
+      "benefits are not [29]. Fig. 3 shows the policy."),
 
 ("P", "Each skill dimension k of a learner carries an urn whose size determines the width "
       "w_{k} of the posterior—a direct, natively available measure of how uncertain the system "
@@ -583,7 +535,7 @@ BODY = [
       "probe and a contrastive English explanation naming the specific misconception—only "
       "when the measurement would be worth the cost:"),
 
-("EQ", "escalate  ⟺  w_{k} > τ   ∨   consecutive(m_{j}) ≥ 2\t(5)"),
+("EQ", "escalate  ⟺  w_{k} > τ   ∨   consecutive(m_{j}) ≥ 2\t(2)"),
 
 ("P", "That is, when the system is genuinely uncertain about the learner on this skill, or "
       "when the learner has repeated the same diagnosed misconception and a persistent "
@@ -598,7 +550,7 @@ BODY = [
       "it where it should do most good. We are not aware of prior work that allocates "
       "generative compute in an educational system according to psychometric uncertainty."),
 
-("H2", "E. Selection Policy: Measurement Versus Learning"),
+("H2", "D. Selection Policy: Measurement Versus Learning"),
 
 ("P", "One further design decision deserves explicit defence because it departs from "
       "convention. Classical adaptive testing selects the item that maximises information "
@@ -610,25 +562,25 @@ BODY = [
       "about 85% [27], and the pedagogical literature on desirable difficulty points the "
       "same way. We therefore select"),
 
-("EQ", "i* = argmin_{i} | σ(θ̂_{p} − β̂_{i}) − 0.85 |\t(6)"),
+("EQ", "i* = argmin_{i} | σ(θ̂_{p} − β̂_{i}) − 0.85 |\t(3)"),
 
 ("P", "restricted to items targeting the skill with the greatest expected pedagogical return. "
       "This deliberately sacrifices measurement efficiency for learning efficiency. Because "
       "the trade-off is real rather than free—a drill system is also, implicitly, an "
       "assessment—this choice over the conventional maximum-information target is a design "
       "decision we state rather than resolve empirically in the present evaluation; it is "
-      "a natural comparison for future work rather than one of the three claims this paper "
+      "a natural comparison for future work rather than one of the two claims this paper "
       "sets out to validate in Section V. Scheduling across sessions follows a spacing model "
       "in the tradition of half-life regression [28], with the tracker posterior supplying "
       "the ability term."),
 
 ("H1", "V. Experimental Design"),
 
-("P", "This design follows directly from Section IV: each of the three novelties gets a "
+("P", "This design follows directly from Section IV: each of the two novelties gets a "
       "single, targeted piece of evidence rather than an exhaustive ablation grid, because "
       "a large factorial study answers questions this paper does not ask. The offline "
-      "validations in Subsections B through D are the primary evidence for the paper's "
-      "claims and stand on their own; the classroom pilot in Subsection E is a secondary, "
+      "validations in Subsections B through C are the primary evidence for the paper's "
+      "claims and stand on their own; the classroom pilot in Subsection D is a secondary, "
       "exploratory extension that is valuable but not a precondition for the technical "
       "claims being true."),
 
@@ -639,60 +591,18 @@ BODY = [
       "misconception taxonomy is KAGAS [24], the 14-category Korean grammatical error "
       "taxonomy, rather than a project-specific scheme, so that the diagnostic labels a "
       "generated distractor carries are independently defined and independently "
-      "auditable. For supervised difficulty calibration we use retired TOPIK items with "
-      "published response statistics. All generated items entering any evaluation are "
+      "auditable. All generated items entering any evaluation are "
       "reviewed by qualified Korean instructors first; we report, but do not act on, the "
       "verifier's agreement with those reviewers, so that the verifier's standalone "
       "accuracy can be measured on its own terms."),
 
-("H2", "B. Validating Novelty 1: The Generate–Calibrate–Select Loop"),
-
-("P", "The claim to validate is narrow: does seeding a new item's urn from the encoder's "
-      "predicted (μ̂ᵢ, σ̂ᵢ²) make that item usable sooner than treating it as unknown? We "
-      "test this with one controlled comparison, not a factorial sweep — a held-out set of "
-      "generated items is served under two conditions, encoder-seeded urns and "
-      "uninformative urns, with every other part of the pipeline identical, and we report "
-      "the number of responses each condition needs before the item's estimated difficulty "
-      "reaches a fixed precision. This single number is the direct operational claim of "
-      "Novelty 1, and it is what we measure — not tracker behaviour in general, which "
-      "Section III-B already establishes with the simulation in Fig. 5 and does not need "
-      "repeating here."),
-
-("P", "Calibration quality is assessed by comparing encoder priors against tracker "
-      "posteriors once items have accumulated real responses, reporting root mean squared "
-      "error and, importantly, whether the predicted variances are themselves calibrated — "
-      "whether items the encoder claimed to be unsure about are in fact the ones it got "
-      "wrong. We also check the re-distillation effect once, at one retraining round, "
-      "rather than tracking it across many rounds: does prior quality on held-out items "
-      "improve after the encoder is retrained on accumulated posteriors, yes or no."),
-
-("P", "A preliminary simulation, run ahead of the encoder-on-real-data study above and "
-      "reported here for transparency rather than omitted, complicates the headline claim. "
-      "Using the same Rasch generating model and adaptive-selection regime as Fig. 5, "
-      "seeding item urns from a noisy but unbiased difficulty estimate did not measurably "
-      "speed convergence of learner ability estimates under Urnings, across simulated "
-      "estimator quality ranging from weak to strong (correlation 0.47-0.96 with true "
-      "difficulty) and in both a fixed and a continuously growing item pool. A parallel "
-      "check under Elo-style tracking showed the expected speedup clearly when the "
-      "estimator was accurate, but also showed severe degradation — final RMSE several "
-      "times worse than an uninformative start — once the estimator was only moderately or "
-      "poorly correlated with the truth, because Elo has no mechanism analogous to "
-      "σ̂ᵢ² for discounting an untrustworthy prior. We read this as evidence for a "
-      "different, and arguably more load-bearing, property than the one originally framed: "
-      "Urnings' confidence-weighted urn sizing makes prior injection safe under estimator "
-      "uncertainty — the condition this system actually faces, since the encoder described "
-      "above is not yet trained — rather than a guaranteed speedup, which presupposes an "
-      "estimator quality not yet established. The encoder-on-real-data study above is "
-      "designed to test both the original convergence claim and this robustness property, "
-      "not the convergence claim alone."),
-
-("H2", "C. Validating Novelty 2: Misconception-Conditioned Distractors"),
+("H2", "B. Validating Novelty 1: Misconception-Conditioned Distractors"),
 
 ("P", "Item quality is rated by three independent Korean language instructors on four "
       "dimensions — grammaticality of the stem, uniqueness of the key, plausibility of "
       "each distractor, and correctness of the KAGAS label — with agreement reported as "
       "Fleiss' κ. Two measures matter most. First, the rate of items containing more than "
-      "one defensible answer, since this is the failure the verifier gate in Section IV-C "
+      "one defensible answer, since this is the failure the verifier gate in Section IV-B "
       "exists specifically to catch, and it is the one the general distractor-generation "
       "literature does not report [10]. Second, agreement between the KAGAS label a "
       "distractor was generated to realise and the label an instructor independently "
@@ -700,7 +610,7 @@ BODY = [
       "misconception-conditioning actually produces a usable diagnosis, or merely a "
       "plausible wrong answer with a label attached."),
 
-("H2", "D. Validating Novelty 3: Uncertainty-Gated Escalation"),
+("H2", "C. Validating Novelty 2: Uncertainty-Gated Escalation"),
 
 ("P", "Two questions, each answered by one comparison. First, is the escalation trigger "
       "actually diagnostic of where measurement is weak: we correlate the posterior width "
@@ -713,17 +623,17 @@ BODY = [
       "precision, that is the claim; if it does not, that is a negative result worth "
       "reporting plainly rather than omitting."),
 
-("H2", "E. Exploratory Classroom Pilot"),
+("H2", "D. Exploratory Classroom Pilot"),
 
-("P", "Fig. 6 summarises the design, offered as secondary evidence of real-world "
+("P", "Fig. 5 summarises the design, offered as secondary evidence of real-world "
       "usefulness rather than as the paper's central claim. We recruit learners of Korean "
       "as a foreign language at CEFR A2–B1 equivalent, block-randomised by placement score "
       "into three arms. Arm A receives a fixed expert-authored item bank in random order. "
       "Arm B receives the same fixed bank with Elo-based adaptive selection, representing "
       "current good practice [18]. Arm C receives the full KO-DRILL system. Arms A and B "
       "share an item bank so that the effect of generation is separable from the effect of "
-      "adaptivity. Running this pilot at the full scale implied by Fig. 6 — three arms of "
-      "60 — is desirable but not required before the claims in Subsections B through D can "
+      "adaptivity. Running this pilot at the full scale implied by Fig. 5 — three arms of "
+      "60 — is desirable but not required before the claims in Subsections B through C can "
       "be reported; a smaller single-cohort pilot comparing only Arm A against Arm C is a "
       "reasonable first step if resources are limited, at the cost of not separating the "
       "generation and adaptivity effects."),
@@ -737,9 +647,9 @@ BODY = [
       "two-sided, or d = 0.59 Bonferroni-corrected across the three pairwise comparisons — "
       "larger than the 0.28–0.33 range reported for LLM feedback alone [29]. This is a "
       "known limitation of the pilot, not of the paper's technical claims, which is "
-      "exactly why Subsections B through D are designed to stand independently of it."),
+      "exactly why Subsections B through C are designed to stand independently of it."),
 
-("H2", "F. Threats to Validity"),
+("H2", "E. Threats to Validity"),
 
 ("P", "Three threats apply regardless of which evaluation is run. Novelty effects may "
       "inflate engagement in any condition using the generative system regardless of "
@@ -842,31 +752,26 @@ FIGURES = [
   "an English explainer (Qwen3). Learner state is held by an explicit multidimensional Urnings "
   "tracker rather than by a neural network, so that every ability estimate carries a known "
   "standard error."),
- ("figures/fig2_gcs_loop.png", 6.9,
-  "Fig. 2. The Generate–Calibrate–Select loop (Novelty 1). The encoder's predicted mean and "
-  "variance are converted into the composition and size of the item's initial urn, so a newly "
-  "generated item is adaptively servable immediately, with uncertainty that decays as real "
-  "responses arrive. Accumulated posteriors are periodically distilled back into the encoder."),
- ("figures/fig3_distractors.png", 6.4,
-  "Fig. 3. Misconception-conditioned distractor generation (Novelty 2). Each distractor is "
+ ("figures/fig2_distractors.png", 6.4,
+  "Fig. 2. Misconception-conditioned distractor generation (Novelty 1). Each distractor is "
   "generated from, and tagged with, a specific misconception category drawn from KAGAS, an "
   "independently validated 14-category Korean error taxonomy, so that choosing it updates "
   "only the corresponding skill dimension. The verifier gate guards against the dominant "
   "failure mode of generated distractors—an option that is accidentally also correct—and "
   "a failed item is revised by a critic rather than discarded and resampled blindly."),
- ("figures/fig4_escalation.png", 7.0,
-  "Fig. 4. Uncertainty-gated escalation (Novelty 3). Expensive reasoning-mode generation and "
+ ("figures/fig3_escalation.png", 7.0,
+  "Fig. 3. Uncertainty-gated escalation (Novelty 2). Expensive reasoning-mode generation and "
   "contrastive feedback are spent only where the posterior is wide or a misconception has "
   "persisted, rather than uniformly across all interactions."),
- ("figures/fig5_simulation.png", 7.0,
-  "Fig. 5. Motivating simulation: 120,000 responses, 300 learners, 400 items, Rasch generating "
+ ("figures/fig4_simulation.png", 7.0,
+  "Fig. 4. Motivating simulation: 120,000 responses, 300 learners, 400 items, Rasch generating "
   "model, with adaptive selection and simultaneous item calibration — the regime a generative "
   "item pool forces. (a) Elo's rating spread inflates to 2.69 against a true value of 1.04 and "
   "is still rising; Urnings holds at 1.11. (b) Elo's error against true ability grows after "
   "roughly 15,000 responses, so the estimates get worse as more data arrives. This reproduces, "
   "at realistic scale, the failure characterised analytically by Bolsinova et al. [15]."),
- ("figures/fig6_experiment.png", 7.0,
-  "Fig. 6. Human study design. Arms A and B share a fixed expert-authored item bank so that the "
+ ("figures/fig5_experiment.png", 7.0,
+  "Fig. 5. Human study design. Arms A and B share a fixed expert-authored item bank so that the "
   "effect of generation is separable from the effect of adaptivity; Arm C receives the full "
   "system. Retention at four weeks, rather than immediate post-test performance, is the measure "
   "weighted most heavily, to guard against novelty effects."),

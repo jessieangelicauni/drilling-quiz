@@ -113,7 +113,7 @@ masing-masing punya karakteristik data yang beda dan butuh solusi beda.
 | **Keputusan** | Model psikometrik eksplisit — **Urnings** sebagai tracker utama sistem (bukan Parallel Elo). Elo dan Parallel Elo dipertahankan sebagai baseline pembanding di evaluasi (§5), bukan sebagai default produksi. |
 | **Alasan** | (a) Data kita kecil (puluhan-ratusan pelajar) — model neural (DKT/SAKT/AKT) butuh ratusan ribu interaksi untuk tidak overfit, dan tetap unggul tipis dibanding IRT/Elo bahkan di dataset besar menurut literatur pembanding langsung. (b) Butuh uncertainty yang bisa dipakai modul lain (§3.3) — Elo polos tidak punya ini secara native. (c) Harus interpretable untuk diaudit guru/reviewer. |
 | **Kenapa bukan Elo polos** | Elo gagal spesifik ketika **item dipilih adaptif DAN dikalibrasi dinamis secara bersamaan** — persis kondisi yang dipaksa oleh item hasil-generate-LLM. Disimulasikan sendiri: 120.000 respons, SD rating Elo melebar ke 2.69 (SD asli 1.04) dan terus naik; Urnings stabil di 1.11. Kode: `src/simulate_trackers.py`. |
-| **Kenapa Urnings, bukan Parallel Elo, yang jadi default** | Awalnya kami pertimbangkan Parallel Elo sebagai default (lebih ringan diimplementasikan: tanpa urn ball-exchange + Metropolis-Hastings). Tapi ternyata **dua dari tiga novelty inti** sudah dibangun di atas formalisme urn Urnings secara spesifik, bukan cuma satu: Novelty 1 (seed urn dari varians encoder, persamaan 3–4) **dan** Novelty 3 (uncertainty-gated escalation, persamaan 5, literal `w_k > τ` = lebar urn). Parallel Elo tidak punya konsep "lebar" — untuk setara butuh proxy baru yang belum diturunkan di mana pun. Pindah ke Parallel Elo berarti menurunkan ulang matematika dua novelty sekaligus, demi manfaat kompleksitas implementasi yang untuk kode riset (bukan produk produksi dengan SLA) tidak terlalu mahal — implementasi Urnings sudah ada dan jalan di `src/simulate_trackers.py` (`run_urnings`), ~30 baris. Argumen "data kecil, pathology Elo belum separah itu" juga pedang bermata dua: kalau benar, *downside* Urnings (kompleksitas ekstra) juga rendah risiko; *upside*-nya (standard error native dipakai 2 novelty) tetap berharga terlepas dari skala. Konsistensi dengan bukti simulasi paper sendiri (Fig. 5, §5 dokumen ini) juga jadi pertimbangan — sistem yang dipakai harus sama dengan yang dibuktikan terbaik, kalau tidak reviewer akan mempertanyakannya. |
+| **Kenapa Urnings, bukan Parallel Elo, yang jadi default** | **Diperbarui 2026-10-19 (lihat §9.18) — Novelty 1 (seed urn dari encoder) sudah dihapus dari paper, jadi alasan di bawah ini DIKOREKSI supaya tidak merujuk ke sesuatu yang sudah tidak ada.** Awalnya kami pertimbangkan Parallel Elo sebagai default (lebih ringan diimplementasikan: tanpa urn ball-exchange + Metropolis-Hastings). Alasan yang TETAP BERLAKU: (1) Novelty "escalation" (sekarang Novelty 2 di paper) dibangun literal di atas lebar urn (`w_k > τ`) — Parallel Elo tidak punya konsep ini. (2) Mekanisme "Select" (§9.15, seleksi adaptif per-siswa — bukan lagi diklaim novelty, tapi tetap fitur aplikasi nyata) juga butuh `item_urn` Urnings untuk menghitung kesulitan item yang dipakai mencocokkan ke kemampuan siswa. (3) Eksperimen §9.13 bahkan menambah bukti BARU: Urnings terbukti aman dipakai dengan prior yang mungkin salah (robust-by-construction lewat `sigma_hat2`), sementara Elo terbukti bisa "meledak" kalau prior-nya salah — jadi walau klaim "speedup" asli (dulu Novelty 1) tidak terbukti, properti *robustness* ini justru alasan baru yang independen untuk tetap Urnings. Pindah ke Parallel Elo tetap berarti kehilangan (1) dan (2) sekaligus properti robustness di (3), demi manfaat kompleksitas implementasi yang untuk kode riset (bukan produk produksi dengan SLA) tidak terlalu mahal — implementasi Urnings sudah ada dan jalan di `src/simulate_trackers.py` (`run_urnings`), ~30 baris. |
 | **Posisi Parallel Elo** | Tidak dibuang — didokumentasikan sebagai alternatif "ringan" untuk deployment produksi nanti kalau proyek keluar dari tahap riset (lisensi/SLA/tim engineering kecil jadi pertimbangan saat itu), dan tetap jadi baseline pembanding di evaluasi (§5) supaya kontribusi Urnings terukur, bukan diasumsikan. |
 | **Ditolak** | Deep Knowledge Tracing (DKT/SAKT/AKT) — data terlalu kecil, tidak interpretable, tidak perlu untuk novelty riset kita. Cognitive diagnosis model (NeuralCD) — butuh matriks item-skill yang di-supply expert; taksonomi kita (§3.2) justru membuat mapping ini otomatis dari proses generate, jadi CDM jadi tidak perlu. **Glicko-2** — dipertimbangkan serius (lihat `src/simulate_drift.py`): punya rating deviation (RD) native, kontinu, tanpa masalah diskritisasi urn. Menang telak di simulasi ability statis, tapi begitu ability dibuat naik seiring waktu (regime sungguhan untuk drilling app), RD-nya mengecil lalu "terkunci" — makin lama makin tertinggal dari kemampuan asli yang membaik (RMSE akhir 1.05, hampir seburuk Elo polos). Konsekuensi produk konkret: kalau dipakai untuk status mastery (lihat baris **Mastery criterion** di bawah), siswa bisa macet di status "mastered" walau sudah mulai salah lagi — bertentangan langsung dengan fitur *"requeue wrong answer until mastered"* yang mengasumsikan status itu harus bisa dicabut. Tidak ada precedent literatur yang memakai Glicko di regime item-baru-tanpa-kalibrasi ini (lihat `docs/literature-review-15.md` gap G3) — keputusan ini murni dari simulasi sendiri, bukan dari otoritas sumber luar. |
 | **Multi-skill** | Satu learner punya **banyak** ability — satu per skill (partikel, honorifik, konjugasi, dst — lihat KAGAS §3.2), bukan satu angka tunggal. Urnings diperluas jadi vektor skill, bukan skalar. |
@@ -159,7 +159,32 @@ melayani model psikometrik (lewat prior kesulitan).
 Semua keputusan di atas cuma infrastruktur. Novelty riset ada di 3 hal ini
 saja. Kalau harus memangkas scope, pangkas apa saja **selain** tiga ini.
 
-### 3.1 Novelty 1 — Generate–Calibrate–Select Loop
+### 3.1 Novelty 1 — Generate–Calibrate–Select Loop — **DIHAPUS dari paper 2026-10-19, lihat §9.18**
+
+**Status: tidak lagi diklaim sebagai novelty di paper.** Bagian ini
+dibiarkan apa adanya di bawah sebagai **catatan historis** (kenapa
+desain ini pernah diputuskan, apa yang terjadi) — bukan desain yang
+masih berlaku. Ringkasan singkat (detail lengkap di §9.18): klaim inti
+("prior dari encoder mempercepat konvergensi") diuji langsung (§9.13)
+dan **tidak terbukti** untuk Urnings di semua regime yang diuji; bagian
+"Calibrate" dihapus dari paper sepenuhnya, bagian "Select" (seleksi
+adaptif per-siswa) **tetap ada sebagai fitur aplikasi** (§9.15) tapi
+TIDAK lagi diklaim sebagai novelty riset — `difficulty_heuristic.py`,
+`seed_item_from_encoder()`, dan seleksi adaptif di `BankContentProvider`
+semuanya tetap berjalan di kode, cuma framing "novelty"-nya yang
+dicabut.
+
+**PENTING — mismatch penomoran:** paper sekarang cuma punya **2
+novelty** (apa yang di PRD ini disebut Novelty 2 dan Novelty 3, lihat
+§3.2/§3.3, sekarang jadi "Novelty 1" dan "Novelty 2" di paper). PRD ini
+**SENGAJA TIDAK direnumber** mengikuti paper — penomoran §3.1/§3.2/§3.3
+di PRD dipertahankan apa adanya untuk kontinuitas riwayat (semua audit
+note di atas sudah menulis "Novelty 1/2/3" sesuai skema lama, me-renumber
+berarti mengedit ulang riwayat). Kalau butuh tahu nomor novelty yang
+BENAR di paper saat ini, selalu rujuk ke paper (`src/content.py`)
+langsung, bukan ke nomor di PRD ini.
+
+**Deskripsi desain asli (historis, tidak lagi berlaku):**
 
 **Masalah yang dijawab:** Soal baru dari LLM tidak punya data kalibrasi, jadi
 tidak bisa dipakai adaptif tanpa menunggu puluhan respons dulu.
@@ -1152,6 +1177,88 @@ di bank soal, bukan cuma memantau soal yang kalibrasinya meleset.
 
 Status: pola non-monoton §9.13 **sudah dijelaskan penuh**, bukan lagi
 open item.
+
+### 9.18 Novelty 1 (Generate–Calibrate–Select) DIHAPUS dari paper — keputusan besar, bukan sepihak
+
+Setelah diskusi langsung soal apakah ketiga novelty "sudah kuat dan
+memberi improvement" (jawaban jujur: belum ada satupun yang tervalidasi
+penuh, lihat ringkasan di percakapan sesi ini), dan setelah diminta
+pendapat sebagai "senior LLM engineer" soal relevansi novelty terhadap
+tujuan produk (personalized drill quiz) — user eksplisit minta Novelty
+1 **dihapus sepenuhnya dari paper**, bukan sekadar dilunakkan lagi
+(§3.1 sudah dilunakkan sebelumnya di sesi yang sama, tapi user
+memutuskan itu belum cukup).
+
+**Alasan keputusan (rekomendasi yang diberikan, disetujui user):**
+1. Klaim inti Novelty 1 ("prior dari encoder mempercepat konvergensi")
+   sudah diuji langsung (§9.13) dan **terbukti tidak berlaku** untuk
+   Urnings — bukan cuma "belum tervalidasi", tapi "diuji dan gagal".
+2. Bagian yang SEBENARNYA melayani tujuan "personalized drill quiz"
+   bukan "Calibrate" (prediksi kesulitan dari encoder), tapi "Select"
+   (pencocokan adaptif per-siswa, §9.15) — dan itu TIDAK BUTUH klaim
+   "encoder mempercepat konvergensi" untuk tetap berfungsi. Urnings
+   sudah mengkalibrasi item dari respons nyata (robust, terbukti
+   §2.1/§9.13); Select memakai itu langsung.
+3. Pola yang berulang sepanjang sesi ini: setiap kali LLM diminta
+   membuat PENILAIAN terbuka (seberapa sulit kalimat ini, apakah
+   distractor ini juga benar, jawaban mana yang benar) — gagal atau
+   butuh dipersempit drastis (lihat §9.14, §9.16). Klaim prediksi-
+   kesulitan Novelty 1 itu persis tugas penilaian semacam itu —
+   konsisten, bukan kebetulan terisolasi, bahwa itu juga tidak
+   berhasil.
+
+**Yang DIHAPUS dari paper (`src/content.py`, `src/make_figures.py`,
+`src/build_docx.py`), bukan cuma dicoret kata-katanya:**
+- Section IV-B "Novelty 1: The Generate–Calibrate–Select Loop" —
+  seluruh subsection, termasuk persamaan (2)(3)(4) dan deskripsi
+  re-distilasi encoder.
+- Section V-B "Validating Novelty 1" — seluruh subsection (termasuk
+  paragraf temuan simulasi yang baru ditambahkan sesi ini sendiri).
+- Fig. 2 lama (diagram loop Generate-Calibrate-Select) — dihapus total,
+  bukan cuma caption-nya; `make_figures.py`'s `fig2()` (GCS loop)
+  dihapus, fungsi-fungsi sisanya di-rename (fig3→fig2, fig4→fig3,
+  fig5→fig4, fig6→fig5) dan file PNG lama dibersihkan.
+- Gap "G1. Generation and calibration are studied separately" di
+  Research Gaps — dihapus, gap lain direnumber (G2→G1, G3→G2, G4→G3).
+- Klaim "tiga novelty"/"four gaps" di abstrak dan daftar kontribusi →
+  "dua novelty"/"three gaps".
+- `ANCHORS` di `build_docx.py` (pemetaan teks→figure index) diperbaiki
+  supaya tidak menunjuk ke paragraf yang sudah dihapus — ini detail
+  teknis yang kalau terlewat akan membuat build GAGAL DIAM-DIAM (figure
+  salah tempat tanpa error), jadi dicek eksplisit sebelum build ulang.
+- Seluruh lettering subsection Section IV dan V di-geser (B/C/D/E →
+  sesuai jumlah subsection yang tersisa) dan SEMUA cross-reference
+  "Section IV-X"/"Fig. N" terkait diperbaiki satu-satu, diverifikasi
+  lewat render PDF ulang (bukan cuma grep) untuk pastikan tidak ada
+  yang bolong.
+
+**Yang DIBIARKAN ada secara eksplisit (keputusan sadar, bukan lupa):**
+- Kode aplikasi (`difficulty_heuristic.py`, `seed_item_from_encoder()`,
+  `item_urn` di `BankEntry`, seleksi adaptif di `BankContentProvider`)
+  — **semua tetap jalan**, karena "Select" memang berguna untuk produk
+  terlepas dari apakah "Calibrate" itu novelty riset atau bukan.
+- Deskripsi arsitektur di Fig. 1 dan abstrak (bagian "a small encoder
+  predicts difficulty") — tetap disebut sebagai KOMPONEN SISTEM, bukan
+  sebagai novelty.
+- Referensi [13] (Gao et al., adaptive item bank for Big Five
+  personality) di daftar References paper — jadi **tidak lagi disitasi
+  di teks manapun** (dulu cuma dipakai di paragraf Novelty 1 yang
+  dihapus) tapi SENGAJA TIDAK dihapus dari daftar, karena menghapusnya
+  butuh renumber SEMUA sitasi [14] dst sepanjang paper (~40 referensi),
+  risiko salah-ketik lebih besar daripada manfaatnya untuk draf yang
+  belum disubmit. **Dicatat jujur sebagai technical debt kecil**, bukan
+  ditutupi: satu referensi di bibliografi paper saat ini tidak disitasi
+  di teks manapun.
+- Penomoran "Novelty 1/2/3" di PRD ini sendiri (§3.1/§3.2/§3.3, §8)
+  **SENGAJA TIDAK direnumber** mengikuti paper — lihat catatan di awal
+  §3.1 soal mismatch penomoran ini.
+
+**Diverifikasi, bukan diasumsikan beres:** paper di-render ulang jadi
+PDF (LibreOffice) dan dicek halaman demi halaman (bukan cuma grep teks
+sumber) — abstrak, Related Work/Research Gaps, Design Rationale,
+Proposed Method (Fig. 1 & 2 baru), Experimental Design, Discussion,
+References. Semua cross-reference, nomor persamaan, nomor figure, dan
+lettering subsection konsisten di versi akhir.
 
 ---
 

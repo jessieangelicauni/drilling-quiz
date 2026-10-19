@@ -63,31 +63,6 @@ def fig1():
 
 # ------------------------------------------------------------------ Fig 2
 def fig2():
-    fig, ax = canvas(7.15, 2.85)
-    B = lambda *a, **k: box(fig, ax, *a, **k)
-    ys, h, w = .49, .275, .205
-    B(.015, ys, w, h, "(1) GENERATE\nEXAONE emits\nitem for skill $k$", F_GEN, 7.0)
-    B(.265, ys, w, h, "(2) PRIOR\nKLUE-RoBERTa\n$(\\hat\\mu_i,\\hat\\sigma_i^2)$", F_EST, 7.0)
-    B(.515, ys, w, h, "(3) SEED URN\ngreen share from $\\hat\\mu_i$\nsize from $\\hat\\sigma_i^{-2}$", F_PSY, 7.0)
-    B(.762, ys, .228, h, "(4) SERVE\nadaptive selection;\nurn absorbs data", F_POL, 7.0)
-    for a, b in [(.220, .265), (.470, .515), (.720, .762)]:
-        arrow(ax, (a, ys + h / 2), (b, ys + h / 2))
-
-    B(.280, .055, .44, .225,
-      "(5) RE-DISTIL\nre-train the encoder on Urnings posteriors\n"
-      "→ sharper priors for unseen items", F_VER, 7.0)
-    ortho(ax, [(.876, ys), (.876, .1675), (.720, .1675)])
-    ortho(ax, [(.280, .1675), (.118, .1675), (.118, ys)])
-    tag(fig, ax, .800, .345, "responses", 6.2)
-    tag(fig, ax, .190, .345, "new prior", 6.2)
-    free(fig, ax, .015, .935,
-         "Cold start is eliminated: an item is adaptively servable the moment it is generated.",
-         7.0, italic=True, maxw=.97, name="fig2-caption")
-    finish(fig, "figures/fig2_gcs_loop.png")
-
-
-# ------------------------------------------------------------------ Fig 3
-def fig3():
     fig, ax = canvas(7.15, 3.5)
     B = lambda *a, **k: box(fig, ax, *a, **k)
     B(.015, .775, .315, .155, "KOREAN LEARNER\nCORPUS (annotated)", F_EXT, 7.0, True)
@@ -126,11 +101,11 @@ def fig3():
             "할아버지께서 ___ .    key 오십니다    d: 옵니다  →  m₃",
             fontsize=7.0, fontname=KOF, va="center", ha="left", linespacing=1.75,
             bbox=dict(fc="#f7f7f7", ec=MUTE, lw=0.7, pad=4.0))
-    finish(fig, "figures/fig3_distractors.png")
+    finish(fig, "figures/fig2_distractors.png")
 
 
-# ------------------------------------------------------------------ Fig 4
-def fig4():
+# ------------------------------------------------------------------ Fig 3
+def fig3():
     fig, ax = canvas(7.15, 1.85)
     B = lambda *a, **k: box(fig, ax, *a, **k)
     B(.015, .30, .205, .40, "LEARNER STATE\nurn width $w_k$\nfor skill $k$", F_PSY, 7.0, True)
@@ -148,11 +123,11 @@ def fig4():
     free(fig, ax, .4775, .880, "yes", 6.5, "center")
     ortho(ax, [(.4450, .380), (.4775, .380), (.4775, .2325), (.5100, .2325)])
     free(fig, ax, .4775, .110, "no", 6.5, "center")
-    finish(fig, "figures/fig4_escalation.png")
+    finish(fig, "figures/fig3_escalation.png")
 
 
-# ------------------------------------------------------------------ Fig 5
-def fig5():
+# ------------------------------------------------------------------ Fig 4
+def fig4():
     d = np.load("figures/tracker_sim.npz")
     truth = float(d["truth_sd"])
     keys = [k for k in d.files if k != "truth_sd"]
@@ -178,12 +153,12 @@ def fig5():
         for s in ("top", "right"):
             a.spines[s].set_visible(False)
     fig.tight_layout(pad=0.4)
-    fig.savefig("figures/fig5_simulation.png", dpi=400)
+    fig.savefig("figures/fig4_simulation.png", dpi=400)
     plt.close(fig)
 
 
-# ------------------------------------------------------------------ Fig 6
-def fig6():
+# ------------------------------------------------------------------ Fig 5
+def fig5():
     fig, ax = canvas(7.15, 1.75)
     B = lambda *a, **k: box(fig, ax, *a, **k)
     B(.015, .20, .205, .60, "n = 180\nKFL learners\nblock-randomised\nby TOPIK level", F_EXT, 7.0, True)
@@ -201,10 +176,10 @@ def fig6():
         ax.text(x, .905, t, ha="center", fontsize=6.0, style="italic")
     ax.annotate("", xy=(.995, .14), xytext=(.690, .14),
                 arrowprops=dict(arrowstyle="-|>", lw=0.9, color=INK))
-    finish(fig, "figures/fig6_experiment.png")
+    finish(fig, "figures/fig5_experiment.png")
 
 
 if __name__ == "__main__":
-    for f in (fig1, fig2, fig3, fig4, fig5, fig6):
+    for f in (fig1, fig2, fig3, fig4, fig5):
         f(); print("rendered:", f.__name__)
     report()

@@ -165,11 +165,10 @@ def add_fullwidth_figure(path, width_in, caption):
 
 ANCHORS = [
     ("Fig. 1 shows the architecture.", 0),
-    ("The first novelty addresses gap G1", 1),
-    ("This inverts the usual relationship", 2),
-    ("That is, when the system is genuinely uncertain", 3),
-    ("Two remedies are available.", 4),
-    ("Participants complete a TOPIK-aligned pre-test", 5),
+    ("This inverts the usual relationship", 1),
+    ("That is, when the system is genuinely uncertain", 2),
+    ("Two remedies are available.", 3),
+    ("Participants complete a TOPIK-aligned pre-test", 4),
 ]
 anchor_map = {}
 for prefix, fidx in ANCHORS:
