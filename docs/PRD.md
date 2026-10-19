@@ -402,19 +402,21 @@ generasi soal (`exaone_provider.py`, `vocab_provider.py`, `content_provider.py`)
 feedback (`qwen_feedback.py`), validator (`distractor_validator.py`), proxy
 kesulitan (`difficulty_heuristic.py`), gamifikasi dasar (`streak.py`).
 
-**Masih kosong — sisi admin/LMS, belum tersentuh sama sekali** (lihat
-daftar fitur awal proyek): *Maintain topic/subject*, *Maintain curriculum
-per subject* (upload kurikulum), *Review topic & Question Bank*
-(approve/edit/drop soal dari bank), *Set batch publish time*, *Set number
-of questions*, *Set question type*, *Auto-tagging topic* (soal baru
-ditandai topiknya otomatis). Semua ini logika aplikasi murni (CRUD +
-workflow), belum ada satu baris kode pun — ini kandidat kerja berikutnya
-yang paling jelas, BUKAN infra.
+**Masih kosong — sisi admin/LMS**: *Maintain topic/subject*, *Maintain
+curriculum per subject* (upload kurikulum), *Set batch publish time*,
+*Set number of questions*, *Set question type*, *Auto-tagging topic*
+(soal baru ditandai topiknya otomatis). Semua ini logika aplikasi murni
+(CRUD + workflow), belum ada satu baris kode pun — ini kandidat kerja
+berikutnya yang paling jelas, BUKAN infra.
+(*Review topic & Question Bank* — approve/edit/drop soal dari bank —
+**sudah tidak kosong lagi**, lihat §9.7.)
 
 **Juga belum ada:** logika EXP/leaderboard (§2.4 sudah mendesain
 pemisahannya dari tracker, tapi akumulasi EXP dan ranking per-topik belum
 diimplementasikan sebagai modul), dan skill grammar KAGAS lain di luar
-`particle_loc`/`particle_obj` (baru 2 dari 14 tipe).
+`particle_loc`/`particle_obj`/`time_range` (kode `PART`) dan
+`honorific`/`tense_past` (kode `END`) — lihat pemetaan resmi dan kode
+yang masih kosong (`VERB`, `ADJ`, `NOUN`, `MOD`, `CONJ`) di §9.8.
 
 ### 9.5 Skill ketiga: `honorific` — kategori gramatikal berbeda struktur, bukan novelty baru
 
@@ -493,27 +495,64 @@ Penyimpanan masih in-memory (dict + dataclass, pola yang sama seperti
 nanti tanpa mengubah interface, konsisten dengan keputusan infra
 ditunda (§9.3).
 
-### 9.8 BELUM SELESAI: pemetaan resmi ke 14 kategori KAGAS
+### 9.8 Pemetaan resmi ke 14 kategori KAGAS — SELESAI, dan mengoreksi asumsi di §9.4/paper
 
-Ditanya "berapa skill lagi?" — jawaban jujurnya: **tidak diketahui**,
-karena 5 skill yang dibangun (§9.1-§9.6) berasal dari kesalahan umum
-pembelajar Korea yang dikenal, BUKAN hasil pemetaan langsung ke daftar
-resmi 14 kategori KAGAS (Yoon et al., ACL 2023,
-`https://aclanthology.org/2023.acl-long.371/`, arXiv 2210.14389).
+Diselesaikan dengan membaca isi Table 3 dari paper aslinya (Yoon et al.,
+ACL 2023, arXiv 2210.14389) langsung — bukan dari web search sekunder,
+dan bukan cuma judul/abstrak. 14 kode resmi KAGAS beserta deskripsi
+satu-baris dari paper:
 
-Sudah dikonfirmasi lewat pencarian web: paper itu benar mendefinisikan
-14 tipe error dan sistem KAGAS untuk anotasi otomatisnya. **Belum
-berhasil diambil: daftar lengkap 14 kategorinya** — percobaan fetch
-PDF (`aclanthology.org/2023.acl-long.371.pdf`) gagal diparse (PDF
-binary, bukan teks). PDF sudah tersimpan lokal di cache tool-result
-sesi sebelumnya; kalau mau dilanjutkan, coba: (a) fetch versi arXiv
-(`arxiv.org/abs/2210.14389`, mungkin punya halaman HTML/abstract lebih
-mudah diparse), (b) download PDF lalu ekstrak teks via `pdftotext`
-lokal, atau (c) terima bahwa pemetaan resmi ini tidak krusial untuk
-nilai aplikasi (sudah dibahas: KAGAS penting untuk kredibilitas paper,
-bukan untuk fungsi aplikasi — lihat diskusi sesi ini) dan lanjutkan
-menambah skill dari kesalahan umum yang sudah dikenal tanpa menunggu
-pemetaan resmi.
+| Kode | Deskripsi (dari Table 3) |
+|---|---|
+| INS | Kata disisipkan |
+| DEL | Kata dihapus |
+| WS | Spasi antar kata berubah |
+| WO | Urutan kata berubah |
+| SPELL | Kesalahan ejaan |
+| PUNCT | Kesalahan tanda baca |
+| SHORT | Edit yang tidak mengubah struktur morfem (kontraksi, mis. `언어이었어요`→`언어였어요`) |
+| VERB | Kesalahan pada kata kerja |
+| ADJ | Kesalahan pada kata sifat |
+| NOUN | Kesalahan pada kata benda |
+| PART | Kesalahan pada partikel |
+| END | Kesalahan pada akhiran |
+| MOD | Kesalahan pada modifier |
+| CONJ | Kesalahan pada konjugasi |
+
+**Koreksi penting terhadap §9.4 dan caption Fig. 3 di paper:** 14 kode
+ini adalah skema anotasi-edit untuk korpus GEC — 7 kode operasi-edit
+(INS/DEL/WS/WO/SPELL/PUNCT/SHORT) + 7 kode kelas-POS
+(VERB/ADJ/NOUN/PART/END/MOD/CONJ) — **BUKAN** taksonomi miskonsepsi
+granular seperti "topic/nominative swap", "object-particle omission",
+"honorific agreement", "irregular-stem over-regularization" yang
+dipakai sebagai label m₁–m₄ di caption Fig. 3 paper. Istilah-istilah
+itu bukan nama kategori resmi KAGAS; dikarang sendiri lalu ditempel
+seolah berasal dari situ. **Ini perlu dikoreksi di paper** (Section
+IV-C / Fig. 3 caption) — ditandai sebagai utang akademik, terpisah
+dari kerja aplikasi di bawah.
+
+Dari 14 kode, hanya **7 kode kelas-POS yang relevan sebagai skill
+drill-quiz** — 7 kode operasi-edit (INS/DEL/WS/WO/SPELL/PUNCT/SHORT)
+adalah mekanik anotasi korpus, bukan grammar point yang bisa diajarkan
+lewat satu soal cloze/MC.
+
+**Pemetaan 5 skill yang sudah ada** (confidence tinggi untuk kode+
+deskripsi resmi di atas; confidence sedang untuk pemetaan skill→kode
+berikut — judgment call dari deskripsi satu-baris, bukan dicocokkan ke
+contoh resmi satu-per-satu):
+- `particle_loc`, `particle_obj`, `time_range` → **PART** (ketiganya
+  kesalahan partikel/posisi — `time_range` sudah ditandai tag `JX` di
+  §9.6, konsisten partikel)
+- `honorific`, `tense_past` → **END**, bukan CONJ seperti asumsi awal —
+  keduanya soal pemilihan *akhiran* kalimat (honorifik vs polos; lampau
+  vs sekarang), bukan pemilihan kata kerja/konjugasi itu sendiri
+
+**Status sebenarnya: 5 skill menutupi 2 dari 7 kode kelas-POS yang
+relevan (PART, END)** — bukan "2 dari 14" seperti klaim lama di §9.4
+(baris itu sudah diperbaiki juga). Lima kode relevan yang masih kosong:
+**VERB, ADJ, NOUN, MOD, CONJ** — kerangka ini yang dipakai untuk
+memutuskan skill berikutnya, bukan sekadar "kesalahan umum yang
+dikenal" tanpa struktur.
 
 ---
 
