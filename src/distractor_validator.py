@@ -19,6 +19,7 @@ the fact over free-form text.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from kiwipiepy import Kiwi
@@ -84,6 +85,48 @@ def expected_object_particle(preceding_text: str) -> str:
     return "을" if has_batchim(preceding_text.strip()[-1]) else "를"
 
 
+_HANGUL_SPAN = re.compile(r"[가-힣](?:[가-힣\s]*[가-힣])?[.!?]?")
+_VERB_TAGS = ("VV", "VV-I", "VX", "VA", "XSV")
+
+
+def correct_korean_conjugation(text: str) -> str:
+    """Auto-corrects a specific, recurring LLM conjugation error: a bare
+    "요" ending attached directly to a verb stem instead of the proper
+    linking-vowel contraction (마시요 -> 마셔요, 보요 -> 봐요, 듣어요 ->
+    들어요, 공부하요 -> 공부해요).
+
+    Works on free-form mixed-language text (Korean example sentences
+    embedded in an English/Indonesian explanation) by finding Hangul spans
+    and correcting each one independently. Deliberately narrow: this fixes
+    ONE identified error pattern, not a general grammar checker --
+    kiwipiepy's analyzer accepts "stem+요" as one valid (if non-standard)
+    parse, which is exactly why a plain analyze-then-join round trip does
+    NOT catch it on its own; forcing the EF morph to "어요" before
+    rejoining is what makes the correction happen. Verified idempotent on
+    already-correct text (공부해요, 가요, 만나요, ...) -- kiwipiepy already
+    represents those internally as stem+"어요", never bare stem+"요", so
+    this never "fixes" something that wasn't broken.
+    """
+    def _fix_span(match: re.Match) -> str:
+        span = match.group(0)
+        try:
+            tokens = _KIWI.analyze(span)[0][0]
+        except Exception:
+            return span
+        morphs = []
+        for t in tokens:
+            if t.tag in ("EF", "EC") and t.form == "요" and morphs and morphs[-1][1] in _VERB_TAGS:
+                morphs.append(("어요", "EF"))
+            else:
+                morphs.append((t.form, t.tag))
+        try:
+            return _KIWI.join(morphs)
+        except Exception:
+            return span
+
+    return _HANGUL_SPAN.sub(_fix_span, text)
+
+
 if __name__ == "__main__":
     stem = "나는 학교___ 갔다."
 
@@ -109,5 +152,15 @@ if __name__ == "__main__":
     assert has_batchim("라면"), "라면 ends in the consonant ㄴ"
     assert expected_object_particle("라면") == "을", "the real EXAONE failure this guards against: 라면를 is wrong"
     assert expected_object_particle("사과") == "를"
+
+    assert correct_korean_conjugation("저는 커피를 마시요.") == "저는 커피를 마셔요."
+    assert correct_korean_conjugation("저는 영화를 보요.") == "저는 영화를 봐요."
+    assert correct_korean_conjugation("저는 학교에서 수업을 듣어요.") == "저는 학교에서 수업을 들어요."
+    assert correct_korean_conjugation("저는 공부하요.") == "저는 공부해요."
+    for already_ok in ("저는 책을 읽어요.", "저는 학교에 가요.", "내일 만나요.", "저는 공부해요."):
+        assert correct_korean_conjugation(already_ok) == already_ok, (
+            f"must be idempotent on already-correct text, got a change for {already_ok!r}")
+    mixed = '**"저는 학교에서 수업을 듣어요"** (I have class at the school).'
+    assert "들어요" in correct_korean_conjugation(mixed), "must fix Korean embedded inside English/markdown prose"
 
     print("all smoke tests passed")

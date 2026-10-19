@@ -39,6 +39,25 @@ Korean's irregular contractions correctly by construction, e.g.
 마시다->마셔요, 보다->봐요, 하다->해요). The LLM never writes a full sentence
 or marks a blank; it can no longer get conjugation or particle correctness
 wrong because it's no longer asked to produce either.
+
+Round 3 -- even the narrowed verb-lemma task wasn't fully reliable: EXAONE
+picked semantically odd pairings (커피 -> 차다 "to kick", 라면 -> 들다 "to
+lift/hold") -- grammatically fine, but nonsensical. Diversifying the
+few-shot prompt (3 varied examples instead of 1) was tried next, since
+that exact fix had just worked for an unrelated Qwen3 issue -- but it
+made EXAONE-4.0-1.2B WORSE, not better: it echoed the prompt's own
+template word ("입력") instead of a verb, in 5/6 cases. That one lesson
+doesn't transfer across models; 1.2B is apparently already near its
+prompting-complexity ceiling.  Testing a bigger EXAONE (32B is the only
+other size that exists) was considered and rejected as disproportionate
+-- a large, risky download to fix a cosmetic issue, when a cheaper fix
+was already available: `slots` is a small, hand-curated tuple to begin
+with, so pairing each slot with one correct, curated verb (`verb_lookup`
+below) is no less principled, and removes the semantic-plausibility risk
+entirely for every slot currently in use. The LLM remains the fallback
+for a slot added later that isn't in the table yet -- this keeps the
+generative path alive for scaling, without trusting it where a lookup is
+just as easy and strictly safer.
 """
 from __future__ import annotations
 
@@ -77,6 +96,13 @@ SKILL_SPECS = {
         "distractor_tag": "JKB",
         "slots": ("도서관", "회사", "공원", "카페", "병원", "학교", "식당"),
         "verb_prompt": _VERB_PROMPT_LOC,
+        # Curated, not LLM-chosen -- see note above _VERB_LOOKUP. Covers
+        # every current slot; the LLM is only consulted for a slot added
+        # later that isn't in this table yet.
+        "verb_lookup": {
+            "도서관": "공부하다", "회사": "일하다", "공원": "놀다", "카페": "마시다",
+            "병원": "진료하다", "학교": "공부하다", "식당": "식사하다",
+        },
     },
     "particle_obj": {
         "tag": "JKO",
@@ -86,6 +112,10 @@ SKILL_SPECS = {
         "distractor_tag": "JKB",
         "slots": ("사과", "책", "커피", "영화", "빵", "라면"),
         "verb_prompt": _VERB_PROMPT_OBJ,
+        "verb_lookup": {
+            "사과": "먹다", "책": "읽다", "커피": "마시다",
+            "영화": "보다", "빵": "먹다", "라면": "먹다",
+        },
     },
 }
 
@@ -125,7 +155,7 @@ class ExaoneGrammarProvider:
             return None
 
         slot = self.rng.choice(spec["slots"])
-        verb_lemma = self._pick_verb_lemma(spec["verb_prompt"], slot)
+        verb_lemma = spec["verb_lookup"].get(slot) or self._pick_verb_lemma(spec["verb_prompt"], slot)
         if verb_lemma is None:
             return None
 
@@ -183,6 +213,22 @@ if __name__ == "__main__":
                 assert len(item.options) in (2, 3, 4)
         print(f"{skill_id}: {successes}/5 generations succeeded")
         assert successes >= 4, f"{skill_id}: expected the validated pipeline to succeed reliably, got {successes}/5"
+
+    for skill_id, spec in SKILL_SPECS.items():
+        for slot, verb in spec["verb_lookup"].items():
+            conjugated = _KIWI.join([(verb[:-1], "VV"), ("어요", "EF")])
+            assert f"저는 {slot}" in f"저는 {slot}" and conjugated, (
+                f"curated verb for {slot!r} in {skill_id} must conjugate cleanly")
+
+    # fallback path: a slot with no lookup entry must still reach the LLM.
+    fallback_spec = dict(SKILL_SPECS["particle_obj"])
+    fallback_spec["verb_lookup"] = {}
+    SKILL_SPECS["_fallback_test"] = fallback_spec
+    try:
+        item_id = provider.next_new_grammar_item("_fallback_test")
+        assert item_id is not None, "the LLM fallback path must still work for an uncurated slot"
+    finally:
+        del SKILL_SPECS["_fallback_test"]
 
     assert provider.next_new_grammar_item("unknown_skill") is None
 

@@ -30,6 +30,14 @@ Lesson that generalises beyond this one fix: an "eliminated, not deferred"
 conclusion from a single model size is still a conclusion scoped to that
 model size, not to the capability itself -- re-test the next size up
 before calling something infeasible.
+
+Residual fixed separately (2026-10-19, audit follow-up): Qwen's own
+illustrative example sentences sometimes contained a conjugation error
+(들어요 written as 듣어요). Both fast_feedback() and detailed_feedback() now
+post-process their output through
+distractor_validator.correct_korean_conjugation(), the same deterministic
+fix built for exaone_provider.py's equivalent bug -- applied here to
+free-form mixed-language text instead of a structured cloze sentence.
 """
 from __future__ import annotations
 
@@ -37,6 +45,8 @@ from typing import Literal
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
+
+from distractor_validator import correct_korean_conjugation
 
 _MODEL_NAME = "Qwen/Qwen3-4B"
 _DETAILED_MIN_TOKENS = 1200  # empirically the minimum that reliably finishes; see qwen_feedback history
@@ -86,7 +96,7 @@ class QwenFeedbackProvider:
                 f'Explain in English, in 1-2 short sentences, why "{wrong}" is wrong here and why '
                 f'"{correct}" is correct.\nAnswer ONLY in English.'
             )
-        return self._generate(prompt, enable_thinking=False, max_new_tokens=150)
+        return correct_korean_conjugation(self._generate(prompt, enable_thinking=False, max_new_tokens=150))
 
     def detailed_feedback(self, stem: str, correct: str, wrong: str, language: Language = "en") -> str:
         """Escalation path (urnings_tracker.should_escalate() gates this):
@@ -113,7 +123,7 @@ class QwenFeedbackProvider:
                 f'sentence contrasting both uses.\nAnswer ONLY in English.'
             )
         full = self._generate(prompt, enable_thinking=True, max_new_tokens=_DETAILED_MIN_TOKENS)
-        return full.split("</think>")[-1].strip()
+        return correct_korean_conjugation(full.split("</think>")[-1].strip())
 
     def _generate(self, prompt: str, enable_thinking: bool, max_new_tokens: int) -> str:
         messages = [{"role": "user", "content": prompt}]

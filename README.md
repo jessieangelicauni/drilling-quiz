@@ -83,23 +83,31 @@ SUPER, 16GB):
   instantly. The fix was a narrowly scaffolded prompt (explicit template +
   one worked example + a single slot to fill), which worked reliably
   (5/5 across five topics) — not a bigger model, not reasoning mode.
-- **Qwen3-1.7B feedback** (`src/qwen_feedback.py`): asked to explain a
-  mistake in Indonesian, it answered in Korean instead, ignoring the
-  language instruction entirely — fixed with a stricter "Answer ONLY in
-  English" prompt, so this feature is English-only for now, not the
-  bilingual ID/EN originally planned. Its reasoning-mode (escalation) path
-  at `max_new_tokens=500` ran out of budget *inside* `<think>` and
-  produced zero usable output; `max_new_tokens=1200` reliably finishes
-  (~1000 tokens, ~12s) with a genuinely more detailed explanation than the
-  fast path — so the escalation path's extra cost is real, but only pays
-  off if the token budget is set high enough.
-- **Indonesian feedback was tried again and eliminated, not deferred**: a
-  one-shot Indonesian worked example fixed language compliance (4/4), but
-  3/4 trials then leaked the example's own topic into the answer (e.g.
-  explaining a restaurant-eating sentence as if it were about studying,
-  because the example was about studying) — fluent Indonesian, wrong
-  content, harder to catch than answering in the wrong language outright.
-  `qwen_feedback.py` is English-only by this tested result.
+- **Qwen3 feedback** (`src/qwen_feedback.py`) went through three rounds,
+  and the conclusion from round 2 was later reversed:
+  1. Qwen3-1.7B asked to answer in Indonesian answered in Korean instead,
+     ignoring the instruction entirely.
+  2. A one-shot Indonesian example fixed language compliance (4/4) but
+     introduced a worse failure: 3/4 trials leaked the example's own topic
+     into the answer (explaining a restaurant-eating sentence as if it
+     were about studying, because the example was about studying) —
+     fluent Indonesian, wrong content, harder to catch than answering in
+     the wrong language outright. This was recorded as "Indonesian
+     eliminated, English-only final."
+  3. That conclusion was challenged, correctly — the untested variable was
+     model *size*, not whether the task was feasible at all.
+     **Qwen3-4B**, same one-shot technique but with the example
+     diversified to two different topics (reduces overfitting to one
+     topic's words), got 4/4 correct and leak-free on both the fast path
+     and the detailed/reasoning path. ~8GB VRAM, still comfortably inside
+     the 16GB budget. `qwen_feedback.py` now supports `language="en"`/`"id"`
+     on Qwen3-4B. The reasoning-mode (escalation) path still needs
+     `max_new_tokens>=1200` — at 500 it runs out of budget *inside*
+     `<think>` and produces zero usable output, in either language.
+  One residual found while checking quality, not yet fixed: an
+  illustrative example Qwen wrote for itself in the English detailed path
+  contained a conjugation error (들어요 → 듣어요) — a different pipeline
+  from the EXAONE conjugation fix below, not covered by it.
 - **Grammar generation was redesigned to remove conjugation/particle risk
   entirely**, not just validate around it: `kiwipiepy`'s analyzer is too
   permissive to catch bad conjugations (it happily re-parses "마시요" as if
