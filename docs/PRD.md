@@ -554,6 +554,34 @@ relevan (PART, END)** — bukan "2 dari 14" seperti klaim lama di §9.4
 memutuskan skill berikutnya, bukan sekadar "kesalahan umum yang
 dikenal" tanpa struktur.
 
+### 9.9 Skill keenam: `irregular_conj` — kategori CONJ resmi, bukan asumsi lagi
+
+Ditambahkan skill ke-6, **kategori resmi pertama yang ditarget dari
+kerangka terstruktur §9.8** (bukan "kesalahan umum yang dikenal" tanpa
+pemetaan, seperti 5 skill sebelumnya). Target: **CONJ** — verba
+tak-beraturan `르` (자르다/모르다/부르다), contoh resmi KAGAS Table 3:
+`잘르러→자르러`.
+
+**Tidak perlu LLM sama sekali untuk skill ini** — verba tak-beraturannya
+sendiri sudah jadi closed set yang dikurasi (3 verba), tidak ada
+"pemilihan kosakata" yang perlu digenerate.
+
+**Temuan kunci:** `kiwi.join()` SELALU menghasilkan kontraksi yang
+BENAR, apa pun varian ending yang diberikan (`자르+아요→잘라요`,
+`부르+아요→불러요` — otomatis menormalkan harmoni vokal juga) — artinya
+`kiwi.join()` tidak bisa dipakai membangun bentuk SALAH (distractor).
+Dibangun `harmony_positive()` baru di `distractor_validator.py` —
+aturan harmoni vokal berbasis dekomposisi Unicode (vokal `ㅏ`/`ㅗ` →
+`-아요`, selain itu → `-어요`), dipakai untuk menyambung literal stem
+tak-terkontraksi + ending yang benar harmoninya tapi SALAH karena tidak
+menerapkan kontraksi tak-beraturan (`자르아요`, bukan `잘라요`) — pola
+error pembelajar yang nyata dan umum.
+
+Hasil: 5/5 berhasil (`불러요`/`부르어요`, `몰라요`/`모르어요`,
+`잘라요`/`자르어요`). Total sekarang **6 skill grammar**, menutupi
+**3 dari 7 kode kelas-POS relevan** (PART, END, CONJ) — sisa: **VERB,
+ADJ, NOUN, MOD**.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

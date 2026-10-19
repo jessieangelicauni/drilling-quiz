@@ -94,6 +94,24 @@ def expected_object_particle(preceding_text: str) -> str:
     return "을" if has_batchim(preceding_text.strip()[-1]) else "를"
 
 
+def harmony_positive(syllable: str) -> bool:
+    """True if `syllable`'s vowel is ㅏ or ㅗ (takes the -아요 family of
+    endings), False otherwise (-어요 family). Needed for KAGAS's CONJ
+    category (irregular-stem errors, e.g. 르-irregular verbs 자르다/
+    모르다/부르다): kiwi.join() always produces the CORRECT irregular
+    contraction (자르+아요 -> 잘라요) regardless of what ending variant
+    it's fed, so it can't be used to build the common learner error of
+    skipping the irregular contraction (literal "자르아요"). That
+    distractor has to be constructed by hand, which means doing the vowel
+    harmony kiwi.join() would otherwise have handled automatically.
+    """
+    code = ord(syllable[-1]) - 0xAC00
+    if not (0 <= code < 11172):
+        raise ValueError(f"{syllable!r} last character is not a Hangul syllable block")
+    vowel_index = (code % (21 * 28)) // 28
+    return vowel_index in (0, 8)  # 0=ㅏ, 8=ㅗ
+
+
 def validate_sentence_final_tag(sentence: str, expected_tag: str) -> ValidationResult:
     """Does the sentence's final predicate morpheme (the one right before
     sentence-final punctuation, if any) carry `expected_tag`?
@@ -211,6 +229,14 @@ if __name__ == "__main__":
     assert hon_check.valid, "a whole conjugated verb ending in EF must validate via sentence-final tag"
     bad_check = validate_sentence_final_tag("선생님께서 가르치는.", "EF")
     assert not bad_check.valid, "a non-EF sentence-final morpheme must fail"
+
+    assert harmony_positive("자"), "자 has vowel ㅏ"
+    assert harmony_positive("모"), "모 has vowel ㅗ"
+    assert not harmony_positive("부"), "부 has vowel ㅜ"
+    assert _KIWI.join([("자르", "VV"), ("아요", "EF")]) == "잘라요"
+    assert _KIWI.join([("부르", "VV"), ("아요", "EF")]) == "불러요", (
+        "kiwi.join() must normalize harmony itself even when fed the 'wrong' variant"
+    )
 
     assert honorific_ending("읽") == "으세요", "읽 ends in a consonant batchim"
     assert honorific_ending("가") == "세요", "가 ends in a vowel"

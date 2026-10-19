@@ -70,6 +70,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from distractor_validator import (
     expected_object_particle,
+    harmony_positive,
     honorific_ending,
     validate_cloze_option,
     validate_sentence_final_tag,
@@ -190,6 +191,36 @@ SKILL_SPECS = {
             "밥": "먹다", "영화": "보다", "책": "읽다", "커피": "마시다", "숙제": "하다",
         },
     },
+    "irregular_conj": {
+        # KAGAS category CONJ (§9.8): errors in applying an irregular verb
+        # stem's sound change, not which ending to pick (that's END,
+        # already covered by honorific/tense_past). 르-irregular verbs
+        # (자르다/모르다/부르다) contract 르 -> ㄹㄹ before a vowel-starting
+        # ending (자르+아요 -> 잘라요); a common learner error is to skip
+        # the contraction and glue the ending on literally ("자르아요").
+        #
+        # No LLM call needed at all here -- unlike the other skills, the
+        # irregular verb itself IS the fixed, closed set being tested
+        # (there's no separate "vocabulary choice" left for a model to
+        # make), so each (object, verb) pair is curated directly, same
+        # reasoning that made verb_lookup cover 100% of particle_loc's
+        # slots already redundant with calling the LLM.
+        #
+        # kiwi.join() always produces the CORRECT contraction regardless
+        # of which ending variant it's fed (verified: 자르+아요 -> 잘라요,
+        # 부르+아요 -> 불러요 -- it self-corrects vowel harmony too), so it
+        # can't be used to build the WRONG (distractor) form. That has to
+        # be constructed by hand: harmony_positive() picks the
+        # harmony-correct ending the way kiwi.join() would, then it's
+        # concatenated literally onto the uncontracted stem.
+        "kind": "irregular_conj",
+        "tag": "EF",
+        "pairs": (
+            ("머리를", "자르다"),
+            ("답을", "모르다"),
+            ("노래를", "부르다"),
+        ),
+    },
 }
 
 
@@ -283,6 +314,24 @@ class ExaoneGrammarProvider:
         template = f"저는 어제 {slot}{particle} ___."
         return self._build_whole_word_item(skill_id, spec, template, past_form, present_form)
 
+    def _build_irregular_conj_item(self, skill_id: str, spec: dict,
+                                    pair: tuple[str, str]) -> str | None:
+        """irregular_conj: correctness comes from kiwi.join()'s irregular
+        contraction (always right, by construction) vs a hand-built naive
+        concatenation (the common learner error of not contracting at all).
+        """
+        obj, verb_lemma = pair
+        stem = verb_lemma[:-1]
+        try:
+            correct_form = _KIWI.join([(stem, "VV"), ("아요", "EF")])
+        except Exception:
+            return None
+        ending = "아요" if harmony_positive(stem[-1]) else "어요"
+        distractor_form = stem + ending
+
+        template = f"저는 {obj} ___."
+        return self._build_whole_word_item(skill_id, spec, template, correct_form, distractor_form)
+
     def _build_paired_particle_item(self, skill_id: str, spec: dict,
                                      pair: tuple[str, str, str]) -> str | None:
         """time_range-style skills: the second half of the pair ("...까지")
@@ -321,6 +370,10 @@ class ExaoneGrammarProvider:
         if spec.get("kind") == "paired_particle":
             pair = self.rng.choice(spec["pairs"])
             return self._build_paired_particle_item(skill_id, spec, pair)
+
+        if spec.get("kind") == "irregular_conj":
+            pair = self.rng.choice(spec["pairs"])
+            return self._build_irregular_conj_item(skill_id, spec, pair)
 
         slot = self.rng.choice(spec["slots"])
         verb_lemma = spec["verb_lookup"].get(slot) or self._pick_verb_lemma(spec["verb_prompt"], slot)
@@ -373,7 +426,7 @@ class ExaoneGrammarProvider:
 if __name__ == "__main__":
     provider = ExaoneGrammarProvider(seed=0)
 
-    for skill_id in ("particle_loc", "particle_obj", "honorific", "time_range", "tense_past"):
+    for skill_id in ("particle_loc", "particle_obj", "honorific", "time_range", "tense_past", "irregular_conj"):
         successes = 0
         for _ in range(5):
             item_id = provider.next_new_grammar_item(skill_id)
@@ -397,6 +450,11 @@ if __name__ == "__main__":
                     # usefully check is that the two options are genuinely different
                     # conjugations, not a degenerate pair.
                     assert item.options[item.answer] != item.options[distractor_label]
+                if skill_id == "irregular_conj":
+                    distractor_label = next(l for l in item.options if l != item.answer)
+                    assert item.options[item.answer] != item.options[distractor_label]
+                    assert item.options[item.answer] in ("잘라요", "몰라요", "불러요"), (
+                        f"the irregular-contracted form must be correct, got {item}")
         print(f"{skill_id}: {successes}/5 generations succeeded")
         assert successes >= 4, f"{skill_id}: expected the validated pipeline to succeed reliably, got {successes}/5"
 
