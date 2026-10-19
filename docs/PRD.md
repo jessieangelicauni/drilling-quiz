@@ -1262,5 +1262,67 @@ lettering subsection konsisten di versi akhir.
 
 ---
 
+### 9.19 Validasi Novelty 2 (PRD)/Novelty 1 (paper) — batch script otomatis dibuat, rating instruktur ditunda
+
+Konteks: user eksplisit minta ditekankan bahwa metode kami harus
+dinyatakan lebih bagus daripada metode di paper literature review.
+Ditinjau ulang apa yang betul-betul bisa dibuktikan untuk novelty
+distractor (§3.2 PRD / "Novelty 1" di paper saat ini) tanpa mengganti
+novelty-nya — kesimpulannya novelty-nya tetap tepat (sudah menyasar gap
+G2 secara spesifik terhadap [12]), yang belum ada cuma eksekusi
+validasinya.
+
+**Keputusan user:** untuk draf ini, tunda rating instruktur manusia (butuh
+orang sungguhan, tidak bisa disimulasikan tanpa jadi circular evidence) —
+laporkan dulu cuma metrik yang bisa dihitung otomatis, catat rating
+instruktur sebagai future work eksplisit.
+
+**Kendala ditemukan:** session cloud ini tidak punya GPU dan `torch`
+belum terinstal — `ExaoneGrammarProvider.__init__` (exaone_provider.py)
+mem-require `.to("cuda")` tanpa fallback, jadi generasi EXAONE nyata sama
+sekali tidak bisa dijalankan di sini. Sama dengan `SolverCheckProvider`
+(solver_check.py), yang juga load Qwen3-4B ke CUDA.
+
+**Yang dibuat:** `src/validate_novelty1.py` — skrip batch yang
+mengagregasi tiga mekanisme yang SUDAH ADA dan sudah masing-masing
+diverifikasi di smoke test file aslinya (bukan mekanisme baru), dijalankan
+di N lebih besar (default 20/skill = 160 total, bukan 5/skill di smoke
+test) dan dilaporkan sebagai satu tabel + file JSON:
+1. Generation pass rate per skill (gate morfologis `distractor_validator`).
+2. Critic-loop recovery rate (`provider.critic_attempts`/`critic_recoveries`,
+   sudah ada sejak §9.14).
+3. Solver round-trip key-acceptance rate — check (c) dari
+   `solver_check.py`, yang sudah dikonfirmasi reliable di §9.16.
+
+**Sengaja TIDAK dilaporkan:** check (b) solver_check.py ("distractor ini
+juga benar tidak?") — §9.16 sudah menemukan yes-bias terkonfirmasi di
+Qwen3-4B untuk check ini, jadi kalau dimasukkan di sini nilainya akan
+false-positive-aman untuk setiap item. Mengikuti keputusan yang sama
+dengan solver_check.py sendiri: dilaporkan di sana cuma untuk referensi,
+tidak dipakai sebagai verdict.
+
+**Peringatan metodologis dicatat eksplisit di docstring skrip:** jangan
+pernah bilang angka dari skrip ini "mengalahkan" 53% teacher-rated-quality
+di [12] (Bitew et al.) — itu skor dari rating manusia, sementara angka
+skrip ini pass-rate otomatis; dua construct berbeda, membandingkan
+langsung adalah category error yang akan ditangkap reviewer. Klaim yang
+valid dari data skrip ini: kegagalan distractor tertangkap otomatis saat
+generasi (bukan cuma lewat review manusia setelah fakta, seperti pada
+[12]) — klaim soal proses deteksi, bukan klaim skor-vs-skor.
+
+**Belum dijalankan sungguhan** — skrip ini ditulis dan dicek sintaksnya
+(`py_compile`) di session tanpa GPU; user masih perlu menjalankannya di
+mesin GPU sendiri (sama seperti catatan "Content generation findings" di
+README) dan membawa hasilnya balik sebelum angka manapun ditulis ke
+Section V-B paper (`src/content.py`). Field label misconception/KAGAS
+per item (untuk metrik agreement vs rating instruktur nanti) SENGAJA
+belum ditambahkan ke `GeneratedItem` di langkah ini — baru relevan kalau
+fase rating instruktur manusia benar-benar dijalankan, dan pemetaan
+skill→kode KAGAS resmi butuh diverifikasi dulu terhadap taksonomi KAGAS
+asli (cuma `irregular_conj`→CONJ dan `adj_relativizer`→ADJ yang sudah
+eksplisit dikonfirmasi di kode saat ini, §9.9/§9.10), bukan ditebak.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
