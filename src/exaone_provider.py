@@ -71,8 +71,10 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from distractor_validator import (
     adj_relativizer_ending,
     expected_object_particle,
+    has_batchim,
     harmony_positive,
     honorific_ending,
+    validate_before_tag,
     validate_cloze_option,
     validate_postnominal_tag,
     validate_prenominal_tag,
@@ -102,6 +104,8 @@ _EF_FILLER_WORDS = ("학교", "사과", "저기", "안녕")       # honorific, t
 _ETM_FILLER_WORDS = ("학교", "사과", "저기")              # adj_relativizer
 _JKS_FILLER_PARTICLES = ("도", "만", "의")                # subj_topic
 _TIME_RANGE_FILLER_PARTICLES = ("에", "에게", "로", "한테")  # time_range (paired particle)
+_EC_FILLER_WORDS = _EF_FILLER_WORDS      # mod_adverb -- same bare nouns, verified separately to fail the EC check too
+_NNB_FILLER_WORDS = _EF_FILLER_WORDS     # noun_counter -- same bare nouns, verified separately to fail the NNB check too
 
 _VERB_PROMPT_LOC = (
     '"{slot}"에서 보통 하는 자연스러운 한국어 동사(기본형, "다"로 끝나는 형태) 딱 하나만 써줘.\n'
@@ -309,6 +313,67 @@ SKILL_SPECS = {
             ("저", "책을 읽어요"),
             ("나", "학교에 가요"),
             ("나", "밥을 먹어요"),
+        ),
+    },
+    "verb_choice": {
+        # KAGAS category VERB (§9.10's gap, now closed): unlike every
+        # other skill so far, this is a LEXICAL error (wrong word for the
+        # context), not a morphological one (wrong form of the right
+        # word) -- kiwipiepy's tag can't discriminate "right verb for
+        # this object" any more than it could discriminate honorific vs
+        # plain (both parse as EF) or correct vs over-regularised
+        # adjective (both parse as ETM); correctness here is likewise
+        # entirely a curated choice, verified by reading the resulting
+        # sentence, not by any tag check -- reuses _build_whole_word_item
+        # unchanged (see _build_verb_choice_item), same division of
+        # responsibility as irregular_conj/honorific.
+        "kind": "verb_choice",
+        "tag": "EF",
+        "pairs": (
+            ("숙제", "하다", "보다"),    # do homework, not "see" it
+            ("밥", "먹다", "마시다"),    # eat rice, not "drink" it
+            ("영화", "보다", "먹다"),    # watch a movie, not "eat" it
+            ("음악", "듣다", "보다"),    # listen to music, not "watch" it
+            ("사진", "찍다", "먹다"),    # take a photo, not "eat" it
+        ),
+    },
+    "noun_counter": {
+        # KAGAS category NOUN (§9.10's gap, now closed): counter-word
+        # (단위명사) choice -- 명 for people, 개 for generic objects, 권
+        # for bound volumes (books), 분 the honorific people-counter.
+        # Also lexical, not morphological (both options tag NNB
+        # regardless -- verified empirically, same as verb_choice above),
+        # so correctness is curated. Template avoids a subject/topic
+        # particle choice on the counted noun itself (already its own
+        # skill, subj_topic) by using a fixed topic frame instead.
+        "kind": "noun_counter",
+        "tag": "NNB",
+        "pairs": (
+            ("사과", "개", "명"),
+            ("학생", "명", "개"),
+            ("선생님", "분", "개"),
+            ("책", "권", "개"),
+            ("컵", "개", "명"),
+        ),
+    },
+    "mod_adverb": {
+        # KAGAS category MOD (§9.10's gap, now closed): adverb (게/EC)
+        # modifying a verb vs the attributive-adjective ending (은/ᆫ/ETM,
+        # reusing adj_relativizer_ending -- same helper adj_relativizer
+        # already uses) wrongly generalised onto a verb-modifying slot.
+        # Unlike verb_choice/noun_counter, this one IS tag-discriminable
+        # (EC vs ETM, verified directly) -- closer in kind to the
+        # morphological skills than to the two lexical ones above, found
+        # while designing this skill, not assumed going in.
+        "kind": "mod_adverb",
+        "tag": "EC",
+        "distractor_tag": "ETM",
+        "pairs": (
+            ("조용하다", "말해요"),
+            ("많다", "먹어요"),
+            ("깨끗하다", "청소해요"),
+            ("느리다", "걸어요"),
+            ("빠르다", "달려요"),
         ),
     },
 }
@@ -589,6 +654,89 @@ class ExaoneGrammarProvider:
 
         return self._assemble_options(skill_id, template, subj_form, topic_form, fillers)
 
+    def _build_verb_choice_item(self, skill_id: str, spec: dict,
+                                 pair: tuple[str, str, str]) -> str | None:
+        """verb_choice (KAGAS VERB): correct_lemma is the verb that
+        collocates with `noun`; distractor_lemma is a real, common verb
+        that does not (e.g. "see homework" instead of "do homework").
+        Both conjugate to ordinary EF-tag sentence enders, same shared
+        tail as honorific/tense_past/irregular_conj -- no new validator
+        needed, this skill's only new part is the curated (noun,
+        correct, wrong) triples themselves.
+        """
+        noun, correct_lemma, wrong_lemma = pair
+        try:
+            correct_form = _KIWI.join([(correct_lemma[:-1], "VV"), ("어요", "EF")])
+            wrong_form = _KIWI.join([(wrong_lemma[:-1], "VV"), ("어요", "EF")])
+        except Exception:
+            return None
+        particle = expected_object_particle(noun)
+        template = f"저는 {noun}{particle} ___."
+        return self._build_whole_word_item(skill_id, spec, template, correct_form, wrong_form)
+
+    def _build_noun_counter_item(self, skill_id: str, spec: dict,
+                                  pair: tuple[str, str, str]) -> str | None:
+        """noun_counter (KAGAS NOUN): correct_counter is the 단위명사
+        that classifies `noun` (명/개/권/분); wrong_counter is a real
+        counter word, just the wrong class for this noun. Blank sits
+        mid-sentence (before "있어요", not at the sentence's end or
+        before a noun), hence validate_before_tag rather than
+        validate_sentence_final_tag/validate_prenominal_tag.
+        """
+        noun, correct_counter, wrong_counter = pair
+        topic_particle = "은" if has_batchim(noun[-1]) else "는"
+        template = f"{noun}{topic_particle} 다섯 ___ 있어요."
+        end_marker = " 있어요."
+        for counter in (correct_counter, wrong_counter):
+            filled = template.replace("___", counter, 1)
+            if not validate_before_tag(filled, end_marker, spec["tag"]).valid:
+                return None
+
+        fillers = self._pick_fillers(
+            (correct_counter, wrong_counter), _NNB_FILLER_WORDS,
+            lambda cand: validate_before_tag(template.replace("___", cand, 1), end_marker, "NNB").valid)
+        if fillers is None:
+            return None
+
+        return self._assemble_options(skill_id, template, correct_counter, wrong_counter, fillers)
+
+    def _build_mod_item(self, skill_id: str, spec: dict,
+                         pair: tuple[str, str]) -> str | None:
+        """mod_adverb (KAGAS MOD): correct_form is the adjective's
+        regular -게 adverbial form (EC-tagged); distractor_form is the
+        SAME stem's attributive relativizer ending (은/ᆫ, ETM-tagged,
+        via adj_relativizer_ending -- the exact helper adj_relativizer
+        already uses), wrongly generalised onto a verb-modifying slot
+        instead of a noun-modifying one. Unlike verb_choice/noun_counter,
+        this pair IS tag-discriminable (verified directly, not assumed),
+        so both forms are checked against their own expected tag, not
+        just confirmed well-formed.
+        """
+        adj_lemma, verb_phrase = pair
+        stem = adj_lemma[:-1]
+        try:
+            correct_form = _KIWI.join([(stem, "VA"), ("게", "EC")])
+            distractor_form = _KIWI.join([(stem, "VA"), (adj_relativizer_ending(stem), "ETM")])
+        except Exception:
+            return None
+        if correct_form == distractor_form:
+            return None
+
+        template = f"저는 ___ {verb_phrase}"
+        end_marker = f" {verb_phrase}"
+        if not validate_before_tag(template.replace("___", correct_form, 1), end_marker, spec["tag"]).valid:
+            return None
+        if validate_before_tag(template.replace("___", distractor_form, 1), end_marker, spec["tag"]).valid:
+            return None  # distractor must NOT also parse as EC -- would mean it's not actually distinguishable
+
+        fillers = self._pick_fillers(
+            (correct_form, distractor_form), _EC_FILLER_WORDS,
+            lambda cand: validate_before_tag(template.replace("___", cand, 1), end_marker, "EC").valid)
+        if fillers is None:
+            return None
+
+        return self._assemble_options(skill_id, template, correct_form, distractor_form, fillers)
+
     def _build_paired_particle_item(self, skill_id: str, spec: dict,
                                      pair: tuple[str, str, str]) -> str | None:
         """time_range-style skills: the second half of the pair ("...까지")
@@ -645,6 +793,18 @@ class ExaoneGrammarProvider:
             pair = self.rng.choice(spec["pairs"])
             return self._build_subj_topic_item(skill_id, spec, pair)
 
+        if spec.get("kind") == "verb_choice":
+            pair = self.rng.choice(spec["pairs"])
+            return self._build_verb_choice_item(skill_id, spec, pair)
+
+        if spec.get("kind") == "noun_counter":
+            pair = self.rng.choice(spec["pairs"])
+            return self._build_noun_counter_item(skill_id, spec, pair)
+
+        if spec.get("kind") == "mod_adverb":
+            pair = self.rng.choice(spec["pairs"])
+            return self._build_mod_item(skill_id, spec, pair)
+
         slot = self.rng.choice(spec["slots"])
         verb_lemma = spec["verb_lookup"].get(slot) or self._pick_verb_lemma(spec["verb_prompt"], slot)
         if verb_lemma is None:
@@ -685,7 +845,8 @@ if __name__ == "__main__":
     provider = ExaoneGrammarProvider(seed=0)
 
     for skill_id in ("particle_loc", "particle_obj", "honorific", "time_range", "tense_past",
-                     "irregular_conj", "adj_relativizer", "subj_topic"):
+                     "irregular_conj", "adj_relativizer", "subj_topic",
+                     "verb_choice", "noun_counter", "mod_adverb"):
         successes = 0
         for _ in range(5):
             item_id = provider.next_new_grammar_item(skill_id)
@@ -734,6 +895,26 @@ if __name__ == "__main__":
                     real_distractor = next(v for v in non_answer.values() if v not in _JKS_FILLER_PARTICLES)
                     assert real_distractor in ("저는", "나는"), (
                         f"the topic-marked (JX) form must be the distractor, got {item}")
+                if skill_id == "verb_choice":
+                    assert item.options[item.answer] in ("해요", "먹어요", "봐요", "들어요", "찍어요"), (
+                        f"the collocating verb must be correct, got {item}")
+                    assert sum(v in _EF_FILLER_WORDS for v in non_answer.values()) == 2
+                if skill_id == "noun_counter":
+                    assert item.options[item.answer] in ("개", "명", "분", "권"), (
+                        f"the matching counter word must be correct, got {item}")
+                    assert sum(v in _NNB_FILLER_WORDS for v in non_answer.values()) == 2
+                if skill_id == "mod_adverb":
+                    assert item.options[item.answer] in ("조용하게", "많게", "깨끗하게", "느리게", "빠르게"), (
+                        f"the adverbial (-게/EC) form must be correct, got {item}")
+                    assert sum(v in _EC_FILLER_WORDS for v in non_answer.values()) == 2
+                    real_distractor = next(v for v in non_answer.values() if v not in _EC_FILLER_WORDS)
+                    # Not a suffix check (endswith "은"/"ᆫ") -- the ETM batchim fuses into
+                    # the preceding syllable as one composed character (하+ᆫ -> 한), the
+                    # same representation quirk already documented in SKILL_SPECS'
+                    # adj_relativizer comment, so there is no separate trailing character
+                    # to match here.
+                    assert real_distractor in ("조용한", "많은", "깨끗한", "느린", "빠른"), (
+                        f"the distractor must be the attributive (ETM) overgeneralisation, got {item}")
         print(f"{skill_id}: {successes}/5 generations succeeded")
         assert successes >= 4, f"{skill_id}: expected the validated pipeline to succeed reliably, got {successes}/5"
 

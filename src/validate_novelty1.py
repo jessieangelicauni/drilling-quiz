@@ -58,7 +58,8 @@ from exaone_provider import ExaoneGrammarProvider
 from solver_check import SolverCheckProvider
 
 SKILLS = ["particle_loc", "particle_obj", "honorific", "time_range", "tense_past",
-          "irregular_conj", "adj_relativizer", "subj_topic"]
+          "irregular_conj", "adj_relativizer", "subj_topic",
+          "verb_choice", "noun_counter", "mod_adverb"]
 
 
 def run(n_per_skill: int, seed: int) -> dict:

@@ -1436,5 +1436,62 @@ dialog baru (§9.20) benar-benar menghilangkan bias solver.
 
 ---
 
+### 9.22 3 skill baru: `verb_choice`, `noun_counter`, `mod_adverb` — menutup 3 kode KAGAS yang sengaja ditunda di §9.10
+
+User eksplisit minta implementasi VERB/NOUN/MOD, kode kelas-POS KAGAS
+yang di §9.10 sengaja ditunda (bukan dilupakan) karena dianggap butuh
+penilaian semantik, bukan cek morfologi seperti 8 skill yang sudah ada.
+**Bukan novelty baru** — sama seperti `irregular_conj`/`adj_relativizer`
+sebelumnya, ini instance tambahan dari Novelty 1 (misconception
+distractor), bukan klaim riset ke-2/ke-3.
+
+**Sebelum menulis kode**, tiga desain diverifikasi dulu satu-per-satu
+langsung di `kiwipiepy` (CPU, tanpa GPU) — bukan ditebak:
+
+- **`verb_choice`** (KAGAS VERB) — kesalahan kolokasi kata kerja ("숙제를
+  봐요" bukan "숙제를 해요"). **Genuinely leksikal**: dicek langsung,
+  kedua opsi (verba benar vs verba salah untuk objek ini) sama-sama tag
+  EF, kiwipiepy tidak bisa membedakan — sama persis situasi
+  honorific/irregular_conj. Pakai ulang `_build_whole_word_item` tanpa
+  perubahan, cuma pasangan (objek, verba-benar, verba-salah) yang
+  dikurasi: 숙제/하다/보다, 밥/먹다/마시다, 영화/보다/먹다, 음악/듣다/보다,
+  사진/찍다/먹다.
+- **`noun_counter`** (KAGAS NOUN) — kesalahan kata bantu bilangan (단위명사:
+  명 untuk orang, 개 untuk benda, 권 untuk buku, 분 untuk orang-dihormati).
+  Juga leksikal — kedua opsi sama-sama tag NNB, diverifikasi langsung.
+  Blank di tengah kalimat (sebelum "있어요", bukan di akhir atau sebelum
+  kata benda) — tidak ada validator existing yang cocok, jadi ditambah
+  `validate_before_tag()` baru di `distractor_validator.py` (generalisasi
+  `validate_sentence_final_tag`'s pendekatan "cek tag di posisi struktural"
+  ke posisi mid-sentence manapun, ditemukan lewat `end_marker` bukan
+  posisi akhir kalimat).
+- **`mod_adverb`** (KAGAS MOD) — kesalahan adverb vs kata sifat atributif
+  (조용히/조용하게 vs *조용한* dipakai salah sebelum kata kerja). **Temuan
+  tak terduga saat verifikasi**: ternyata ini BUKAN leksikal seperti dua
+  di atas — dicek langsung, akhiran adverb (-게, tag EC) dan akhiran
+  atributif (-은/ᆫ, tag ETM, dipakai ulang dari `adj_relativizer_ending`
+  yang sudah ada) **punya tag kiwipiepy yang BERBEDA** di posisi yang
+  sama. Jadi skill ini lebih dekat ke 8 skill morfologis lama daripada ke
+  `verb_choice`/`noun_counter` — ditemukan dari verifikasi langsung,
+  bukan diasumsikan dari awal.
+
+**Bug ditemukan dan diperbaiki sebelum push** (dari verifikasi langsung,
+bukan asumsi): assersi smoke test awal untuk `mod_adverb` menebak
+distractor-nya akan berakhir literal karakter "은"/"ᆫ" — salah, karena
+batchim ETM melebur jadi satu karakter gabung dengan suku kata
+sebelumnya (하+ᆫ→한), persis kuirk representasi yang sama yang sudah
+dicatat di komentar `adj_relativizer` (§9.10). Diganti jadi cek
+keanggotaan ke 5 bentuk distractor yang sudah diketahui, bukan tebak
+pola akhiran.
+
+**Diverifikasi tanpa GPU** (pola sama seperti §9.21): stub `torch`/
+`transformers`, jalankan `__main__` sungguhan via `runpy`. Hasil: 5/5
+sukses di SEMUA 11 skill (8 lama + 3 baru), termasuk assersi konten
+baru per skill. Belum dijalankan di GPU asli — `validate_novelty1.py`
+sudah diupdate mencakup 3 skill baru ini, user perlu jalankan ulang
+untuk dapat angka solver-check yang nyata untuk ketiganya.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

@@ -191,6 +191,32 @@ def validate_postnominal_tag(sentence: str, preceding_word: str, expected_tag: s
     return ValidationResult(False, f"morpheme {form!r} right after {preceding_word!r} parses as {tag}, not {expected_tag}")
 
 
+def validate_before_tag(sentence: str, end_marker: str, expected_tag: str) -> ValidationResult:
+    """Does the morpheme ending exactly where `end_marker` (a fixed string
+    that follows the option in the template, e.g. " 말해요." or " 있어요.")
+    begins carry `expected_tag`?
+
+    For a whole-word option that sits mid-sentence, followed by more text,
+    but where neither existing anchor fits: not validate_sentence_final_tag
+    (the option isn't at the sentence's end), and not validate_prenominal_tag
+    (what follows isn't a NOUN -- a counter word is followed by a verb/copula,
+    an adverb by a verb -- and a verb's own surface form varies too much to
+    anchor on reliably: a bare VV/VA token for a native verb vs an NNG+XSV
+    split for a 하다-compound, e.g. "말하다" tokenises as 말(NNG)+하(XSV), not
+    one "말하" token).
+    """
+    idx = sentence.find(end_marker)
+    if idx < 0:
+        return ValidationResult(False, f"{end_marker!r} not found in sentence")
+    tok = next((t for t in _KIWI.analyze(sentence)[0][0] if t.start + t.len == idx), None)
+    if tok is None:
+        return ValidationResult(False, f"no morpheme ends exactly before {end_marker!r}")
+    if tok.tag == expected_tag:
+        return ValidationResult(True, f"morpheme {tok.form!r} right before {end_marker!r} parses as {expected_tag}")
+    return ValidationResult(False,
+        f"morpheme {tok.form!r} right before {end_marker!r} parses as {tok.tag}, not {expected_tag}")
+
+
 def adj_relativizer_ending(adj_stem: str) -> str:
     """은 after a consonant-final (batchim) adjective stem, the combining
     jongseong NIEUN (U+11AB, NOT the standalone letter ㄴ U+3134 -- a real
