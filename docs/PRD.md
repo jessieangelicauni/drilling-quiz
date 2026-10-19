@@ -493,6 +493,28 @@ Penyimpanan masih in-memory (dict + dataclass, pola yang sama seperti
 nanti tanpa mengubah interface, konsisten dengan keputusan infra
 ditunda (§9.3).
 
+### 9.8 BELUM SELESAI: pemetaan resmi ke 14 kategori KAGAS
+
+Ditanya "berapa skill lagi?" — jawaban jujurnya: **tidak diketahui**,
+karena 5 skill yang dibangun (§9.1-§9.6) berasal dari kesalahan umum
+pembelajar Korea yang dikenal, BUKAN hasil pemetaan langsung ke daftar
+resmi 14 kategori KAGAS (Yoon et al., ACL 2023,
+`https://aclanthology.org/2023.acl-long.371/`, arXiv 2210.14389).
+
+Sudah dikonfirmasi lewat pencarian web: paper itu benar mendefinisikan
+14 tipe error dan sistem KAGAS untuk anotasi otomatisnya. **Belum
+berhasil diambil: daftar lengkap 14 kategorinya** — percobaan fetch
+PDF (`aclanthology.org/2023.acl-long.371.pdf`) gagal diparse (PDF
+binary, bukan teks). PDF sudah tersimpan lokal di cache tool-result
+sesi sebelumnya; kalau mau dilanjutkan, coba: (a) fetch versi arXiv
+(`arxiv.org/abs/2210.14389`, mungkin punya halaman HTML/abstract lebih
+mudah diparse), (b) download PDF lalu ekstrak teks via `pdftotext`
+lokal, atau (c) terima bahwa pemetaan resmi ini tidak krusial untuk
+nilai aplikasi (sudah dibahas: KAGAS penting untuk kredibilitas paper,
+bukan untuk fungsi aplikasi — lihat diskusi sesi ini) dan lanjutkan
+menambah skill dari kesalahan umum yang sudah dikenal tanpa menunggu
+pemetaan resmi.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
