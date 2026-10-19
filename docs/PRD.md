@@ -449,6 +449,50 @@ ditambahkan di Section V paper, bukan novelty terpisah.
    semua jawaban benar menyebut bentuk honorifik (`가르치세요`,
    `연구하세요`, `쉬세요`), tidak ada yang tertukar dengan bentuk polos.
 
+### 9.6 Skill keempat & kelima: `time_range`, `tense_past`
+
+- **`time_range`** (`부터` vs `까지`, keduanya tag `JX`). Ditemukan dulu:
+  `"[waktu]___"` telanjang itu ambigu (bisa jadi awal ATAU akhir rentang)
+  tanpa konteks — jebakan yang sama dengan 이/가 vs 은/는 yang sudah
+  ditolak sebelumnya. Diperbaiki dengan **template berpasangan**
+  (`"...까지"` sudah fixed di kalimat), memaksa `부터` jadi satu-satunya
+  jawaban benar secara struktural. 5/5 berhasil.
+- **`tense_past`** (lampau `-았/었-` vs sekarang, dijangkar kata `어제`).
+  Struktur sama dengan `honorific` (blank mencakup kata kerja utuh) —
+  dipakai ulang lewat `_build_whole_word_item()` (bagian tail yang
+  memang identik digeneralisasi; bagian penentuan bentuk per skill
+  tetap dipisah, `_build_verb_ending_item` vs `_build_tense_item`,
+  supaya tidak mengulang insiden generalisasi-salah sebelumnya).
+  Ditemukan `kiwi.join()` otomatis menangani harmoni vokal `았/었` dan
+  bentuk tak-beraturan (`가다→갔어요`, `하다→했어요`) walau cuma diberi
+  `었` seragam — tidak perlu logika pemilihan alomorf manual seperti di
+  `을`/`를`. 5/5 berhasil.
+
+Total sekarang: **5 skill grammar** (`particle_loc`, `particle_obj`,
+`honorific`, `time_range`, `tense_past`), semua lolos regresi bersama.
+
+### 9.7 Question bank — memisahkan GENERATE dari SERVE
+
+**Masalah yang diangkat:** soal selalu "mulai dari 0" karena
+`exaone_provider.py` dipanggil langsung tiap kali sistem butuh soal
+(live, per-request) — setiap permintaan siswa = satu panggilan GPU,
+dengan risiko gagal/lambat, dan tidak ada bank soal yang tersimpan.
+
+**Solusi:** `src/question_bank.py` — `QuestionBank` (batch-generate
+sejumlah soal via `exaone_provider`, simpan sebagai `PENDING`;
+`approve()`/`reject()`/`edit()` untuk workflow admin — persis fitur
+*"Review topic & Question Bank"* yang sebelumnya kosong di §9.4) dan
+`BankContentProvider` (implementasi `ContentProvider` yang serve HANYA
+dari entry `APPROVED` — tidak ada panggilan LLM sama sekali di jalur
+serving). Diuji end-to-end: `assemble_daily_drill()` jalan sempurna
+tanpa satu pun panggilan GPU saat perakitan drill, karena soal sudah
+di-generate+approve sebelumnya secara batch.
+
+Penyimpanan masih in-memory (dict + dataclass, pola yang sama seperti
+`urnings_tracker.py`/`streak.py`) — bisa ditukar ke database sungguhan
+nanti tanpa mengubah interface, konsisten dengan keputusan infra
+ditunda (§9.3).
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

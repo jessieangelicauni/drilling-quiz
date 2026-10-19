@@ -146,6 +146,50 @@ SKILL_SPECS = {
             "사장님": "일하다", "의사선생님": "진료하다",
         },
     },
+    "time_range": {
+        # 부터/까지 are BOTH tagged JX by kiwipiepy, same as particle_loc's
+        # 에/에서 -- but unlike that pair, a bare "[time]___" is genuinely
+        # ambiguous (could be the start OR the end of a range) without more
+        # context, the exact ambiguity particle_loc/obj were designed to
+        # avoid. Fixed with a PAIRED template: "...까지" is already present
+        # at the end, so 부터 is the only grammatical choice for the first
+        # blank (부터...까지 is a fixed pairing; repeating 까지 twice doesn't
+        # express a range) -- correctness is forced by the template, not
+        # detected from free text, same principle as particle_loc's fixed
+        # "에서" for the activity-at-a-location frame.
+        "kind": "paired_particle",
+        "tag": "JX",
+        "correct_form": "부터",
+        "distractor_form": "까지",
+        "pairs": (
+            ("아홉 시", "열 시", "공부하다"),
+            ("두 시", "네 시", "회의하다"),
+            ("월요일", "금요일", "일하다"),
+            ("아침", "저녁", "운동하다"),
+            ("3월", "5월", "여행하다"),
+        ),
+    },
+    "tense_past": {
+        # Same shape as honorific (whole-word options, both tag EF) -- see
+        # _build_tense_item. Correctness needs an explicit time anchor: a
+        # bare "저는 밥을 ___." has no fixed right answer (both tenses are
+        # grammatical depending on when the eating happens), same ambiguity
+        # trap time_range's bare "[time]___" would have been. "어제"
+        # (yesterday) fixed in the template forces past tense to be the
+        # only correct choice.
+        "kind": "verb_ending",
+        "variant": "tense",
+        "tag": "EF",
+        "slots": ("밥", "영화", "책", "커피", "숙제"),
+        "verb_prompt": (
+            '"{slot}"와 자연스럽게 어울리는 한국어 동사(기본형, "다"로 끝나는 형태) 딱 하나만 써줘.\n'
+            '예시: 입력 "밥" -> 출력 "먹다"\n'
+            "다른 설명 없이 동사 기본형만 출력해."
+        ),
+        "verb_lookup": {
+            "밥": "먹다", "영화": "보다", "책": "읽다", "커피": "마시다", "숙제": "하다",
+        },
+    },
 }
 
 
@@ -178,10 +222,40 @@ class ExaoneGrammarProvider:
             return verb
         return None  # not a usable dictionary-form verb; caller retries/skips
 
+    def _build_whole_word_item(self, skill_id: str, spec: dict, template: str,
+                                correct_form: str, distractor_form: str) -> str | None:
+        """Shared tail for any skill where the blank covers a WHOLE
+        conjugated word (multiple morphemes), not a single particle --
+        e.g. honorific vs plain ending, or past vs present tense. Both
+        options legitimately end in the same tag (EF), so kiwipiepy's
+        tagger can't discriminate correct from distractor by tag alone;
+        that discrimination is each skill's own job (honorific-worthy
+        subject list, a time-adverb anchor, etc.), done before this is
+        called. This only does what's genuinely identical across all of
+        them: confirm both forms are well-formed sentence-final predicates,
+        then assemble the item.
+        """
+        if correct_form == distractor_form:
+            return None  # degenerate; shouldn't happen but guard anyway
+        for form in (correct_form, distractor_form):
+            filled = template.replace("___", form, 1)
+            if not validate_sentence_final_tag(filled, spec["tag"]).valid:
+                return None
+
+        labels = ["A", "B"]
+        self.rng.shuffle(labels)
+        answer_label, distractor_label = labels
+        options = {answer_label: correct_form, distractor_label: distractor_form}
+
+        item_id = f"grammar-{skill_id}-{self._counter}"
+        self._counter += 1
+        self.items[item_id] = GeneratedItem(skill_id, template, "___", options, answer_label)
+        return item_id
+
     def _build_verb_ending_item(self, skill_id: str, spec: dict, slot: str,
                                  verb_lemma: str) -> str | None:
-        """honorific-style skills: blank covers the whole verb (two full
-        conjugated forms as options), not a single inserted particle.
+        """honorific: correctness comes from the curated honorific-worthy
+        subject list (§9.5), not from any rule kiwipiepy or an LLM derives.
         """
         stem_syllables = verb_lemma[:-1]
         try:
@@ -189,23 +263,54 @@ class ExaoneGrammarProvider:
             plain_form = _KIWI.join([(stem_syllables, "VV"), ("어요", "EF")])
         except Exception:
             return None
-        if honorific_form == plain_form:
-            return None  # degenerate; shouldn't happen but guard anyway
+        return self._build_whole_word_item(skill_id, spec, f"{slot}께서 ___.", honorific_form, plain_form)
 
-        sentence_stem = f"{slot}께서 ___."
-        for form in (honorific_form, plain_form):
-            filled = sentence_stem.replace("___", form, 1)
-            if not validate_sentence_final_tag(filled, spec["tag"]).valid:
-                return None
+    def _build_tense_item(self, skill_id: str, spec: dict, slot: str,
+                           verb_lemma: str) -> str | None:
+        """tense_past: correctness comes from the explicit "어제" (yesterday)
+        time-adverb anchor fixed in the template -- without an anchor like
+        this, past vs present is ambiguous/context-dependent, the same
+        trap time_range's bare "[time]___" would have been (§9.5's
+        sibling skill, see time_range's note on paired templates).
+        """
+        stem_syllables = verb_lemma[:-1]
+        try:
+            past_form = _KIWI.join([(stem_syllables, "VV"), ("었", "EP"), ("어요", "EF")])
+            present_form = _KIWI.join([(stem_syllables, "VV"), ("어요", "EF")])
+        except Exception:
+            return None
+        particle = expected_object_particle(slot)
+        template = f"저는 어제 {slot}{particle} ___."
+        return self._build_whole_word_item(skill_id, spec, template, past_form, present_form)
+
+    def _build_paired_particle_item(self, skill_id: str, spec: dict,
+                                     pair: tuple[str, str, str]) -> str | None:
+        """time_range-style skills: the second half of the pair ("...까지")
+        is already fixed text in the template, so only one particle is
+        grammatically possible for the blank -- no LLM output to check,
+        correctness comes entirely from the paired construction itself.
+        """
+        start, end, verb_lemma = pair
+        try:
+            conjugated = _KIWI.join([(verb_lemma[:-1], "VV"), ("어요", "EF")])
+        except Exception:
+            return None
+
+        stem = f"{start}___ {end}까지 {conjugated}."
+        correct_form, distractor_form = spec["correct_form"], spec["distractor_form"]
+        if not validate_cloze_option(stem, "___", correct_form, spec["tag"]).valid:
+            return None
+        if not validate_cloze_option(stem, "___", distractor_form, spec["tag"]).valid:
+            return None
 
         labels = ["A", "B"]
         self.rng.shuffle(labels)
         answer_label, distractor_label = labels
-        options = {answer_label: honorific_form, distractor_label: plain_form}
+        options = {answer_label: correct_form, distractor_label: distractor_form}
 
         item_id = f"grammar-{skill_id}-{self._counter}"
         self._counter += 1
-        self.items[item_id] = GeneratedItem(skill_id, sentence_stem, "___", options, answer_label)
+        self.items[item_id] = GeneratedItem(skill_id, stem, "___", options, answer_label)
         return item_id
 
     def next_new_grammar_item(self, skill_id: str) -> str | None:
@@ -213,12 +318,18 @@ class ExaoneGrammarProvider:
         if spec is None:
             return None
 
+        if spec.get("kind") == "paired_particle":
+            pair = self.rng.choice(spec["pairs"])
+            return self._build_paired_particle_item(skill_id, spec, pair)
+
         slot = self.rng.choice(spec["slots"])
         verb_lemma = spec["verb_lookup"].get(slot) or self._pick_verb_lemma(spec["verb_prompt"], slot)
         if verb_lemma is None:
             return None
 
         if spec.get("kind") == "verb_ending":
+            if spec.get("variant") == "tense":
+                return self._build_tense_item(skill_id, spec, slot, verb_lemma)
             return self._build_verb_ending_item(skill_id, spec, slot, verb_lemma)
 
         try:
@@ -262,7 +373,7 @@ class ExaoneGrammarProvider:
 if __name__ == "__main__":
     provider = ExaoneGrammarProvider(seed=0)
 
-    for skill_id in ("particle_loc", "particle_obj", "honorific"):
+    for skill_id in ("particle_loc", "particle_obj", "honorific", "time_range", "tense_past"):
         successes = 0
         for _ in range(5):
             item_id = provider.next_new_grammar_item(skill_id)
@@ -276,11 +387,21 @@ if __name__ == "__main__":
                 if skill_id == "honorific":
                     assert "세요" in item.options[item.answer], (
                         "the honorific form, never the plain one, must be the correct answer")
+                if skill_id == "time_range":
+                    assert item.options[item.answer] == "부터", (
+                        "부터 must always be correct in the paired '...까지' template")
+                if skill_id == "tense_past":
+                    distractor_label = next(l for l in item.options if l != item.answer)
+                    # correctness is guaranteed by construction (_build_tense_item always
+                    # puts past_form in correct_form's slot); what the smoke test can
+                    # usefully check is that the two options are genuinely different
+                    # conjugations, not a degenerate pair.
+                    assert item.options[item.answer] != item.options[distractor_label]
         print(f"{skill_id}: {successes}/5 generations succeeded")
         assert successes >= 4, f"{skill_id}: expected the validated pipeline to succeed reliably, got {successes}/5"
 
     for skill_id, spec in SKILL_SPECS.items():
-        for slot, verb in spec["verb_lookup"].items():
+        for slot, verb in spec.get("verb_lookup", {}).items():
             conjugated = _KIWI.join([(verb[:-1], "VV"), ("어요", "EF")])
             assert f"저는 {slot}" in f"저는 {slot}" and conjugated, (
                 f"curated verb for {slot!r} in {skill_id} must conjugate cleanly")
