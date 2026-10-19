@@ -22,7 +22,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 
+from difficulty_heuristic import estimate_difficulty
 from exaone_provider import ExaoneGrammarProvider, GeneratedItem
+from urnings_tracker import UrnState, seed_item_from_encoder
 
 
 class ReviewStatus(Enum):
@@ -33,9 +35,28 @@ class ReviewStatus(Enum):
 
 @dataclass
 class BankEntry:
+    """item_urn is Novelty 1's item-level Urnings calibration (PRD §3.1,
+    wired in for real at §9.12): unlike exaone_provider's items used
+    directly (one-shot, never reused), a bank entry genuinely IS served to
+    many different learners once approved -- the reasoning in §9.2 that
+    item urns don't need persisting predates this bank existing, and
+    doesn't hold for entries that live here. Seeded once from
+    estimate_difficulty() at creation (or re-seeded by edit(), since the
+    estimate is of the TEXT, which just changed); accumulates real
+    evidence afterwards via answer_processing.submit_grammar_answer's
+    returned AnswerResult.updated_item_urn, which the caller writes back
+    here directly (this class stays a plain mutable state object, same
+    convention as the rest of this codebase -- no persistence layer of
+    its own).
+    """
     item: GeneratedItem
     status: ReviewStatus = ReviewStatus.PENDING
     created_at: datetime = field(default_factory=datetime.now)
+    item_urn: UrnState | None = None
+
+    def __post_init__(self):
+        if self.item_urn is None:
+            self.item_urn = seed_item_from_encoder(*estimate_difficulty(self.item.stem))
 
 
 class QuestionBank:
@@ -67,8 +88,15 @@ class QuestionBank:
         self.entries[item_id].status = ReviewStatus.REJECTED
 
     def edit(self, item_id: str, item: GeneratedItem) -> None:
-        """Admin edits an item's content directly ("edit" in PRD's approve/edit/drop)."""
+        """Admin edits an item's content directly ("edit" in PRD's approve/edit/drop).
+
+        Re-seeds item_urn from scratch rather than keeping whatever evidence
+        had accumulated: the old urn's accumulated evidence was calibrating
+        the OLD text, which no longer exists -- carrying it forward would
+        silently misattribute responses to the wrong item content.
+        """
         self.entries[item_id].item = item
+        self.entries[item_id].item_urn = seed_item_from_encoder(*estimate_difficulty(item.stem))
 
     def approved_ids(self, skill_id: str) -> list[str]:
         return [iid for iid, e in self.entries.items()
@@ -133,6 +161,28 @@ if __name__ == "__main__":
     assert bank.entries[another_id].item.stem == "저는 도서관___ 공부해요."
 
     assert serving.next_new_grammar_item("honorific") is None, "an unfilled skill must not serve anything"
+
+    # Novelty 1 (§9.12): every entry must get a real encoder-seeded item_urn,
+    # not a flat/missing one, and edit() must re-seed it for the new text.
+    fresh_id = bank.approved_ids("particle_loc")[0]
+    fresh_entry = bank.entries[fresh_id]
+    assert fresh_entry.item_urn is not None
+    assert 0 <= fresh_entry.item_urn.k <= fresh_entry.item_urn.n
+    urn_before_edit = fresh_entry.item_urn
+    bank.edit(fresh_id, GeneratedItem(
+        skill_id="particle_loc",
+        stem="이 문제가 학생들에 의해 풀릴 수 있었던 것으로 보인다 선생님께서 말씀하셨습니다 ___.",
+        blank_marker="___", options={"A": "에서", "B": "에"}, answer="A",
+    ))
+    urn_after_edit = bank.entries[fresh_id].item_urn
+    assert urn_after_edit is not urn_before_edit, "edit() must re-seed, not keep the old item's urn object"
+    # estimate_difficulty's sigma_hat2 is fixed (difficulty_heuristic.py), so
+    # seed_item_from_encoder's n (driven only by sigma_hat2) stays constant;
+    # a much harder stem shows up as a LOWER k (lower implied pass-probability).
+    assert urn_after_edit.k < urn_before_edit.k, (
+        "a much longer/more complex edited stem must seed a lower (harder) item urn, "
+        f"got {urn_after_edit} vs original {urn_before_edit}"
+    )
 
     print(f"batch_generate added {added}/5 for particle_loc")
     print("all smoke tests passed")

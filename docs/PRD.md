@@ -710,8 +710,86 @@ sebelum `가`) ke `는`, yang akan menghasilkan `*제는` yang salah.
 Hasil: 5/5 berhasil. Total sekarang **8 skill grammar**. Ini skill
 terakhir yang ditambahkan dengan alasan kuat (nilai pedagogis tinggi +
 biaya rendah + peninjauan ulang keputusan lama) — bukan untuk mengejar
-checklist apa pun. Fokus berikutnya sungguh-sungguh pindah ke gap
-aplikasi yang masih nol: admin/LMS CRUD atau EXP/leaderboard (§9.4).
+checklist apa pun.
+
+### 9.12 Audit terhadap klaim novelty riset sendiri — Novelty 1 ternyata TIDAK tersambung ke pipeline nyata, sekarang diperbaiki
+
+User eksplisit meminta: sebelum lanjut ke gap aplikasi (admin/LMS,
+EXP/leaderboard), audit dulu apakah tiga novelty riset (§3) benar-benar
+berfungsi di kode, bukan cuma diklaim di paper. Dicek satu-satu
+langsung terhadap kode yang jalan (bukan dokumentasi):
+
+- **Novelty 3 (Uncertainty-Gated Escalation): benar-benar
+  terintegrasi.** `should_escalate()` dipanggil di
+  `answer_processing.py`, menentukan jalur cepat/detail
+  `qwen_feedback.py`. Sesuai klaim.
+- **Novelty 1 (Generate–Calibrate–Select Loop): komponennya ADA
+  (`estimate_difficulty()`, `seed_item_from_encoder()`, masing-masing
+  lolos smoke test sendiri) TAPI TIDAK DIPANGGIL dari pipeline manapun
+  di luar smoke test-nya sendiri.** `answer_processing.py` sebelumnya
+  punya `_NEUTRAL_ITEM_URN = UrnState(k=16, n=32)` tetap untuk SEMUA
+  item apa pun skill/kesulitannya — secara fungsional sistem yang jalan
+  berperilaku seolah Novelty 1 tidak ada sama sekali.
+- **Novelty 2 (critic loop): bagian "Critic (LLM-as-judge)" di Fig.
+  3/Section IV-C paper murni narasi, tidak ada kodenya.** Validator yang
+  ada baru mengerjakan 1 dari 3 pengecekan yang didesain (realisasi
+  morfologi); 2 lainnya ("distractor bukan kebetulan juga benar",
+  "round-trip solver") tidak diimplementasikan sebagai pengecekan
+  umum — untuk 8 skill yang ada, risiko itu dihindari lewat konstruksi
+  manual (distractor sengaja dibuat salah), bukan lewat mekanisme yang
+  diklaim paper. **Belum dikerjakan di sesi ini** — dicatat sebagai
+  tugas terbuka berikutnya, bukan diabaikan.
+
+**Novelty 1 diperbaiki sekarang, lengkap dengan temuan tambahan:**
+saat menelusuri ini, ditemukan alasan desain lama di §9.2 ("urn item
+tidak perlu dipersist, karena item sekali-pakai per kejadian") sudah
+**usang** untuk item dari `question_bank.py` — bank itu sendiri baru
+ada di §9.7, SETELAH §9.2 ditulis, dan justru dirancang supaya item
+APPROVED dipakai ulang ke banyak siswa. Pola yang sama lagi: keputusan
+lama, alasannya sudah tidak berlaku karena perubahan lain yang datang
+belakangan.
+
+Diperbaiki dua lapis sekaligus (user eksplisit minta keduanya
+sekaligus, bukan bertahap):
+1. `answer_processing.py`: `submit_grammar_answer()` sekarang menerima
+   `item_urn` opsional. Kalau diberikan (item dari bank) dipakai
+   langsung dan urn yang sudah diperbarui dikembalikan lewat
+   `AnswerResult.updated_item_urn` untuk disimpan pemanggil. Kalau
+   tidak diberikan (item sekali-pakai di luar bank), di-seed otomatis
+   dari `estimate_difficulty(item.stem)` untuk kejadian itu saja.
+   Modul ini tetap TIDAK menyimpan apa pun sendiri (prinsip modul ini
+   dari awal) — persistensi tetap tanggung jawab pemanggil.
+2. `question_bank.py`: `BankEntry` sekarang punya field `item_urn`,
+   di-seed otomatis saat entry dibuat. `edit()` me-reset `item_urn`
+   dari nol (bukan mempertahankan evidence lama) — keputusan eksplisit:
+   evidence yang terakumulasi itu mengkalibrasi TEKS LAMA yang sudah
+   tidak ada lagi, membawanya begitu saja berarti salah atribusi.
+
+**Bug matematis nyaris masuk ke smoke test — ditangkap sebelum commit,
+bukan sesudah:** asumsi awal "jawaban benar di item yang di-seed LEBIH
+SULIT harus menaikkan urn pelajar LEBIH BANYAK" (intuisi "mengalahkan
+soal sulit = lebih berharga") ternyata **salah arah** untuk algoritma
+ball-exchange yang dipakai di sini — dicek silang terhadap
+`simulate_trackers.run_urnings` (implementasi referensi yang sudah
+divalidasi lewat RMSE/konvergensi di §2.1/§5, bukan diasumsikan ulang)
+dan dikonfirmasi lewat simulasi Monte Carlo (3000 percobaan): jawaban
+benar pada item yang di-seed LEBIH MUDAH (k/n item lebih tinggi)
+justru menaikkan urn pelajar LEBIH BANYAK secara rata-rata dibanding
+item yang di-seed lebih sulit — berlawanan dengan intuisi naif, tapi
+itu memang perilaku asli algoritma tervalidasi ini per-langkah (bukan
+bug; kebenarannya dibuktikan lewat hasil RMSE jangka panjang, bukan
+intuisi satu langkah). Assertion di smoke test ditulis sesuai arah
+yang terverifikasi ini, bukan intuisi awal — dan dites lewat rata-rata
+banyak percobaan (bukan satu draw, yang terbukti terlalu berisik
+karena `y` dan penerimaan MH sama-sama stokastik).
+
+**Yang BELUM dikerjakan, dicatat eksplisit (bukan tugas kecil, perlu
+sesi sendiri):** eksperimen pembuktian penuh PRD §3.1 ("encoder prior
+konvergen lebih cepat ke rating sebenarnya dibanding prior seragam")
+pada skala yang berarti, dan Novelty 2's critic loop. Keduanya kandidat
+kerja berikutnya yang lebih bernilai riset daripada admin/LMS CRUD/
+EXP/leaderboard — tapi itu pun sudah soal prioritas berikutnya, bukan
+pekerjaan sesi ini.
 
 ---
 
