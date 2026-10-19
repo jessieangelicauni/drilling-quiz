@@ -92,9 +92,9 @@ def fig3():
     B = lambda *a, **k: box(fig, ax, *a, **k)
     B(.015, .775, .315, .155, "KOREAN LEARNER\nCORPUS (annotated)", F_EXT, 7.0, True)
     B(.015, .345, .315, .365,
-      "MISCONCEPTION TAXONOMY $\\mathcal{M}$\n(KAGAS, 4 of 14 shown)\n"
-      "$m_1$ topic/nominative swap\n$m_2$ object-particle omission\n"
-      "$m_3$ honorific agreement\n$m_4$ irregular-stem over-reg.", F_VER, 6.0)
+      "MISCONCEPTION TAXONOMY $\\mathcal{M}$\n(KAGAS, 4 of 7 relevant codes)\n"
+      "$m_1$ PART (particle)\n$m_2$ ADJ (relativizer)\n"
+      "$m_3$ END (honorific/plain)\n$m_4$ CONJ (irregular stem)", F_VER, 6.0)
     arrow(ax, (.1725, .775), (.1725, .710))
 
     B(.365, .630, .295, .215,
