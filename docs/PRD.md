@@ -365,24 +365,41 @@ pertama ditulis: feedback salah menyebut label opsi (`"A"`) bukan teks
 partikel sungguhan (`"에"`) — ditemukan dan diperbaiki lewat pengujian,
 bukan diasumsikan benar dari desain.
 
-### 9.3 Infra produksi — keputusan diambil, implementasi DITUNDA
+### 9.3 Infra produksi — keputusan dicatat, implementasi DITUNDA TANPA BATAS WAKTU
 
-Atas permintaan eksplisit: fokus ke application layer dulu, infra nanti.
-Keputusan yang SUDAH diambil untuk cloud session berikutnya (bukan untuk
-didebat ulang, tinggal diimplementasikan):
+Keputusan infra berikut **sudah diambil** dan tidak perlu didebat ulang
+kapan pun infra dikerjakan, tapi **fokus sekarang dan di cloud session
+berikutnya tetap murni application layer** — infra bukan "next", infra
+ditunda sampai diminta eksplisit:
 
 | Keputusan | Pilihan |
 |---|---|
-| Database | **PostgreSQL** |
-| Serving model EXAONE/Qwen3 | **Dedicated inference server** (vLLM atau TGI) — dikonfirmasi `vllm` versi terbaru mendukung arsitektur `exaone4` dan `qwen3` secara native (dicek langsung di model registry-nya, bukan diasumsikan — pelajaran dari insiden `transformers`+EXAONE-3.5 sebelumnya) |
-| Target deployment | **Satu VM cloud dengan GPU**, cukup untuk skala 50-180 pengguna |
+| Database | PostgreSQL |
+| Serving model EXAONE/Qwen3 | Dedicated inference server (vLLM — dikonfirmasi mendukung `exaone4`/`qwen3` native di registry-nya) |
+| Target deployment | Satu VM cloud dengan GPU, skala 50-180 pengguna |
 
-**Belum dikerjakan** (menunggu cloud session): skema database, migrasi,
-endpoint API, konfigurasi vLLM/TGI, job scheduler batch harian, Docker
-Compose, observability, keamanan (rate limiting, validasi input). Semua
-modul `src/*.py` saat ini masih state in-memory, dipanggil langsung
-sebagai fungsi Python — benar secara metode, belum siap produksi secara
-infra.
+### 9.4 Application layer — yang sudah ada vs yang masih kosong
+
+**Sudah ada dan teruji** (sisi pelajar, end-to-end): tracker (`urnings_tracker.py`),
+penjadwalan vocab+grammar (`vocab_scheduler.py`, `grammar_scheduler.py`),
+perakitan drill harian (`daily_drill.py`), proses jawaban (`answer_processing.py`),
+generasi soal (`exaone_provider.py`, `vocab_provider.py`, `content_provider.py`),
+feedback (`qwen_feedback.py`), validator (`distractor_validator.py`), proxy
+kesulitan (`difficulty_heuristic.py`), gamifikasi dasar (`streak.py`).
+
+**Masih kosong — sisi admin/LMS, belum tersentuh sama sekali** (lihat
+daftar fitur awal proyek): *Maintain topic/subject*, *Maintain curriculum
+per subject* (upload kurikulum), *Review topic & Question Bank*
+(approve/edit/drop soal dari bank), *Set batch publish time*, *Set number
+of questions*, *Set question type*, *Auto-tagging topic* (soal baru
+ditandai topiknya otomatis). Semua ini logika aplikasi murni (CRUD +
+workflow), belum ada satu baris kode pun — ini kandidat kerja berikutnya
+yang paling jelas, BUKAN infra.
+
+**Juga belum ada:** logika EXP/leaderboard (§2.4 sudah mendesain
+pemisahannya dari tracker, tapi akumulasi EXP dan ranking per-topik belum
+diimplementasikan sebagai modul), dan skill grammar KAGAS lain di luar
+`particle_loc`/`particle_obj` (baru 2 dari 14 tipe).
 
 ---
 
