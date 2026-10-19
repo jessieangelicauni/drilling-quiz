@@ -171,9 +171,26 @@ prediksi kesulitan jadi titik rating awal, prediksi variance menentukan
 ditimpa oleh data respons asli). Soal baru langsung bisa dipakai adaptif
 sejak detik pertama, bukan setelah fase pra-tes.
 
-**Bukti dibutuhkan (minimal):** encoder prior konvergen lebih cepat ke rating
-sebenarnya dibanding prior seragam/tanpa informasi. Satu perbandingan, bukan
-grid ablasi besar.
+**Bukti (dikumpulkan 2026-10-19, lihat §9.13 untuk detail lengkap):**
+klaim awal ("encoder prior konvergen lebih cepat ke rating sebenarnya
+dibanding prior seragam") **TIDAK terbukti untuk Urnings** di 2 regime
+simulasi yang diuji (pool tetap maupun pool tumbuh) — semua level
+kualitas prior (korelasi 0.47–0.96 terhadap beta sebenarnya) berakhir
+dalam rentang noise yang sama dengan baseline netral. Perbandingan
+dengan Elo/Parallel Elo (regime sama, prior di-inject langsung tanpa
+transformasi Urnings) justru menunjukkan arah SEBALIKNYA dari yang
+diharapkan: Elo MEMANG menunjukkan speedup jelas untuk prior berkualitas
+tinggi, tapi RMSE akhirnya MELEDAK (3–6x lebih buruk dari netral) kalau
+prior-nya ternyata kurang akurat — sementara Urnings tidak meledak sama
+sekali di kondisi manapun, karena `sigma_hat2` secara eksplisit
+membatasi seberapa besar pengaruh prior.
+
+**Klaim yang didukung bukti bukan "konvergensi lebih cepat", tapi
+"robust terhadap prior yang mungkin salah"** — mengingat
+`difficulty_heuristic.py` sendiri eksplisit tidak terkalibrasi, sifat
+robust ini justru lebih relevan/berharga untuk kondisi nyata sistem
+ini daripada klaim speedup yang mengasumsikan prior sudah akurat.
+Bagian V-B paper (`src/content.py`) sudah ditambah catatan yang sama.
 
 ### 3.2 Novelty 2 — Misconception-Conditioned Diagnostic Distractors
 

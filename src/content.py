@@ -666,6 +666,26 @@ BODY = [
       "rather than tracking it across many rounds: does prior quality on held-out items "
       "improve after the encoder is retrained on accumulated posteriors, yes or no."),
 
+("P", "A preliminary simulation, run ahead of the encoder-on-real-data study above and "
+      "reported here for transparency rather than omitted, complicates the headline claim. "
+      "Using the same Rasch generating model and adaptive-selection regime as Fig. 5, "
+      "seeding item urns from a noisy but unbiased difficulty estimate did not measurably "
+      "speed convergence of learner ability estimates under Urnings, across simulated "
+      "estimator quality ranging from weak to strong (correlation 0.47-0.96 with true "
+      "difficulty) and in both a fixed and a continuously growing item pool. A parallel "
+      "check under Elo-style tracking showed the expected speedup clearly when the "
+      "estimator was accurate, but also showed severe degradation — final RMSE several "
+      "times worse than an uninformative start — once the estimator was only moderately or "
+      "poorly correlated with the truth, because Elo has no mechanism analogous to "
+      "σ̂ᵢ² for discounting an untrustworthy prior. We read this as evidence for a "
+      "different, and arguably more load-bearing, property than the one originally framed: "
+      "Urnings' confidence-weighted urn sizing makes prior injection safe under estimator "
+      "uncertainty — the condition this system actually faces, since the encoder described "
+      "above is not yet trained — rather than a guaranteed speedup, which presupposes an "
+      "estimator quality not yet established. The encoder-on-real-data study above is "
+      "designed to test both the original convergence claim and this robustness property, "
+      "not the convergence claim alone."),
+
 ("H2", "C. Validating Novelty 2: Misconception-Conditioned Distractors"),
 
 ("P", "Item quality is rated by three independent Korean language instructors on four "
