@@ -1091,6 +1091,68 @@ sebagian besar bisa dijelaskan sebagai keterbatasan solver
 sebelumnya (`subj_topic`), bukan cacat baru di konstruksi deterministik
 kita.
 
+### 9.17 Pola non-monoton di §9.13 (simulasi pool-tumbuh) — akar penyebab dikonfirmasi
+
+§9.13 menemukan pola aneh di simulasi pool-tumbuh: prior LEMAH
+(noise_std=2.0, nyaris tidak informatif) justru RMSE akhirnya PALING
+BAIK, mengalahkan baik prior netral maupun prior KUAT — dicatat waktu
+itu sebagai "dugaan belum dikonfirmasi: efek saturasi k0 ekstrem".
+Dugaan itu sekarang diuji langsung, dua tahap.
+
+**Tahap 1 — apakah prior lemah memang mendorong lebih banyak item ke
+k0 ekstrem (0 atau 32)?** Dihasilkan 2000 item per level sinyal, dihitung
+proporsi yang mentok di batas:
+
+| Sinyal | noise_std | % item mentok (k=0 atau 32) |
+|---|---|---|
+| Kuat | 0.3 | 0.0% |
+| Sedang | 0.8 | 0.7% |
+| Lemah | 2.0 | **11.3%** |
+
+Terkonfirmasi — sinyal lemah memang mendorong jauh lebih banyak item
+ke posisi ekstrem (transformasi sigmoid+pembulatan+clipping dari
+`mu_hat` yang sangat ber-noise sering mentok di ujung skala).
+
+**Tahap 2 — apakah item yang mentok itu memang jarang dipilih
+`pick_adaptive`?** Dijalankan simulasi 120.000 respons penuh dengan
+pelacakan tambahan (berapa kali tiap item benar-benar dipilih untuk
+disajikan):
+
+| Kondisi | Item mentok dipilih rata-rata | Item normal dipilih rata-rata |
+|---|---|---|
+| Kuat (n=5 item mentok) | 0.00x | 19.95x |
+| Lemah (n=739 item mentok) | **0.00x** | 22.72x |
+
+**Terkonfirmasi penuh, bukan dugaan lagi:** item yang k0-nya mentok
+di ujung **TIDAK PERNAH dipilih sama sekali** sepanjang 120.000
+respons — `pick_adaptive` memang didesain memilih item yang kesulitannya
+cocok dengan kemampuan siswa (target ~50% peluang benar), dan item
+dengan k0 ekstrem nyaris tidak pernah "cocok" dengan siapa pun.
+
+**Penjelasan lengkap pola non-monoton §9.13:** di kondisi sinyal LEMAH,
+~11-12% item pool efektif **tidak pernah terpakai sama sekali** —
+bukan "banyak item dengan tebakan acak yang saling meng-cancel", tapi
+sebagian item benar-benar HILANG dari peredaran. Akibatnya, 120.000
+respons yang sama terkonsentrasi ke item yang TERSISA (lebih sedikit)
+— tiap item yang tersisa dapat rata-rata LEBIH BANYAK exposure
+(22.72x vs 19.95x di kondisi kuat). Lebih banyak respons per item =
+urn item itu makin presisi mengkalibrasi dirinya sendiri terlepas dari
+titik awalnya — inilah yang membuat RMSE akhir kondisi lemah terlihat
+"lebih baik": itu efek SAMPING dari pool yang efektif mengecil, BUKAN
+manfaat nyata dari prior yang tidak informatif.
+
+**Implikasi untuk sistem nyata (bukan cuma simulasi):** kalau
+`difficulty_heuristic.py` pernah menghasilkan tebakan yang sangat
+meleset untuk satu soal tertentu, akibatnya BUKAN cuma "soal itu
+dikalibrasi agak salah" — akibatnya bisa soal itu **tidak pernah
+disajikan ke siapa pun sama sekali** (dianggap "tidak cocok" buat semua
+siswa). Ini pertimbangan monitoring praktis baru yang sebelumnya tidak
+disadari: perlu cara mendeteksi item "mati" (tidak pernah disajikan)
+di bank soal, bukan cuma memantau soal yang kalibrasinya meleset.
+
+Status: pola non-monoton §9.13 **sudah dijelaskan penuh**, bukan lagi
+open item.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
