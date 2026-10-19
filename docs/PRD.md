@@ -47,11 +47,26 @@ dibahas dan disepakati. Tujuannya satu: supaya 3 bulan dari sekarang, saat ada
 pertanyaan "kenapa dulu kita pilih X dan bukan Y", jawabannya ada di sini —
 bukan harus digali ulang dari histori chat.
 
-Prinsip kerja proyek ini: **ini riset, bukan produk produksi.** Fokus ke
-novelty yang bisa dipertahankan di depan reviewer Q1, bukan ke cakupan
-ablasi/fitur yang lengkap. Kalau sebuah komponen tidak menjawab salah satu
-dari 3 novelty inti (lihat §3), itu kandidat kuat untuk **tidak** dikerjakan
-sekarang.
+Prinsip kerja proyek ini: **ini riset, bukan produk produksi** — untuk
+paper dan tiga novelty-nya (§3). Untuk implementasi aplikasi (§9
+seterusnya), tujuannya **production-grade**: metode yang dipakai harus
+yang paling tepat secara teknis, bukan sekadar "cukup jalan". Dua hal ini
+hidup berdampingan, bukan kontradiksi — paper butuh novelty yang defensible,
+aplikasi butuh metode yang benar.
+
+**Keputusan di dokumen ini tidak permanen secara dogmatis.** Semua boleh
+diubah nanti — TAPI hanya dengan alasan yang kuat (bukti baru, pengujian
+nyata, bukan sekadar preferensi atau kemalasan mengecek ulang), bukan
+ditimpa begitu saja. Pola yang sudah terjadi berkali-kali di proyek ini:
+Urnings-vs-Elo dibalik dari keputusan awal setelah simulasi; Glicko sempat
+menang lalu ditolak setelah uji drift; "Indonesia tidak bisa" untuk Qwen3
+dibalik setelah model lebih besar diuji. Semua pembalikan itu VALID karena
+disertai bukti konkret, bukan tebakan. Standar yang sama berlaku untuk
+siapa pun (termasuk sesi/cloud session berikutnya) yang mau mengubah
+keputusan di dokumen ini: tunjukkan pengujian/bukti, jangan cuma asumsi.
+Kalau sebuah komponen tidak menjawab salah satu dari 3 novelty inti (§3)
+ATAU tidak menjawab kebutuhan aplikasi (§9.4), itu kandidat kuat untuk
+**tidak** dikerjakan sekarang.
 
 ---
 
