@@ -1014,6 +1014,83 @@ berjalan untuk jalur bank (`BankContentProvider`) — jalur live-generation
 (`ExaoneGrammarProvider`) tidak punya konsep "pilih dari kandidat" sama
 sekali karena cuma generate satu item per panggilan.
 
+### 9.16 Verifier gate (b)/(c) — dibangun, tapi (b) terbukti tidak reliable, (c) berguna setelah 2 kali perbaikan
+
+Dibangun `src/solver_check.py` — implementasi (b) "distractor tidak
+kebetulan juga benar" dan (c) "cek round-trip lewat solver" dari §3.2,
+pakai Qwen3-4B (sudah ada di `qwen_feedback.py`) dalam peran BARU: bukan
+menjelaskan jawaban, tapi menyelesaikan soal secara BUTA (tidak tahu
+kunci jawaban).
+
+**Percobaan pertama gagal, dan alasannya penting:** satu prompt diminta
+"sebutkan SEMUA opsi yang bisa diterima" (menguji (b) dan (c) sekaligus).
+Hasil pada 8 skill nyata: 4/24 bersih — termasuk solver MENOLAK jawaban
+yang gramatikal benar dan MENERIMA opsi yang tidak masuk akal (mis.
+menerima `도`/`만` padahal kalimatnya butuh penanda lokasi). Dicoba
+perbaikan dengan contoh kerja (teknik yang dulu menyelamatkan reliability
+generasi EXAONE sendiri) — malah LEBIH BURUK, model mulai echo
+meta-komentar bukan jawab. **Tugas "pilih semua yang benar" (multi-select)
+ternyata terlalu berat untuk mode non-reasoning model ini** — pelajaran
+"model kecil butuh tugas sempit" yang sama seperti EXAONE-1.2B, kali ini
+ditemukan lagi untuk model berbeda (Qwen3-4B) di tugas berbeda.
+
+**Diperbaiki dengan memecah jadi 2 tugas sempit terpisah:**
+- (c): pilih SATU jawaban terbaik (format pilihan-ganda standar + satu
+  contoh kerja).
+- (b): untuk tiap opsi non-kunci, tanya terpisah "apakah kalimat ini
+  juga bisa diterima? ya/tidak".
+
+**Ditemukan lagi, kedua kalinya di investigasi ini: budget token terlalu
+kecil bikin hasil terlihat gagal padahal cuma terpotong.** Model ini
+sering echo ULANG seluruh pertanyaan dulu sebelum menjawab (mode
+non-reasoning) — token budget 5-10 motong jawaban SEBELUM sampai ke
+jawaban sebenarnya, bukan berarti modelnya "tidak menjawab". Skrip
+diagnostik cepat pertama JUGA sempat salah baca hasil (cuma cek karakter
+PERTAMA dari teks, yang selalu "정" dari "정답:", bukan huruf jawaban
+sungguhan) — setelah dibenerkan, kasus yang kelihatan "gagal total" di
+percobaan pertama ternyata sebagian besar BENAR.
+
+**Pengecekan (b) — dites ketat, TERBUKTI tidak reliable, bukan
+diasumsikan.** Diuji 6 kasus diketahui (3 benar, 3 salah, termasuk
+bentuk tak-terkontraksi yang jelas tidak gramatikal) — model SELALU
+condong jawab "ya, bisa diterima", bahkan untuk kalimat yang jelas
+salah. Dicoba 2 framing prompt berbeda DAN mode reasoning (budget 800
+token) — tetap sama, model selalu bilang "맞음" (benar) untuk 4/4 kasus
+termasuk yang jelas salah. Ini BUKAN masalah konfigurasi yang bisa
+diperbaiki lagi (sudah divariasikan: format prompt, budget token, kata-
+kata prompt, mode reasoning) — dicatat sebagai keterbatasan nyata yang
+sudah diuji, bukan ditutup-tutupi. **Hasil (b) ditampilkan di output
+tapi diberi label eksplisit "tidak reliable, FYI saja" — TIDAK dipakai
+sebagai verdict.**
+
+**Pengecekan (c) — setelah diperbaiki, berguna.** Dijalankan terhadap
+24 item nyata (3 per skill × 8 skill): **18/24 (75%) kunci jawaban
+diterima solver.** Pola kegagalan jelas dan bisa dijelaskan, bukan
+acak:
+- `irregular_conj`: 2/3 meleset, solver konsisten pilih bentuk TIDAK
+  terkontraksi (salah) — ditemukan berulang di 3 ronde pengujian
+  berbeda sepanjang investigasi ini. Bukan bukti item kita salah
+  (bentuk benar sudah diverifikasi `kiwi.join()`) — bukti Qwen3-4B
+  punya blind spot spesifik untuk konjugasi tak-beraturan 르.
+- `subj_topic`: 2/3 meleset, solver konsisten condong ke bentuk topik
+  (나는/저는) — ini justru **MENGKONFIRMASI** langsung apa yang sudah
+  diakui jujur di §9.11: skill ini berbasis konvensi pedagogis, bukan
+  aturan sintaksis keras. Solver independen pun tidak yakin — selaras
+  dengan confidence tier yang sudah ditetapkan, bukan temuan baru yang
+  mengejutkan.
+- `particle_loc`, `time_range`: masing-masing 1/3 meleset — belum
+  cukup pola untuk disimpulkan, dicatat sebagai temuan tunggal.
+
+**Kesimpulan jujur:** asumsi "benar terjamin karena konstruksi" untuk
+8 skill yang ada **tetap berdiri** — yang diukur eksperimen ini bukan
+"apakah item kita benar" (itu sudah dijamin kode deterministik), tapi
+"apakah solver independen setuju", sinyal yang LEBIH LEMAH karena
+kompetensi solver sendiri bervariasi. Kegagalan yang ditemukan
+sebagian besar bisa dijelaskan sebagai keterbatasan solver
+(`irregular_conj`) atau soft-ambiguity yang memang sudah diungkap
+sebelumnya (`subj_topic`), bukan cacat baru di konstruksi deterministik
+kita.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
