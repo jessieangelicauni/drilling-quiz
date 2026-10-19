@@ -1373,5 +1373,68 @@ menggambarkan kode saat ini untuk `subj_topic`.
 
 ---
 
+### 9.21 Semua skill dipaksa 4 opsi (A-D) — user eksplisit minta, 6 skill sebelumnya cuma 2
+
+User bertanya kenapa cuma 2 opsi lalu eksplisit minta semua soal pilihan
+ganda punya 4 opsi. Dicek: `particle_loc`/`particle_obj` sudah 4 opsi
+dari awal (mekanisme filler `_FILLER_PARTICLES` sudah ada); 6 skill
+lain (honorific, time_range, tense_past, irregular_conj,
+adj_relativizer, subj_topic) cuma 2 — bukan keterbatasan teknis, cuma
+belum dikerjakan.
+
+**Risiko utama yang dijaga:** menambah distractor sembarangan bisa
+menciptakan jawaban ganda-benar — persis failure mode yang
+`distractor_validator.py` dibangun untuk cegah (§3.2). Jadi SETIAP
+filler tambahan diverifikasi dulu, standalone, pakai `kiwipiepy` CPU
+langsung (tanpa GPU) terhadap distractor_validator yang sudah ada,
+sebelum masuk kode — bukan ditebak.
+
+**Yang dibangun** (`exaone_provider.py`):
+- Helper umum `_pick_fillers()`: ambil 2 kandidat dari daftar filler
+  skill, masing-masing cuma dipakai kalau validator skill itu
+  **menolaknya** (fails = definitely wrong, sama persis prinsip
+  `_FILLER_PARTICLES` yang particle_loc/obj sudah pakai dari awal) —
+  kalau kurang dari 2 kandidat lolos, item itu di-skip (return None),
+  bukan diterbitkan dengan <4 opsi.
+- Helper `_assemble_options()`: susun 4 opsi + shuffle label, dipakai
+  semua skill (hapus duplikasi `labels = ["A","B"]`/`shuffle` yang
+  tadinya ada di 5 tempat berbeda).
+- Filler per skill, masing-masing diverifikasi via `distractor_validator`
+  sebelum dipakai (lihat komentar di kode untuk detail per kasus):
+  `_EF_FILLER_WORDS` (학교/사과/저기/안녕 — kata benda biasa, gagal tes EF
+  di posisi akhir kalimat) untuk honorific/tense_past/irregular_conj;
+  `_ETM_FILLER_WORDS` (학교/사과/저기) untuk adj_relativizer;
+  `_JKS_FILLER_PARTICLES` (도/만/의) untuk subj_topic;
+  `_TIME_RANGE_FILLER_PARTICLES` (에/에게/로/한테) untuk time_range.
+- **Catatan jujur, bukan ditutupi:** filler ini SENGAJA bukan distractor
+  misconception yang sophisticated seperti distractor utama tiap skill
+  (yang 2 opsi lama) — filler cuma "aman secara morfologis", setara
+  dengan filler yang particle_loc/obj sudah pakai dari awal, bukan
+  diagnostik. Direkam sebagai limitasi untuk dibenahi kalau fase review
+  instruktur manusia (§9.19) benar-benar jalan.
+- Smoke test di `__main__` diupdate: `len(item.options) == 4` (bukan
+  toleransi 2/3/4 lagi), plus assersi baru per skill yang cek filler-nya
+  memang berasal dari konstanta yang benar, bukan cuma cek jumlahnya.
+
+**Diverifikasi tanpa GPU** (bukan diasumsikan beres): karena constructor
+`ExaoneGrammarProvider.__init__` tetap wajib `.to("cuda")`, verifikasi
+dilakukan dengan men-stub `torch`/`transformers` di `sys.modules`
+(modul palsu, tidak pernah benar-benar load model) lalu menjalankan
+`__main__`-nya secara nyata via `runpy` — bukan baca kode dan percaya.
+Hasilnya: 5/5 sukses di SEMUA 8 skill, semua assersi lulus termasuk
+assersi filler baru. Jalur fallback LLM (slot tak terkurasi) tidak bisa
+diuji dengan cara ini — itu memang butuh model asli, di luar apa yang
+bisa diverifikasi tanpa GPU, batasnya sama seperti sebelumnya.
+
+**Belum dijalankan di GPU asli** — stub di atas membuktikan logikanya
+benar untuk SEMUA slot terkurasi saat ini, tapi belum membuktikan jalur
+LLM fallback (untuk slot baru di luar lookup table) juga tetap
+menghasilkan 4 opsi dengan benar. User perlu jalankan ulang
+`validate_novelty1.py` di mesin GPU untuk konfirmasi end-to-end,
+termasuk cek apakah `subj_topic` yang sekarang 4 opsi + label
+dialog baru (§9.20) benar-benar menghilangkan bias solver.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

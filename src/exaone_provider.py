@@ -83,6 +83,26 @@ _MODEL_NAME = "LGAI-EXAONE/EXAONE-4.0-1.2B"
 _KIWI = Kiwi()
 _FILLER_PARTICLES = ("도", "만", "가", "는")
 
+# Every item must have exactly 4 options (A-D), not just the one meaningful
+# distractor each skill already builds. These filler candidates pad out to
+# 4 the same way _FILLER_PARTICLES already does for particle_loc/particle_obj
+# (below): each is checked against the skill's own validator and used only if
+# it FAILS -- i.e. it is definitely, mechanically wrong, never a second
+# accidentally-correct answer. Verified empirically (not guessed) against
+# every stem/pair currently in SKILL_SPECS, standalone via distractor_validator
+# (CPU-only, no GPU needed for that check) before being wired in here.
+#
+# These are deliberately not sophisticated misconception-distractors like
+# each skill's own hand-built one -- they're closer to particle_loc/obj's
+# existing fillers: safe filler to reach 4 options, not independently
+# diagnostic. A later pass with real instructor review (PRD §9.19/§9.20)
+# could replace them with better-crafted ones; recorded as a known
+# limitation, not hidden.
+_EF_FILLER_WORDS = ("학교", "사과", "저기", "안녕")       # honorific, tense_past, irregular_conj
+_ETM_FILLER_WORDS = ("학교", "사과", "저기")              # adj_relativizer
+_JKS_FILLER_PARTICLES = ("도", "만", "의")                # subj_topic
+_TIME_RANGE_FILLER_PARTICLES = ("에", "에게", "로", "한테")  # time_range (paired particle)
+
 _VERB_PROMPT_LOC = (
     '"{slot}"에서 보통 하는 자연스러운 한국어 동사(기본형, "다"로 끝나는 형태) 딱 하나만 써줘.\n'
     '예시: 입력 "학교" -> 출력 "공부하다"\n'
@@ -344,6 +364,37 @@ class ExaoneGrammarProvider:
         self.critic_attempts = 0
         self.critic_recoveries = 0
 
+    def _pick_fillers(self, existing: tuple[str, ...], candidates: tuple[str, ...],
+                       is_valid) -> list[str] | None:
+        """Every item needs exactly 4 options -- pick 2 more from `candidates`,
+        keeping only ones `is_valid` rejects (so a filler can never turn out to
+        also be a correct answer), skipping anything already in `existing`.
+        Returns None, not a short list, if fewer than 2 turn up -- the caller
+        must then skip the item rather than ship one with fewer than 4 options.
+        """
+        fillers = []
+        for cand in candidates:
+            if len(fillers) == 2:
+                break
+            if cand in existing or cand in fillers:
+                continue
+            if not is_valid(cand):
+                fillers.append(cand)
+        return fillers if len(fillers) == 2 else None
+
+    def _assemble_options(self, skill_id: str, stem: str, correct_form: str,
+                           distractor_form: str, fillers: list[str]) -> str:
+        option_texts = [correct_form, distractor_form, *fillers]
+        labels = ["A", "B", "C", "D"]
+        self.rng.shuffle(labels)
+        answer_label = labels[0]
+        options = dict(zip(labels, option_texts))
+
+        item_id = f"grammar-{skill_id}-{self._counter}"
+        self._counter += 1
+        self.items[item_id] = GeneratedItem(skill_id, stem, "___", options, answer_label)
+        return item_id
+
     def _generate_raw(self, messages: list[dict]) -> str:
         enc = self.tok.apply_chat_template(messages, add_generation_prompt=True, enable_thinking=False,
                                             return_tensors="pt", return_dict=True).to("cuda")
@@ -395,7 +446,8 @@ class ExaoneGrammarProvider:
         subject list, a time-adverb anchor, etc.), done before this is
         called. This only does what's genuinely identical across all of
         them: confirm both forms are well-formed sentence-final predicates,
-        then assemble the item.
+        then assemble the item -- now always 4 options (A-D), padded with
+        _EF_FILLER_WORDS (see its definition for why those are safe).
         """
         if correct_form == distractor_form:
             return None  # degenerate; shouldn't happen but guard anyway
@@ -404,15 +456,13 @@ class ExaoneGrammarProvider:
             if not validate_sentence_final_tag(filled, spec["tag"]).valid:
                 return None
 
-        labels = ["A", "B"]
-        self.rng.shuffle(labels)
-        answer_label, distractor_label = labels
-        options = {answer_label: correct_form, distractor_label: distractor_form}
+        fillers = self._pick_fillers(
+            (correct_form, distractor_form), _EF_FILLER_WORDS,
+            lambda cand: validate_sentence_final_tag(template.replace("___", cand, 1), "EF").valid)
+        if fillers is None:
+            return None
 
-        item_id = f"grammar-{skill_id}-{self._counter}"
-        self._counter += 1
-        self.items[item_id] = GeneratedItem(skill_id, template, "___", options, answer_label)
-        return item_id
+        return self._assemble_options(skill_id, template, correct_form, distractor_form, fillers)
 
     def _build_verb_ending_item(self, skill_id: str, spec: dict, slot: str,
                                  verb_lemma: str) -> str | None:
@@ -490,15 +540,13 @@ class ExaoneGrammarProvider:
             if not validate_prenominal_tag(filled, noun, spec["tag"]).valid:
                 return None
 
-        labels = ["A", "B"]
-        self.rng.shuffle(labels)
-        answer_label, distractor_label = labels
-        options = {answer_label: correct_form, distractor_label: distractor_form}
+        fillers = self._pick_fillers(
+            (correct_form, distractor_form), _ETM_FILLER_WORDS,
+            lambda cand: validate_prenominal_tag(template.replace("___", cand, 1), noun, "ETM").valid)
+        if fillers is None:
+            return None
 
-        item_id = f"grammar-{skill_id}-{self._counter}"
-        self._counter += 1
-        self.items[item_id] = GeneratedItem(skill_id, template, "___", options, answer_label)
-        return item_id
+        return self._assemble_options(skill_id, template, correct_form, distractor_form, fillers)
 
     def _build_subj_topic_item(self, skill_id: str, spec: dict,
                                 pair: tuple[str, str]) -> str | None:
@@ -533,15 +581,13 @@ class ExaoneGrammarProvider:
             if not validate_postnominal_tag(filled, pronoun, tag).valid:
                 return None
 
-        labels = ["A", "B"]
-        self.rng.shuffle(labels)
-        answer_label, distractor_label = labels
-        options = {answer_label: subj_form, distractor_label: topic_form}
+        fillers = self._pick_fillers(
+            (subj_form, topic_form), _JKS_FILLER_PARTICLES,
+            lambda cand: validate_postnominal_tag(template.replace("___", cand, 1), pronoun, "JKS").valid)
+        if fillers is None:
+            return None
 
-        item_id = f"grammar-{skill_id}-{self._counter}"
-        self._counter += 1
-        self.items[item_id] = GeneratedItem(skill_id, template, "___", options, answer_label)
-        return item_id
+        return self._assemble_options(skill_id, template, subj_form, topic_form, fillers)
 
     def _build_paired_particle_item(self, skill_id: str, spec: dict,
                                      pair: tuple[str, str, str]) -> str | None:
@@ -563,15 +609,13 @@ class ExaoneGrammarProvider:
         if not validate_cloze_option(stem, "___", distractor_form, spec["tag"]).valid:
             return None
 
-        labels = ["A", "B"]
-        self.rng.shuffle(labels)
-        answer_label, distractor_label = labels
-        options = {answer_label: correct_form, distractor_label: distractor_form}
+        fillers = self._pick_fillers(
+            (correct_form, distractor_form), _TIME_RANGE_FILLER_PARTICLES,
+            lambda cand: validate_cloze_option(stem, "___", cand, spec["tag"]).valid)
+        if fillers is None:
+            return None
 
-        item_id = f"grammar-{skill_id}-{self._counter}"
-        self._counter += 1
-        self.items[item_id] = GeneratedItem(skill_id, stem, "___", options, answer_label)
-        return item_id
+        return self._assemble_options(skill_id, stem, correct_form, distractor_form, fillers)
 
     def next_new_grammar_item(self, skill_id: str, learner_urn=None,
                                exclude: set[str] = frozenset()) -> str | None:
@@ -625,25 +669,13 @@ class ExaoneGrammarProvider:
         if not validate_cloze_option(stem, "___", distractor_form, distractor_tag).valid:
             return None
 
-        fillers = []
-        for candidate in _FILLER_PARTICLES:
-            if len(fillers) == 2:
-                break
-            if candidate in (correct_form, distractor_form):
-                continue
-            if not validate_cloze_option(stem, "___", candidate, spec["tag"]).valid:
-                fillers.append(candidate)
+        fillers = self._pick_fillers(
+            (correct_form, distractor_form), _FILLER_PARTICLES,
+            lambda cand: validate_cloze_option(stem, "___", cand, spec["tag"]).valid)
+        if fillers is None:
+            return None
 
-        option_texts = [correct_form, distractor_form, *fillers]
-        labels = ["A", "B", "C", "D"][:len(option_texts)]
-        self.rng.shuffle(labels)
-        answer_label = labels[0]
-        options = dict(zip(labels, option_texts))
-
-        item_id = f"grammar-{skill_id}-{self._counter}"
-        self._counter += 1
-        self.items[item_id] = GeneratedItem(skill_id, stem, "___", options, answer_label)
-        return item_id
+        return self._assemble_options(skill_id, stem, correct_form, distractor_form, fillers)
 
     def next_new_vocab_item(self, user_id: str, exclude: set[str]) -> str | None:
         raise NotImplementedError("vocab items come from the admin-maintained curriculum, not generation")
@@ -663,38 +695,44 @@ if __name__ == "__main__":
                 print(item)
                 assert item.blank_marker in item.stem
                 assert item.answer in item.options
-                assert len(item.options) in (2, 3, 4)
+                assert len(item.options) == 4, (
+                    f"every item must have exactly 4 options (A-D), got {len(item.options)}: {item}")
+                non_answer = {l: v for l, v in item.options.items() if l != item.answer}
                 if skill_id == "honorific":
                     assert "세요" in item.options[item.answer], (
                         "the honorific form, never the plain one, must be the correct answer")
+                    assert sum(v in _EF_FILLER_WORDS for v in non_answer.values()) == 2
                 if skill_id == "time_range":
                     assert item.options[item.answer] == "부터", (
                         "부터 must always be correct in the paired '...까지' template")
+                    assert sum(v in _TIME_RANGE_FILLER_PARTICLES for v in non_answer.values()) == 2
                 if skill_id == "tense_past":
-                    distractor_label = next(l for l in item.options if l != item.answer)
                     # correctness is guaranteed by construction (_build_tense_item always
                     # puts past_form in correct_form's slot); what the smoke test can
-                    # usefully check is that the two options are genuinely different
-                    # conjugations, not a degenerate pair.
-                    assert item.options[item.answer] != item.options[distractor_label]
+                    # usefully check is that the meaningful distractor (present form) is
+                    # genuinely different, and the other two options are the known fillers.
+                    assert sum(v in _EF_FILLER_WORDS for v in non_answer.values()) == 2
+                    real_distractor = next(v for v in non_answer.values() if v not in _EF_FILLER_WORDS)
+                    assert item.options[item.answer] != real_distractor
                 if skill_id == "irregular_conj":
-                    distractor_label = next(l for l in item.options if l != item.answer)
-                    assert item.options[item.answer] != item.options[distractor_label]
                     assert item.options[item.answer] in ("잘라요", "몰라요", "불러요"), (
                         f"the irregular-contracted form must be correct, got {item}")
+                    assert sum(v in _EF_FILLER_WORDS for v in non_answer.values()) == 2
+                    real_distractor = next(v for v in non_answer.values() if v not in _EF_FILLER_WORDS)
+                    assert item.options[item.answer] != real_distractor
                 if skill_id == "adj_relativizer":
-                    distractor_label = next(l for l in item.options if l != item.answer)
-                    assert item.options[item.answer] != item.options[distractor_label]
-                    assert item.options[distractor_label].endswith("는"), (
-                        f"the distractor must be the verb-pattern '는' overgeneralization, got {item}")
                     assert item.options[item.answer] in ("매운", "작은", "큰", "긴", "예쁜", "비싼"), (
                         f"the correctly-contracted adjective form must be correct, got {item}")
+                    assert sum(v in _ETM_FILLER_WORDS for v in non_answer.values()) == 2
+                    real_distractor = next(v for v in non_answer.values() if v not in _ETM_FILLER_WORDS)
+                    assert real_distractor.endswith("는"), (
+                        f"the distractor must be the verb-pattern '는' overgeneralization, got {item}")
                 if skill_id == "subj_topic":
-                    distractor_label = next(l for l in item.options if l != item.answer)
-                    assert item.options[item.answer] != item.options[distractor_label]
                     assert item.options[item.answer] in ("제가", "내가"), (
                         f"the subject-marked (JKS) form must be the correct answer to a 누가 question, got {item}")
-                    assert item.options[distractor_label] in ("저는", "나는"), (
+                    assert sum(v in _JKS_FILLER_PARTICLES for v in non_answer.values()) == 2
+                    real_distractor = next(v for v in non_answer.values() if v not in _JKS_FILLER_PARTICLES)
+                    assert real_distractor in ("저는", "나는"), (
                         f"the topic-marked (JX) form must be the distractor, got {item}")
         print(f"{skill_id}: {successes}/5 generations succeeded")
         assert successes >= 4, f"{skill_id}: expected the validated pipeline to succeed reliably, got {successes}/5"
