@@ -887,8 +887,67 @@ dibiarkan mengklaim manfaat yang belum terbukti.
 
 **Belum dikerjakan (dicatat, bukan diabaikan):** pola non-monoton di
 Simulasi 2 (dugaan efek saturasi k0 ekstrem) belum dikonfirmasi akar
-penyebabnya secara pasti. Critic loop Novelty 2 masih murni narasi
-paper, belum disentuh.
+penyebabnya secara pasti.
+
+### 9.14 Critic loop Novelty 2 — scope kecil (verb lemma), bukan generasi bebas penuh
+
+Dikerjakan setelah diskusi eksplisit soal scope: bukan revisit generasi
+distractor bebas (yang terbukti tidak reliable di audit awal, lihat
+catatan "Round 1" di `exaone_provider.py`), tapi critic loop ditempel
+ke SATU-SATUNYA panggilan LLM yang masih ada di seluruh pipeline 8
+skill — `_pick_verb_lemma()`. Generator → Validator → Critic (§3.2)
+diuji di titik paling kecil dan paling aman dulu, bukan di titik
+paling ambisius.
+
+**Metodologi: dicari kegagalan NYATA dulu, bukan skenario karangan.**
+Dicoba 20 slot di luar semua tabel `verb_lookup` terkurasi (memaksa
+jalur LLM) — 12/20 gagal (output bukan bentuk dasar verba berakhiran
+"다"). Diperiksa teks mentahnya satu-satu, bukan diasumsikan.
+
+**Ditemukan: 2 dari 12 kegagalan itu BUKAN kegagalan model, tapi bug
+di kode ekstraksi** — `text.split()[0]` cuma cek token PERTAMA. Untuk
+slot "박물관", model sebenarnya sudah menjawab benar ("책을 읽다")
+tapi kode cuma melihat "책을" (bukan "읽다") dan membuangnya. Diperbaiki
+dulu TANPA LLM sama sekali (`_extract_verb_lemma()` sekarang scan semua
+token) — 2 kegagalan pulih gratis, prinsip "jangan panggil LLM kalau
+bug kode biasa yang menyebabkan" dipegang.
+
+**10 kegagalan sisanya genuinely dari model** — tiga pola: (1) output
+bahasa Inggris ("travel" untuk 우주선/공항/기차역), (2) kata benda,
+bukan kata kerja (해변→"해변", 교도소→"감옥", dst), (3) bentuk gerund
+`-기`, bukan bentuk dasar `-다` (카지노→"게임하기").
+
+**Dibuktikan dulu kenapa blind retry TIDAK bisa membantu di sini
+(bukan diasumsikan):** model pakai greedy decoding (`do_sample=False`)
+— prompt yang identik dijamin menghasilkan output identik. Diuji
+langsung: slot yang sama dipanggil 3x tanpa critic → gagal identik
+3/3 kali. Ini yang membuat critic loop punya alasan kuat untuk ADA:
+satu-satunya cara memperbaiki kegagalan pada slot yang SAMA adalah
+mengubah konteks percakapannya, bukan coba lagi dengan harapan beda.
+
+**Critic loop:** kalau `_extract_verb_lemma` gagal, model diperlihatkan
+jawaban salahnya sendiri + diminta revisi dalam percakapan yang sama
+(bukan prompt baru dari nol) — satu giliran tambahan, dibatasi (tidak
+retry berulang tanpa batas). Hasil terhadap 10 kegagalan nyata:
+**4/10 pulih (40%)** — 우주선→이동하다, 호텔→숙박하다, 기차역→이동하다,
+영화관→보다. 6/10 tetap gagal bahkan setelah critic (해변, 교도소,
+스타디움, 공항, 카지노, 수족관) — dicatat jujur, bukan diklaim 100%
+berhasil.
+
+**Instrumentasi produksi:** `ExaoneGrammarProvider.critic_attempts`/
+`.critic_recoveries` mencatat seberapa sering critic loop benar-benar
+dipakai dan seberapa sering berhasil di pemakaian nyata nanti, bukan
+cuma dari eksperimen satu kali ini.
+
+**Yang BELUM dikerjakan (scope sengaja dibatasi, dicatat eksplisit):**
+generasi distractor bebas dikondisikan-miskonsepsi (visi penuh Fig. 3)
+masih belum disentuh — keputusan eksplisit untuk tidak revisit itu
+sekarang, karena riwayat proyek ini sudah menunjukkan pendekatan itu
+tidak reliable dan lebih berisiko daripada critic loop berskala kecil
+ini. Pengecekan verifier gate (b) "distractor bukan kebetulan juga
+benar" dan (c) "round-trip solver" (§9.12) juga masih belum
+diimplementasikan sebagai pengecekan umum — kedua ini masih open
+item terpisah.
 
 ---
 
