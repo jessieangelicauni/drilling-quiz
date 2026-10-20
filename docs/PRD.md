@@ -3180,5 +3180,94 @@ kalibrasi), `src/curriculum_grammar_provider.py` (baru),
 
 ---
 
+### 9.50 Validator plausibilitas semantik substitusi domain: 6 metode dicoba, SEMUA gagal — limitasi genuine model 4B, didisclose bukan dipaksakan
+
+**Konteks**: §9.46-9.49 membangun fitur substitusi kosakata domain
+EV/smart-factory. User koreksi arsitektur (tabel kata hardcode Claude
+diganti jadi keputusan LLM, lihat `domain_vocab_substitution.py`) lalu
+minta dibandingkan dengan EXAONE (hasil: EXAONE-4.0-1.2B lebih buruk,
+EXAONE-3.5-7.8B tidak bisa dijalankan sama sekali karena bug
+inkompatibilitas versi `transformers` di kode custom repo-nya sendiri —
+dicoba 3 versi berbeda, 4.46/4.57/5.20, semua gagal dengan error
+berbeda, disimpulkan bukan masalah di sisi kita). Ditemukan juga: Qwen3
+sendiri menghasilkan substitusi yang gramatikal sempurna tapi semantiknya
+rusak ("부품을 먹어요" = makan komponen, "설비를 읽으세요" = membaca alat
+berat). User secara eksplisit minta investigasi menyeluruh sebagai
+"senior LLM engineer" untuk menemukan validator yang bekerja, bukan
+menyerah di percobaan pertama.
+
+**Dataset kalibrasi**: 26-28 pasang (orig, substituted) dari sweep 75
+entri kurikulum, dinilai plausibel/tidak secara manual (akal sehat dunia
+nyata, bukan gramatikalitas) — dasar untuk menguji setiap sinyal.
+
+**6 metode dicoba, berurutan, masing-masing dengan alasan kenapa metode
+sebelumnya gagal dan apa yang dicoba beda**:
+
+1. **kiwipiepy parse score** (reuse sinyal yang sukses di check (d)/(f)
+   §9.48-9.49): **GAGAL TOTAL** — PLAUSIBLE dan BAD tercampur rata di
+   seluruh rentang gap (-0.24 sampai 2.73), nol separasi. Make sense:
+   parser statistik morfologi cuma tahu "kombinasi morfem ini umum atau
+   tidak", buta terhadap akal sehat dunia nyata ("pabrik itu enak"
+   gramatikal sempurna).
+2. **Qwen3 whole-sentence log-probability** (`sentence_logprob`, sinyal
+   yang sukses di `solver_check.py` §9.35): **GAGAL TOTAL** — gap
+   -0.8 sampai +1.9, PLAUSIBLE dan BAD tercampur di semua rentang. Model
+   generatif pun, kalau diukur rata-rata seluruh kalimat, sinyalnya
+   terdilusi oleh kata-kata lain yang tetap wajar.
+3. **Predicate-conditional-logprob, versi 1** (isolasi token predikat
+   via common-suffix token matching, bukan rata-rata seluruh kalimat):
+   **SEBAGIAN membaik** — di ekstrem (gap > 0.85) 8/8 BAD terdeteksi
+   tanpa false positive, tapi rentang tengah (0.1-0.8) masih campur.
+   Precision tinggi di satu ekstrem, recall rendah (~57%) — tidak cukup
+   untuk hard gate.
+4. **Predicate-conditional-logprob, versi 2** (perbaikan: offset
+   karakter presisi dari kiwipiepy + `return_offsets_mapping` tokenizer,
+   bukan common-suffix token yang rapuh akibat BPE): **TIDAK lebih baik
+   dari versi 1**, malah beberapa kasus PLAUSIBLE bernilai tinggi
+   (2.06) di atas kasus BAD — perbaikan presisi teknis tidak menolong
+   karena akar masalahnya bukan presisi pengukuran, tapi model memang
+   tidak punya sinyal yang relevan di sana.
+5. **Forced best-pick** (reuse `solver_check._pick_best`, pola yang
+   SUDAH terbukti lebih reliable dari yes/no untuk model ini — dasar
+   check (c) di 11 skill): diberi pilihan A/B antara kata baru vs kata
+   asli, model diminta pilih mana yang lebih pas. **GAGAL, mendekati
+   acak**: kasus BAD yang berhasil menolak kata baru 7/16 (44%), kasus
+   PLAUSIBLE yang tetap pilih kata baru 5/12 (42%) — keduanya di bawah
+   50%, bukan sekadar lemah tapi genuinely tidak ada sinyal.
+6. **Direct judgment dengan reasoning mode** (`enable_thinking=True`,
+   budget 600 token, parsing longgar): dimensi yang BELUM dicoba
+   (sepanjang sesi ini reasoning mode selalu dimatikan demi kecepatan).
+   Hasil awal pada 12-sampel sempat menjanjikan (3/4 verdict jelas
+   benar, termasuk MENANGKAP kasus "커피에다가 철분" yang tidak
+   terdeteksi metode manapun sebelumnya) — tapi pada tes konfirmasi
+   penuh 26-pasang: **correct=15/26, accuracy 57.7%** — cuma sedikit di
+   atas tebakan acak (50%), bukan breakthrough yang diharapkan.
+
+**Kesimpulan, sebagai senior-LLM-engineer finding bukan sekadar
+"menyerah"**: 6 metode berbeda — 3 varian scoring (kiwipiepy,
+whole-sentence Qwen3, predicate-isolation x2), 1 varian diskriminasi
+(forced best-pick), 2 varian judgment langsung (dengan/tanpa reasoning)
+— semua gagal mencapai level yang bisa diandalkan untuk menggerbang
+produksi otomatis. Ini BUKAN karena kurang usaha atau salah
+implementasi (setiap metode diverifikasi bekerja secara mekanis,
+diukur di data nyata, bukan ditebak) — ini limitasi genuine model 4B
+untuk task "akal sehat dunia nyata dalam bahasa Korea", berbeda sifat
+dari task-task lain yang BERHASIL di sesi ini (gramatikalitas,
+span-finding, scoring vs judging untuk distraktor) yang semuanya
+tentang kebenaran LINGUISTIK, bukan kebenaran DUNIA NYATA.
+
+**Belum diputuskan** (butuh arahan user): disclose sebagai limitasi
+(fitur substitusi tetap dipakai, kualitas semantik di-flag untuk review
+manusia, tidak digerbang otomatis) vs investigasi model API eksternal
+(keluar dari arsitektur all-local yang dipakai proyek ini sejauh ini,
+perubahan scope besar) vs pendekatan lain yang belum terpikirkan.
+
+**File:** tidak ada perubahan kode (semua eksperimen di atas adalah
+skrip investigasi sementara, bukan kode produksi — `domain_vocab_substitution.py`
+TIDAK diubah karena tidak ada metode yang cukup baik untuk
+diimplementasikan).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
