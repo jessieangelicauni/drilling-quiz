@@ -3148,14 +3148,35 @@ track per grammar point, sesuai keputusan user poin 1.
 mengimplementasikan `ContentProvider.next_new_grammar_item` protocol yang
 sama dengan `ExaoneGrammarProvider`, routing berdasarkan prefix skill_id.
 
-**Belum selesai di akhir sesi ini**: dispatcher penggabung di
-`content_provider.py` (routing skill_id "curriculum_*" vs skill lama ke
-provider yang tepat) dan smoke test end-to-end lewat
-`daily_drill.assemble_daily_drill` + `answer_processing.submit_grammar_answer`
-dengan skill_id campuran — lanjutan langsung berikutnya.
+**Dispatcher dibangun dan diverifikasi end-to-end**: `DispatchingGrammarProvider`
+baru di `content_provider.py` — routing `next_new_grammar_item` berdasarkan
+prefix skill_id (`"curriculum_"` → `CurriculumGrammarProvider`, selain itu →
+`ExaoneGrammarProvider`), dengan `.items` sebagai `ChainMap` read-only yang
+menggabungkan dict item dari kedua provider tanpa copy. `daily_drill.py` dan
+`answer_processing.py` TIDAK PERLU diubah sama sekali — keduanya sudah
+duck-typed terhadap `next_new_grammar_item`/`item.skill_id`/`item.options`/dst,
+bukan terhadap tipe konkret provider/item tertentu.
+
+**Smoke test end-to-end**: drill dengan skill_ids campuran
+(`["particle_loc", "curriculum_40"]`) lewat satu `DispatchingGrammarProvider`
+yang sama → `submit_grammar_answer` dipanggil untuk item kurikulum → Urnings
+`skill_profile` ter-update dengan benar untuk skill `"curriculum_40"`.
+
+**Satu masalah ditemukan & diperbaiki saat menjalankan smoke test**: GPU OOM
+(15.57 GiB, proses makan 15.54 GiB) saat smoke test awalnya memuat 3 model
+sekaligus (EXAONE untuk `particle_loc` + Qwen3-4B untuk `CurriculumGrammarProvider`
++ Qwen3-4B TERPISAH LAGI untuk `QwenFeedbackProvider`). Diperbaiki dengan stub
+`_FakeFeedbackProvider` di smoke test (bukan di kode produksi) — yang perlu
+dibuktikan test ini adalah mekanisme dispatch+Urnings bekerja, bukan menguji
+ulang `QwenFeedbackProvider` yang sudah punya smoke test sendiri di
+`answer_processing.py`. **Catatan untuk nanti**: kalau provider ini benar-benar
+dipakai bersamaan di produksi (bukan cuma smoke test), 3 model GPU sekaligus
+bisa jadi masalah nyata, bukan cuma masalah test — belum diselesaikan,
+dicatat sebagai limitasi operasional terbuka.
 
 **File:** `src/curriculum_item_generator.py` (check (f) + 2 revisi
-kalibrasi), `src/curriculum_grammar_provider.py` (baru).
+kalibrasi), `src/curriculum_grammar_provider.py` (baru),
+`src/content_provider.py` (`DispatchingGrammarProvider` baru + smoke test).
 
 ---
 
