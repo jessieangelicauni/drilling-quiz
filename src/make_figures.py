@@ -114,11 +114,11 @@ def fig3():
 
     B(.510, .525, .475, .455,
       "ESCALATED PATH — high diagnostic value\n"
-      "EXAONE reasoning mode: minimal-pair probe;\n"
-      "Qwen3: contrastive feedback naming $m_j$", F_GEN, 7.0)
+      "Qwen3 reasoning mode: contrastive feedback\n"
+      "naming the specific misconception $m_j$", F_GEN, 7.0)
     B(.510, .030, .475, .405,
       "ROUTINE PATH — low diagnostic value\n"
-      "EXAONE non-reasoning;\ncached short feedback", F_VER, 7.0)
+      "Qwen3 non-reasoning;\nshort cached feedback", F_VER, 7.0)
     ortho(ax, [(.4450, .620), (.4775, .620), (.4775, .7525), (.5100, .7525)])
     free(fig, ax, .4775, .880, "yes", 6.5, "center")
     ortho(ax, [(.4450, .380), (.4775, .380), (.4775, .2325), (.5100, .2325)])

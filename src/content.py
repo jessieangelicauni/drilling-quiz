@@ -448,12 +448,14 @@ BODY = [
       "concrete ways. Its tokeniser segments Hangul efficiently, reducing both cost and the "
       "morphological fragmentation that inflates sequence length for Korean in "
       "English-centric tokenisers—the same consideration that motivates KRongBERT's "
-      "morphological factorisation [26]. And its hybrid design, offering both a fast "
-      "non-reasoning mode and a slower reasoning mode, maps unusually well onto the "
-      "escalation policy we describe in Section IV-D. The main caveat is licensing: EXAONE "
-      "is released under terms restricting commercial use, which is unproblematic for "
-      "research but must be disclosed, and which is a reason to retain a permissively "
-      "licensed fallback."),
+      "morphological factorisation [26]. EXAONE's role in this system is generation only "
+      "(item stems, verb lemmas), and its non-reasoning mode is sufficient for that "
+      "narrow task throughout—we do not exercise its reasoning mode anywhere, so we do not "
+      "claim its hybrid design as a property this system relies on. The escalation policy "
+      "in Section IV-D switches Qwen3 between its modes, not EXAONE. The main caveat on "
+      "EXAONE is licensing: it is released under terms restricting commercial use, which is "
+      "unproblematic for research but must be disclosed, and which is a reason to retain a "
+      "permissively licensed fallback."),
 
 ("P", "English explanatory feedback: Qwen3. The user-facing explanation is a cross-lingual "
       "task, not an English one: the model must reason about Korean morphology while writing "
@@ -630,11 +632,13 @@ BODY = [
       "we do not claim the replacement as a research novelty on its own. Each skill "
       "dimension k of a learner carries an urn whose posterior width w_{k} is a natively "
       "available signal of how evenly matched the learner's recent record has been against "
-      "the items they faced, maximal when that record sits near a coin flip. By default the "
-      "system takes a routine path—fast non-reasoning generation and short, cached "
-      "feedback—and escalates to reasoning-mode generation of a minimal-pair probe and a "
-      "contrastive explanation only when the recent record is ambiguous enough, or a "
-      "misconception has persisted enough, to be worth the cost:"),
+      "the items they faced, maximal when that record sits near a coin flip. This policy "
+      "gates Qwen3's feedback generation only—EXAONE's role is item generation, already "
+      "finished before a learner answers, and does not itself branch on escalation. By "
+      "default the system takes a routine path: Qwen3's fast non-reasoning mode, short and "
+      "cached. It escalates to Qwen3's reasoning mode, producing a contrastive explanation "
+      "that names the specific misconception, only when the recent record is ambiguous "
+      "enough, or a misconception has persisted enough, to be worth the cost:"),
 
 ("EQ", "escalate  ⟺  w_{k} > τ   ∨   consecutive(m_{j}) ≥ 2\t(3)"),
 
