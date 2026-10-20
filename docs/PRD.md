@@ -3344,5 +3344,82 @@ gap, feedback quality) berubah dibanding Qwen3-4B.
 
 ---
 
+### 9.52 Model swap ke EXAONE-3.5-7.8B diperluas ke exaone_provider.py dan curriculum_item_generator.py (scope diperluas per instruksi user, risiko terbesar sejauh ini)
+
+**Instruksi user**: setelah §9.51, user bilang "EXAONE-3.5-7.8B untuk
+semuanya". Ditanya scope persis via AskUserQuestion (karena beberapa
+file punya alasan terdokumentasi kenapa TIDAK pakai EXAONE) — user
+pilih memasukkan **`curriculum_item_generator.py`** dan
+**`exaone_provider.py`** ke dalam scope, sudah diberi tahu di pertanyaan
+itu sendiri bahwa keduanya punya temuan empiris sebelumnya yang relevan.
+
+**`curriculum_item_generator.py`** (sebelumnya Qwen3-4B): modul ini
+secara eksplisit MENGUJI EXAONE-4.0-1.2B untuk tugas span-finding ini
+dan KALAH (gagal menemukan span asli di kalimat, kadang malah
+mendeskripsikan grammar point). Temuan itu untuk varian 1.2B, BUKAN
+7.8B — jadi tidak diasumsikan masih kalah, tapi juga tidak diasumsikan
+sudah beres. UNVERIFIED tanpa run ulang smoke test file ini di GPU
+nyata pada sampel representatif dari ~247 entri yang ditangani modul
+ini.
+
+**`exaone_provider.py`** (sebelumnya EXAONE-4.0-1.2B) — **swap dengan
+blast radius terbesar di seluruh sesi ini**, karena beberapa alasan
+sekaligus:
+1. Bukan cuma naik ukuran dalam satu keluarga — ganti KELUARGA model
+   (3.5, bukan 4.0) sekaligus ukuran (7.8B, bukan 1.2B). Fig. 1,
+   Section III-A, dan sitasi [34] (`content.py` baris ~456-468)
+   menjelaskan "EXAONE" sambil secara spesifik mengutip EXAONE 4.0 dan
+   mode hybrid non-reasoning/reasoning-nya ("its non-reasoning mode is
+   sufficient... we do not claim its hybrid design as a property this
+   system relies on") — EXAONE-3.5 mendahului desain hybrid itu, jadi
+   sitasi [34] sekarang menggambarkan model yang BUKAN yang benar-benar
+   jalan. Framing paper itu sendiri masih secara teknis aman (sudah
+   di-hedge: "we do not claim..."), tapi sitasinya perlu direvisi kalau
+   swap ini jadi final — BELUM diubah di `content.py`, sengaja ditunda
+   sampai swap ini terverifikasi di GPU (paper mengikuti investigasi,
+   bukan sebaliknya).
+2. Modul docstring `exaone_provider.py`'s sendiri (Round 3) mencatat
+   EXAONE-4.0-1.2B memilih pasangan verb yang aneh secara semantik dan
+   JUSTRU MEMBURUK dengan prompt lebih kompleks — disimpulkan sebagai
+   keterbatasan kapasitas 1.2B, bukan sifat keluarga EXAONE. 7.8B bisa
+   jadi tidak mengulangi kegagalan itu, bisa juga tidak — UNVERIFIED.
+3. Semua 4 artifact validasi yang sudah di-commit
+   (`1_validation_results.json`, `item_discrimination_results.json`,
+   `lm_plausibility_results.json`, `log_likelihood_results.json`)
+   dihasilkan dari item yang digenerate pakai EXAONE-4.0-1.2B. Artifact
+   itu TIDAK otomatis invalid (mereka mengukur properti distraktor/item
+   yang sudah dihasilkan, bukan "model mana yang menghasilkannya"),
+   tapi generasi item BARU apa pun sekarang pakai model berbeda, dan
+   klaim kualitas-generasi EXAONE yang baru butuh verifikasi terpisah,
+   bukan dibaca dari angka lama.
+
+**Perubahan teknis di kedua file**: `_MODEL_NAME` diganti ke
+`"LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"`, `trust_remote_code=True`
+ditambahkan di kedua `from_pretrained` call (tokenizer dan model) —
+dependensi pada `src/patch_exaone35_remote_code.py` (lihat docstring
+skrip itu) tetap berlaku di sini juga.
+
+**Wajib sebelum dianggap final** (lebih berat dari §9.51 karena scope
+lebih luas): jalankan smoke test masing-masing file
+(`exaone_provider.py`, `curriculum_item_generator.py`) di GPU nyata
+dulu untuk pastikan tidak crash/regresi fungsional dasar, LALU jalankan
+ulang keempat skrip validasi (`validate_novelty1.py`,
+`validate_item_discrimination.py`, `validate_lm_plausibility.py`,
+`validate_log_likelihood.py`) dengan item yang digenerate model baru,
+bandingkan dengan 4 artifact JSON yang sudah di-commit. Kalau ada
+regresi nyata pada kualitas item/distraktor, pertimbangkan kembalikan
+`exaone_provider.py` ke EXAONE-4.0-1.2B (file ini adalah generator
+utama untuk 11 skill yang mendasari Novelty 1 — risiko regresi di sini
+mempengaruhi klaim paper paling langsung dari semua swap yang dibuat
+sesi ini).
+
+**Verifikasi yang SUDAH dilakukan**: `py_compile` pada kedua file
+(sintaks valid). **Verifikasi yang BELUM bisa dilakukan** (sandbox ini
+tidak punya GPU): semua hal yang disebut di atas.
+
+**File:** `src/exaone_provider.py`, `src/curriculum_item_generator.py`.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
