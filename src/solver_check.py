@@ -95,22 +95,7 @@ from dataclasses import dataclass
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-_MODEL_NAME = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"  # swapped from Qwen3-4B 2026-10-20, per
-# explicit user instruction ("pakai exaone 7.8b" -> "ketiganya" -> "lanjut"). THIS IS THE
-# HIGHEST-RISK OF THE THREE SWAPS: Qwen3-4B's judgment numbers for this exact file are already
-# PUBLISHED in the paper (Section IV-B / PRD Sec.9.36: EXAONE-4.0-1.2B scored 48.2% vs Qwen3-4B's
-# 87.5% on grammaticality-judgment; PRD Sec.9.50: Qwen3-4B scored 57.7% on the separate
-# semantic-plausibility task). Those numbers are for EXAONE-4.0-1.2B, NOT EXAONE-3.5-7.8B, and a
-# "65.4% vs 57.7%" EXAONE-3.5-7.8B-beats-Qwen3 result was discussed earlier in this project's
-# chat history but could NOT be located in docs/PRD.md, any committed results JSON, or git
-# history when this swap was made -- treat that number as UNCONFIRMED, not as settled evidence.
-# Before this swap is final: re-run validate_log_likelihood.py and validate_novelty1.py on a real
-# GPU with this model and compare against the committed Qwen3-4B results
-# (log_likelihood_results.json, 1_validation_results.json). If EXAONE-3.5-7.8B regresses either
-# check(c) key-acceptance or the log-likelihood gap, revert _MODEL_NAME to "Qwen/Qwen3-4B" and/or
-# rewrite the affected paper section -- do not leave both the code and the paper's cited numbers
-# silently mismatched. Also requires trust_remote_code=True and
-# src/patch_exaone35_remote_code.py (see that script's docstring).
+_MODEL_NAME = "Qwen/Qwen3-4B"
 
 _PICK_PROMPT = (
     '다음 한국어 문제의 빈칸(___)에 가장 알맞은 답 하나를 골라줘.\n\n'
@@ -162,9 +147,8 @@ class LogLikelihoodResult:
 
 class SolverCheckProvider:
     def __init__(self, model_name: str = _MODEL_NAME):
-        self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype=torch.bfloat16, trust_remote_code=True).to("cuda")
+        self.tok = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda")
         self.model.eval()
 
     @torch.no_grad()

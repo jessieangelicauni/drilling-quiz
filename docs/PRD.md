@@ -3462,5 +3462,87 @@ python3 src/verify_exaone35_swap.py --skip-validate   # cuma smoke test
 
 ---
 
+### 9.54 Swap EXAONE-3.5-7.8B DIBATALKAN: dites nyata di GPU, OOM — kembali ke model asli
+
+**Hasil tes nyata** (user jalankan `verify_exaone35_swap.py` di GPU RTX
+4070 16GB, §9.51-§9.53 akhirnya benar-benar diuji, bukan cuma
+`py_compile`):
+
+- **Percobaan 1**: 3 dari 5 smoke test OOM (`qwen_feedback.py`,
+  `curriculum_item_generator.py`, `solver_check.py`); `exaone_provider.py`
+  lolos load tapi gagal di assertion lain (bug terpisah, lihat di bawah);
+  `domain_vocab_substitution.py` lolos.
+- Investigasi: error OOM pertama menyebut proses lain (PID 2380575)
+  sudah menahan 13.89 GiB — ternyata model Ollama (phi4/qwen2.5) masih
+  ter-load di GPU. `nvidia-smi` setelah di-stop/dihapus: GPU benar-benar
+  bersih (4 MiB terpakai, "No running processes found").
+- **Percobaan 2, GPU bersih**: `qwen_feedback.py` dan
+  `domain_vocab_substitution.py` LOLOS kali ini (sebelumnya gagal hanya
+  karena kontensi dari proses Ollama itu), tapi
+  `curriculum_item_generator.py` **TETAP OOM** dengan pesan yang sama:
+  proses ini sendiri sudah memakai 14.89 GiB sebelum sempat alokasi 800
+  MiB lagi.
+
+**Diagnosis**: EXAONE-3.5-7.8B-Instruct di bf16 adalah ~15.6GB bobot
+mentah (7.8B x 2 byte) — nyaris 100% dari kapasitas GPU 15.57GiB yang
+terlihat PyTorch (card fisik 16GB/16376MiB per `nvidia-smi`, sisanya
+overhead driver). Ini BUKAN soal kontensi multi-model (§9.49) atau
+proses nyasar (sudah dibuktikan terpisah dan di-fix) — bahkan SATU
+instance model ini saja, sendirian, di GPU yang benar-benar bersih,
+masih gagal konsisten karena tidak ada margin sama sekali untuk
+KV-cache/activation di atas bobot model. Temuan ini genuine (diuji
+nyata dua kali dengan kondisi GPU berbeda, bukan ditebak), bukan
+kegagalan prosedural.
+
+**Keputusan user**: "revert to original model" — dipilih dari 3 opsi
+yang ditawarkan (quantize 4-bit / turun ke EXAONE-3.5-2.4B / revert).
+Konsisten dengan prinsip proyek ini: kalau hasil tes jelek dan tidak
+mendukung rencana, ganti pendekatannya, jangan dipaksakan dengan
+reframing lemah.
+
+**Aksi**: kelima file dikembalikan PERSIS ke state sebelum §9.51
+(`git checkout ab81d8a -- <5 file>`, commit tepat sebelum swap pertama):
+- `exaone_provider.py` → `LGAI-EXAONE/EXAONE-4.0-1.2B` (tanpa `trust_remote_code`)
+- `qwen_feedback.py`, `solver_check.py`, `curriculum_item_generator.py` → `Qwen/Qwen3-4B`
+- `domain_vocab_substitution.py` → kembali reuse `generate_fn` dari model lain (desain asli, hindari OOM 3-model, §9.49)
+
+Semua angka yang dikutip paper (48.2% vs 87.5% di §9.36, 57.7% di
+§9.50, dll.) kembali akurat terhadap model yang benar-benar jalan —
+tidak perlu revisi `content.py` sama sekali, karena paper tidak pernah
+diubah untuk mengasumsikan swap ini (§9.51/§9.52 sengaja menunda
+perubahan `content.py` sampai terverifikasi — keputusan itu sekarang
+terbukti tepat).
+
+**Bug terpisah, ditemukan kebetulan, DIPERBAIKI** (tidak terkait swap
+sama sekali): `exaone_provider.py`'s `__main__` smoke test punya
+assertion whitelist basi untuk `mod_adverb` — masih berisi `"깨끗하게"`
+padahal pasangan kata itu sudah diganti jadi `늦다`/`늦게` di §9.46
+(perubahan `pairs` tuple di-update, tapi assertion terpisah ini
+terlewat). Baru ketahuan sekarang karena ini kali pertama smoke test
+file ini benar-benar dijalankan sejak §9.46. Diperbaiki: whitelist
+sekarang `("조용하게", "많게", "늦게", "느리게", "빠르게")`.
+
+**Belum diperbaiki** (ditemukan sambil investigasi, di luar scope
+"revert model" hari ini, dicatat agar tidak hilang): `content.py`
+baris ~580-583 masih menyebut `씻다`/`청소하다` sebagai contoh
+penggantian pasangan mod_adverb yang terkonfirmasi — narasi itu adalah
+versi SEBELUM `늦다` (yaitu history §9.43→§9.45), sudah digantikan oleh
+perbaikan §9.46 tapi teks paper belum diperbarui mengikuti. Tidak
+mengubah kebenaran klaim akhir (5/5 log-likelihood tetap benar untuk
+pasangan `늦다`/`늦게` yang sekarang dipakai), tapi detail historis di
+paragraf itu sudah tidak akurat.
+
+**Nasib `verify_exaone35_swap.py`**: TIDAK dihapus — tetap berguna
+sebagai smoke-test+validation runner generik untuk audit masa depan,
+walau namanya sekarang menyebut swap yang sudah dibatalkan. Dibiarkan
+sebagaimana adanya kecuali user minta dihapus.
+
+**File:** `src/exaone_provider.py`, `src/qwen_feedback.py`,
+`src/solver_check.py`, `src/curriculum_item_generator.py`,
+`src/domain_vocab_substitution.py` (kelima dikembalikan ke state
+pre-swap + 1 bug fix tidak terkait).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

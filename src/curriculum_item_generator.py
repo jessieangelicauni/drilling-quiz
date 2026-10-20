@@ -164,16 +164,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from curriculum_provider import CurriculumEntry
 from distractor_validator import lm_plausibility_gap
 
-_MODEL_NAME = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"  # swapped from Qwen3-4B 2026-10-20, per
-# explicit user instruction ("EXAONE-3.5-7.8B untuk semuanya"). IMPORTANT: this file's module
-# docstring above documents that EXAONE-4.0-1.2B was explicitly TESTED on this exact span-finding
-# task and LOST (mostly failed to locate a real substring, sometimes described the grammar point
-# instead) -- that finding is about the 1.2B variant specifically, not EXAONE-3.5-7.8B, so it is
-# NOT assumed to still hold (a 7.8B model may have enough capacity where 1.2B didn't), but it is
-# also NOT assumed to be fixed -- UNVERIFIED either way without a fresh GPU run of this file's
-# own smoke test / a real sample of the ~247 entries this file handles. Requires
-# trust_remote_code=True (see src/patch_exaone35_remote_code.py).
-
+_MODEL_NAME = "Qwen/Qwen3-4B"  # tested against EXAONE-4.0-1.2B first, see module docstring
 _GIBBERISH_GAP_THRESHOLD = 8.0  # see module docstring, check (d)
 # Reuses exaone_provider.py's own proven-safe bare-noun filler pool
 # (_EF_FILLER_WORDS) rather than inventing a new one -- see check (f).
@@ -246,9 +237,8 @@ def _parse_response(text: str) -> tuple[str, str] | None:
 
 class CurriculumItemGenerator:
     def __init__(self, model_name: str = _MODEL_NAME, seed: int | None = None):
-        self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype=torch.bfloat16, trust_remote_code=True).to("cuda")
+        self.tok = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda")
         self.model.eval()
         self.rng = random.Random(seed)
 

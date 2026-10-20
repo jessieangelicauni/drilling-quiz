@@ -81,26 +81,7 @@ from distractor_validator import (
     validate_sentence_final_tag,
 )
 
-_MODEL_NAME = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"  # swapped from EXAONE-4.0-1.2B 2026-10-20,
-# per explicit user instruction ("EXAONE-3.5-7.8B untuk semuanya", scope confirmed via
-# AskUserQuestion to include this file). HIGHEST-BLAST-RADIUS swap made this session, flagged
-# in full in docs/PRD.md §9.52 -- short version: this is a DIFFERENT model family (3.5, not 4.0)
-# and a much larger variant (7.8B vs 1.2B), not just a size bump within the same line:
-#   - Fig. 1 and Section III-A's architecture description, and citation [34] (the EXAONE 4.0
-#     tech report), describe "EXAONE" generically but cite EXAONE 4.0 specifically and note its
-#     non-reasoning/reasoning hybrid mode -- EXAONE-3.5 predates that hybrid-mode design, so the
-#     citation and "its non-reasoning mode is sufficient" framing (Section III-A) describe a
-#     model that is no longer the one actually running.
-#   - Round 3 of the module docstring above found EXAONE-4.0-1.2B picked semantically odd verb
-#     pairings and got WORSE with a more complex prompt -- attributed to 1.2B's capacity ceiling,
-#     not to EXAONE as a family. A 7.8B model may or may not repeat that failure; UNTESTED.
-#   - every committed validation artifact (1_validation_results.json, item_discrimination_
-#     results.json, lm_plausibility_results.json, log_likelihood_results.json) was generated
-#     using EXAONE-4.0-1.2B as the item generator. None of them are invalidated by this swap per
-#     se (they measure distractor/item properties, not "which generator produced this"), but any
-#     NEW generation run (and any claim about EXAONE's generation quality specifically) now
-#     reflects a different model and needs separate re-verification, not a re-read of old numbers.
-#   - trust_remote_code=True is now required (see src/patch_exaone35_remote_code.py).
+_MODEL_NAME = "LGAI-EXAONE/EXAONE-4.0-1.2B"
 _KIWI = Kiwi()
 _FILLER_PARTICLES = ("도", "만", "가", "는")
 
@@ -511,9 +492,8 @@ _CRITIC_VERB_PROMPT = (
 
 class ExaoneGrammarProvider:
     def __init__(self, model_name: str = _MODEL_NAME, seed: int | None = None):
-        self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype=torch.bfloat16, trust_remote_code=True).to("cuda")
+        self.tok = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda")
         self.rng = random.Random(seed)
         self._counter = 0
         self.items: dict[str, GeneratedItem] = {}
@@ -1001,7 +981,7 @@ if __name__ == "__main__":
                         f"the matching counter word must be correct, got {item}")
                     assert sum(v in _NNB_FILLER_WORDS for v in non_answer.values()) == 2
                 if skill_id == "mod_adverb":
-                    assert item.options[item.answer] in ("조용하게", "많게", "깨끗하게", "느리게", "빠르게"), (
+                    assert item.options[item.answer] in ("조용하게", "많게", "늦게", "느리게", "빠르게"), (
                         f"the adverbial (-게/EC) form must be correct, got {item}")
                     assert sum(v in _EC_FILLER_WORDS for v in non_answer.values()) == 2
                     real_distractor = next(v for v in non_answer.values() if v not in _EC_FILLER_WORDS)

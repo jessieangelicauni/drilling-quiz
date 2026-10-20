@@ -28,43 +28,21 @@ whatever example sentence it's given -- the grammar-point-finding and
 distractor-generation logic has no idea the vocabulary is different, by
 design, since the whole point is grammar stays standard.
 
-Model reuse, not a 4th separate load (original design): PRD §9.49 found
-that loading 3 independent models at once (EXAONE + 2x separate
-Qwen3-4B instances) OOMs a 15GB GPU. DomainVocabSubstitutor therefore
-takes a `generate_fn` callable instead of owning a model -- a caller can
-wire it to any already-loaded model's generate method, adding zero
-extra GPU memory.
-
-MODEL SWAP (2026-10-20, per explicit user instruction -- "pakai exaone
-7.8b" -> "ketiganya" -> "lanjut"): this file has no `_MODEL_NAME`
-constant of its own to swap (it only consumes whatever `generate_fn` a
-caller passes in), so the swap is implemented as a new standalone
-`Exaone35Generator` below, used by this module's own __main__ instead
-of reusing CurriculumItemGenerator's Qwen3-4B instance. This REINTRODUCES
-the exact GPU-memory risk the paragraph above was written to avoid: a
-real production wiring (not yet built -- grep confirms no caller outside
-this file's own __main__ exists) that runs EXAONE-4.0-1.2B
-(exaone_provider.py) + EXAONE-3.5-7.8B (here) + Qwen3-4B
-(curriculum_item_generator.py's grammar-point-finding, qwen_feedback.py,
-solver_check.py) at once would need the OOM question re-tested on real
-hardware, not assumed solved. Unverified beyond that: the "65.4% vs
-57.7%" EXAONE-3.5-7.8B-beats-Qwen3-4B figure discussed earlier in this
-project's chat history could NOT be located in docs/PRD.md, any
-committed results JSON, or git history -- it is NOT re-asserted here as
-settled evidence, only as the user's stated reason for this swap.
+Model reuse, not a 4th separate load: PRD §9.49 already found that
+loading 3 independent models at once (EXAONE + 2x separate Qwen3-4B
+instances) OOMs a 15GB GPU. DomainVocabSubstitutor takes a `generate_fn`
+callable instead of loading its own model -- a caller wires it to an
+already-loaded CurriculumItemGenerator's `_generate` method, so this
+adds zero extra GPU memory.
 """
 from __future__ import annotations
 
 from dataclasses import replace
 
-import torch
 from kiwipiepy import Kiwi
-from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from curriculum_provider import CurriculumEntry
 from distractor_validator import has_batchim
-
-_MODEL_NAME = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"
 
 _KIWI = Kiwi()
 
@@ -131,29 +109,6 @@ def _apply_substitution(entry: CurriculumEntry, original: str, new_word: str) ->
     return replace(entry, example=new_example)
 
 
-class Exaone35Generator:
-    """Standalone EXAONE-3.5-7.8B loader matching the `generate_fn` shape
-    DomainVocabSubstitutor expects (prompt in, text out). Requires
-    trust_remote_code=True and src/patch_exaone35_remote_code.py (see
-    that script's docstring for the known create_causal_mask bug this
-    model family's custom modeling code has). No `enable_thinking`
-    passed -- EXAONE-3.5 predates EXAONE-4.0's reasoning-mode toggle and
-    this task (short structured word-pair extraction) doesn't need it.
-    """
-
-    def __init__(self, model_name: str = _MODEL_NAME):
-        self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype=torch.bfloat16, trust_remote_code=True).to("cuda")
-
-    def __call__(self, prompt: str, max_new_tokens: int = 80) -> str:
-        messages = [{"role": "user", "content": prompt}]
-        enc = self.tok.apply_chat_template(messages, add_generation_prompt=True,
-                                            return_tensors="pt", return_dict=True).to("cuda")
-        out = self.model.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False)
-        return self.tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip()
-
-
 class DomainVocabSubstitutor:
     def __init__(self, generate_fn):
         self._generate = generate_fn
@@ -171,11 +126,13 @@ class DomainVocabSubstitutor:
 
 
 if __name__ == "__main__":
+    from curriculum_item_generator import CurriculumItemGenerator
     from curriculum_provider import parse_curriculum_docx
 
     entries = parse_curriculum_docx("Korean_Grammar_Curriculum.docx")
     by_num = {e.number: e for e in entries}
-    substitutor = DomainVocabSubstitutor(Exaone35Generator())
+    generator = CurriculumItemGenerator(seed=0)
+    substitutor = DomainVocabSubstitutor(generator._generate)
 
     sample = [by_num[n] for n in ["1", "18", "40", "11", "4"]]
     produced = 0
