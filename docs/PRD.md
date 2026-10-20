@@ -3421,5 +3421,46 @@ tidak punya GPU): semua hal yang disebut di atas.
 
 ---
 
+### 9.53 CLI untuk jalankan verifikasi swap EXAONE-3.5-7.8B (`verify_exaone35_swap.py`)
+
+**Konteks**: §9.51/§9.52 masing-masing berakhir dengan daftar "wajib
+sebelum dianggap final" yang manual (run smoke test tiap file satu-satu,
+urutan tertentu, apply patch kalau kena bug `create_causal_mask`, baru
+jalankan 4 skrip validasi dan bandingkan ke baseline). User minta ini
+dibuat jadi CLI, bukan daftar langkah manual.
+
+**`src/verify_exaone35_swap.py`** (baru): dua tahap otomatis, jalankan
+dari repo root dengan venv aktif:
+1. **Smoke test** 5 file yang di-swap, urutan risiko terendah→tertinggi
+   (`qwen_feedback.py` → `domain_vocab_substitution.py` →
+   `curriculum_item_generator.py` → `solver_check.py` →
+   `exaone_provider.py`). Kalau gagal dengan error yang menyebut
+   `create_causal_mask`, otomatis jalankan
+   `patch_exaone35_remote_code.py` sekali dan coba ulang file itu.
+   Berhenti di tahap ini (tidak lanjut ke validasi) kalau ada yang masih
+   gagal setelah itu.
+2. **Validasi**: jalankan ulang 4 skrip validasi
+   (`validate_novelty1.py`, `validate_item_discrimination.py`,
+   `validate_lm_plausibility.py`, `validate_log_likelihood.py`) ke file
+   `_new_*.json` (TIDAK menimpa baseline yang sudah di-commit), lalu
+   diff setiap angka skalar top-level terhadap baseline lama dan tandai
+   `<-- regression` kalau turun.
+
+**Belum/TIDAK bisa dilakukan di sandbox ini** (tidak ada GPU): hanya
+`py_compile` dan `--help` yang diverifikasi — isi logicnya (subprocess
+calls ke 9 skrip lain) belum pernah benar-benar dijalankan end-to-end
+karena setiap skrip yang dipanggil butuh model besar + CUDA. Harus
+dicoba dulu di GPU nyata user sebelum dipercaya 100% tidak ada bug.
+
+**Usage**:
+```
+python3 src/verify_exaone35_swap.py                  # full: smoke test + validasi + diff
+python3 src/verify_exaone35_swap.py --skip-validate   # cuma smoke test
+```
+
+**File:** `src/verify_exaone35_swap.py` (baru).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
