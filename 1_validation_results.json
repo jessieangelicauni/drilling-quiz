@@ -3121,9 +3121,1179 @@
           "solver_key_accepted": true
         }
       ]
+    },
+    "verb_choice": {
+      "attempts": 20,
+      "generation_pass": 20,
+      "critic_attempts": 0,
+      "critic_recoveries": 0,
+      "solver_checked": 20,
+      "solver_key_accepted": 17,
+      "items": [
+        {
+          "stem": "저는 사진을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "B": "찍어요",
+            "A": "먹어요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "찍어요",
+          "distractor_options": {
+            "A": "먹어요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 사진을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "찍어요",
+            "C": "먹어요",
+            "B": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "찍어요",
+          "distractor_options": {
+            "C": "먹어요",
+            "B": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 숙제를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "해요",
+            "C": "봐요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "해요",
+          "distractor_options": {
+            "C": "봐요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 사진을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "D": "찍어요",
+            "C": "먹어요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "찍어요",
+          "distractor_options": {
+            "C": "먹어요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 숙제를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "해요",
+            "B": "봐요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "해요",
+          "distractor_options": {
+            "B": "봐요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 음악을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "들어요",
+            "C": "봐요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "들어요",
+          "distractor_options": {
+            "C": "봐요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 음악을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "B": "들어요",
+            "C": "봐요",
+            "D": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "들어요",
+          "distractor_options": {
+            "C": "봐요",
+            "D": "학교",
+            "A": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 영화를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "B": "봐요",
+            "D": "먹어요",
+            "C": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "봐요",
+          "distractor_options": {
+            "D": "먹어요",
+            "C": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 음악을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "들어요",
+            "B": "봐요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "들어요",
+          "distractor_options": {
+            "B": "봐요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 음악을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "들어요",
+            "D": "봐요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "들어요",
+          "distractor_options": {
+            "D": "봐요",
+            "A": "학교",
+            "B": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 영화를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "봐요",
+            "C": "먹어요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "봐요",
+          "distractor_options": {
+            "C": "먹어요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 숙제를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "해요",
+            "B": "봐요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "해요",
+          "distractor_options": {
+            "B": "봐요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 숙제를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "해요",
+            "B": "봐요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "해요",
+          "distractor_options": {
+            "B": "봐요",
+            "C": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 숙제를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "해요",
+            "A": "봐요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "해요",
+          "distractor_options": {
+            "A": "봐요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 영화를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "A": "봐요",
+            "C": "먹어요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "봐요",
+          "distractor_options": {
+            "C": "먹어요",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 숙제를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "해요",
+            "B": "봐요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "해요",
+          "distractor_options": {
+            "B": "봐요",
+            "A": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 영화를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "봐요",
+            "B": "먹어요",
+            "D": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "봐요",
+          "distractor_options": {
+            "B": "먹어요",
+            "D": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 숙제를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "D": "해요",
+            "C": "봐요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "해요",
+          "distractor_options": {
+            "C": "봐요",
+            "B": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 사진을 ___.",
+          "blank_marker": "___",
+          "options": {
+            "C": "찍어요",
+            "A": "먹어요",
+            "B": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "찍어요",
+          "distractor_options": {
+            "A": "먹어요",
+            "B": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 영화를 ___.",
+          "blank_marker": "___",
+          "options": {
+            "D": "봐요",
+            "A": "먹어요",
+            "B": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "봐요",
+          "distractor_options": {
+            "A": "먹어요",
+            "B": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        }
+      ]
+    },
+    "noun_counter": {
+      "attempts": 20,
+      "generation_pass": 20,
+      "critic_attempts": 0,
+      "critic_recoveries": 0,
+      "solver_checked": 20,
+      "solver_key_accepted": 19,
+      "items": [
+        {
+          "stem": "컵은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "B": "개",
+            "C": "명",
+            "D": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "개",
+          "distractor_options": {
+            "C": "명",
+            "D": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "선생님은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "A": "분",
+            "B": "개",
+            "D": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "분",
+          "distractor_options": {
+            "B": "개",
+            "D": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "사과는 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "개",
+            "C": "명",
+            "A": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "개",
+          "distractor_options": {
+            "C": "명",
+            "A": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "책은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "권",
+            "A": "개",
+            "B": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "권",
+          "distractor_options": {
+            "A": "개",
+            "B": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "컵은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "개",
+            "A": "명",
+            "C": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "개",
+          "distractor_options": {
+            "A": "명",
+            "C": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "책은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "A": "권",
+            "B": "개",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "권",
+          "distractor_options": {
+            "B": "개",
+            "C": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "선생님은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "C": "분",
+            "A": "개",
+            "B": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "분",
+          "distractor_options": {
+            "A": "개",
+            "B": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "학생은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "B": "명",
+            "D": "개",
+            "C": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "명",
+          "distractor_options": {
+            "D": "개",
+            "C": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "책은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "A": "권",
+            "B": "개",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "권",
+          "distractor_options": {
+            "B": "개",
+            "C": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "학생은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "A": "명",
+            "D": "개",
+            "B": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "명",
+          "distractor_options": {
+            "D": "개",
+            "B": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "책은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "A": "권",
+            "C": "개",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "권",
+          "distractor_options": {
+            "C": "개",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "컵은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "개",
+            "A": "명",
+            "B": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "개",
+          "distractor_options": {
+            "A": "명",
+            "B": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "책은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "D": "권",
+            "B": "개",
+            "A": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "권",
+          "distractor_options": {
+            "B": "개",
+            "A": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "사과는 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "C": "개",
+            "D": "명",
+            "A": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "개",
+          "distractor_options": {
+            "D": "명",
+            "A": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "책은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "B": "권",
+            "C": "개",
+            "A": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "권",
+          "distractor_options": {
+            "C": "개",
+            "A": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "사과는 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "C": "개",
+            "B": "명",
+            "A": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "개",
+          "distractor_options": {
+            "B": "명",
+            "A": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "사과는 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "B": "개",
+            "D": "명",
+            "C": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "개",
+          "distractor_options": {
+            "D": "명",
+            "C": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "선생님은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "B": "분",
+            "A": "개",
+            "D": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "분",
+          "distractor_options": {
+            "A": "개",
+            "D": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "학생은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "B": "명",
+            "D": "개",
+            "A": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "명",
+          "distractor_options": {
+            "D": "개",
+            "A": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "책은 다섯 ___ 있어요.",
+          "blank_marker": "___",
+          "options": {
+            "A": "권",
+            "B": "개",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "권",
+          "distractor_options": {
+            "B": "개",
+            "C": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        }
+      ]
+    },
+    "mod_adverb": {
+      "attempts": 20,
+      "generation_pass": 20,
+      "critic_attempts": 0,
+      "critic_recoveries": 0,
+      "solver_checked": 20,
+      "solver_key_accepted": 13,
+      "items": [
+        {
+          "stem": "저는 ___ 걸어요",
+          "blank_marker": "___",
+          "options": {
+            "A": "느리게",
+            "C": "느린",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "느리게",
+          "distractor_options": {
+            "C": "느린",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 걸어요",
+          "blank_marker": "___",
+          "options": {
+            "C": "느리게",
+            "A": "느린",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "느리게",
+          "distractor_options": {
+            "A": "느린",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 달려요",
+          "blank_marker": "___",
+          "options": {
+            "B": "빠르게",
+            "D": "빠른",
+            "A": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "빠르게",
+          "distractor_options": {
+            "D": "빠른",
+            "A": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 먹어요",
+          "blank_marker": "___",
+          "options": {
+            "A": "많게",
+            "C": "많은",
+            "B": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "많게",
+          "distractor_options": {
+            "C": "많은",
+            "B": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 걸어요",
+          "blank_marker": "___",
+          "options": {
+            "C": "느리게",
+            "A": "느린",
+            "B": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "느리게",
+          "distractor_options": {
+            "A": "느린",
+            "B": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 먹어요",
+          "blank_marker": "___",
+          "options": {
+            "B": "많게",
+            "C": "많은",
+            "A": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "많게",
+          "distractor_options": {
+            "C": "많은",
+            "A": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 걸어요",
+          "blank_marker": "___",
+          "options": {
+            "B": "느리게",
+            "C": "느린",
+            "D": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "느리게",
+          "distractor_options": {
+            "C": "느린",
+            "D": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 먹어요",
+          "blank_marker": "___",
+          "options": {
+            "B": "많게",
+            "D": "많은",
+            "A": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "많게",
+          "distractor_options": {
+            "D": "많은",
+            "A": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 먹어요",
+          "blank_marker": "___",
+          "options": {
+            "B": "많게",
+            "A": "많은",
+            "D": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "많게",
+          "distractor_options": {
+            "A": "많은",
+            "D": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 달려요",
+          "blank_marker": "___",
+          "options": {
+            "A": "빠르게",
+            "D": "빠른",
+            "B": "학교",
+            "C": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "빠르게",
+          "distractor_options": {
+            "D": "빠른",
+            "B": "학교",
+            "C": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 걸어요",
+          "blank_marker": "___",
+          "options": {
+            "D": "느리게",
+            "B": "느린",
+            "C": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "느리게",
+          "distractor_options": {
+            "B": "느린",
+            "C": "학교",
+            "A": "사과"
+          },
+          "solver_picked": null,
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 달려요",
+          "blank_marker": "___",
+          "options": {
+            "A": "빠르게",
+            "C": "빠른",
+            "B": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "빠르게",
+          "distractor_options": {
+            "C": "빠른",
+            "B": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 걸어요",
+          "blank_marker": "___",
+          "options": {
+            "A": "느리게",
+            "C": "느린",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "느리게",
+          "distractor_options": {
+            "C": "느린",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 말해요",
+          "blank_marker": "___",
+          "options": {
+            "B": "조용하게",
+            "C": "조용한",
+            "D": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "조용하게",
+          "distractor_options": {
+            "C": "조용한",
+            "D": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "B",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 청소해요",
+          "blank_marker": "___",
+          "options": {
+            "C": "깨끗하게",
+            "D": "깨끗한",
+            "B": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "깨끗하게",
+          "distractor_options": {
+            "D": "깨끗한",
+            "B": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 먹어요",
+          "blank_marker": "___",
+          "options": {
+            "C": "많게",
+            "D": "많은",
+            "B": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "많게",
+          "distractor_options": {
+            "D": "많은",
+            "B": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 달려요",
+          "blank_marker": "___",
+          "options": {
+            "B": "빠르게",
+            "A": "빠른",
+            "C": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "B",
+          "correct_option_text": "빠르게",
+          "distractor_options": {
+            "A": "빠른",
+            "C": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": false
+        },
+        {
+          "stem": "저는 ___ 걸어요",
+          "blank_marker": "___",
+          "options": {
+            "C": "느리게",
+            "A": "느린",
+            "D": "학교",
+            "B": "사과"
+          },
+          "correct_answer": "C",
+          "correct_option_text": "느리게",
+          "distractor_options": {
+            "A": "느린",
+            "D": "학교",
+            "B": "사과"
+          },
+          "solver_picked": "C",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 달려요",
+          "blank_marker": "___",
+          "options": {
+            "D": "빠르게",
+            "C": "빠른",
+            "B": "학교",
+            "A": "사과"
+          },
+          "correct_answer": "D",
+          "correct_option_text": "빠르게",
+          "distractor_options": {
+            "C": "빠른",
+            "B": "학교",
+            "A": "사과"
+          },
+          "solver_picked": "D",
+          "solver_key_accepted": true
+        },
+        {
+          "stem": "저는 ___ 달려요",
+          "blank_marker": "___",
+          "options": {
+            "A": "빠르게",
+            "C": "빠른",
+            "B": "학교",
+            "D": "사과"
+          },
+          "correct_answer": "A",
+          "correct_option_text": "빠르게",
+          "distractor_options": {
+            "C": "빠른",
+            "B": "학교",
+            "D": "사과"
+          },
+          "solver_picked": "A",
+          "solver_key_accepted": true
+        }
+      ]
     }
   },
   "overall_generation_pass_rate": 1.0,
   "overall_critic_recovery_rate": null,
-  "overall_solver_key_accept_rate": 0.60625
+  "overall_solver_key_accept_rate": 0.6636363636363637
 }

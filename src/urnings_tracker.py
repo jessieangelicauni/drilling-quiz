@@ -116,8 +116,23 @@ def update(learner: UrnState, item: UrnState, correct: bool,
     return UrnState(k=kp_s, n=n_p), UrnState(k=ki_s, n=n_i)
 
 
-def should_escalate(learner: UrnState, tau: float = 0.2) -> bool:
-    """Novelty 3: uncertainty-gated escalation, w_k > tau."""
+def should_escalate(learner: UrnState, tau: float = 0.15) -> bool:
+    """Novelty 3: uncertainty-gated escalation, w_k > tau.
+
+    tau=0.15, not the previous 0.2: width() is bounded by the urn size.
+    For the n=32 urns used everywhere in this codebase (LearnerSkillProfile's
+    n_default, every example/smoke-test urn), the maximum possible width is
+    ~0.1715 (at k=16, the most uncertain state) -- found by computing it
+    directly, not assumed. tau=0.2 was therefore UNREACHABLE: this branch
+    could never return True for any learner, at any k, ever -- the whole
+    width-based escalation trigger was dead code in production
+    (answer_processing.py calls should_escalate() with no tau override, so
+    it always used this default). 0.15 fires for k in [12, 20] out of
+    [0, 32] -- a genuinely-uncertain band around 50/50, not the extremes --
+    while staying under the n=32 ceiling. If n_default ever changes, recompute
+    the ceiling (2*sqrt(Beta(k+.5, n-k+.5) variance) at k=n/2) before trusting
+    this default again.
+    """
     return learner.width() > tau
 
 
@@ -181,10 +196,13 @@ if __name__ == "__main__":
     assert l.proportion() > 0.8, f"learner who always answers correctly should trend high, got {l.proportion()}"
     assert is_mastered(l), "500 correct answers should be enough to be declared mastered"
 
-    l2 = UrnState(k=16, n=32)
-    for _ in range(50):
-        l2, _ = update(l2, UrnState(k=16, n=32), correct=True, rng=rng)
-    assert should_escalate(l2) or not should_escalate(l2)  # just must not raise
+    # Real assertions, not "x or not x" (that vacuous form is exactly how
+    # the tau=0.2 bug above went undetected -- it can never fail).
+    assert should_escalate(UrnState(k=16, n=32)), (
+        "maximally uncertain urn (k=n/2) must escalate -- if this fails, "
+        "tau is above the achievable width ceiling for this urn size again")
+    assert not should_escalate(UrnState(k=0, n=32))
+    assert not should_escalate(UrnState(k=32, n=32))
 
     mastered = UrnState(k=28, n=32)
     assert is_mastered(mastered)

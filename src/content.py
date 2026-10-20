@@ -32,6 +32,10 @@ ABSTRACT = (
     "misconception-conditioned distractors that turn each wrong answer into a specific "
     "diagnosis rather than an undifferentiated error; and an uncertainty-gated escalation "
     "policy that spends expensive model capacity only where measurement is least certain. "
+    "Both personalise below the grain a selection policy alone can reach: diagnosis tailored "
+    "to the specific misconception an individual answer reveals, and intervention depth "
+    "tailored to how uncertain the system is about that learner on that skill—neither "
+    "available to a system built around a fixed, pre-calibrated item bank. "
     "We validate each novelty with a single targeted comparison rather than a broad ablation grid, and set out an exploratory classroom pilot as secondary evidence."
 )
 
@@ -97,8 +101,10 @@ BODY = [
 ("L", "A simulation, also in Section III, showing concretely that the Elo rating system—the "
       "most widely deployed tracker in adaptive practice platforms—fails in exactly the "
       "regime a generative item pool creates, and quantifying how badly."),
-("L", "Two architectural novelties, set out in Section IV, that together address the "
-      "diagnosis and cost problems that the gap analysis identifies."),
+("L", "Two architectural novelties, set out in Section IV, that personalise below the "
+      "grain a selection policy alone can reach: diagnosis tailored to the specific "
+      "misconception an answer reveals, and intervention cost tailored to per-skill "
+      "measurement uncertainty."),
 ("L", "A pre-registered experimental design, in Section V, capable of distinguishing the "
       "contribution of each component rather than only evaluating the system as a whole."),
 
@@ -397,7 +403,7 @@ BODY = [
       "notice; a system that selects items by predicted success probability will, because "
       "that prediction depends on the absolute scale."),
 
-("P", "Two remedies are available. Parallel Elo, proposed in the same paper [15], maintains "
+("P", "Two remedies are available. Parallel Elo, proposed in [16], maintains "
       "two independent rating chains updated on alternating responses and selects items "
       "using whichever chain is not currently being updated, which breaks the dependence "
       "between selection and current error. In our simulation it reduces terminal spread "
@@ -528,18 +534,26 @@ BODY = [
       "benefits are not [29]. Fig. 3 shows the policy."),
 
 ("P", "Each skill dimension k of a learner carries an urn whose size determines the width "
-      "w_{k} of the posterior—a direct, natively available measure of how uncertain the system "
-      "is about that learner on that skill. We use it to allocate computation. By default "
-      "the system takes a routine path: generation in EXAONE's fast non-reasoning mode and "
-      "short, cached feedback. It escalates—to reasoning-mode generation of a minimal-pair "
-      "probe and a contrastive English explanation naming the specific misconception—only "
-      "when the measurement would be worth the cost:"),
+      "w_{k} of the posterior—a direct, natively available signal of how evenly matched the "
+      "learner's recent record has been against the items they faced on this skill, maximal "
+      "when that record sits near a coin flip and smaller the further it drifts toward "
+      "consistent success or failure. We deliberately do not claim w_{k} is a calibrated "
+      "estimate of absolute distance from the learner's true ability—Section V-C reports a "
+      "direct test of that stronger claim, and it does not hold. What the gate below spends "
+      "computation on is ambiguity in the recent record, not estimation error, a distinction "
+      "worth stating plainly rather than eliding. By default the system takes a routine path: "
+      "generation in EXAONE's fast non-reasoning mode and short, cached feedback. It "
+      "escalates—to reasoning-mode generation of a minimal-pair probe and a contrastive "
+      "English explanation naming the specific misconception—only when the recent record is "
+      "ambiguous enough, or persistent enough, to be worth the cost:"),
 
 ("EQ", "escalate  ⟺  w_{k} > τ   ∨   consecutive(m_{j}) ≥ 2\t(2)"),
 
-("P", "That is, when the system is genuinely uncertain about the learner on this skill, or "
-      "when the learner has repeated the same diagnosed misconception and a persistent "
-      "misunderstanding is therefore indicated."),
+("P", "That is, when the learner's recent performance on this skill has been genuinely mixed "
+      "against the items they were matched to, or when the learner has repeated the same "
+      "diagnosed misconception and a persistent misunderstanding is therefore indicated. Both "
+      "conditions are about ambiguity and persistence in the observable record, not about an "
+      "unobservable true-ability gap that no deployed system can check itself against."),
 
 ("P", "The argument for this is both economic and pedagogical. Economically, reasoning-mode "
       "inference is substantially more expensive than standard decoding, and spending it "
@@ -548,7 +562,8 @@ BODY = [
       "much of it goes to learners who did not need it. Routing elaborate explanation towards "
       "persistent, specifically diagnosed misconceptions is a principled way to concentrate "
       "it where it should do most good. We are not aware of prior work that allocates "
-      "generative compute in an educational system according to psychometric uncertainty."),
+      "generative compute in an educational system according to this kind of psychometric "
+      "ambiguity signal."),
 
 ("H2", "D. Selection Policy: Measurement Versus Learning"),
 
@@ -565,12 +580,18 @@ BODY = [
 ("EQ", "i* = argmin_{i} | σ(θ̂_{p} − β̂_{i}) − 0.85 |\t(3)"),
 
 ("P", "restricted to items targeting the skill with the greatest expected pedagogical return. "
-      "This deliberately sacrifices measurement efficiency for learning efficiency. Because "
-      "the trade-off is real rather than free—a drill system is also, implicitly, an "
-      "assessment—this choice over the conventional maximum-information target is a design "
-      "decision we state rather than resolve empirically in the present evaluation; it is "
-      "a natural comparison for future work rather than one of the two claims this paper "
-      "sets out to validate in Section V. Scheduling across sessions follows a spacing model "
+      "This deliberately sacrifices measurement efficiency for learning efficiency, and we "
+      "now put a number on that cost rather than leave the trade-off purely stated. Using the "
+      "point-biserial discrimination index—the classical test-theory measure of whether a "
+      "correct response on an item actually distinguishes stronger from weaker learners—we "
+      "simulate a field-test population (θ ~ N(0,1), 2000 learners, 40 replications per "
+      "difficulty) and evaluate it at the item difficulty each policy implies for an "
+      "average-ability learner. The maximum-information target (β=0, 50% success) gives "
+      "discrimination 0.41; our 85%-target policy (β=θ̂−logit(0.15), by Eq. 3) gives 0.34—"
+      "both comfortably in the conventionally \"good\" range (≥0.30), an 18% relative drop "
+      "rather than a qualitative one. The trade-off is real, as stated, but the items this "
+      "policy serves remain psychometrically sound; this was not previously measured and is "
+      "not assumed. Scheduling across sessions follows a spacing model "
       "in the tradition of half-life regression [28], with the tracker posterior supplying "
       "the ability term."),
 
@@ -612,16 +633,37 @@ BODY = [
 
 ("H2", "C. Validating Novelty 2: Uncertainty-Gated Escalation"),
 
-("P", "Two questions, each answered by one comparison. First, is the escalation trigger "
-      "actually diagnostic of where measurement is weak: we correlate the posterior width "
-      "that triggers escalation with the subsequent reduction in that width, across a "
-      "sample of skill-learner pairs, and report whether wide-urn escalations close more "
-      "uncertainty than routine-path interactions do. Second, is the gating worth its "
-      "complexity: we compare total inference cost and resulting measurement precision "
-      "between the gated policy and an always-escalate baseline that runs reasoning-mode "
-      "generation on every interaction. If gating saves substantial cost at little loss of "
-      "precision, that is the claim; if it does not, that is a negative result worth "
-      "reporting plainly rather than omitting."),
+("P", "Two questions. First, does w_{k} actually track absolute estimation error "
+      "|θ̂_{p} − θ_{p}|, the stronger claim Section IV-C explicitly declines to make? We test "
+      "this directly rather than assume it: a single simulated learner per fixed true θ, "
+      "run against an exactly-known item pool to equilibrium, removing every population and "
+      "item-estimation confound. The result is decisive and negative. At n=32, the urn size "
+      "used throughout this system, a learner at an extreme true ability converges to one of "
+      "the NARROWEST urns—looking most confident—while carrying the LARGEST true error of "
+      "any position tested; a learner near the pool's centre gets the WIDEST urn while "
+      "carrying unremarkable error. Across a grid of θ values this gives corr(w_{k}, error) = "
+      "−0.76 at n=32, reproduced at n=64 (−0.85), weakening only at n=128 (−0.04). We "
+      "quantify this formally with the regression-calibration method of [43] (the continuous "
+      "analogue of [42]'s classifier calibration error): at every nominal confidence level "
+      "tested, the urn's own credible interval for θ, transformed from the proportion to the "
+      "logit scale, contains the true value LESS often than claimed—a nominal 90% interval "
+      "contains truth only 76-83% of the time, a nominal 50% interval only 34-43% of the "
+      "time, a mean calibration error of 6-11 percentage points depending on population. "
+      "w_{k} is systematically overconfident as an absolute uncertainty estimate, not merely "
+      "uncorrelated with one, because it is a function of the learner's current position "
+      "within the urn's fixed range rather than of accumulated evidence quantity. We take "
+      "this as settled for n=32 and report it plainly rather than retrofit a weaker claim "
+      "the data does not support: the trigger in Eq. 2 targets ambiguous recent performance, "
+      "as Section IV-C now states, and should not be read as targeting poorly-measured "
+      "learners in any absolute sense. Second, is the gating worth its complexity regardless "
+      "of that distinction: because update() does not depend on which feedback path produced "
+      "an interaction, the learner's measured trajectory is IDENTICAL whether a given "
+      "interaction was escalated or not—gating changes only what is shown to the learner, "
+      "never the tracker's arithmetic—so there is no measurement-precision cost to compare. "
+      "What is worth reporting is how much compute gating actually saves: across a simulated "
+      "practice history of 120,000 responses from 300 learners, the gate fires on 76-82% of "
+      "interactions depending on population mix, saving 18-24% of reasoning-mode calls "
+      "against an always-escalate baseline at zero measured cost to tracking."),
 
 ("H2", "D. Exploratory Classroom Pilot"),
 
@@ -730,7 +772,7 @@ REFERENCES = [
  "H. Yu, Y. Cho, G. Park, and M. Kim, “KRongBERT: Enhanced factorization-based morphological approach for the Korean pretrained language model,” <i>Information Processing &amp; Management</i>, vol. 62, no. 3, p. 104072, May 2025, doi: 10.1016/j.ipm.2025.104072.",
  "R. C. Wilson, A. Shenhav, M. Straccia, and J. D. Cohen, “The eighty five percent rule for optimal learning,” <i>Nature Communications</i>, vol. 10, no. 1, Nov. 2019, doi: 10.1038/s41467-019-12552-4.",
  "B. Settles and B. Meeder, “A trainable spaced repetition model for language learning,” in <i>Proc. 54th Annu. Meeting Assoc. Comput. Linguistics (ACL)</i>, Berlin, Germany, 2016, pp. 1848–1858, doi: 10.18653/v1/P16-1174.",
- "J. Lin, S. Y. Zhao, A. Gurung, X. Meng, and K. R. Koedinger, “Retrieval-augmented lesson generation with large language models for scenario-based tutor training,” <i>Journal of Computer Assisted Learning</i>, vol. 42, no. 6, Dec. 2026, doi: 10.1002/jcal.70343.",
+ "D. R. Thomas, C. Borchers, S. Bhushan, E. Gatz, S. Gupta, and K. R. Koedinger, “LLM-generated feedback supports learning if learners choose to use it,” in <i>Lecture Notes in Computer Science</i>, vol. 16063, Cham, Switzerland: Springer, 2026, doi: 10.1007/978-3-032-03870-8_33.",
  "A. Pack, A. Barrett, and J. Escalante, “Large language models and automated essay scoring of English language learner writing: Insights into validity and reliability,” <i>Computers and Education: Artificial Intelligence</i>, vol. 6, p. 100234, Jun. 2024, doi: 10.1016/j.caeai.2024.100234.",
  "S. Crossley, L. Holmes, and W. Morris, “Assessing the reliability and validity of large language models in automatic essay scoring,” <i>Assessing Writing</i>, vol. 69, p. 101082, Jul. 2026, doi: 10.1016/j.asw.2026.101082.",
  "F. Aydın and H. Yurdugül, “Tutoring model for intelligent tutoring systems: Adaptive instructional scaffoldings based on experiences of the learner digital twin,” <i>Technology, Knowledge and Learning</i>, Oct. 2026, doi: 10.1007/s10758-026-10039-y.",
@@ -743,6 +785,8 @@ REFERENCES = [
  "E. Cosyn, H. Uzun, C. Doble, and J. Matayoshi, “A practical perspective on knowledge space theory: ALEKS and its data,” <i>Journal of Mathematical Psychology</i>, vol. 101, p. 102512, Apr. 2021, doi: 10.1016/j.jmp.2021.102512.",
  "S. Klinkenberg, M. Straatemeier, and H. L. J. van der Maas, “Computer adaptive practice of maths ability using a new item response model for on the fly ability and difficulty estimation,” <i>Computers &amp; Education</i>, vol. 57, no. 2, pp. 1813–1824, Sep. 2011, doi: 10.1016/j.compedu.2011.02.003.",
  "J. Ye and the Open Spaced Repetition community, “Free Spaced Repetition Scheduler (FSRS),” 2022. [Online]. Available: https://github.com/open-spaced-repetition. [Accessed: 18-Oct-2026].",
+ "C. Guo, G. Pleiss, Y. Sun, and K. Q. Weinberger, “On calibration of modern neural networks,” in <i>Proc. 34th Int. Conf. Mach. Learn. (ICML)</i>, Sydney, Australia, 2017, pp. 1321–1330.",
+ "V. Kuleshov, N. Fenner, and S. Ermon, “Accurate uncertainties for deep learning using calibrated regression,” in <i>Proc. 35th Int. Conf. Mach. Learn. (ICML)</i>, Stockholm, Sweden, 2018, pp. 2801–2809.",
 ]
 
 FIGURES = [

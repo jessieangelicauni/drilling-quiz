@@ -156,10 +156,23 @@ def print_report(overall: dict) -> None:
     print(f"\nOVERALL generation pass rate:  {overall['overall_generation_pass_rate']:.1%}")
     if overall["overall_critic_recovery_rate"] is not None:
         print(f"OVERALL critic recovery rate:  {overall['overall_critic_recovery_rate']:.1%}")
+    else:
+        total_critic_attempts = sum(v["critic_attempts"] for v in overall["per_skill"].values())
+        print("OVERALL critic recovery rate:  n/a (0 critic attempts -- see note below)")
     if overall["overall_solver_key_accept_rate"] is not None:
         print(f"OVERALL solver key-accept rate: {overall['overall_solver_key_accept_rate']:.1%}")
     print("\n(check (b), 'is this distractor also correct', intentionally omitted -- confirmed")
     print(" yes-bias on this solver model, see solver_check.py's module docstring.)")
+    if sum(v["critic_attempts"] for v in overall["per_skill"].values()) == 0:
+        print("\n(critic_attempts=0 for every skill is EXPECTED under the current SKILL_SPECS,")
+        print(" not a bug: every skill is either a fully curated closed set (kind=...) or has")
+        print(" a verb_lookup table covering 100% of its slots -- the only call site for")
+        print(" _pick_verb_lemma()/the critic loop (exaone_provider.py's next_new_grammar_item,")
+        print(" generic branch) is structurally unreachable in this configuration. The 40%")
+        print(" critic-recovery figure in PRD §9.14/the paper comes from a separate, isolated")
+        print(" 20-slot experiment that forced the uncurated path -- it has NOT been")
+        print(" reproduced at this script's N, and won't be until a genuinely uncurated slot")
+        print(" exists for the solver to exercise. Don't quote a recovery rate from this run.)")
 
 
 if __name__ == "__main__":

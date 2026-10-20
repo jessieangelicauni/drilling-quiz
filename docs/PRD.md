@@ -1493,5 +1493,321 @@ untuk dapat angka solver-check yang nyata untuk ketiganya.
 
 ---
 
+### 9.23 Audit literature review (3 gap G1/G2/G3) + investigasi critic-loop 0/0 + subj_topic "regresi" — user eksplisit minta dicek ulang, bukan diasumsikan benar
+
+User bertanya langsung: apakah novelty terlalu lemah dibanding literature
+review, dan minta 3 gap (G1/G2/G3, `src/content.py` Section II.F) dicek
+ulang kebenarannya, bukan dipercaya begitu saja. Hasil, per bagian:
+
+**G1/G2/G3 sendiri (sebagai gap riset) tetap valid** — bukan diagnosis yang
+salah. Yang ditemukan salah adalah DUA SITASI pendukungnya:
+
+1. **[29] salah paper, dikutip 4x (baris 315/528/547/648 sebelum fix).**
+   Klaim G3 ("Lin et al., 7 lesson, 885 learner, signifikan di 2/7,
+   effect size 0.28/0.33") sebenarnya berasal dari **Thomas, Borchers,
+   Bhushan, Gatz, Gupta, & Koedinger, "LLM-Generated Feedback Supports
+   Learning if Learners Choose to Use It," EC-TEL 2025 / LNCS vol. 16063**
+   (diverifikasi via web search langsung ke abstract-nya: angka 885
+   learner, 2/7 lesson, effect size 0.28/0.33 match persis). Paper yang
+   SEBELUMNYA ada di slot [29] — **J. Lin, S. Y. Zhao, A. Gurung, X.
+   Meng, K. R. Koedinger, "Retrieval-Augmented Lesson Generation...for
+   Scenario-Based Tutor Training," JCAL 2026** — adalah paper BERBEDA
+   (soal generate materi training untuk tutor, bukan soal efektivitas
+   feedback ke learner), dan tidak dikutip di tempat lain manapun di
+   `content.py` di luar slot [29] ini. **Diperbaiki**: isi referensi [29]
+   diganti ke Thomas et al. (posisi list tidak diubah, jadi nomor [29]
+   tidak perlu renumber di tempat lain — `REFERENCES` di-enumerate
+   otomatis oleh `build_docx.py`, aman).
+2. **[15] salah paper untuk klaim "Parallel Elo" (baris ~400).** Kalimat
+   "Parallel Elo, proposed in the same paper [15]" salah: [15] (Bolsinova,
+   Gergely, Brinkhuis, "Keeping Elo Alive," 2026) membahas remedy
+   BERBEDA (K-factor adaptif berbasis tren), bukan dua rating chain
+   paralel. Mekanisme "dua chain paralel" yang benar-benar disebut
+   "Parallel Elo" di paper itu berasal dari **[16] (Bolsinova, Brinkhuis,
+   Hofman, Maris, "Tracking a Multitude of Abilities as They Develop,"
+   2022)** — paper yang SAMA yang sudah benar dikutip untuk Urnings satu
+   kalimat setelahnya. Diverifikasi via web search langsung ke abstract
+   [16] (deskripsi "two parallel chains of ratings...removes dependence
+   of item selection on current errors" match persis istilah "Parallel
+   Elo"). **Diperbaiki**: `[15]` di kalimat itu diganti jadi `[16]`.
+3. **[15]/[18] untuk klaim G2 lainnya ("Elo dipakai di adaptive platform",
+   "karakterisasi presisi soal kegagalan Elo") sudah DICEK dan BENAR** —
+   [15] (Keeping Elo Alive) memang spesifik soal mengkarakterisasi
+   kegagalan pengukuran Elo; [18] (Vesin et al., "Adaptive assessment...
+   On the use of Elo-rating") memang spesifik soal Elo dipakai di
+   platform adaptif nyata. Tidak diubah.
+4. **G1's [10] (Bitew et al., angka "53% teacher-rated-quality") juga
+   DICEK dan BENAR** — diverifikasi via web search langsung ke abstract
+   paper itu, angka 53% match persis "roughly half" yang dikutip di
+   `content.py` baris 131. Tidak diubah.
+
+Kedua fix di atas sudah di-rebuild ke `paper/KO-DRILL_IEEE.docx` lewat
+`src/build_docx.py` dan dikonfirmasi langsung di PDF hasil render
+(`pdftotext`, bukan cuma percaya build sukses) — baris "[16]" dan "[29]"
+yang benar muncul di teks maupun di daftar referensi.
+
+**Critic-loop `critic_attempts=0` di SEMUA 11 skill (`1_validation_results.json`
+terbaru) — diinvestigasi sampai akar kode, BUKAN cuma dicatat sebagai
+anomali.** Ditelusuri ke `exaone_provider.py`: `_pick_verb_lemma()` (satu-
+satunya pemanggil critic loop) hanya dipanggil dari `next_new_grammar_item`'s
+cabang generik (baris ~808-809), dan HANYA kalau `spec["verb_lookup"].get(slot)`
+mengembalikan falsy. Dicek `SKILL_SPECS` langsung: `particle_loc` (7/7 slot
+ter-curated), `particle_obj` (6/6), `honorific` (5/5), `tense_past` (5/5) —
+`verb_lookup` masing-masing menutupi 100% dari `slots`-nya sendiri. 7 skill
+lain (`time_range`, `irregular_conj`, `adj_relativizer`, `subj_topic`,
+`verb_choice`, `noun_counter`, `mod_adverb`) sama sekali tidak pernah
+memanggil LLM (komentar kode sendiri bilang "No LLM call"). **Kesimpulan:
+dengan konfigurasi SKILL_SPECS saat ini, jalur yang memicu critic loop
+TIDAK BISA dijangkau sama sekali** — bukan bug skrip validasi, tapi
+konsekuensi nyata dari pola yang sudah berulang di proyek ini (particle_loc/
+obj/honorific/tense_past/irregular_conj/verb_choice/noun_counter semua
+pindah dari "tanya LLM" ke "kurasi penuh" begitu terbukti closed-set
+leksikal, §9.9/§9.10/§9.22). **Implikasi untuk paper: angka critic-recovery
+40% yang dikutip (dari §9.14, eksperimen terisolasi 20-slot yang MEMAKSA
+jalur uncurated) belum pernah direproduksi di skala `validate_novelty1.py`
+yang sama dengan metrik lain, dan TIDAK AKAN bisa selama tidak ada slot
+yang sungguh-sungguh uncurated di produksi.** Dua pilihan, belum diputuskan
+sepihak, perlu arahan user: (a) lunakkan klaim "Generator→Validator→Critic"
+di paper jadi eksplisit "mekanisme fallback untuk vocabulary belum
+terkurasi, divalidasi terisolasi (§9.14), belum teruji end-to-end pada
+konfigurasi produksi saat ini" — jujur, tidak overclaim; atau (b) sengaja
+sisakan/tambah satu slot genuinely uncurated supaya critic loop benar-benar
+ter-exercise di `validate_novelty1.py` berikutnya, dengan verifikasi
+linguistik langsung (pola yang sama seperti §9.21/§9.22), bukan ditebak.
+Ditambahkan juga pengecekan eksplisit di `print_report()`
+(`validate_novelty1.py`) supaya skrip SENDIRI mencetak peringatan ini kalau
+`critic_attempts` total 0 — bukan diam-diam tampil "-" tanpa penjelasan.
+
+**`subj_topic` "turun" dari 35% (§9.20, 7/20) ke 10% (run 11-skill terbaru,
+2/20) — diinvestigasi, BUKAN regresi baru, dua run tidak apple-to-apple.**
+Fix label dialog (질문/답, §9.20) dikonfirmasi SUDAH ada di kode
+(`_build_subj_topic_item`, baris ~643) — bukan hilang/ter-revert. Yang
+berubah antara dua run adalah §9.21 (paksa 4 opsi) terjadi SETELAH angka
+35% itu dicatat: 35% berasal dari versi subj_topic 2-opsi (A/B), sementara
+10% berasal dari versi 4-opsi (A-D) yang sekarang berjalan. Ini mengubah
+baseline tebak-acak solver dari 50% (2 opsi) jadi 25% (4 opsi) — faktor 2x
+saja sudah menjelaskan sebagian besar selisihnya, belum butuh teori baru.
+Apakah 10% (2/20) signifikan di BAWAH baseline acak 25% (indikasi solver
+punya anti-preferensi sungguhan ke bentuk topic-marked, bukan cuma gagal
+menebak) — dicek: pada n=20, p=0.25, hasil 2 kejadian cuma ~1.5 SD di
+bawah mean (5), TIDAK cukup kuat untuk membedakan dari noise murni secara
+statistik. **Jadi: konsisten dengan (bukan bukti baru independen untuk)
+limitasi yang sudah diketahui jujur di §9.11/§9.16** ("pedagogical
+convention, bukan hard rule" — solver yang tidak diajar konvensi
+buku-teks itu wajar condong ke bentuk topic-marked yang lebih umum dalam
+percakapan natural). **Tidak ada fix kode yang dibutuhkan** — angka 35%
+di §9.20 sudah stale (dari konfigurasi 2-opsi yang sudah tidak ada),
+jangan dikutip lagi dibanding angka 11-skill/4-opsi saat ini. `irregular_conj`
+juga tetap rendah (1/20 → 2/20) across the same transition, konsisten
+dengan temuan §9.20 sendiri bahwa pilihan solver di skill ini mengikuti
+ISI kalimat, bukan posisi/jumlah opsi — perubahan dari 2 ke 4 opsi memang
+diperkirakan tidak banyak mengubah angka ini, dan memang tidak banyak
+berubah.
+
+**Bottom line untuk ketiga poin yang user minta:** (1) 3 gap literatur
+sendiri valid, tapi 2 sitasi pendukungnya salah paper — sudah diperbaiki
+dan diverifikasi di PDF hasil render. (2) belum dijawab di sesi ini —
+lihat percakapan soal framing "personalized" di luar PRD. (3) critic-loop
+0/0 adalah temuan nyata yang butuh keputusan desain (lunakkan klaim vs.
+tambah slot uncurated), subj_topic/irregular_conj BUKAN regresi, cuma
+perbandingan across konfigurasi berbeda yang perlu didokumentasikan
+supaya tidak disalahartikan di masa depan.
+
+---
+
+### 9.24 Novelty 2 — bug tau TIDAK TERCAPAI diperbaiki, lalu ditemukan masalah lebih dalam: width TIDAK mengukur error sebenarnya (n=32)
+
+Lanjutan investigasi §9.23. User minta tegas: investigasi, jangan cuma
+dicatat. Dua temuan, satu bug (sudah diperbaiki), satu temuan konseptual
+yang BELUM diputuskan arah perbaikannya (perlu keputusan user).
+
+**Bug #1 (diperbaiki): `should_escalate()` default `tau=0.2`, tapi
+`width()` maksimum untuk urn n=32 (satu-satunya ukuran urn yang dipakai di
+SELURUH kodebase) cuma ~0.1715 — secara matematis TIDAK PERNAH bisa
+melebihi 0.2.** Dicek `answer_processing.py`: `should_escalate(new_learner_urn)`
+dipanggil tanpa override tau, jadi **eskalasi berbasis ketidakpastian
+mati total di produksi, selalu False, untuk learner mana pun, pada k
+berapa pun.** Lolos karena smoke test di `urnings_tracker.py` vakum:
+`assert should_escalate(l2) or not should_escalate(l2)` tidak pernah bisa
+gagal. **Diperbaiki**: `tau` default diganti ke 0.15 (benar-benar
+tercapai, dicek langsung k=0..32), smoke test diganti jadi assersi nyata
+(urn paling tidak pasti k=16 harus escalate, urn ekstrem k=0/32 tidak
+boleh).
+
+**Temuan #2 (belum diputuskan arahnya — murni investigasi, bukan bug
+sederhana): `width()` TIDAK mengukur jarak estimasi ke kemampuan asli
+(`|theta_hat - theta_true|`) — ia mengukur seberapa SENTRAL posisi k saat
+ini dalam rentang urn, independen dari benar-tidaknya estimasi itu.**
+Dibuktikan lewat eksperimen terkontrol yang menghilangkan semua perancu
+populasi/item (`validate_novelty2.py::controlled_position_diagnostic`):
+SATU learner per nilai theta_true tetap, melawan pool item yang
+diketahui PERSIS (tanpa noise estimasi item), dijalankan sampai
+ekuilibrium (8000 respons, diukur di 1000 respons terakhir).
+
+Hasil (n=32, ukuran urn produksi): learner ekstrem (theta=-2.5) berakhir
+di width **tersempit** (0.092, "tampak paling yakin") tapi error
+**terbesar** (0.57-0.66) dari semua posisi yang diuji; learner di tengah
+(theta=0) justru width **terlebar** (0.16-0.17, "tampak paling ragu")
+dengan error yang biasa-biasa saja. Korelasi width-vs-error lintas grid
+theta: **-0.755 (n=32), -0.849 (n=64), -0.040 (n=128, noisy)** — robust
+negatif di ukuran urn yang dipakai produksi, baru mendekati nol/hilang di
+n=128. Konsisten dengan temuan lama §9.13 (lantai RMSE n=32 ≈0.45) —
+error di sini memang didominasi noise diskretisasi n=32, bukan sinyal
+yang width bisa ikuti.
+
+**Kenapa ini terjadi (mekanisme, bukan cuma angka):** `width()` adalah SD
+posterior Beta(k+.5, n-k+.5) pada n **TETAP** — maksimal saat k=n/2 (rekor
+terbaru learner persis 50/50 melawan pool item yang dihadapi), BUKAN
+fungsi dari banyaknya bukti terkumpul seperti SE klasik yang mengecil
+dengan n bertambah (di Urnings, n urn tidak pernah bertambah, cuma k yang
+bergeser). Jadi width mengukur "seberapa seri performa belakangan
+melawan pool", bukan "seberapa jauh estimasi dari kebenaran" — dua hal
+yang kebetulan searah hanya di awal pelacakan (belum ada bukti = lebar
+DAN salah sekaligus), tapi berpisah begitu tracker mencapai ekuilibrium.
+
+**Implikasi untuk klaim paper (Section V-C) — PERLU KEPUTUSAN USER, belum
+saya putuskan sepihak:**
+- **Opsi (a) — reframe klaim**: jangan klaim width mengukur error absolut
+  (sudah terbukti salah/terfalsifikasi untuk n=32). Klaim yang BISA
+  dipertahankan: "escalate saat performa belakangan learner ini melawan
+  pool item yang dihadapi genuinely ambigu (dekat 50/50)" — defensible
+  secara pedagogis sendiri (konsisten dengan separuh trigger lain,
+  `consecutive(misconception)>=2`, yang juga soal ambiguitas/persistensi,
+  bukan soal jarak ke kebenaran absolut). Section V-C perlu ditulis ulang
+  supaya tidak menjanjikan bukti yang sudah terbukti tidak ada.
+- **Opsi (b) — ganti/tambah sinyal**: width saja tidak cukup untuk klaim
+  "menyasar learner yang terukur buruk"; perlu sinyal tambahan yang
+  genuinely melacak kualitas estimasi independen dari posisi (misalnya
+  SE berbasis jumlah-kunjungan eksplisit, atau volatilitas tren k
+  terbaru — ide yang mirip K-factor adaptif di [15]/"Keeping Elo Alive").
+
+**Yang TETAP valid tanpa perlu keputusan di atas**: fraksi eskalasi
+realistis (setelah fix tau) — 75.8-82.2% interaksi terpicu pada riwayat
+praktik 120rb respons/300 learner, hemat compute 17.8-24.2% vs
+always-escalate. Ini tidak bergantung pada interpretasi width yang benar,
+cuma pada seberapa sering `w_k > tau` terpenuhi.
+
+**File:** `src/urnings_tracker.py` (bug fix + smoke test nyata, bukan
+vakum), `src/validate_novelty2.py` (skrip baru, sudah termasuk
+`controlled_position_diagnostic` sebagai angka yang bisa dipercaya, dan
+`simulate()` sebagai pelengkap untuk fraksi eskalasi — korelasi pooled
+di `simulate()` ditandai eksplisit "NOT_TRUSTED" di output supaya tidak
+dikutip tanpa sadar terperangkap perancu populasi).
+
+---
+
+### 9.25 Kalibrasi formal width (ECE-style) — mengkuantifikasi temuan §9.24 dengan metrik standar literatur, bukan cuma korelasi mentah
+
+User minta metrik evaluasi yang tepat secara literatur untuk mengukur
+temuan §9.24 secara formal, bukan cuma korelasi Pearson ad-hoc. Dipilih
+metodologi *regression calibration* dari Kuleshov, Fenner & Ermon (ICML
+2018, "Accurate Uncertainties for Deep Learning Using Calibrated
+Regression") — versi kontinu dari Expected Calibration Error (ECE) milik
+Guo et al. (ICML 2017) yang biasa dipakai untuk classifier. Keduanya
+dicek judul/tahun/venue-nya dulu (web search), belum ditambahkan ke
+bibliografi paper karena belum ada teks paper yang mengutipnya — tunggu
+keputusan arah (lihat §9.24, opsi a/b) sebelum ditambahkan supaya tidak
+jadi sitasi yatim seperti [13]/Gao et al. yang sudah ada.
+
+**Cara kerja** (`src/validate_novelty2.py::beta_quantile_table` +
+`calibration_curve`, tanpa scipy — quantile Beta(k+.5,n-k+.5) diestimasi
+via Monte Carlo 200rb sampel per k, konsisten dengan gaya numpy-only
+skrip simulate_* lain di repo ini): untuk level nominal X% (10%..90%),
+ambil interval kredibel urn pada skala pi, transformasi ke skala logit
+(theta), cek apakah theta_true benar-benar jatuh di dalamnya. Kalibrasi
+baik = observed coverage ≈ nominal.
+
+**Hasil (n=32, ukuran urn produksi):**
+
+| nominal | observed (terkontrol) | observed (populasi realistis) |
+|---|---|---|
+| 50% | 33.8% | 42.9% |
+| 80% | 63.6% | 71.0% |
+| 90% | 75.7% | 82.8% |
+
+**Calibration error (rata-rata \|nominal-observed\| lintas 9 level):
+11.3% (setup terkontrol), 6.2% (populasi realistis).** Arahnya KONSISTEN
+di semua level dan kedua setup: observed selalu LEBIH RENDAH dari
+nominal — artinya **interval kredibel urn secara sistematis terlalu
+sempit (overconfident)**, bukan cuma "tidak berkorelasi" seperti temuan
+korelasi di §9.24. Interval yang diklaim 90% cuma benar-benar menangkap
+kebenaran 76-83% dari waktu; yang diklaim 50% cuma 34-43%.
+
+**Ini memperkuat (bukan menggantikan) temuan §9.24 dengan angka yang
+lebih presisi dan lebih mudah dikutip di paper**: bukan cuma "width tidak
+melacak error" tapi "width secara sistematis meremehkan ketidakpastian
+sebesar ~6-16 poin persentase tergantung level confidence." Siap dikutip
+langsung begitu arah paper (§9.24 opsi a vs b) diputuskan.
+
+**File:** `src/validate_novelty2.py` (fungsi `beta_quantile_table`,
+`calibration_curve`, terintegrasi ke `__main__` dan `simulate()`/
+`controlled_position_diagnostic()` yang sekarang juga mengembalikan
+`k_theta_pairs` mentah untuk dikalibrasi).
+
+---
+
+### 9.26 Novelty 2 Section IV-C/V-C ditulis ulang (opsi a, reframe) + item discrimination index diimplementasikan — satu temuan negatif dikonfirmasi final, satu temuan POSITIF
+
+User setuju opsi (a) dari §9.24/§9.25: reframe klaim Novelty 2, jangan
+rombak sinyal. Dikerjakan:
+
+**Paper (`src/content.py`), Section IV-C**: kalimat "a direct, natively
+available measure of how uncertain the system is about that learner"
+diganti jadi "a signal of how evenly matched the learner's recent record
+has been" + kalimat eksplisit "we deliberately do not claim w_k is a
+calibrated estimate of absolute distance from true ability." Eq. 2's
+narasi juga diubah dari "genuinely uncertain about the learner" jadi
+"performance ... genuinely mixed ... not about an unobservable
+true-ability gap."
+
+**Section V-C ditulis ulang total**: bukan lagi menjanjikan perbandingan
+yang sudah terbukti tidak valid (width vs subsequent reduction), tapi
+melaporkan APA YANG SUNGGUH DITEMUKAN: korelasi -0.76/-0.85 (n=32/64),
+kalibrasi ECE-style 6-11 poin persentase overconfident (§9.25), dan
+kesimpulan jujur "w_k is systematically overconfident... not merely
+uncorrelated." Fraksi eskalasi (76-82%) dan hemat compute (18-24%)
+dipertahankan sebagai klaim yang TETAP valid. 2 sitasi baru ditambahkan
+ke bibliografi (posisi [42]/[43], append di akhir list jadi aman tanpa
+renumber): Guo et al. 2017 (ICML, "On Calibration of Modern Neural
+Networks") dan Kuleshov et al. 2018 (ICML, "Accurate Uncertainties for
+Deep Learning Using Calibrated Regression") — keduanya dicek judul/
+tahun/venue/halaman via web search sebelum ditambahkan, bukan ditebak.
+Di-rebuild ke docx+pdf, dikonfirmasi `pdftotext`.
+
+**Item discrimination index (`src/validate_item_discrimination.py`,
+baru)** — metrik #2 dari analisis literatur sesi sebelumnya. Point-
+biserial correlation (= Pearson correlation langsung untuk true Rasch
+generating model, tidak perlu formula baru) antara respons biner ke satu
+item dan true theta populasi, field-test style (semua learner dapat item
+yang sama, standar validasi item klasik sebelum dipakai adaptif).
+
+**Pertanyaan spesifik-KO-DRILL yang dijawab, bukan cuma sanity check
+generik**: Section IV-D (paper) sudah lama menyatakan target 85% sukses
+(Eq. 3, demi pedagogi) "deliberately sacrifices measurement efficiency"
+tapi menyebutnya "a natural comparison for future work," belum pernah
+diukur. Sekarang diukur: diskriminasi di β=0 (target 50%, CAT klasik)
+= 0.408 ("good"); di β=+1.73 (setara target 85% untuk learner rata-rata)
+= 0.335 ("good" juga, cuma turun 17.9% relatif) — **TEMUAN POSITIF**:
+trade-off itu nyata tapi kecil, item yang diserve policy 85% tetap
+psikometrically sehat (masih di atas ambang 0.30 yang lazim dipakai),
+bukan kompromi kualitas yang serius. Ditulis ke Section IV-D, angka
+"future work"-nya diganti jadi hasil ukur nyata.
+
+**Catatan metodologis, bukan ditutupi**: ini simulasi field-test
+(item TETAP untuk seluruh populasi), bukan simulasi deployment adaptif
+sungguhan (tiap learner dapat item BEDA yang dicocokkan ke
+kemampuannya sendiri) — beda pertanyaan, didisclosure eksplisit di
+docstring skrip, jangan dibaca sebagai "discrimination item yang benar-
+benar diserve ke user".
+
+**Pola yang baik untuk diingat**: sesi investigasi novelty ini
+menghasilkan dua macam hasil — satu negatif-tapi-ditemukan-dan-
+dilaporkan-jujur (width/kalibrasi, §9.24-9.25), satu positif (item
+discrimination, §9.26). Jangan biarkan nada investigasi terus-menerus
+negatif membuat user mengira semuanya bermasalah — laporkan temuan baik
+sama jujurnya dengan temuan buruk.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
