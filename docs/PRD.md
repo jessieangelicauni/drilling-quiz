@@ -2202,5 +2202,68 @@ sekarang juga benar di jalur produksi.
 
 ---
 
+### 9.33 User minta verifikasi: "kalau kode mengikuti paper, apakah paper-nya sendiri sudah benar?" — dicek untuk fix §9.32, ketemu klaim 85% kurang kuat dasarnya, diperbaiki
+
+Pertanyaan tepat setelah saya memperbaiki `question_bank.py` supaya
+mengikuti klaim 85% paper (§9.32) — sebelum menganggap paper itu "sudah
+benar jadi kode harus ikut", saya verifikasi dulu klaim 85%-nya sendiri,
+bukan diasumsikan benar cuma karena sudah tertulis.
+
+**Dicek sitasi Wilson et al. [27] langsung (web search ke paper
+aslinya)**: judul/jurnal/tahun/DOI cocok. TAPI — temuan penting —
+**penulisnya sendiri eksplisit mengingatkan jangan generalisasi
+berlebihan**: 85% itu diturunkan khusus untuk binary classifier berbasis
+gradient-descent, bukan untuk pembelajar manusia secara umum, dan Wilson
+sendiri bilang "85 percent is [not] some magic number we should be aiming
+at all the time." Paper KO-DRILL sebelumnya menulis "Wilson et al. show
+that for a broad class of learning systems..." — melebih-lebihkan cakupan
+asli temuan itu.
+
+**Lebih parah**: kalimat "the pedagogical literature on desirable
+difficulty points the same way" **sama sekali tidak ada sitasinya** —
+klaim kosong tanpa rujukan, padahal konsep "desirable difficulties" itu
+benar nyata (Bjork, 1994/2011) dan seharusnya mudah disitasi.
+
+**Diperbaiki, bukan dihapus** — karena argumen kualitatifnya (tantangan
+moderat lebih baik dari terlalu mudah/sulit) tetap valid dan punya dasar
+riil di literatur manusia, cuma butuh sitasi yang benar dan framing yang
+jujur soal seberapa jauh Wilson et al. sebenarnya mendukung. Ditambahkan
+sitasi baru [44] (Bjork & Bjork 2011, "Making Things Hard on Yourself,
+But in a Good Way" — dicek detail publikasi lengkap via web search,
+bukan ditebak) dan paragraf Section IV-D ditulis ulang: eksplisit
+mengakui Wilson et al. cuma tentang binary classifier gradient-descent
+BUKAN pembelajar manusia, dan menyebut 85% sebagai "principled starting
+point," BUKAN "value proven optimal for Korean grammar drilling" —
+posisi yang sekarang jujur selaras dengan discrimination-index check
+yang sudah ada (§9.26) sebagai bukti PENDUKUNG tambahan, bukan bukti
+utama.
+
+**Kesimpulan untuk pertanyaan user**: ya, setelah diperiksa, argumen
+85%-nya tetap sah dipertahankan (bukan harus diganti/dihapus) — cuma
+derajat kepastiannya tadinya dilebih-lebihkan. Fix kode di §9.32 tetap
+benar untuk dilakukan.
+
+**Dua temuan tambahan dari audit lanjutan sesi ini, perbaikan kecil**:
+1. Section V-A mengklaim "TOPIK-aligned syllabus... 120 discrete
+   grammatical points" — dicek `vocab_provider.py` dan seluruh `src/`,
+   **tidak ada struktur data level/TOPIK apa pun**, cuma 11 skill yang
+   sungguh dibangun. Diperbaiki: dipisahkan eksplisit "target kurikulum"
+   (120 poin, aspirational) vs "yang sungguh dibangun & dievaluasi" (11
+   skill), supaya pembaca tidak menyimpulkan hasil V-B berlaku untuk
+   seluruh 120 poin.
+2. Section "Threats to Validity" ditambah 1 poin (jadi "Four threats"):
+   feedback bebas-bentuk Qwen3 cuma diperbaiki otomatis untuk SATU jenis
+   kesalahan (konjugasi) dan diuji bersih dari 2 kesalahan lain
+   (bahasa salah, kebocoran topik dari contoh) di N=4 trial — belum
+   diaudit menyeluruh untuk kesalahan faktual lain. Sudah lama
+   terdokumentasi di `qwen_feedback.py`'s docstring, belum pernah masuk
+   teks paper.
+
+**File:** `src/content.py` saja (Section IV-D, V-A, Threats to Validity,
++1 referensi baru [44]). Diverifikasi di PDF halaman demi halaman, Fig.
+1-5 tetap muncul tepat 1x.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

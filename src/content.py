@@ -601,14 +601,23 @@ BODY = [
 ("H2", "D. Application Policies: Item Selection and Escalation"),
 
 ("P", "One further design decision deserves explicit defence because it departs from "
-      "convention. Classical adaptive testing selects the item that maximises information "
-      "about the learner, which for a Rasch model means an item the learner has roughly a "
-      "50% chance of answering correctly. That is optimal if the goal is to measure someone "
-      "efficiently. It is not optimal if the goal is to help them learn: a 50% success rate "
-      "is demoralising over a long practice session. Wilson et al. show that for a broad "
-      "class of learning systems the rate of improvement is maximised at an accuracy of "
-      "about 85% [27], and the pedagogical literature on desirable difficulty points the "
-      "same way. We therefore select"),
+      "convention, and we are precise about how much weight its justification actually "
+      "carries rather than citing it as settled. Classical adaptive testing selects the "
+      "item that maximises information about the learner, which for a Rasch model means "
+      "an item the learner has roughly a 50% chance of answering correctly. That is "
+      "optimal if the goal is to measure someone efficiently. It is not optimal if the "
+      "goal is to help them learn: a 50% success rate is demoralising over a long "
+      "practice session. Wilson et al. derive 85% as the optimal training accuracy for "
+      "gradient-descent binary classifiers, and are explicit that this is not a universal "
+      "constant to target in every setting [27]—we do not claim stronger support from "
+      "that result than the authors themselves do. What does transfer is the qualitative "
+      "shape of the argument, independently supported in human learning specifically by "
+      "the desirable-difficulties literature: moderate, well-calibrated challenge "
+      "produces more durable learning than either trivial or overwhelming difficulty "
+      "[44]. We treat 85% as a principled starting point motivated by both, not a "
+      "value proven optimal for Korean grammar drilling, and the discrimination-index "
+      "check below is in part how we verify this starting point is not actively harmful. "
+      "We therefore select"),
 
 ("EQ", "i* = argmin_{i} | σ(θ̂_{p} − β̂_{i}) − 0.85 |\t(2)"),
 
@@ -669,15 +678,19 @@ BODY = [
 
 ("H2", "A. Materials and Data"),
 
-("P", "Grammatical targets are drawn from a TOPIK-aligned syllabus spanning levels I "
-      "through IV, decomposed into roughly 120 discrete grammatical points. The "
-      "misconception taxonomy is KAGAS [24], the 14-category Korean grammatical error "
-      "taxonomy, rather than a project-specific scheme, so that the diagnostic labels a "
-      "generated distractor carries are independently defined and independently "
-      "auditable. All generated items entering any evaluation are "
-      "reviewed by qualified Korean instructors first; we report, but do not act on, the "
-      "verifier's agreement with those reviewers, so that the verifier's standalone "
-      "accuracy can be measured on its own terms."),
+("P", "The target curriculum this architecture is designed for is a TOPIK-aligned "
+      "syllabus spanning levels I through IV, roughly 120 discrete grammatical points; "
+      "what is actually built and evaluated here is 11 skills (Section IV-B lists them), "
+      "covering 7 of the 7 relevant KAGAS part-of-speech categories. The gap between "
+      "120 and 11 is simply unimplemented coverage, not a claim about what has been "
+      "tested—every number in Section V-B below is reported at the 11-skill scale, never "
+      "projected onto the full syllabus. The misconception taxonomy is KAGAS [24], the "
+      "14-category Korean grammatical error taxonomy, rather than a project-specific "
+      "scheme, so that the diagnostic labels a generated distractor carries are "
+      "independently defined and independently auditable. All generated items entering "
+      "any evaluation are reviewed by qualified Korean instructors first; we report, but "
+      "do not act on, the verifier's agreement with those reviewers, so that the "
+      "verifier's standalone accuracy can be measured on its own terms."),
 
 ("H2", "B. Validating Novelty 1: Misconception-Conditioned Distractors"),
 
@@ -769,7 +782,7 @@ BODY = [
 
 ("H2", "E. Threats to Validity"),
 
-("P", "Three threats apply regardless of which evaluation is run. Novelty effects may "
+("P", "Four threats apply regardless of which evaluation is run. Novelty effects may "
       "inflate engagement in any condition using the generative system regardless of "
       "instructional quality, which is why retention at four weeks rather than immediate "
       "engagement is the measure weighted most heavily wherever the pilot is run. "
@@ -779,9 +792,15 @@ BODY = [
       "ratings alone. KAGAS was developed from corpora of predominantly non-Indonesian "
       "learners and may transfer imperfectly to Indonesian speakers of Korean specifically, "
       "so error-type distributions should be reported by first-language background rather "
-      "than assumed to transfer. Finally, EXAONE's licence restricts commercial "
+      "than assumed to transfer. EXAONE's licence restricts commercial "
       "deployment; the Qwen3-generator configuration noted in Section III-C should be "
-      "treated as the one to validate if deployment beyond research use is ever intended."),
+      "treated as the one to validate if deployment beyond research use is ever intended. "
+      "Finally, Qwen3's free-form explanatory feedback is automatically corrected for one "
+      "specific, previously observed failure (an irregular-conjugation slip) and was "
+      "tested clean of two other previously observed failures—answering in the wrong "
+      "language, and leaking an in-prompt example's topic into the explanation—on four "
+      "trials; it has not been exhaustively audited for other factual errors a free-form "
+      "explanation could contain, and we do not claim it has."),
 
 ("H1", "VI. Discussion and Conclusion"),
 
@@ -865,6 +884,7 @@ REFERENCES = [
  "J. Ye and the Open Spaced Repetition community, “Free Spaced Repetition Scheduler (FSRS),” 2022. [Online]. Available: https://github.com/open-spaced-repetition. [Accessed: 18-Oct-2026].",
  "C. Guo, G. Pleiss, Y. Sun, and K. Q. Weinberger, “On calibration of modern neural networks,” in <i>Proc. 34th Int. Conf. Mach. Learn. (ICML)</i>, Sydney, Australia, 2017, pp. 1321–1330.",
  "V. Kuleshov, N. Fenner, and S. Ermon, “Accurate uncertainties for deep learning using calibrated regression,” in <i>Proc. 35th Int. Conf. Mach. Learn. (ICML)</i>, Stockholm, Sweden, 2018, pp. 2801–2809.",
+ "E. L. Bjork and R. A. Bjork, “Making things hard on yourself, but in a good way: Creating desirable difficulties to enhance learning,” in <i>Psychology and the Real World: Essays Illustrating Fundamental Contributions to Society</i>, M. A. Gernsbacher, R. W. Pew, L. M. Hough, and J. R. Pomerantz, Eds. New York, NY, USA: Worth Publishers, 2011, pp. 56–64.",
 ]
 
 FIGURES = [
