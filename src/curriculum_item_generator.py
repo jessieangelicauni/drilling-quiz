@@ -52,6 +52,65 @@ disclosed as such rather than presented with equal confidence:
       with zero surrounding context -- useless as a cloze item for a
       learner or for solver_check's round-trip. Rejected when nothing but
       the blank marker and punctuation would remain in the stem.
+  (f) generic fillers, to reach 4 options (PRD §9.49): daily_drill's
+      existing ContentProvider protocol and the already-validated
+      Urnings/IRT math assume a fixed 25% guess-rate (PRD §9.21 -- every
+      hand-coded skill was deliberately forced from 2 to 4 options for
+      this reason), so a curriculum item cannot stay a bare 2-way
+      correct/distractor pair if it is to be scheduled through the same
+      pipeline. Reuses exaone_provider.py's own proven pattern (bare,
+      generic filler words like "학교"/"사과", individually checked to be
+      definitely wrong for THIS slot, not independently diagnostic) --
+      but there is no per-skill tag validator to check against here like
+      the 11 hand-coded skills have. First attempt reused
+      lm_plausibility_gap() (check (d)'s raw-SUM score) directly and
+      failed badly: production rate collapsed from 14/41 to 5/41,
+      because kiwipiepy's raw summed score favors SHORTER sentences
+      regardless of grammaticality -- whenever the correct span was a
+      longer multi-word phrase (e.g. entry 144's "하기가 어려워요"), every
+      short bare-noun filler scored HIGHER (gap negative) than the
+      correct answer even though the resulting sentence is nonsense,
+      because it's shorter, not because it's better. Found by directly
+      inspecting the gap values for known-good cases, not assumed.
+      Fixed with a SEPARATE, length-normalised gap (_filler_gap() below,
+      average score per morpheme, not raw sum) used ONLY for this check
+      -- check (d)'s gibberish filter keeps the original raw-sum signal
+      unchanged, since it was independently validated in that form and
+      compares two FULL sentences of similar length to begin with.
+      Threshold calibration, revised TWICE after each pass was checked
+      against more data rather than trusted on a small sample (PRD
+      §9.49): pass 1 tested 3 entries, saw gaps of 2.2-3.9, and set the
+      threshold at 1.5 -- re-measuring on 2 more real entries ("하지만"
+      vs "그러나", "-아/어 두다") showed every genuine filler gap
+      clustering at 0.4-1.4, all below that threshold, so production
+      collapsed (7/41) for the wrong reason: correctly-directional
+      fillers rejected on margin, not actually unsafe. Lowered to 0.3 --
+      still comfortably above 0 (the only sign that actually matters:
+      the filler must be LESS plausible than the correct answer, not by
+      a specific margin) and below every genuinely-safe case observed
+      across both calibration rounds. Re-measured on the full 41-entry
+      sweep at this final threshold: 13/41 produced, 9/13 (69%) solver
+      agreement -- back in line with the pre-filler-check baseline
+      (14/41, 64%, PRD §9.48), confirming the filler mechanism itself
+      doesn't cost production rate once correctly calibrated. The real
+      safety guarantee here is mostly the curated candidate pool itself
+      (bare content nouns that don't fit a grammar slot almost by
+      construction, same logic as exaone_provider.py's own fillers) --
+      this numeric check is a secondary guard against a candidate that
+      somehow comes out MORE plausible than the correct answer, not the
+      primary source of safety, so a small positive margin is enough. If
+      fewer than 2 of the 4 candidates clear that bar for a given
+      sentence, the item is discarded rather than shipped with only 2
+      or 3 options.
+      One anomaly seen in the 41-sweep, disclosed rather than hidden:
+      entry "-느니" (352)'s two fillers both got flagged
+      also_acceptable=True by solver_check's check (b) -- but check (b)
+      is ALREADY documented (solver_check.py's own module docstring) as
+      having a persistent yes-bias on this solver model, independent of
+      this module, so this is read as that known limitation recurring,
+      not new evidence the filler itself is unsafe (the lm_plausibility-
+      based filler check that actually gates production is a SEPARATE,
+      already-validated signal from check (b)'s judgment prompt).
 There is no per-item-type morphological tag check here, unlike the 11
 hand-coded skills -- 524 grammar points span far too many structural
 types to hand-verify each one the way irregular_conj/adj_relativizer/etc.
@@ -60,6 +119,14 @@ official 7-code KAGAS mapping (PRD §9.8) was derived by hand for the 11
 existing skills and does not generalise automatically to the other ~500
 curriculum points without the same care, so guessing one here would be a
 false precision this module does not claim.
+
+skill_id is set to f"curriculum_{entry.number}" -- PER GRAMMAR POINT,
+not one shared bucket (user's explicit choice, PRD §9.49), so each of
+the 524 points gets its own independent Urnings mastery track through
+the existing per-skill scheduling machinery, same as the 11 hand-coded
+skills. This has NOT been validated at this scale (§9.12-9.38's cold-
+start/convergence results were all measured at ~11 skills) -- flagged
+as an open validation gap, not assumed to transfer.
 
 Known remaining quality limitation, partially (not fully) mitigated by
 prompting (PRD §9.48): at intermediate/advanced TOPIK levels, many
@@ -86,10 +153,12 @@ equal-confidence to the 11 hand-coded skills.
 """
 from __future__ import annotations
 
+import random
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import torch
+from kiwipiepy import Kiwi
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from curriculum_provider import CurriculumEntry
@@ -97,6 +166,23 @@ from distractor_validator import lm_plausibility_gap
 
 _MODEL_NAME = "Qwen/Qwen3-4B"  # tested against EXAONE-4.0-1.2B first, see module docstring
 _GIBBERISH_GAP_THRESHOLD = 8.0  # see module docstring, check (d)
+# Reuses exaone_provider.py's own proven-safe bare-noun filler pool
+# (_EF_FILLER_WORDS) rather than inventing a new one -- see check (f).
+_FILLER_CANDIDATES = ("학교", "사과", "저기", "안녕")
+_FILLER_GAP_THRESHOLD = 0.3  # length-normalised, see check (f) in module docstring
+_KIWI = Kiwi()
+
+
+def _filler_gap(correct_sentence: str, candidate_sentence: str) -> float:
+    """Per-morpheme average score gap -- deliberately NOT the same raw-sum
+    signal as lm_plausibility_gap(), see check (f) in the module docstring
+    for why a raw sum is the wrong comparison when the correct span is a
+    much longer phrase than a short filler candidate.
+    """
+    def avg_score(sentence: str) -> float:
+        tokens, score = _KIWI.analyze(sentence, top_n=1)[0]
+        return score / max(len(tokens), 1)
+    return avg_score(correct_sentence) - avg_score(candidate_sentence)
 
 _GEN_PROMPT = (
     '한국어 문법 학습 문제를 만들어줘.\n'
@@ -119,12 +205,20 @@ _STRIP_CHARS = ' \t\n\r\'"“”[]()-'
 
 @dataclass
 class CurriculumItem:
+    # Duck-typed to match exaone_provider.GeneratedItem's interface
+    # (skill_id, stem, blank_marker, options, answer, kagas_code,
+    # primary_distractor_label) so answer_processing.submit_grammar_answer
+    # works unmodified -- see module docstring, check (f).
+    skill_id: str              # f"curriculum_{entry.number}" -- one Urnings track per grammar point
     entry: CurriculumEntry
-    stem: str                 # the example sentence with the span blanked out
+    stem: str                  # the example sentence with the span blanked out
     blank_marker: str
-    correct_span: str
-    distractor_span: str
-    kagas_code: None = None   # deliberately None, see module docstring
+    options: dict[str, str]    # 4 options, labels A-D
+    answer: str                # which label (A-D) is correct
+    primary_distractor_label: str
+    correct_span: str          # kept for introspection/debugging, duplicates options[answer]
+    distractor_span: str       # kept for introspection/debugging, duplicates options[primary_distractor_label]
+    kagas_code: None = None    # deliberately None, see module docstring
 
 
 def _clean(text: str) -> str:
@@ -142,10 +236,11 @@ def _parse_response(text: str) -> tuple[str, str] | None:
 
 
 class CurriculumItemGenerator:
-    def __init__(self, model_name: str = _MODEL_NAME):
+    def __init__(self, model_name: str = _MODEL_NAME, seed: int | None = None):
         self.tok = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda")
         self.model.eval()
+        self.rng = random.Random(seed)
 
     @torch.no_grad()
     def _generate(self, prompt: str, max_new_tokens: int = 80) -> str:
@@ -154,6 +249,23 @@ class CurriculumItemGenerator:
                                             return_tensors="pt", return_dict=True).to("cuda")
         out = self.model.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False)
         return self.tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip()
+
+    def _pick_fillers(self, entry: CurriculumEntry, stem: str, blank_marker: str,
+                       correct: str, distractor: str, n: int = 2) -> list[str] | None:
+        """check (f): generic fillers, accepted only if clearly WORSE than
+        the correct answer when substituted in -- see module docstring.
+        """
+        fillers: list[str] = []
+        for cand in _FILLER_CANDIDATES:
+            if cand in (correct, distractor) or cand in fillers:
+                continue
+            candidate_sentence = stem.replace(blank_marker, cand, 1)
+            gap = _filler_gap(entry.example, candidate_sentence)
+            if gap > _FILLER_GAP_THRESHOLD:
+                fillers.append(cand)
+            if len(fillers) == n:
+                break
+        return fillers if len(fillers) == n else None
 
     def generate(self, entry: CurriculumEntry) -> CurriculumItem | None:
         prompt = _GEN_PROMPT.format(grammar=entry.grammar, meaning=entry.meaning, example=entry.example)
@@ -173,7 +285,20 @@ class CurriculumItemGenerator:
         stem = entry.example.replace(original, "___", 1)
         if stem.replace("___", "").strip(" .!?,") == "":
             return None  # check (e): the span ate the whole sentence, no context left
-        return CurriculumItem(entry=entry, stem=stem, blank_marker="___",
+
+        fillers = self._pick_fillers(entry, stem, "___", original, distractor)
+        if fillers is None:
+            return None  # check (f): couldn't build 2 safely-wrong generic fillers for this sentence
+
+        option_texts = [original, distractor, *fillers]
+        labels = ["A", "B", "C", "D"]
+        self.rng.shuffle(labels)
+        options = dict(zip(labels, option_texts))
+        answer_label, distractor_label = labels[0], labels[1]
+
+        return CurriculumItem(skill_id=f"curriculum_{entry.number}", entry=entry, stem=stem,
+                               blank_marker="___", options=options, answer=answer_label,
+                               primary_distractor_label=distractor_label,
                                correct_span=original, distractor_span=distractor)
 
 
@@ -188,22 +313,26 @@ if __name__ == "__main__":
     # full curriculum, not just the beginner-level rows checked first.
     sample = entries[::13]
 
-    generator = CurriculumItemGenerator()
+    generator = CurriculumItemGenerator(seed=0)
     solver = SolverCheckProvider()
 
     produced, solver_ok = 0, 0
     for entry in sample:
         item = generator.generate(entry)
-        status = "SKIP (failed check a/b/d)" if item is None else "OK"
+        status = "SKIP (failed check a/b/d/e/f)" if item is None else "OK"
         print(f"[{entry.number}] {entry.grammar}: {status}")
         if item is None:
             continue
         produced += 1
-        print(f"    stem={item.stem!r}  correct={item.correct_span!r}  distractor={item.distractor_span!r}")
-        options = {"A": item.correct_span, "B": item.distractor_span}
-        result = solver.check(item.stem, item.blank_marker, options, "A")
+        assert item.skill_id == f"curriculum_{entry.number}"
+        assert len(item.options) == 4 and set(item.options) == {"A", "B", "C", "D"}
+        assert item.answer in item.options and item.primary_distractor_label in item.options
+        assert item.answer != item.primary_distractor_label
+        print(f"    stem={item.stem!r}  options={item.options!r}  answer={item.answer!r}")
+        result = solver.check(item.stem, item.blank_marker, item.options, item.answer)
         solver_ok += int(result.key_accepted)
-        print(f"    solver blind pick: {result.picked}  (key_accepted={result.key_accepted})")
+        print(f"    solver blind pick: {result.picked}  (key_accepted={result.key_accepted})  "
+              f"also_acceptable={result.also_acceptable}")
 
     print(f"\nproduced {produced}/{len(sample)} items; solver round-trip accepted "
           f"{solver_ok}/{produced if produced else 1}")

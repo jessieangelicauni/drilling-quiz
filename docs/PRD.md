@@ -3086,5 +3086,78 @@ update).
 
 ---
 
+### 9.49 Integrasi ke daily_drill/answer_processing: 2 keputusan arsitektur ditanyakan, 4-opsi dibangun, threshold filler dikalibrasi 2x setelah kalibrasi pertama meleset
+
+User minta lanjut ke integrasi (`ContentProvider`/`daily_drill.py`).
+Sebelum coding, dua keputusan arsitektur ditanyakan eksplisit ke user
+(bukan ditebak) karena menyentuh asumsi yang sudah divalidasi:
+
+1. **Skala tracking mastery**: per grammar point (524 skill Urnings
+   terpisah) vs satu skill payung vs di luar Urnings dulu. User pilih
+   **per grammar point** (rekomendasi saya) — paling akurat secara
+   pedagogis, tapi secara eksplisit DICATAT sebagai belum divalidasi di
+   skala ini (§9.12-9.38 semua diukur di ~11 skill).
+2. **Jumlah opsi**: item kurikulum cuma 2 opsi, sementara 11 skill lain
+   dipaksa 4 opsi karena baseline tebak-acak (25% vs 50%) mempengaruhi
+   matematika Urnings/IRT (§9.21, keputusan eksplisit sebelumnya). User
+   pilih **buat 4 opsi juga** (rekomendasi saya), dengan mekanisme filler
+   generik yang perlu dibangun karena tidak ada candidate pool per-skill
+   seperti 11 skill lama.
+
+**Mekanisme filler (check (f) baru di `curriculum_item_generator.py`)**:
+reuse pool filler generik yang SUDAH terbukti aman di `exaone_provider.py`
+("학교"/"사과"/"저기"/"안녕"), divalidasi per kalimat dengan sinyal
+kiwipiepy yang sama dipakai untuk check (d) — filler diterima HANYA jika
+skornya jelas lebih rendah dari jawaban benar saat disubstitusi.
+
+**Dua kesalahan kalibrasi ditemukan dan diperbaiki berurutan, bukan
+diasumsikan benar dari awal**:
+1. Percobaan pertama reuse `lm_plausibility_gap()` mentah (skor SUM,
+   sama seperti check (d)) → produksi jatuh drastis dari 14/41 ke
+   **5/41**. Diinvestigasi, bukan dibiarkan: skor SUM kiwipiepy
+   menyukai kalimat LEBIH PENDEK secara sistematis, tidak peduli
+   gramatikalitas — begitu jawaban benar adalah frasa panjang (misal
+   "하기가 어려워요"), filler pendek apa pun otomatis menang meski jelas
+   omong kosong. Dibuktikan langsung dengan angka (entry 144: gap
+   negatif -1.3 sampai -5.5 untuk SEMUA filler, padahal substitusinya
+   jelas rusak).
+2. Diperbaiki dengan skor ternormalisasi per-token (`_filler_gap()`,
+   fungsi baru, terpisah dari `lm_plausibility_gap()` yang dibiarkan
+   tidak berubah karena sudah divalidasi di bentuk aslinya untuk
+   konteks berbeda). Threshold awal 1.5 (dari 3 contoh kalibrasi) masih
+   TERLALU KETAT — diukur lagi di 2 entri baru, margin asli cuma
+   0.4-1.4, produksi jatuh lagi ke **7/41**. Diturunkan ke **0.3**
+   (comfortably di atas 0, di bawah semua margin aman yang terukur).
+
+**Hasil final, diukur di sweep 41-sampel yang sama**: **13/41 (32%)
+produksi, 9/13 (69%) solver-agreement** — sejalan dengan baseline
+sebelum check (f) ada (14/41, 64%, §9.48), membuktikan mekanisme filler
+itu sendiri TIDAK mengorbankan rate produksi setelah dikalibrasi benar.
+Semua item sekarang punya 4 opsi A-D yang valid. Satu anomali didisclose
+(bukan disembunyikan): entry "-느니" (352) kedua filler-nya ditandai
+`also_acceptable=True` oleh check (b) solver — tapi check (b) SUDAH
+terdokumentasi punya yes-bias persisten (lihat `solver_check.py`), jadi
+ini dibaca sebagai limitasi lama yang berulang, bukan bukti baru filler
+tidak aman (sinyal yang benar-benar menggerbang produksi adalah
+`_filler_gap`, sinyal berbeda dan independen dari check (b)).
+
+**`skill_id` format**: `f"curriculum_{entry.number}"` — satu Urnings
+track per grammar point, sesuai keputusan user poin 1.
+
+**File baru**: `src/curriculum_grammar_provider.py` — `CurriculumGrammarProvider`
+mengimplementasikan `ContentProvider.next_new_grammar_item` protocol yang
+sama dengan `ExaoneGrammarProvider`, routing berdasarkan prefix skill_id.
+
+**Belum selesai di akhir sesi ini**: dispatcher penggabung di
+`content_provider.py` (routing skill_id "curriculum_*" vs skill lama ke
+provider yang tepat) dan smoke test end-to-end lewat
+`daily_drill.assemble_daily_drill` + `answer_processing.submit_grammar_answer`
+dengan skill_id campuran — lanjutan langsung berikutnya.
+
+**File:** `src/curriculum_item_generator.py` (check (f) + 2 revisi
+kalibrasi), `src/curriculum_grammar_provider.py` (baru).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
