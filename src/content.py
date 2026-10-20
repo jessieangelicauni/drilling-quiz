@@ -824,10 +824,25 @@ BODY = [
 ("P", "A note on scope, stated rather than left for a reviewer to find: a different, "
       "growing-pool regime closer to live deployment (items mostly new, rarely revisited) "
       "produces a more dramatic gap between Elo/Parallel Elo's neutral and worst-prior "
-      "conditions, but also a non-monotonic result for Urnings across the same prior-quality "
-      "grid that we do not yet have a complete account of. We report the fixed-pool regime "
-      "here because it is fully understood end to end; the growing-pool regime is left for "
-      "future work rather than included partially explained."),
+      "conditions. Urnings shows a non-monotonic result across the same prior-quality grid in "
+      "this regime—a weak, near-uninformative prior yields a better terminal RMSE than either "
+      "a neutral or a strong one—but this is a confirmed artifact, not an open question. A "
+      "noisier prior pushes more items to a saturated starting urn (11.3% of items at the "
+      "weakest signal level we tested, versus 0.0% at the strongest), and the adaptive "
+      "selection policy never serves a saturated item in practice: tracked directly across "
+      "120,000 responses, saturated items were selected 0 times, against roughly 20–23 "
+      "selections for a normally-seeded item. The same fixed response budget then "
+      "concentrates onto fewer surviving items, which each calibrate more precisely purely "
+      "from the extra exposure this concentration gives them—an artifact of the selection "
+      "mechanism, not a real benefit of an uninformative prior. This has a practical "
+      "implication beyond the simulation: a badly miscalibrated difficulty estimate for one "
+      "generated item does not just misestimate that item, it can make it functionally "
+      "unservable, which argues for monitoring dead items in the bank as its own signal, "
+      "separate from calibration accuracy. We still report the fixed-pool regime as the "
+      "headline result, since it is the simpler comparison and isolates prior quality from "
+      "this selection-saturation interaction; the growing-pool finding is reported here for "
+      "completeness, as an operationally relevant finding in its own right, not because it "
+      "changes Novelty 2's core claim."),
 
 ("H2", "D. Exploratory Classroom Pilot"),
 

@@ -3949,5 +3949,66 @@ sistematis yang layak) masih pending run user.
 
 ---
 
+### 9.62 Klaim paper yang KEDALUWARSA ditemukan & diperbaiki: pola non-monoton growing-pool "belum dipahami" padahal SUDAH dijelaskan penuh di §9.17
+
+**Konteks**: user menantang audit sebelumnya (§9.56-9.61) — jangan
+terima begitu saja framing "paper sendiri jujur mengakui [X]" sebagai
+batas akhir; sebagai senior LLM engineer, cari dulu apakah metode/bukti
+yang lebih kuat sudah ada sebelum menyerah pada framing itu.
+
+**Temuan**: `content.py` Section V-C (dekat baris 824, evidensi
+Novelty 2) menyatakan hasil non-monoton Urnings di regime growing-pool
+"we do not yet have a complete account of" — TAPI PRD §9.17 (ditulis
+jauh lebih awal dari paragraf ini, lihat tanggal section) sudah
+menyimpulkan secara eksplisit: **"pola non-monoton §9.13 sudah
+dijelaskan penuh, bukan lagi open item."** Akar penyebabnya sudah
+dikonfirmasi lewat `simulate_item_coldstart_diagnosis.py`, 2 tahap,
+bukan dugaan:
+1. Prior lemah (noise_std=2.0) mendorong 11.3% item ke k0 ekstrem
+   (0/32) vs 0.0% di prior kuat (noise_std=0.3) — diukur dari 2000
+   sampel per level.
+2. Item yang mentok TIDAK PERNAH dipilih `pick_adaptive` — dikonfirmasi
+   lewat pelacakan langsung sepanjang 120.000 respons: 0.00x untuk
+   item mentok, vs ~20-23x untuk item normal.
+3. Kesimpulan: RMSE akhir kondisi lemah "terlihat lebih baik" bukan
+   karena prior tidak informatif itu bermanfaat, tapi karena item yang
+   mentok efektif hilang dari peredaran — respons yang sama
+   terkonsentrasi ke lebih sedikit item, masing-masing dapat exposure
+   lebih banyak, jadi mengkalibrasi lebih presisi terlepas dari titik
+   awalnya. Artefak mekanisme seleksi, bukan manfaat nyata prior lemah.
+
+**Ini BUKAN kasus "metode baru ditemukan"** — ini kasus **evidensi yang
+sudah ada dan sudah dikonfirmasi penuh, tapi tidak pernah dibawa masuk
+ke teks paper** saat paragraf Section V-C ditulis. Paper secara tidak
+sengaja UNDERSELLING bukti yang sudah dimiliki proyek ini sendiri.
+
+**Diperbaiki**: paragraf Section V-C ditulis ulang — klaim "we do not
+yet have a complete account of" diganti penjelasan lengkap (saturasi
+11.3% vs 0.0%, seleksi 0x vs ~20-23x, mekanisme konsentrasi-exposure),
+plus implikasi praktis yang sudah tercatat di §9.17 (item dengan
+estimasi kesulitan sangat meleset bisa jadi "mati"/tidak pernah
+disajikan — perlu monitoring item mati, bukan cuma akurasi kalibrasi).
+Regime fixed-pool tetap jadi headline result (lebih simpel, memisahkan
+kualitas prior dari interaksi saturasi-seleksi ini) — growing-pool
+dilaporkan untuk kelengkapan dan karena temuannya sendiri relevan
+secara operasional, bukan karena mengubah klaim inti Novelty 2.
+
+**Diverifikasi**: `py_compile` pada `content.py` lolos. `build_docx.py`
+dijalankan ulang → `paper/KO-DRILL_IEEE.docx` ter-generate. Konversi
+PDF via `libreoffice --headless --convert-to pdf` → `paper/KO-DRILL_IEEE.pdf`.
+Dicek langsung lewat ekstraksi teks PDF (`pdfplumber`): teks baru
+("saturated starting urn", "selected 0 times") terkonfirmasi muncul
+di PDF yang di-build ulang, bukan diasumsikan berhasil.
+
+**Catatan untuk audit lanjutan**: ini mengindikasikan kemungkinan ada
+klaim "belum dipahami/belum diselesaikan" LAIN di paper yang juga
+sudah kedaluwarsa relatif terhadap temuan PRD yang lebih baru — belum
+disurvei secara sistematis, baru 1 kasus ini yang dicek dan
+dikonfirmasi.
+
+**File:** `src/content.py`, `paper/KO-DRILL_IEEE.docx`, `paper/KO-DRILL_IEEE.pdf`.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
