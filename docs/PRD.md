@@ -3269,5 +3269,80 @@ diimplementasikan).
 
 ---
 
+### 9.51 Model swap ke EXAONE-3.5-7.8B di 3 file (per instruksi eksplisit user, BELUM diverifikasi di GPU)
+
+**Instruksi user**: "pakai exaone 7.8b" → diklarifikasi via AskUserQuestion
+mencakup ketiga file sekaligus ("ketiganya") → dikonfirmasi "lanjut".
+Target: `src/domain_vocab_substitution.py`, `src/qwen_feedback.py`,
+`src/solver_check.py` — ketiganya sebelumnya pakai Qwen3-4B.
+
+**Precondition yang membuat ini sekarang mungkin**: §9.50 mencatat
+EXAONE-3.5-7.8B "tidak bisa dijalankan sama sekali" karena bug
+inkompatibilitas `transformers` di custom modeling code-nya sendiri.
+Commit `ab81d8a` (`src/patch_exaone35_remote_code.py`) memperbaiki bug
+itu (dua masalah dalam satu call: `input_embeds`→`inputs_embeds` yang
+salah nama, dan parameter `cache_position` yang sudah dihapus dari
+`create_causal_mask()`). Tanpa patch itu dijalankan setelah load
+pertama, ketiga swap di bawah akan gagal dengan `TypeError` yang sama.
+
+**Catatan penting soal provenance angka**: dalam diskusi sesi ini
+sempat disebut hasil "EXAONE-3.5-7.8B 65.4% vs Qwen3-4B 57.7%" pada
+task semantic-plausibility (§9.50). Angka itu **TIDAK ditemukan** di
+`docs/PRD.md`, file hasil JSON manapun, atau riwayat git saat swap ini
+dibuat — kemungkinan berasal dari output terminal sesi lokal paralel
+yang dibahas di chat tapi belum pernah dicatat ke PRD sebelum context
+di-compact. Angka itu **tidak digunakan sebagai bukti terverifikasi**
+di komentar kode yang ditambahkan oleh swap ini; hanya dicatat sebagai
+alasan yang disampaikan user, bukan sebagai fakta yang sudah
+dikonfirmasi tertulis di repo ini.
+
+**Perubahan per file**, risiko terendah ke tertinggi:
+
+1. **`domain_vocab_substitution.py`** — file ini tidak punya
+   `_MODEL_NAME` sendiri (desain aslinya: reuse `generate_fn` dari
+   model lain yang sudah di-load, demi hindari OOM 3-model di GPU 15GB,
+   lihat §9.49). Ditambahkan `Exaone35Generator`, loader EXAONE-3.5-7.8B
+   mandiri, dipakai di `__main__` menggantikan reuse Qwen3-4B milik
+   `CurriculumItemGenerator`. Ini **membalikkan** keputusan hindari-OOM
+   itu — perlu diuji ulang di GPU asli apakah kombinasi model yang
+   berjalan bersamaan sekarang (EXAONE-4.0 generator + EXAONE-3.5-7.8B +
+   Qwen3-4B lainnya) masih OOM atau tidak. Belum ada wiring produksi
+   nyata untuk modul ini di luar `__main__` (dicek via grep), jadi risiko
+   saat ini terbatas pada smoke test, belum pipeline nyata.
+2. **`qwen_feedback.py`** — `_MODEL_NAME` diganti langsung. Risiko lebih
+   rendah: output modul ini (feedback bahasa bebas ke learner) bukan
+   dasar klaim psikometrik apa pun di paper. Catatan teknis belum
+   terverifikasi: `enable_thinking` adalah toggle khas Qwen3; EXAONE-3.5
+   kemungkinan tidak punya konsep reasoning-mode di chat template-nya,
+   jadi `detailed_feedback()` (pakai `enable_thinking=True`) diasumsikan
+   menjadi no-op diam-diam (Jinja undefined var), bukan error — **asumsi
+   ini belum dikonfirmasi di hardware nyata.**
+3. **`solver_check.py`** — **risiko tertinggi dari ketiganya.** Angka
+   Qwen3-4B untuk file ini SUDAH DIPUBLIKASIKAN di paper (Section IV-B /
+   §9.36: EXAONE-4.0-1.2B 48.2% vs Qwen3-4B 87.5% pada grammaticality-
+   judgment; §9.50: Qwen3-4B 57.7% pada semantic-plausibility). Angka itu
+   untuk EXAONE-4.0-1.2B, BUKAN EXAONE-3.5-7.8B — swap ini belum
+   menggantikan baseline yang dipublikasikan dengan data baru apa pun,
+   hanya mengganti kode. **Wajib sebelum dianggap final:** jalankan ulang
+   `validate_log_likelihood.py` dan `validate_novelty1.py` di GPU asli
+   dengan model baru ini, bandingkan dengan artifact yang sudah di-commit
+   (`log_likelihood_results.json`, `1_validation_results.json`). Kalau
+   `check(c)` (key-acceptance) atau log-likelihood gap turun dibanding
+   Qwen3-4B, kembalikan `_MODEL_NAME` ke `"Qwen/Qwen3-4B"` dan/atau revisi
+   bagian paper yang mengutip angka lama — jangan biarkan kode dan
+   angka yang dikutip paper diam-diam tidak sinkron.
+
+**Verifikasi yang SUDAH dilakukan**: `py_compile` pada ketiga file
+(sintaks valid). **Verifikasi yang BELUM bisa dilakukan** (sandbox ini
+tidak punya GPU): loading model nyata, `trust_remote_code` path,
+`apply_chat_template` dengan/tanpa `enable_thinking` pada EXAONE-3.5,
+dan — paling penting — apakah kualitas hasil (check(c), log-likelihood
+gap, feedback quality) berubah dibanding Qwen3-4B.
+
+**File:** `src/domain_vocab_substitution.py`, `src/qwen_feedback.py`,
+`src/solver_check.py`.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

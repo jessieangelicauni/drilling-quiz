@@ -48,7 +48,18 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from distractor_validator import correct_korean_conjugation
 
-_MODEL_NAME = "Qwen/Qwen3-4B"
+_MODEL_NAME = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"  # swapped from Qwen3-4B 2026-10-20,
+# per explicit user instruction ("pakai exaone 7.8b" -> "ketiganya" -> "lanjut"), NOT because
+# this task's own quality was re-measured on this model. Two things are genuinely unverified:
+#   1. trust_remote_code=True is required (EXAONE-3.5's custom modeling_exaone.py) and that file
+#      has a known transformers-version bug -- run src/patch_exaone35_remote_code.py AFTER the
+#      first load (see that script's docstring) or generation will fail with a create_causal_mask
+#      TypeError.
+#   2. enable_thinking is a Qwen3-specific chat-template toggle; EXAONE-3.5's template has no
+#      reasoning-mode concept, so detailed_feedback()'s enable_thinking=True below is expected to
+#      be a silent no-op (undefined Jinja var), not a hard error -- NOT confirmed on real hardware.
+# Lower risk than the other two swapped files: this module's output (free-form learner feedback
+# text) is not the basis of any published psychometric claim in the paper, unlike solver_check.py.
 _DETAILED_MIN_TOKENS = 1200  # empirically the minimum that reliably finishes; see qwen_feedback history
 
 Language = Literal["en", "id"]
@@ -76,8 +87,9 @@ _ID_DETAILED_EXAMPLE = (
 
 class QwenFeedbackProvider:
     def __init__(self, model_name: str = _MODEL_NAME):
-        self.tok = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda")
+        self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_name, dtype=torch.bfloat16, trust_remote_code=True).to("cuda")
 
     def fast_feedback(self, stem: str, correct: str, wrong: str, language: Language = "en") -> str:
         """Default path: short, cheap. No reasoning mode."""
