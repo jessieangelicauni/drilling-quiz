@@ -3784,5 +3784,49 @@ hasil nyata didapat.
 
 ---
 
+### 9.59 Bug ekstraksi partikel di `investigate_kolla_corpus.py` ditemukan dari run nyata user, diperbaiki & diverifikasi
+
+**Hasil run pertama user** (GPU/mesin lokal, akses nyata ke Zenodo):
+script BERHASIL unduh+parse 4464 anotasi dari `KoLLA_multi-refs.m2`.
+Survei taksonomi tag terkonfirmasi: error partikel (tag mengandung
+`ADP`) memang BANYAK — `R:NOUN+ADP -> NOUN+ADP`: 152,
+`R:ADV+ADP -> ADV+ADP`: 109, `R:VERB+ADP -> VERB+ADP`: 104,
+`R:NOUN -> NOUN+ADP`: 197, dst., total ratusan instance. TAPI filter
+"project-relevant particle" cuma menangkap **2 instance total** — jelas
+bug, bukan berarti datanya tidak ada.
+
+**Akar masalah**: filter v1 mencocokkan field `correction` M2 secara
+LITERAL ke daftar partikel pendek (`"에서"` dll.) — tapi `correction`
+berisi KATA UTUH termasuk partikelnya (`"학교에서"`, bukan `"에서"`
+saja), jadi hampir semua instance nyata tidak pernah cocok.
+
+**Fix v2 pertama (common-prefix diff) JUGA salah**, ditemukan sendiri
+lewat tes standalone sebelum dikirim ke user (bukan dari laporan user
+lagi): diff `"학교에"` vs `"학교에서"` lewat longest-common-prefix
+gagal — karena `"에"` adalah PERSIS prefix literal dari `"에서"`,
+seluruh `"학교에"` (3 karakter) ikut dianggap "sama" dengan 3 karakter
+pertama `"학교에서"`, menyisakan `before=""` (kosong) → ditolak oleh
+pengecekan `not before`. Ini justru menghilangkan kasus 에/에서 yang
+PALING relevan untuk `particle_loc` — kegagalan diam-diam yang baru
+ketahuan karena ditest eksplisit, bukan diasumsikan jalan.
+
+**Fix v3 (final, diverifikasi)**: ganti pendekatan diff-karakter dengan
+pencocokan SUFFIX PARTIKEL YANG DIKETAHUI (`_KNOWN_PARTICLE_SUFFIXES`,
+diurutkan terpanjang dulu supaya `"에서"` dicoba sebelum `"에"`) —
+lepaskan suffix partikel dari kedua sisi, terima sebagai perubahan
+partikel HANYA kalau stem kata bendanya identik di kedua sisi (bukan
+ganti kata sekaligus). Diverifikasi lewat 5 assertion standalone,
+termasuk kasus bug asli (`학교에`→`학교에서` sekarang benar
+menghasilkan `("에","에서")`) dan kasus negatif (ganti kata utuh TIDAK
+boleh disalahbaca sebagai ganti partikel) — semua lolos sebelum commit.
+
+**Status**: belum dijalankan ulang oleh user dengan fix ini — hasil
+nyata (apakah jumlah instance per pasangan partikel cukup untuk
+fine-tuning) masih pending run berikutnya.
+
+**File:** `src/investigate_kolla_corpus.py`.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

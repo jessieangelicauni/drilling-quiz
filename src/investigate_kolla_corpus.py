@@ -87,16 +87,73 @@ def find_m2_files() -> list[Path]:
     return list(_DOWNLOAD_DIR.rglob("*.m2")) + list(_DOWNLOAD_DIR.rglob("*.M2"))
 
 
-def parse_m2(path: Path) -> list[tuple[str, str]]:
-    """Returns a list of (error_type, correction_text) tuples found in one
-    M2 file -- does NOT assume the exact tag vocabulary in advance.
+def parse_m2(path: Path) -> list[tuple[str, str, str]]:
+    """Returns (error_type, original_span, correction_text) tuples.
+
+    FIX (v2, after the first run showed only 2/4464 matches -- the bug was
+    here, not a lack of data): the original version matched `correction`
+    directly against a short particle set, but M2's correction field holds
+    the WHOLE corrected span/word (e.g. "학교에서"), not just the particle
+    ("에서") -- almost every real particle-substitution instance was
+    invisible to that filter. Fixed by tracking each `S` line's tokens
+    (M2 annotations reference them by token index) so the ORIGINAL span can
+    actually be recovered and diffed against the correction, not just the
+    correction read in isolation.
     """
     results = []
+    tokens: list[str] = []
     for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        if line.startswith("S "):
+            tokens = line[2:].split()
+            continue
         m = _M2_ANNOTATION_RE.match(line)
-        if m:
-            results.append((m.group("etype").strip(), m.group("correction").strip()))
+        if not m:
+            continue
+        start, end = int(m.group("start")), int(m.group("end"))
+        correction = m.group("correction").strip()
+        if start < 0 or end < 0 or end > len(tokens) or end <= start:
+            continue  # -NONE-/insertion-only annotations, or out-of-range -- not a substitution
+        original_span = "".join(tokens[start:end])
+        results.append((m.group("etype").strip(), original_span, correction))
     return results
+
+
+# Sorted longest-first so e.g. "에서" is tried before "에" -- a naive
+# character-diff (first version of this function) breaks exactly on this
+# case: "에" is a literal prefix of "에서", so blind longest-common-prefix
+# diffing of "학교에"/"학교에서" consumes "에" as part of the "unchanged"
+# prefix and leaves an empty "before" particle, silently dropping the most
+# basic 에/에서 confusion this project's own particle_loc skill is built
+# around. Fixed by matching against a known-suffix list instead of diffing.
+_KNOWN_PARTICLE_SUFFIXES = sorted([
+    "에게서", "한테서", "으로서", "으로써", "에다가",
+    "에서", "에게", "한테", "로서", "로써", "으로", "에다",
+    "이랑", "하고", "이나", "께서",
+    "이", "가", "을", "를", "은", "는", "의", "도", "만", "에", "께", "로", "와", "과", "나",
+], key=len, reverse=True)
+
+
+def _strip_particle(word: str) -> tuple[str, str | None]:
+    for particle in _KNOWN_PARTICLE_SUFFIXES:
+        if word.endswith(particle) and len(word) > len(particle):
+            return word[: -len(particle)], particle
+    return word, None
+
+
+def extract_particle_change(original_span: str, correction: str) -> tuple[str, str] | None:
+    """Isolates a particle substitution, e.g. ("학교에", "학교에서") ->
+    ("에", "에서"), by matching known particle suffixes rather than diffing
+    characters -- only returns a pair when the NOUN STEM is identical on
+    both sides (so a genuine word change, not just a particle change,
+    is correctly excluded rather than misread as one).
+    """
+    orig_stem, orig_particle = _strip_particle(original_span)
+    corr_stem, corr_particle = _strip_particle(correction)
+    if orig_particle is None or corr_particle is None:
+        return None
+    if orig_stem != corr_stem or orig_particle == corr_particle:
+        return None
+    return orig_particle, corr_particle
 
 
 def main() -> None:
@@ -118,28 +175,43 @@ def main() -> None:
     print(f"=== Total annotations parsed: {len(all_annotations)} ===\n")
 
     print("=== Error type tag frequency (unfiltered survey -- actual taxonomy, not assumed) ===")
-    etype_counts = Counter(etype for etype, _ in all_annotations)
+    etype_counts = Counter(etype for etype, _, _ in all_annotations)
     for etype, count in etype_counts.most_common(30):
         print(f"  {etype}: {count}")
 
-    print("\n=== Particle-substitution-specific counts (project-relevant subset) ===")
-    # Correction text for a particle-substitution error is typically just
-    # the correct particle itself (single short token) -- filtered
-    # defensively rather than assuming the exact etype string.
-    particle_corrections = Counter(
-        correction for etype, correction in all_annotations
-        if correction in _PROJECT_PARTICLES
-    )
-    if particle_corrections:
-        for particle, count in particle_corrections.most_common():
-            print(f"  -> {particle}: {count} instances")
-    else:
-        print("  none matched by this heuristic -- inspect the etype survey above and "
-              "adjust the filter; the correction-text field may not isolate single "
-              "particles the way this script assumed.")
+    print("\n=== Particle-change pairs (before -> after), via original/correction diff ===")
+    all_changes = Counter()
+    project_changes = Counter()
+    unresolved = 0
+    for etype, original_span, correction in all_annotations:
+        if "ADP" not in etype:  # ADP = adposition/particle, per the taxonomy survey above
+            continue
+        change = extract_particle_change(original_span, correction)
+        if change is None:
+            unresolved += 1
+            continue
+        all_changes[change] += 1
+        if change[0] in _PROJECT_PARTICLES or change[1] in _PROJECT_PARTICLES:
+            project_changes[change] += 1
 
-    total_particle_instances = sum(particle_corrections.values())
-    print(f"\nTotal project-relevant particle-correction instances: {total_particle_instances}")
+    print(f"(ADP-tagged annotations where the diff could NOT isolate a clean short suffix: "
+          f"{unresolved} -- likely whole-word changes alongside the particle, not pure "
+          f"substitutions; excluded rather than guessed)\n")
+
+    print("All particle-change pairs found (any length <=3 chars, not just this project's set):")
+    for (before, after), count in all_changes.most_common(30):
+        print(f"  {before!r} -> {after!r}: {count}")
+
+    print("\nProject-relevant subset (involves a particle particle_loc/particle_obj already use):")
+    if project_changes:
+        for (before, after), count in project_changes.most_common():
+            print(f"  {before!r} -> {after!r}: {count}")
+    else:
+        print("  none -- the particles this project targets may not be the ones KoLLA's "
+              "learners actually struggled with; see the full list above instead.")
+
+    total_particle_instances = sum(project_changes.values())
+    print(f"\nTotal project-relevant particle-change instances: {total_particle_instances}")
     print("\nDecision rule for this investigation: fine-tuning (option B) needs enough "
           "instances PER particle type to avoid overfitting a classifier (rule of thumb: "
           "at least several dozen per class, ideally 100+) -- if most particles above have "
