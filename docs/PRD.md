@@ -4052,5 +4052,54 @@ lolos setelah revert.
 
 ---
 
+### 9.64 Coba perbaiki EXAONE dulu sebelum revert permanen ke Qwen3 (user menantang §9.63) — fix ditulis, BELUM diuji di GPU
+
+**Konteks**: user menolak revert langsung (§9.63) — minta coba
+perbaiki EXAONE-3.5-7.8B dulu, konsisten dengan prinsip proyek ini
+sendiri ("re-test sebelum menyimpulkan infeasible", persis pelajaran
+yang sudah tertulis di docstring file ini soal Qwen3-1.7B→4B).
+
+**Diagnosis root-cause yang lebih presisi**: path Bahasa Inggris di
+`qwen_feedback.py` **tidak pernah punya one-shot example sama sekali**
+— cuma instruksi bare "Answer ONLY in English". Path Indonesia SUDAH
+punya `_ID_FAST_EXAMPLE`/`_ID_DETAILED_EXAMPLE` sebagai pengaman sejak
+dulu (teknik yang sama persis yang memperbaiki Qwen3-1.7B). Qwen3-4B
+rupanya tidak pernah butuh pengaman itu untuk Inggris (bahasa
+high-resource, representasi kuat di model manapun) — tapi EXAONE yang
+Korean-first (per framing paper Section III-C) kemungkinan butuh
+pengaman yang sama yang selama ini cuma diberikan ke path Indonesia.
+
+**Fix**: dikembalikan dulu ke EXAONE-3.5-7.8B (revert §9.63 dibatalkan
+sementara), ditambahkan `_EN_FAST_EXAMPLE`/`_EN_DETAILED_EXAMPLE` —
+teknik identik (2 topik berbeda dalam 1 contoh, menghindari topic-leak)
+yang sudah terbukti untuk path Indonesia, sekarang diterapkan juga ke
+path Inggris.
+
+**Gap pengujian yang juga ditemukan sambil memperbaiki**: smoke test
+`__main__` SELAMA INI cuma cek topic-leak ("학교"/"공부" tidak boleh
+bocor), TIDAK PERNAH benar-benar cek apakah output sungguh dalam
+bahasa yang diminta — persis bug yang baru dilaporkan user bisa lolos
+smoke test tanpa terdeteksi. Ditambahkan `_hangul_char_count()` +
+assertion batas karakter Hangul (longgar, karena contoh kalimat Korea
+yang disematkan sebagai ilustrasi itu legitimate/diharapkan, bukan
+pelanggaran) untuk kedua path (fast/detailed) di kedua bahasa.
+
+**BELUM diverifikasi di GPU** — tidak bisa dites di sandbox ini (tidak
+ada GPU). `py_compile` lolos, itu saja yang bisa dikonfirmasi di sini.
+Threshold Hangul-count (`_FAST_HANGUL_LIMIT=15`, `_DETAILED_HANGUL_LIMIT=40`)
+adalah TEBAKAN AWAL, belum dikalibrasi dari data nyata — mungkin perlu
+disesuaikan setelah run pertama.
+
+**Keputusan yang masih terbuka**: kalau fix ini TERBUKTI bekerja di
+GPU user (smoke test lolos termasuk assertion Hangul baru) → EXAONE
+dipertahankan untuk ketiga file. Kalau TETAP gagal (masih jawab
+Korea) → baru revert permanen ke Qwen3 (seperti §9.63), kali ini
+dengan bukti sudah benar-benar dicoba, bukan diasumsikan infeasible.
+
+**File:** `src/qwen_feedback.py` (EXAONE-3.5-7.8B + one-shot example
+Inggris + assertion kepatuhan-bahasa baru).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
