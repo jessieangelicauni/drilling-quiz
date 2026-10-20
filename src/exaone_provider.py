@@ -493,11 +493,40 @@ def _extract_verb_lemma(text: str) -> str | None:
     tables to generate real failure cases for the critic loop -- 2 of 12
     "failures" turned out to be this extraction bug, not a model failure,
     recovered here with zero LLM involvement.
+
+    Tightened 2026-10-20 (PRD §9.55, after the EXAONE-3.5-7.8B swap):
+    "ends in 다" alone also accepts narrative-present CONJUGATIONS that
+    happen to end in 다 too (먹다 -> 먹는다, 가다 -> 간다), which are real
+    Korean words but not the bare lemma this function must return.
+    EXAONE-4.0-1.2B never exposed this gap (it always failed in other,
+    obvious ways); EXAONE-3.5-7.8B produced "노는다" for 놀다 -- not even
+    a correct conjugation (real present tense is 논다) but surface-shaped
+    enough to slip through unnoticed. Fixed by rejecting both
+    conjugation patterns: consonant-stem "-는다" (literal suffix, e.g.
+    먹는다/읽는다/노는다 -- unambiguous, no genuine lemma ends this way)
+    and vowel/ㄹ-stem "-ㄴ다" (the ㄴ fuses into the preceding syllable's
+    batchim, e.g. 가다->간다, 놀다->논다 -- checked via the same Hangul
+    decomposition distractor_validator.has_batchim uses). Empirically
+    verified against kiwipiepy (see PRD §9.55): this intentionally also
+    rejects a small number of genuine dictionary-form verbs that are
+    homographs of a vowel-stem present-tense conjugation and are
+    unparseable as the lemma reading without sentence context (e.g. 안다
+    "to hug" / 신다 "to wear(shoes)" -- kiwipiepy's own analyzer defaults
+    to reading these as 알다/시다's "-ㄴ다" conjugation, not as the lemma,
+    even in isolation). Disclosed trade-off, not hidden: losing these rare
+    homographs as candidate answers is far cheaper than letting a wrong
+    conjugation through as if it were a verified lemma.
     """
     for tok in text.split():
         tok = tok.strip('".,!?')
-        if tok.endswith("다") and len(tok) >= 2:
-            return tok
+        if not (tok.endswith("다") and len(tok) >= 2):
+            continue
+        if tok.endswith("는다") and len(tok) >= 3:
+            continue  # consonant-stem narrative-present conjugation, not a lemma
+        code = ord(tok[-2]) - 0xAC00
+        if 0 <= code < 11172 and code % 28 == 4:  # batchim ㄴ -- vowel/ㄹ-stem "-ㄴ다"
+            continue
+        return tok
     return None
 
 

@@ -3563,5 +3563,88 @@ tentang quantization.
 
 ---
 
+### 9.56 Konflik sesi cloud vs sesi lokal diselesaikan: lanjut quantization (bukan revert), qwen_feedback.py yang terlewat diperbaiki, `_extract_verb_lemma` diperketat
+
+**Konteks penting**: sesi cloud ini (§9.51/9.52/9.54) dan sesi lokal
+(§9.53, akses GPU nyata) berjalan PARALEL tanpa saling tahu, dan
+mengambil keputusan BERLAWANAN pada masalah OOM yang sama — cloud
+memilih revert total ke model asli (commit `937504c`), lokal memilih
+quantization 4-bit (commit `14a2693`). Keduanya di-push, terjadi merge
+conflict, dan merge (`52ba9ad`) memilih **mempertahankan quantization
+lokal, membuang revert cloud**. User ditanya ulang secara eksplisit di
+sesi ini setelah menemukan konflik ini — jawaban: **lanjut
+quantization** (bukan revert lagi), dan **perketat `_extract_verb_lemma`**
+untuk isu yang masih pending dari §9.53.
+
+**1. `qwen_feedback.py` yang terlewat quantization, diperbaiki**: saat
+fix quantization §9.53 diterapkan ke 4 file, file ini TIDAK disentuh —
+masih bf16 polos. Lolos smoke test di run user HANYA karena GPU
+kebetulan bersih saat itu (lihat urutan run di chat), bukan karena
+aman — `detailed_feedback()`-nya butuh hingga 1200 token baru, KV-cache
+lebih besar dari generation file lain, jadi ini yang paling berisiko
+OOM lagi. Sekarang pakai `BitsAndBytesConfig(load_in_4bit=True,
+bnb_4bit_compute_dtype=torch.bfloat16)`, konsisten dengan 4 file
+lainnya.
+
+**2. `_extract_verb_lemma` diperketat, divalidasi empiris dengan
+kiwipiepy nyata (bukan ditebak)**: masalah asli — "ends in 다" saja
+menerima bentuk KONJUGASI present-tense naratif yang juga berakhir 다
+(먹다→먹는다, 가다→간다), bukan hanya bentuk kamus. EXAONE-3.5-7.8B
+menghasilkan "노는다" untuk slot "해변" (bahkan BUKAN konjugasi yang
+benar dari 놀다 — present tense asli adalah "논다" — tapi cukup mirip
+bentuk konjugasi untuk lolos check lama).
+
+Diinstal `kiwipiepy` di sandbox ini (CPU-only, tidak butuh GPU) untuk
+menguji hipotesis perbaikan SEBELUM diimplementasikan, bukan asumsi:
+```
+'읽다': [('읽', 'VV'), ('다', 'EF')]      -- bentuk kamus asli
+'간다': [('가', 'VV'), ('ᆫ다', 'EF')]     -- konjugasi (ㄴ fusi batchim)
+'노는다': [('놀', 'VV'), ('는다', 'EF')]   -- konjugasi (akhiran literal)
+'안다': [('알', 'VV'), ('ᆫ다', 'EF')]     -- AMBIGU: kiwi baca sebagai
+                                            konjugasi 알다("tahu"), bukan
+                                            kata dasar 안다("memeluk")
+```
+Temuan penting dari tes ini: kata dasar kamus asli (consonant-stem
+verb berakhiran ㄴ-batchim+다, misal 안다 "memeluk", 신다 "memakai
+sepatu") SECARA INHEREN ambigu dengan konjugasi vowel/ㄹ-stem — bahkan
+kiwipiepy sendiri, parser statistik yang sudah dipakai di seluruh
+proyek ini, default membaca "안다" sebagai konjugasi "알다" (tahu)
+bukan kata dasar "memeluk", tanpa konteks kalimat. Tidak ada cara
+murah untuk membedakan keduanya dari kata tunggal saja.
+
+**Keputusan trade-off, didisclose bukan disembunyikan**: perketat
+dengan dua aturan deterministik (Unicode decomposition, bukan model
+call) — (a) tolak akhiran literal "-는다" (aman, tidak ambigu, tidak
+ada kata dasar asli yang berakhir begini), (b) tolak jika karakter
+sebelum "다" punya batchim ㄴ (menangkap pola "-ㄴ다" vowel/ㄹ-stem).
+Ini SENGAJA juga menolak kata dasar asli yang kebetulan collision
+dengan pola ini (안다, 신다, dan sejenisnya) — diterima sebagai trade-off
+sadar: kehilangan kandidat jawaban yang jarang dan ambigu jauh lebih
+murah daripada meloloskan konjugasi salah sebagai lemma terverifikasi.
+
+**Diverifikasi** (di sandbox ini, logic murni tanpa GPU): fungsi
+diekstrak dan dites standalone terhadap seluruh assertion smoke test
+yang sudah ada (읽다→읽다, "travel"→None, 게임하기→None) PLUS kasus bug
+baru (노는다→None, 먹는다→None, 간다→None, 논다→None) PLUS kata dasar
+asli yang tidak ambigu (가다/먹다/놀다/하다/만나다→diterima apa adanya).
+Semua ✓. Efek samping: assert `blind_retries == [None, None, None]`
+untuk slot "해변" (§9.53's blocker) seharusnya otomatis kembali lolos
+dengan EXAONE-3.5-7.8B juga, karena "노는다" sekarang diekstrak jadi
+`None` sama seperti kegagalan model lama -- TIDAK bisa dikonfirmasi di
+sini (butuh GPU untuk benar-benar generate), tapi logic ekstraksinya
+sudah diverifikasi benar.
+
+**Belum dilakukan** (butuh GPU user): jalankan ulang
+`verify_exaone35_swap.py` penuh (smoke test + validasi) untuk konfirmasi
+kedua fix ini benar-benar menyelesaikan semua blocker, lalu lanjut ke
+Step 2/2 (4 skrip validasi) yang belum pernah jalan sejak swap+quantization,
+dengan caveat §9.53 tentang quantization mengubah 2 variabel sekaligus
+(model DAN precision) dibanding baseline yang dipublikasikan.
+
+**File:** `src/qwen_feedback.py` (+quantization), `src/exaone_provider.py`
+(`_extract_verb_lemma` diperketat).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

@@ -44,7 +44,7 @@ from __future__ import annotations
 from typing import Literal
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from distractor_validator import correct_korean_conjugation
 
@@ -60,6 +60,14 @@ _MODEL_NAME = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"  # swapped from Qwen3-4B 20
 #      be a silent no-op (undefined Jinja var), not a hard error -- NOT confirmed on real hardware.
 # Lower risk than the other two swapped files: this module's output (free-form learner feedback
 # text) is not the basis of any published psychometric claim in the paper, unlike solver_check.py.
+#
+# 4-bit quantized (PRD §9.55, same fix as PRD §9.53's exaone_provider.py/
+# curriculum_item_generator.py/solver_check.py/domain_vocab_substitution.py): this file was
+# MISSED by that earlier quantization pass -- it kept running unquantized bf16 (~15.6GB on a
+# 15.57GB GPU) and only appeared to pass its smoke test because the GPU happened to be clean at
+# that moment, not because it was actually safe. detailed_feedback()'s 1200-token budget needs
+# more KV-cache than the other files' shorter generations, so it was the single most likely of
+# the five to resurface this OOM. Quantized now for consistency with the other four.
 _DETAILED_MIN_TOKENS = 1200  # empirically the minimum that reliably finishes; see qwen_feedback history
 
 Language = Literal["en", "id"]
@@ -88,8 +96,9 @@ _ID_DETAILED_EXAMPLE = (
 class QwenFeedbackProvider:
     def __init__(self, model_name: str = _MODEL_NAME):
         self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        _bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype=torch.bfloat16, trust_remote_code=True).to("cuda")
+            model_name, quantization_config=_bnb_config, trust_remote_code=True, device_map="cuda")
 
     def fast_feedback(self, stem: str, correct: str, wrong: str, language: Language = "en") -> str:
         """Default path: short, cheap. No reasoning mode."""
