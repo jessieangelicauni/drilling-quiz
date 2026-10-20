@@ -2085,5 +2085,65 @@ menyamakan teks paper dengan kode yang sudah ada.
 
 ---
 
+### 9.31 Dua pendekatan baru untuk check (b) dicoba secara empiris — KEDUANYA GAGAL, memperkuat kesimpulan §9.16 (bukan cuma belum ketemu prompt yang pas)
+
+User minta investigasi mendalam apakah framing forced-choice bisa memperbaiki
+yes-bias check (b), **implementasikan kalau memang terbukti lebih baik**.
+Diuji langsung di GPU dengan Qwen3-4B asli (bukan dinalar di atas kertas),
+pakai kasus yang kebenarannya sudah diketahui pasti (irregular_conj/
+adj_relativizer = ungrammatical pasti, honorific/tense_past = pragmatically
+mismatch tapi sintaksis valid, plus sanity check kasus yang harusnya benar):
+
+**Hipotesis awal (salah, tapi worth menguji)**: mungkin yes-bias lama
+muncul karena prompt lama ("apakah kalimat ini alami secara gramatikal?")
+mencampur gramatikalitas dengan kesesuaian konteks (pragmatik) — dicoba
+prompt baru yang eksplisit menyebut petunjuk konteks (penanda waktu,
+subjek yang butuh honorifik) dan minta forced-choice "정답/오답".
+
+**Hasil prompt baru (context-anchored forced-choice): 3/7 benar, LEBIH
+BURUK dari yang lama** — bahkan membuat kasus sanity-check yang jelas
+benar (honorific form yang correct) ikut salah dijawab "오답". Bukan
+sekadar tetap bias yes — sekarang noise ke DUA arah, lebih tidak bisa
+diprediksi daripada yes-bias yang konsisten.
+
+**Dicoba pendekatan kedua, genuinely berbeda karakter**: perbandingan
+berpasangan langsung (tunjukkan DUA kalimat sekaligus — versi benar dan
+versi distractor — minta pilih "A saja/B saja/keduanya/tidak satupun").
+Non-reasoning: 3/7 (di bawah chance level untuk pilihan 4-arah). Reasoning
+mode (budget 300 token): 0/7, SEMUA terpotong di tengah `<think>` sebelum
+sempat menjawab — bahkan butuh lebih dari 300 token cuma untuk mulai
+menjawab pertanyaan pembanding sederhana ini, mengonfirmasi ulang temuan
+lama (§9.16) soal reasoning mode dengan budget token besar (800) juga
+tidak menyelesaikan masalah, bukan soal budget yang kurang besar.
+
+**Kesimpulan, 3 framing berbeda sekarang semua gagal dengan pola
+kegagalan BERBEDA satu sama lain** (yes-bias konsisten / noise dua-arah /
+di-bawah-chance pairwise) — ini memperkuat, bukan sekadar mengulang,
+simpulan §9.16: ini keterbatasan kapabilitas genuine Qwen3-4B untuk tugas
+penilaian gramatikalitas halus ini, bukan masalah prompt yang belum
+ketemu formatnya. **TIDAK diimplementasikan** — sesuai prinsip yang
+disepakati user sendiri sesi ini: kalau investigasi menunjukkan memang
+tidak ada solusi, jangan dipaksakan/direframe, laporkan jujur.
+
+**Satu catatan ditemukan di tengah pengujian**: kasus irregular_conj
+gagal di SEMUA framing termasuk pairwise — ini kemungkinan BUKAN murni
+soal yes-bias, tapi tumpang tindih dengan limitasi terpisah yang sudah
+didokumentasikan (§9.16/Section V-B paper): Qwen3-4B memang punya blind
+spot spesifik untuk pola kontraksi 르-irregular, dikonfirmasi independen
+di check (c) juga. Jangan pakai kasus irregular_conj lagi sebagai test
+case murni untuk yes-bias di masa depan — kasusnya tercemar oleh
+limitasi lain.
+
+**Arah yang belum dicoba, di luar scope sesi ini (dicatat, bukan
+dikerjakan)**: cek berbasis frekuensi corpus (bukan LLM-judge sama
+sekali) untuk pasangan partikel yang ambigu — butuh akses corpus Korea
+berskala besar yang tidak tersedia di lingkungan ini sekarang.
+
+**File:** tidak ada perubahan kode — skrip uji ada di scratchpad sesi,
+tidak dipermanenkan karena hasilnya negatif (tidak ada yang perlu
+direproduksi).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
