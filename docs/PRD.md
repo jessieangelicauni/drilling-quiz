@@ -2781,5 +2781,64 @@ baru supaya artefak dan kode kembali sinkron.
 
 ---
 
+### 9.44 Audit sinkronisasi git cloud/local — PDF basi 6 commit, bukan error merge, DIPERBAIKI
+
+User minta cek apakah ada kesalahan saat sinkronisasi git antar sesi
+cloud dan local (sesi ini sempat kena limit penggunaan, sesi lain
+melanjutkan di cloud sambil ini terputus). Diinvestigasi menyeluruh,
+bukan diasumsikan bersih atau diasumsikan rusak:
+
+**Struktur merge sendiri BERSIH**: `git log --merges`, cek conflict
+marker (`grep "<<<<<<<"` dkk, nol hasil), `git status` bersih, riwayat
+linear sampai titik percabangan (`merge-base` = `080b355`), tidak ada
+commit hilang di kedua sisi. Penomoran PRD §9.37-9.39 (sesi ini) vs
+§9.40-9.43 (sesi cloud) BERURUTAN TANPA TABRAKAN — sesi cloud secara
+eksplisit menyebut "continuing a citation-accuracy check a local
+session had started and hit its session limit" di pesan commit
+`1c0cbfa`, dan hasil investigasinya mengonfirmasi tepat dugaan saya
+sendiri sebelum limit (korelasi tinggi Liu et al., bukan "divergensi
+sistematis" — lihat §9.40).
+
+**SATU masalah nyata ditemukan**: `paper/KO-DRILL_IEEE.pdf` basi 6
+commit (sejak `c5a15f2`, commit terakhir saya sebelum limit). Dicek
+dengan hash biner langsung (bukan tebak): `src/content.py` dan
+`paper/KO-DRILL_IEEE.docx` SUDAH benar ter-merge (mengandung semua fix
+sesi cloud: sitasi Liu et al. §9.40, nama penulis §9.41, dll — diverifikasi
+dengan convert docx→text dan dibandingkan byte). Tapi `.pdf` committed
+di HEAD **identik 100% (md5) dengan versi di merge-base `080b355`** —
+berarti tidak pernah di-convert ulang di 6 commit manapun sesudahnya,
+walau pesan commit-commit itu bilang "rebuilt paper/KO-DRILL_IEEE.docx"
+(cuma docx, PDF-nya memang tidak disebut — bukan klaim palsu, cuma
+langkah `libreoffice --headless --convert-to pdf` manual yang berulang
+kali terlewat lintas beberapa commit/sesi berbeda).
+
+**Akibat nyata**: siapa pun yang membuka file `.pdf` langsung (bukan
+`.docx`) akan membaca teks LAMA yang salah (termasuk sitasi Liu et al.
+yang sudah terbukti salah representasi di §9.40) — padahal sumber
+aslinya (`content.py`) sudah benar. Bukan data hilang, bukan merge
+salah ambil sisi (dicek eksplisit: hash `.docx` di HEAD = hash di
+commit cloud yang benar) — murni langkah build yang terlewat berulang.
+
+**Diperbaiki**: `python3 src/build_docx.py` + `libreoffice --headless
+--convert-to pdf` dijalankan ulang dari `content.py` HEAD saat ini.
+Diverifikasi presisi (bukan cuma "build sukses"): ekstrak teks PDF hasil
+rebuild dan bandingkan ke ekstraksi teks dari `.docx` yang sudah
+dikonfirmasi benar — 0 baris beda. Diff `.docx` yang muncul di
+`git status` cuma metadata biner non-deterministik (timestamp
+python-docx), dikonfirmasi 0 beda teks terhadap versi HEAD yang sudah
+benar — aman di-commit.
+
+**Pelajaran proses untuk sesi-sesi berikutnya**: `build_docx.py` cuma
+menghasilkan `.docx`; langkah konversi `.pdf` via LibreOffice itu
+terpisah dan manual — kalau sesi mana pun cuma menjalankan yang pertama
+dan lupa yang kedua, `.pdf` akan diam-diam basi tanpa error apa pun.
+Worth dipertimbangkan menggabungkan kedua langkah jadi satu script
+kalau pola ini berulang lagi.
+
+**File:** `paper/KO-DRILL_IEEE.docx` (refresh metadata saja, teks sudah
+benar sebelumnya), `paper/KO-DRILL_IEEE.pdf` (fix isi sungguhan).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
