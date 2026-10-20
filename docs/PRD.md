@@ -3646,5 +3646,88 @@ dengan caveat §9.53 tentang quantization mengubah 2 variabel sekaligus
 
 ---
 
+### 9.57 Audit "terlalu hardcoded": gerbang plausibilitas kolokasi (Korean SBERT) untuk fallback LLM verb_lookup, divalidasi empiris di GPU user sebelum diimplementasikan
+
+**Konteks**: user minta audit eksplisit elemen hardcoded di seluruh
+codebase ("you are llm engineer senior expert, investigate what can we
+try to replace it"). Agent survey menemukan ~55 pasangan kata
+tangan-kurasi di `SKILL_SPECS`'s `verb_lookup`/`pairs` sebagai blok
+hardcoded terbesar — dipilih di awal proyek karena generasi LLM bebas
+menghasilkan pasangan aneh secara semantik ("커피 -> 차다" = "menendang
+kopi", module docstring Round 3). 2 opsi perbaikan diajukan: (1)
+Korean Sentence-BERT sebagai gerbang plausibilitas untuk generasi LLM
+bebas, (2) diversifikasi filler word via LLM+scoring yang sudah
+terbukti. User putuskan: skip opsi (2) (dampaknya kecil — filler
+sudah terdokumentasi sendiri sebagai "not independently diagnostic",
+tidak menyentuh klaim paper manapun — biaya implementasi lebih besar
+dari manfaatnya), lanjut opsi (1) saja.
+
+**Validasi empiris SEBELUM implementasi** (bukan diasumsikan bekerja):
+tidak bisa dites di sandbox cloud ini (huggingface.co diblokir
+kebijakan jaringan sesi — dicek lewat endpoint status proxy, bukan
+masalah transient, jadi TIDAK dicoba diakali). Ditulis
+`src/investigate_sbert_plausibility.py` untuk dijalankan user di GPU
+lokalnya. Hasil nyata: 10 pasangan GOOD (dari verb_lookup sendiri) vs
+10 pasangan BAD (termasuk kasus asli "커피+차다") pakai model
+`jhgan/ko-sroberta-multitask` — GOOD mean=0.5575, BAD mean=0.3180,
+overlap cuma 7/100 pasangan (bad,good) di mana BAD > GOOD. Separasi
+jauh lebih baik dari ekspektasi awal (awalnya skeptis berdasarkan
+preseden §9.50 yang gagal 6 metode untuk tugas plausibilitas sejenis
+— tapi itu untuk substitusi kosakata DOMAIN KHUSUS/teknis
+smart-factory, bukan kolokasi sehari-hari seperti di sini; perbedaan
+domain inilah alasan prinsipil kenapa hasilnya berbeda, bukan
+kontradiksi temuan lama).
+
+**Keterbatasan yang didisclose, bukan disembunyikan**: 1 kasus di data
+kalibrasi ("공원"+"마시다" = 0.4689) hampir tidak terpisahkan dari
+pasangan GOOD terlemah — nouns yang topically-related (parkir dan
+minum sama-sama aktivitas yang berasosiasi) tapi argumen verbanya
+sebenarnya salah. Ini kelemahan umum cosine similarity untuk
+plausibilitas kolokasi (mengukur keterkaitan topik, bukan kecocokan
+argumen-verba sesungguhnya) — bukan bug yang "diperbaiki" dengan
+threshold lebih baik, melainkan sifat metode yang diterima dengan
+sadar.
+
+**Implementasi** (`src/collocation_plausibility.py`, baru):
+- `is_plausible_collocation(noun, verb)` — cosine similarity via
+  `jhgan/ko-sroberta-multitask`, threshold `0.43` (dipilih konservatif:
+  lebih baik tolak kandidat bagus yang ambigu daripada terima kandidat
+  buruk — biaya tolak rendah, caller sudah punya jalur retry/skip).
+- **Fail-open secara sengaja**: kalau model/`sentence-transformers`
+  tidak tersedia (offline, belum ter-install), gerbang ini BYPASS
+  (anggap semua pasangan plausible) — PERSIS perilaku sebelum modul
+  ini ada, bukan crash. Satu peringatan dicetak sekali supaya bypass
+  ini terlihat, tidak diam-diam. Diverifikasi langsung di sandbox ini
+  (tanpa akses huggingface.co): `python3 src/collocation_plausibility.py`
+  → bypass terkonfirmasi jalan, tidak crash.
+- **Tabel `verb_lookup` yang sudah ada TIDAK disentuh sama sekali** —
+  gerbang ini hanya dipasang di jalur fallback `_pick_verb_lemma`
+  (dipakai HANYA kalau slot belum ada di tabel,
+  `spec["verb_lookup"].get(slot) or self._pick_verb_lemma(...)`) — nol
+  risiko regresi ke konten yang sudah terbukti jalan.
+- **Critic-loop prompt diperbaiki juga** (bug yang ditemukan sambil
+  implementasi, bukan disengaja sejak awal): `_CRITIC_VERB_PROMPT` yang
+  lama bilang "ini bukan kata kerja / tidak berakhir 다" ke model —
+  pesan itu SALAH kalau alasan tolaknya justru plausibilitas (kata
+  kerjanya valid secara gramatikal, cuma aneh maknanya, seperti
+  "차다"). Ditambahkan `_CRITIC_VERB_PLAUSIBILITY_PROMPT` terpisah, dan
+  `_pick_verb_lemma` sekarang pilih prompt yang BENAR berdasarkan
+  kegagalan mana yang sebenarnya terjadi — diverifikasi lewat 4 skenario
+  standalone (grammar-fail, plausibility-fail, langsung lolos, dan
+  gagal total) sebelum commit, semua lolos.
+
+**Belum diverifikasi** (butuh GPU+internet user, tidak bisa di
+sandbox ini): perilaku nyata `is_plausible_collocation` saat benar-benar
+dipanggil dari `_pick_verb_lemma` (baru diverifikasi mekanisme kontrol
+alirnya secara standalone, bukan end-to-end dengan model nyata), dan
+apakah threshold 0.43 masih pas di skala produksi (baru dikalibrasi di
+20 pasangan, bukan ratusan).
+
+**File:** `src/collocation_plausibility.py` (baru),
+`src/exaone_provider.py` (`_pick_verb_lemma` + 2 prompt kritik),
+`requirements.txt` (+sentence-transformers==6.1.0).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

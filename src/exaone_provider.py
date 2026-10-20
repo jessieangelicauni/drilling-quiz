@@ -68,6 +68,7 @@ import torch
 from kiwipiepy import Kiwi
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
+from collocation_plausibility import is_plausible_collocation
 from distractor_validator import (
     adj_relativizer_ending,
     expected_object_particle,
@@ -536,6 +537,19 @@ _CRITIC_VERB_PROMPT = (
     '"{slot}"에서 자연스러운 한국어 동사 기본형(반드시 "다"로 끝나야 함) 딱 하나만 다시 써줘. '
     '설명이나 다른 말 없이 동사만 출력해.'
 )
+# Separate wording for the OTHER failure mode _pick_verb_lemma can now detect
+# (collocation_plausibility.py): grammatically a valid verb lemma, but a bad
+# semantic fit for the slot (the "커피 -> 차다" case this whole gate exists
+# for). Telling the model "that's not a verb ending in 다" when it clearly IS
+# one would be factually wrong feedback and defeat the critic loop's own
+# premise (PRD §9.14: show the model an ACCURATE diagnosis of its own
+# mistake, not a generic retry prompt).
+_CRITIC_VERB_PLAUSIBILITY_PROMPT = (
+    '방금 "{slot}"에 대해 "{bad_output}"라고 답했는데, 이건 한국어 동사 기본형으로는 맞지만 '
+    '"{slot}"와 의미상 자연스럽게 어울리지 않아 (실제로 그 상황에서 하는 행동이 아니야).\n'
+    '"{slot}"에서 실제로 자연스러운 한국어 동사 기본형(반드시 "다"로 끝나야 함) 딱 하나만 다시 써줘. '
+    '설명이나 다른 말 없이 동사만 출력해.'
+)
 
 
 class ExaoneGrammarProvider:
@@ -601,10 +615,19 @@ class ExaoneGrammarProvider:
         return self.tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip()
 
     def _pick_verb_lemma(self, prompt_template: str, slot: str, use_critic: bool = True) -> str | None:
+        """Grammatical check (_extract_verb_lemma) alone is not enough here --
+        it only confirms the LLM's answer IS a dictionary-form verb, not that
+        it's a SENSIBLE one for `slot` (the "커피 -> 차다"/"kick coffee"
+        failure that led to this fallback being gated at all is perfectly
+        well-formed grammatically). collocation_plausibility.is_plausible_
+        collocation adds that missing semantic check -- see that module's
+        docstring for the calibration evidence and its one disclosed known
+        weakness (topically-related-but-wrong pairs like "공원"/"마시다").
+        """
         prompt = prompt_template.format(slot=slot)
         text = self._generate_raw([{"role": "user", "content": prompt}])
         verb = _extract_verb_lemma(text)
-        if verb is not None:
+        if verb is not None and is_plausible_collocation(slot, verb):
             return verb
         if not use_critic:
             return None
@@ -621,7 +644,12 @@ class ExaoneGrammarProvider:
         # conversation, changing the actual context rather than hoping for
         # different luck.
         self.critic_attempts += 1
-        critic_prompt = _CRITIC_VERB_PROMPT.format(slot=slot, bad_output=text[:50])
+        if verb is None:
+            critic_prompt = _CRITIC_VERB_PROMPT.format(slot=slot, bad_output=text[:50])
+        else:
+            # Grammatically fine (it passed _extract_verb_lemma) but rejected
+            # by is_plausible_collocation -- give the accurate diagnosis.
+            critic_prompt = _CRITIC_VERB_PLAUSIBILITY_PROMPT.format(slot=slot, bad_output=verb)
         messages = [
             {"role": "user", "content": prompt},
             {"role": "assistant", "content": text},
@@ -629,7 +657,7 @@ class ExaoneGrammarProvider:
         ]
         revised_text = self._generate_raw(messages)
         revised_verb = _extract_verb_lemma(revised_text)
-        if revised_verb is not None:
+        if revised_verb is not None and is_plausible_collocation(slot, revised_verb):
             self.critic_recoveries += 1
             return revised_verb
         return None  # critic-assisted retry also failed; caller retries/skips
