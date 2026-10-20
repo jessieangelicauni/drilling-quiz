@@ -4187,5 +4187,72 @@ Tidak bisa dites end-to-end (tidak ada GPU di sandbox ini).
 
 ---
 
+### 9.67 Hasil Step 2/2 + perbandingan feedback: `solver_check.py` DIREVERT (regresi nyata), `qwen_feedback.py` DIPERTAHANKAN (scope Inggris saja), `exaone_provider.py` BELUM diputuskan (butuh isolasi ulang)
+
+**Hasil Step 2/2 nyata** (user jalankan di GPU):
+```
+overall_solver_key_accept_rate: 0.6636 -> 0.5500  (turun 11.4 poin, REGRESI)
+log_likelihood overall_pass_rate: 0.9808 -> 0.8462  (turun 13.5 poin, REGRESI)
+relative_discrimination_drop: tidak berubah (metrik ini memang tidak bergantung model)
+lm_plausibility overall_pass_rate: tidak berubah (pakai kiwipiepy, bukan LLM)
+```
+2 metrik yang DIKUTIP LANGSUNG di paper (87.5%/94.2%) turun signifikan
+dengan EXAONE-3.5-7.8B sebagai solver. Ini PERSIS skenario yang sudah
+ditulis sebagai kondisi revert di komentar kode `solver_check.py`
+sendiri sejak swap awal (§9.51): *"If EXAONE-3.5-7.8B regresses either
+check(c) key-acceptance or the log-likelihood gap, revert _MODEL_NAME
+to Qwen/Qwen3-4B"* — kondisi itu sekarang terpenuhi, bukan hipotetis
+lagi.
+
+**Hasil `compare_feedback_models.py`** (16 perbandingan: 4 item x 2
+bahasa x 2 jalur): Bahasa Inggris — EXAONE dan Qwen3 sama bagus di
+8/8 kasus, tidak ada kesalahan fakta. **Bahasa Indonesia — EXAONE
+bermasalah serius**: `fast_feedback[id]` terpotong di tengah kalimat
+di SEMUA 4 kasus, mengandung kata tidak nyata ("nenyawa", "dalyang",
+"saatane"); `detailed_feedback[id]` kasus 읽은/읽는 EXAONE menulis
+**"Jawaban Benar: 읽는"** — TERBALIK dari jawaban sebenarnya
+(`correct='읽은'`), kesalahan fakta yang bisa menyesatkan pembelajar.
+Qwen3 bersih di semua 16 kasus termasuk Indonesia.
+
+**Keputusan user**: target produk saat ini CUMA Bahasa Inggris —
+jalur Indonesia TETAP ADA di kode (tidak dihapus) tapi TIDAK AKTIF
+dipakai pengguna sekarang. Jadi:
+- **`solver_check.py` → DIREVERT ke `Qwen/Qwen3-4B`** (bf16, tanpa
+  quantization). Regresinya tidak terkait bahasa sama sekali (soal
+  akurasi menilai partikel Korea), jadi tidak terpengaruh keputusan
+  scope-Inggris — tetap direvert.
+- **`qwen_feedback.py` TETAP EXAONE-3.5-7.8B** — Inggris (satu-satunya
+  yang dipakai aktif) terbukti bagus di semua 8 kasus. Masalah kualitas
+  Indonesia (terpotong, kata ngaco, 1 kasus jawaban terbalik) DICATAT
+  sebagai known issue, bukan diperbaiki sekarang — harus diperbaiki
+  SEBELUM jalur Indonesia diaktifkan ke pengguna nyata, jangan
+  diasumsikan aman.
+- **`exaone_provider.py` BELUM diputuskan** — `overall_generation_pass_rate`-nya
+  sendiri tidak berubah (100%→100%), tapi `overall_solver_key_accept_rate`
+  (metrik gabungan generator+solver) ikut terpengaruh regresi
+  `solver_check.py` yang lama (saat itu KEDUANYA masih EXAONE) — efek
+  generator SENDIRI belum bisa dipisahkan dari run sebelumnya. User
+  minta diuji ULANG sekarang dengan `solver_check.py` sudah balik ke
+  Qwen3, supaya `overall_solver_key_accept_rate` yang baru murni
+  mengukur kualitas generator EXAONE dinilai oleh solver yang SUDAH
+  terbukti baik (Qwen3) — isolasi yang lebih bersih.
+
+**Diverifikasi**: diff eksplisit vs versi pre-swap (`ab81d8a`) dicek
+dulu (cuma konstanta model + kode loading yang beda, konsisten dengan
+revert `qwen_feedback.py` sebelumnya). `py_compile` lolos.
+
+**Langkah berikut untuk user**: `git pull` lalu
+`python3 src/verify_exaone35_swap.py` lagi — sekarang `solver_check.py`
+pakai Qwen3, `exaone_provider.py` masih EXAONE. Kalau
+`overall_solver_key_accept_rate` SEKARANG mendekati/menyamai baseline
+asli (0.6636), itu konfirmasi generator EXAONE sendiri baik-baik saja,
+regresi sebelumnya murni dari solver. Kalau MASIH jauh di bawah,
+berarti generator EXAONE juga berkontribusi ke masalah, perlu
+dipertimbangkan revert juga.
+
+**File:** `src/solver_check.py` (dikembalikan ke `Qwen/Qwen3-4B`, bf16).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
