@@ -2695,6 +2695,24 @@ commit hasilnya, sama seperti `1_validation_results.json` sebelumnya,
 supaya SEMUA angka yang dikutip paper punya artefak ter-verifikasi,
 bukan cuma 3 dari 5.
 
+**Update (2026-10-20): gap ke-5 ditutup.** User menjalankan
+`validate_log_likelihood.py` sungguhan di mesin GPU (Qwen3-4B asli,
+bukan stub) dan commit `log_likelihood_results.json`. Hasil:
+**94.2%** (49/52) — cocok persis dengan klaim §9.35. Sekarang **5 dari
+5** skrip validasi permanen punya artefak hasil ter-commit
+(`1_validation_results.json`, `2_validation_results.json`,
+`item_discrimination_results.json`, `lm_plausibility_results.json`,
+`log_likelihood_results.json`) — setiap angka eval yang dikutip di
+paper sekarang bisa diverifikasi ulang siapa pun tanpa perlu
+menjalankan ulang simulasi/model dari nol.
+
+**Masih belum tersimpan** (tercatat eksplisit, bukan lupa): perbandingan
+Qwen3 (87.5%) vs EXAONE (48.2%) di §9.36 — PRD sendiri mencatat itu
+"skrip ad-hoc di scratchpad, tidak dipermanenkan" karena hasil
+negatif untuk EXAONE dianggap tidak perlu direproduksi rutin. Beda
+kategori dari 5 skrip di atas (yang permanen by design), jadi tidak
+termasuk gap yang perlu ditutup di sini.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
