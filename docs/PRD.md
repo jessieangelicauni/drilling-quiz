@@ -3898,5 +3898,56 @@ file dihapus (lihat atas).
 
 ---
 
+### 9.61 Investigasi kategori edit-operation KAGAS (SPELL) via data KoLLA yang sudah ada — kandidat skill ke-12
+
+**Konteks**: user tanya kenapa 7 kategori edit-operation KAGAS
+(INS/DEL/WS/WO/SPELL/PUNCT/SHORT) tidak diimplementasikan, lalu minta
+investigasi apakah bisa "dilatih atau dari corpus/library transformers"
+untuk mengisi gap ini.
+
+**Koreksi atas penjelasan sebelumnya**: tidak semua 7 kategori
+edit-operation memang tidak cocok format pilihan-ganda-cloze yang
+dipakai 11 skill ini — SPELL, WS (spasi), SHORT (pemendekan) secara
+struktural BISA jadi item cloze sama seperti yang sudah ada. Yang
+benar-benar sulit cuma INS/DEL/WO (soal keberadaan/urutan token, bukan
+substitusi satu blank — butuh perubahan format item, bukan cuma
+tabel baru).
+
+**Temuan konkret**: survei taksonomi `investigate_kolla_corpus.py` di
+§9.59 (run nyata user) sudah menunjukkan `R:SPELL: 1986` — JAUH lebih
+banyak dari seluruh kategori partikel digabung (329 total). Ini data
+yang SUDAH ADA di mesin user (`kolla_corpus_download/`), tidak perlu
+download ulang.
+
+**`src/investigate_kolla_spell.py`** (baru): reuse `parse_m2`/
+`download_and_extract` dari `investigate_kolla_corpus.py` (bukan
+duplikasi), filter khusus `etype == "R:SPELL"`, laporkan: (a) jumlah
+pasangan (asli, koreksi) UNIK, (b) berapa yang BERULANG (count>=2 —
+indikasi konfusi sistematis seperti 되/돼, bukan typo acak per-esai),
+(c) top-40 pasangan terbanyak, (d) sampel pasangan singleton untuk
+menilai apakah long-tail-nya memang typo acak atau masih berpola.
+
+**Aturan keputusan eksplisit di skrip**: beberapa pasangan dengan
+count>=10 = kandidat skill baru yang layak (format sama seperti 11
+skill lain: cloze blank, bentuk benar vs bentuk salah-umum sebagai
+distraktor) — ini Opsi A (kurasi berbasis frekuensi) untuk KATEGORI
+BARU, bukan untuk skill yang sudah ada. Kalau 1986 koreksi tersebar di
+ratusan pasangan nyaris-unik dengan repetisi rendah per-pasangan →
+errornya kemungkinan besar typo acak per-individu, bukan konfusi
+sistematis — tidak layak jadi skill baru meski totalnya besar
+(jumlah besar tidak otomatis = pola yang bisa dipelajari, perlu dicek
+distribusinya, bukan cuma totalnya).
+
+**Diverifikasi**: `py_compile` lolos, parsing `R:SPELL` dites terhadap
+sampel M2 sintetis — mekanisme ekstraksi (original dari token-index S
+line, dipasangkan dengan correction) terkonfirmasi benar.
+
+**Belum dijalankan**: hasil nyata (apakah SPELL benar-benar punya pola
+sistematis yang layak) masih pending run user.
+
+**File:** `src/investigate_kolla_spell.py` (baru).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
