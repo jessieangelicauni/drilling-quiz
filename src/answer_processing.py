@@ -46,7 +46,7 @@ from difficulty_heuristic import estimate_difficulty
 from exaone_provider import GeneratedItem
 from qwen_feedback import QwenFeedbackProvider
 from streak import StreakState
-from urnings_tracker import UrnState, is_mastered, seed_item_from_encoder, should_escalate
+from urnings_tracker import UrnState, is_mastered, seed_item_from_encoder, should_escalate_full
 from urnings_tracker import update as urnings_update
 from vocab_scheduler import new_vocab_card
 from vocab_scheduler import review as vocab_review
@@ -73,12 +73,17 @@ def submit_grammar_answer(state: UserDrillState, item: GeneratedItem, chosen_opt
 
     new_learner_urn, new_item_urn = urnings_update(learner_urn, item_urn, correct, rng)
     state.skill_profile.set(item.skill_id, new_learner_urn)
+    # Eq. 3's OTHER disjunct (PRD §9.38): previously the whole
+    # consecutive(m_j)>=2 trigger had nothing to read from anywhere in
+    # this codebase, so escalation silently only ever checked urn width.
+    # Updated unconditionally (correct answers reset the streak).
+    consecutive = state.skill_profile.record_outcome(item.skill_id, correct, item.kagas_code)
 
     feedback = None
     if not correct:
         correct_text = item.options[item.answer]
         wrong_text = item.options[chosen_option]
-        if should_escalate(new_learner_urn):
+        if should_escalate_full(new_learner_urn, consecutive):
             feedback = feedback_provider.detailed_feedback(item.stem, correct_text, wrong_text)
         else:
             feedback = feedback_provider.fast_feedback(item.stem, correct_text, wrong_text)

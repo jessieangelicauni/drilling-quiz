@@ -140,6 +140,18 @@ def should_escalate(learner: UrnState, tau: float = 0.15) -> bool:
     return learner.width() > tau
 
 
+def should_escalate_full(learner: UrnState, consecutive_misconceptions: int, tau: float = 0.15) -> bool:
+    """Eq. 3 in full: w_k > tau  OR  consecutive(m_j) >= 2. should_escalate()
+    above only ever implemented the first disjunct -- the second had
+    nothing to read from anywhere in this codebase until
+    LearnerSkillProfile.record_outcome() (PRD §9.38) started tracking it.
+    Use this, not should_escalate() alone, wherever Eq. 3's actual trigger
+    is meant to fire -- answer_processing.py was silently only checking
+    half of it before this was found and fixed.
+    """
+    return should_escalate(learner, tau) or consecutive_misconceptions >= 2
+
+
 def is_mastered(learner: UrnState, k_threshold: float = 0.8) -> bool:
     """Mastery criterion (PRD §2.1, corrected PRD §9.28): k/n >= k_threshold.
 
@@ -175,6 +187,12 @@ class LearnerSkillProfile:
         self.user_id = user_id
         self.n_default = n_default
         self._skills: Dict[str, UrnState] = {}
+        # Eq. 3's consecutive(m_j) >= 2 trigger (PRD §9.38): per-skill
+        # (last misconception KAGAS code, consecutive count). Found
+        # entirely unimplemented -- answer_processing.py only ever
+        # checked should_escalate()'s width disjunct; this half of the
+        # OR had nothing to read from anywhere in the codebase.
+        self._consecutive: Dict[str, tuple] = {}
 
     def get(self, skill_id: str) -> UrnState:
         if skill_id not in self._skills:
@@ -184,6 +202,24 @@ class LearnerSkillProfile:
     def set(self, skill_id: str, state: UrnState) -> None:
         self._skills[skill_id] = state
 
+    def record_outcome(self, skill_id: str, correct: bool, misconception_code: str | None = None) -> int:
+        """Update and return the consecutive-same-misconception count for
+        this skill: resets to 0 on a correct answer or when no
+        misconception code is available (e.g. subj_topic, which carries
+        kagas_code=None by design); increments only when the SAME code
+        repeats back-to-back, otherwise restarts at 1.
+        """
+        if correct or misconception_code is None:
+            self._consecutive[skill_id] = (None, 0)
+            return 0
+        last_code, count = self._consecutive.get(skill_id, (None, 0))
+        count = count + 1 if misconception_code == last_code else 1
+        self._consecutive[skill_id] = (misconception_code, count)
+        return count
+
+    def consecutive_misconceptions(self, skill_id: str) -> int:
+        return self._consecutive.get(skill_id, (None, 0))[1]
+
     def competency_percent(self, skill_id: str) -> float:
         return 100.0 * self.get(skill_id).proportion()
 
@@ -192,12 +228,14 @@ class LearnerSkillProfile:
 
     def to_dict(self) -> dict:
         return {"user_id": self.user_id, "n_default": self.n_default,
-                "skills": {s: st.to_dict() for s, st in self._skills.items()}}
+                "skills": {s: st.to_dict() for s, st in self._skills.items()},
+                "consecutive": {s: list(v) for s, v in self._consecutive.items()}}
 
     @staticmethod
     def from_dict(d: dict) -> "LearnerSkillProfile":
         p = LearnerSkillProfile(d["user_id"], d["n_default"])
         p._skills = {s: UrnState.from_dict(st) for s, st in d["skills"].items()}
+        p._consecutive = {s: tuple(v) for s, v in d.get("consecutive", {}).items()}
         return p
 
 
@@ -239,5 +277,29 @@ if __name__ == "__main__":
 
     d = profile.to_dict()
     assert LearnerSkillProfile.from_dict(d).competency_percent("honorifics") == 87.5
+
+    # Eq. 3's consecutive(m_j) >= 2 trigger (PRD §9.38) -- real assertions,
+    # not just "must not raise": a narrow (low-width) urn so should_escalate()
+    # alone would say no, isolating this mechanism from the width disjunct.
+    narrow = UrnState(k=29, n=32)  # width well under tau=0.15
+    assert not should_escalate(narrow), "test setup must start width-safe to isolate this check"
+    cprofile = LearnerSkillProfile("u2")
+    assert cprofile.consecutive_misconceptions("particle_loc") == 0
+    c1 = cprofile.record_outcome("particle_loc", correct=False, misconception_code="PART")
+    assert c1 == 1 and not should_escalate_full(narrow, c1), "one wrong answer must not escalate"
+    c2 = cprofile.record_outcome("particle_loc", correct=False, misconception_code="PART")
+    assert c2 == 2 and should_escalate_full(narrow, c2), (
+        "two CONSECUTIVE wrong answers with the SAME misconception must escalate "
+        "even when width alone would not")
+    c3 = cprofile.record_outcome("particle_loc", correct=False, misconception_code="END")
+    assert c3 == 1, "a DIFFERENT misconception must restart the streak at 1, not keep counting"
+    c4 = cprofile.record_outcome("particle_loc", correct=True)
+    assert c4 == 0, "a correct answer must reset the streak to 0"
+    assert cprofile.consecutive_misconceptions("particle_loc") == 0
+    # subj_topic carries kagas_code=None by design (§9.11) -- must never
+    # accumulate a streak, not silently count None==None as a match.
+    s1 = cprofile.record_outcome("subj_topic", correct=False, misconception_code=None)
+    s2 = cprofile.record_outcome("subj_topic", correct=False, misconception_code=None)
+    assert s1 == 0 and s2 == 0, "a skill with no misconception code must never trigger this path"
 
     print("all smoke tests passed")

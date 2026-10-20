@@ -2457,5 +2457,54 @@ tapi sekarang punya 2 alternatif yang sudah dibuktikan lebih buruk.
 
 ---
 
+### 9.38 Separuh trigger eskalasi (Eq. 3) sama sekali tidak terimplementasi — ditemukan dan diperbaiki di kode
+
+Lanjutan audit. Eq. 3 paper: `escalate ⟺ w_k > τ ∨ consecutive(m_j) ≥ 2`
+— dicek langsung, `should_escalate()` cuma mengimplementasikan disjunct
+PERTAMA (width). Grep `consecutive` di seluruh `src/`: **nol hasil** di
+luar yang baru saya tulis. `answer_processing.py` memanggil
+`should_escalate(new_learner_urn)` TANPA informasi misconception apa
+pun — separuh kondisi OR itu tidak pernah ada tempat untuk dibaca dari
+mana pun di kode. Sama kategorinya dengan temuan minimal-pair-probe
+(§9.sebelumnya) tapi arahnya beda: ini bukan fitur fiktif yang perlu
+dihapus, tapi fitur nyata, implementable, dan sudah dispesifikasi jelas
+di paper — jadi diperbaiki di KODE (pola yang sama dengan fix 85% di
+§9.32).
+
+**Diimplementasikan**:
+- `urnings_tracker.py`: `LearnerSkillProfile` dapat `_consecutive: Dict[skill_id, (kagas_code, count)]`
+  + method `record_outcome(skill_id, correct, misconception_code)` (reset
+  ke 0 saat benar ATAU saat kagas_code None — misalnya subj_topic yang
+  memang `kagas_code=None` by design, §9.11 — jadi tidak pernah salah
+  mengakumulasi; increment cuma kalau kode SAMA PERSIS dengan yang
+  terakhir, restart ke 1 kalau beda) + `consecutive_misconceptions(skill_id)`.
+  `to_dict`/`from_dict` diperbarui ikut menyimpan state ini.
+- Fungsi baru `should_escalate_full(learner, consecutive_count, tau)` =
+  `should_escalate(learner, tau) OR consecutive_count >= 2` — implementasi
+  Eq. 3 LENGKAP, bukan cuma separuh.
+- `answer_processing.py`: `submit_grammar_answer` sekarang memanggil
+  `skill_profile.record_outcome(item.skill_id, correct, item.kagas_code)`
+  (data `kagas_code` ini SUDAH ADA di `GeneratedItem` sejak §9.27 —
+  prasyaratnya kebetulan sudah terpasang, tinggal disambungkan) dan pakai
+  `should_escalate_full(...)` menggantikan `should_escalate(...)`.
+
+**Smoke test baru** (`urnings_tracker.py`) memverifikasi mekanisme
+secara terisolasi dari width: urn SENGAJA dibuat sempit (k=29, width
+di bawah τ) supaya width SENDIRI tidak memicu eskalasi — lalu
+dikonfirmasi 1 jawaban salah TIDAK eskalasi, 2 jawaban salah berturut-
+turut dengan misconception SAMA baru eskalasi, misconception BEDA
+me-reset hitungan ke 1 (bukan lanjut), jawaban benar me-reset ke 0, dan
+skill dengan `kagas_code=None` (subj_topic) tidak pernah terpicu sama
+sekali. Dijalankan dengan GPU asli (`answer_processing.py`'s smoke test
+penuh), semua lulus.
+
+**Paper TIDAK perlu diubah** — Eq. 3 dan teksnya sudah akurat
+menggambarkan desain yang dimaksud dari awal; sekarang untuk pertama
+kalinya juga akurat menggambarkan implementasi.
+
+**File:** `src/urnings_tracker.py`, `src/answer_processing.py`.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
