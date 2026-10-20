@@ -1,10 +1,10 @@
-# Literature Review — 15 Sources (2024–2026) & Research Gaps
+# Literature Review — 13 Sources (2024–2026) & Research Gaps
 
 **Scope:** Personalized Korean drill-quiz generation — LLM item generation,
 psychometric item/learner calibration, and Korean L2 learning technology.
 **Selection criteria:** published 2024–2026, from IEEE, Springer, Elsevier,
 Wiley, Taylor & Francis, or SAGE. No arXiv, no MDPI, no preprint-only
-sources. All 15 are drawn from the 41-reference list already verified
+sources. All 13 are drawn from the 42-reference list already verified
 against the Crossref API for `paper/KO-DRILL_IEEE.docx`.
 **Note on "open access":** publisher reputability and peer-review status
 were verified for every entry; gold/hybrid open-access status was not
@@ -12,8 +12,8 @@ independently re-confirmed per article (several Elsevier/Wiley/SAGE venues
 are hybrid) and should be checked against the publisher page if OA is a
 hard requirement for submission.
 
-**Note on link verification:** all 15 DOIs below were resolved against
-`https://doi.org/` and confirmed to redirect to a live publisher page — 7 resolve directly; the other 8 (Wiley/SAGE/Taylor & Francis) return HTTP 403 to automated tools because those publishers block scripted requests, not because the link is broken — the DOI redirect itself succeeds (confirmed via the redirect `Location` header), and a normal browser click reaches the article.
+**Note on link verification:** all 13 DOIs below were resolved against
+`https://doi.org/` and confirmed to redirect to a live publisher page — 6 resolve directly; the other 7 (Wiley/SAGE/Taylor & Francis, plus one Springer venue in this set that gates access behind an identity-provider redirect) return HTTP 403 or a login wall to automated tools because those publishers block scripted requests, not because the link is broken — the DOI redirect itself succeeds (confirmed via the redirect `Location` header), and a normal browser click reaches the article.
 
 ---
 
@@ -39,11 +39,35 @@ data, from the same research lineage that operates Math Garden — direct
 evidence this isn't an outsider's critique of Elo but a refinement by the
 team that runs one of the largest Elo-based adaptive-learning deployments.
 
+### 3. Psychometrics of an Elo-Based Large-Scale Online Learning System
+H. Vermeiren, J. Kruis, M. Bolsinova, H. L. J. van der Maas, A. D. Hofman — *Computers and Education: Artificial Intelligence*, 8, 100376, Jun. 2025. Elsevier (CC BY-NC-ND, immediate OA — verified directly via Crossref license metadata, not assumed).
+**Link:** https://doi.org/10.1016/j.caeai.2025.100376
+
+Documents item drift and an unmodelled speed–accuracy tradeoff inside a
+real large-scale deployed Elo system (Prowise Learn, same lineage as
+[1]/[2]), and patches both with a new response-time-aware scoring rule
+and a fixed item-scale anchor. A third independent confirmation that
+plain Elo needs active patching to survive production use, not just a
+theoretical failure mode.
+
+### 4. Balancing Stability and Flexibility: A Dynamic K-Value Approach for the Elo Rating System in Adaptive Learning Environments
+H. Vermeiren, A. D. Hofman, M. Bolsinova, H. L. J. van der Maas, W. Van Den Noortgate — *User Modeling and User-Adapted Interaction*, 36(1), Art. 4, Dec. 2025 (print Mar. 2026). Springer (CC BY-NC-ND, immediate OA — verified directly via Crossref license metadata).
+**Link:** https://doi.org/10.1007/s11257-025-09439-z
+
+Targets Elo's fixed-K tradeoff directly: a large K tracks real ability
+change but is volatile; a small K is stable but lags behind it. Proposes
+a K that adapts to the trend in recent rating changes, validated by
+simulation against existing K-adjustment strategies. A third,
+independent fix to the same underlying problem [1] proves analytically —
+distinct from the Urnings line in [2] and the response-time/item-drift
+fixes in [3], underscoring how unresolved plain Elo's failure mode still
+is across the field.
+
 ---
 
 ## B. Can an LLM Judge Its Own Difficulty? — No
 
-### 3. Item Difficulty Modeling Using Fine-Tuned Small and Large Language Models
+### 5. Item Difficulty Modeling Using Fine-Tuned Small and Large Language Models
 M. Li, H. Jiao, T. Zhou, N. Zhang, S. Peters, R. W. Lissitz — *Educational and Psychological Measurement*, 85(6), 1065–1090, Dec. 2025. SAGE.
 **Link:** https://doi.org/10.1177/00131644251344973
 
@@ -53,7 +77,7 @@ text, winning a shared-task benchmark. Direct empirical support for using
 a small KLUE-RoBERTa encoder rather than an LLM for the difficulty-prior
 role.
 
-### 4. Leveraging LLM Respondents for Item Evaluation: A Psychometric Analysis
+### 6. Leveraging LLM Respondents for Item Evaluation: A Psychometric Analysis
 Y. Liu, S. Bhandari, Z. A. Pardos — *British Journal of Educational Technology*, 56(3), 1028–1052, May 2025. Wiley.
 **Link:** https://doi.org/10.1111/bjet.13570
 
@@ -74,7 +98,7 @@ one model self-rating its own generated item's difficulty.
 
 ## C. Korean-Specific NLP and Learner Data
 
-### 5. Enriching the Korean Learner Corpus for Grammatical Error Correction and Writing Assessment
+### 7. Enriching the Korean Learner Corpus for Grammatical Error Correction and Writing Assessment
 J. Song, K. Lim, J. Park — *Language Resources and Evaluation*, 60(1), Mar. 2026. Springer.
 **Link:** https://doi.org/10.1007/s10579-025-09882-9
 
@@ -82,7 +106,7 @@ The most recent, largest error-annotated Korean learner corpus. Source
 material for grounding a misconception taxonomy (used alongside KAGAS,
 ACL 2023) in real, attested learner errors rather than invented categories.
 
-### 6. KRongBERT: Enhanced Factorization-Based Morphological Approach for the Korean Pretrained Language Model
+### 8. KRongBERT: Enhanced Factorization-Based Morphological Approach for the Korean Pretrained Language Model
 H. Yu, Y. Cho, G. Park, M. Kim — *Information Processing & Management*, 62(3), 104072, May 2025. Elsevier.
 **Link:** https://doi.org/10.1016/j.ipm.2025.104072
 
@@ -94,36 +118,18 @@ interchangeable with a general multilingual LLM for this task.
 
 ---
 
-## D. Generative AI in Korean / L2 Learning — Current Practice and Its Limits
+## D. LLM-Generated Feedback — Effectiveness Is Not Uniform
 
-### 7. Enhancing Korean as a Foreign Language Learning Through a Mobile-Assisted Blended Course: A Triarchic and Motivational Perspective
-S.-H. Hong, S. C. Yang — *Language Teaching Research*, Sep. 2025. SAGE.
-**Link:** https://doi.org/10.1177/13621688251368643
+**Note (2026-10-20):** this section previously also carried two generic
+generative-AI-in-language-learning papers (reading/vocabulary tooling;
+EFL speaking chatbots). Removed on relevance review — neither was
+Korean-specific, neither addressed drill-quiz items or psychometric
+calibration, and both functioned only as scene-setting padding rather
+than evidence for a specific claim below. The actual Korean-specific
+material lives in Section C; this section now holds only the one source
+that is load-bearing for a specific gap (G3).
 
-Recent empirical KFL (Korean-as-foreign-language) study reporting gains
-from mobile-assisted blended instruction — but the system is not
-adaptive/personalized at the item level, which is precisely the gap this
-project targets.
-
-### 8. Ethically Integrated Generative AI for Reading and Vocabulary Development in Higher Education
-S. Rashid, S. Malik, F. Ghauri — *Asian-Pacific Journal of Second and Foreign Language Education*, 11(1), Sep. 2026. Springer (SpringerOpen, gold OA).
-**Link:** https://doi.org/10.1186/s40862-026-00451-3
-
-Experimental study of generative-AI-supported vocabulary/reading
-development; representative of the current ceiling of generative-AI
-language-learning research — content generation and delivery, but without
-psychometric calibration of what is generated.
-
-### 9. Impact of Generative AI Chatbots and Interaction Modes on the Speaking Proficiency of Adolescent EFL Learners
-T.-Y. Tai, H. H.-J. Chen — *Computer Assisted Language Learning*, 1–30, Oct. 2025. Taylor & Francis.
-**Link:** https://doi.org/10.1080/09588221.2025.2572999
-
-Evaluates generative-AI chatbot interaction for L2 speaking; useful
-counter-example showing generative AI research in language learning
-currently concentrates on conversational practice, not structured,
-difficulty-calibrated assessment items.
-
-### 10. LLM-Generated Feedback Supports Learning if Learners Choose to Use It
+### 9. LLM-Generated Feedback Supports Learning if Learners Choose to Use It
 D. R. Thomas, C. Borchers, S. Bhushan, E. Gatz, S. Gupta, K. R. Koedinger — *Lecture Notes in Computer Science*, vol. 16063, Springer, 2026.
 **Link:** https://doi.org/10.1007/978-3-032-03870-8_33
 
@@ -150,7 +156,7 @@ review or the paper's reference list once removed from this slot.
 
 ## E. Automatic Item and Distractor Generation — State of the Art
 
-### 11. Transformer and Large Language Models for Automatic Multiple-Choice Question Generation: A Systematic Literature Review
+### 10. Transformer and Large Language Models for Automatic Multiple-Choice Question Generation: A Systematic Literature Review
 H. W. Awalurahman, R. F. Aji, I. Budi — *IEEE Access*, 13, 127100–127112, 2025. IEEE (gold OA).
 **Link:** https://doi.org/10.1109/ACCESS.2025.3590423
 
@@ -160,7 +166,7 @@ pedagogical usefulness — general context for why automatic item
 generation research hasn't closed the diagnosis gap (G1) or the
 tracker-validity gap (G2) below on its own.
 
-### 12. Distractor Generation for Multiple-Choice Questions with Predictive Prompting and Large Language Models
+### 11. Distractor Generation for Multiple-Choice Questions with Predictive Prompting and Large Language Models
 S. K. Bitew, J. Deleu, C. Develder, T. Demeester — in *Communications in Computer and Information Science*, Springer, 2025, pp. 48–63. (Springer-published peer-reviewed proceedings volume, not a standalone journal — flagged for transparency.)
 **Link:** https://doi.org/10.1007/978-3-031-74627-7_4
 
@@ -170,7 +176,7 @@ Distractors here are optimized purely for *plausibility*, never for
 diagnosing *which* misconception a wrong answer reveals — the gap
 Novelty 1 (misconception-conditioned distractors) directly addresses.
 
-### 13. Efficient Unified Framework for Difficulty-Controllable Question Generation
+### 12. Efficient Unified Framework for Difficulty-Controllable Question Generation
 X. Dong, Z. Li — *IEEE Access*, 14, 76358–76371, 2026. IEEE (gold OA).
 **Link:** https://doi.org/10.1109/ACCESS.2026.3693277
 
@@ -178,7 +184,7 @@ Combines active-learning labeling with LoRA-based prompting to steer
 generation toward a requested difficulty. One of the few papers to treat
 difficulty control as a first-class generation objective rather than an
 afterthought — but still relies on the generator's own difficulty
-judgment, the same self-rating weakness source [4] documents directly;
+judgment, the same self-rating weakness source [6] documents directly;
 general context, not the closest prior work to either of this paper's
 two novelties specifically (an earlier draft of this review called it
 the closest prior work to a difficulty-calibration novelty that has
@@ -186,16 +192,13 @@ since been removed from the paper entirely, see §9.18 in the project's
 own decision log; corrected here rather than left pointing at something
 that no longer exists).
 
-### 14. Automatic Question-Answer Pairs Generation Using Pre-Trained Large Language Models in Higher Education
-J. Ling, M. Afzaal — *Computers and Education: Artificial Intelligence*, 6, 100252, Jun. 2024. Elsevier.
-**Link:** https://doi.org/10.1016/j.caeai.2024.100252
+**Note (2026-10-20):** this section previously also carried a generic
+"LLM-generated QA pairs for higher education" paper, removed on
+relevance review — it was not Korean, not psychometric, and its own
+entry text already admitted it was "not tied to a specific numbered
+gap below."
 
-Establishes feasibility of LLM-generated QA pairs for higher-education
-assessment at scale — representative baseline of "generate without
-calibrate," general context for the same self-rating weakness [4]
-documents directly; not tied to a specific numbered gap below.
-
-### 15. QuerIA: Adaptive Question Generation and Evaluation in Higher Education Using Large Language Models and Contextual Learning
+### 13. QuerIA: Adaptive Question Generation and Evaluation in Higher Education Using Large Language Models and Contextual Learning
 C. Badenes-Olmedo, P. Eyzaguirre — *Expert Systems with Applications*, 301, 130140, Mar. 2026. Elsevier.
 **Link:** https://doi.org/10.1016/j.eswa.2025.130140
 
@@ -221,27 +224,41 @@ two independent, recent (2025–2026) sources above, not asserted from a
 single paper.
 
 ### G1 — Distractors are optimized for plausibility, not diagnosis
-Evidenced by: [12] (predictive prompting improves plausibility, ceiling
+Evidenced by: [11] (predictive prompting improves plausibility, ceiling
 ~53% teacher-rated quality; no diagnostic labeling of *why* a distractor is
-wrong). Cross-checked against Korean-specific error data in [5] — a
+wrong). Cross-checked against Korean-specific error data in [7] — a
 taxonomy of real, attested Korean learner errors exists and is
 under-exploited by the distractor-generation literature.
 
 ### G2 — Psychometric rating systems are deployed outside their proven validity conditions
 Evidenced by: [1] (analytically proves Elo's specific failure mode:
 simultaneous adaptive selection + dynamic item calibration), [2] (the fix,
-from the same research lineage that runs a major Elo-based deployment).
-**No source in the Korean-/L2-learning literature set [7]–[10] uses
-Urnings or any Elo alternative — all assume either a fixed pre-calibrated
-bank or do not address item-level adaptivity at all.**
+from the same research lineage that runs a major Elo-based deployment);
+[3] and [4] independently confirm plain Elo needs active patching even
+inside a real deployed system (item drift, speed–accuracy tradeoff, the
+fixed-K tradeoff) — four independent groups/fixes for one failure mode,
+not a single paper's claim.
+**No source among the generative-AI-for-education literature reviewed
+here ([9]–[13]) uses Urnings or any Elo alternative — all assume either
+a fixed pre-calibrated bank or do not address item-level adaptivity at
+all.** (Reworded 2026-10-20: the previous "Korean-/L2-learning
+literature set" framing no longer holds — the two papers that made that
+set at all Korean- or L2-specific were removed on relevance review; see
+Section D/E notes. No source reviewed here, Korean-specific or not,
+uses Urnings or an Elo alternative, which is the actual claim this gap
+needs.)
 
 ### G3 — LLM-generated feedback is applied uniformly though its benefit is not
-Evidenced by: [10] (significant learning gains in only 2 of 7 lessons,
-quantified with propensity-adjusted effect sizes of 0.28–0.33). Cross-
-checked against the broader generative-AI-in-Korean/L2 set [7]–[9], none
-of which gate or ration feedback generation by measurement uncertainty —
-feedback is generated the same way for every learner, every time. This
-gap motivates the uncertainty-gated escalation *policy* in the paper
+Evidenced by: [9] (significant learning gains in only 2 of 7 lessons,
+quantified with propensity-adjusted effect sizes of 0.28–0.33). **Single-
+source evidence for this gap** (2026-10-20: the two other papers this
+gap used to cross-check against were removed on relevance review — they
+were generic generative-AI-in-language-learning papers, not actually
+tied to feedback-uncertainty gating, so the cross-check was weaker than
+it looked). None of the generation-focused sources in Section E ([10]–
+[13]) gate or ration output by measurement uncertainty either, though
+none of them generate feedback at all, so that is context, not
+corroborating evidence. This gap motivates the uncertainty-gated escalation *policy* in the paper
 (Section IV-D), reported as an application decision rather than a third
 research novelty — the policy's own width-tracks-error premise was
 tested directly and did not hold at the urn size this system uses
@@ -262,6 +279,6 @@ novelty (see above).
 
 ---
 
-*Full 41-reference list with verified Crossref metadata: see the References
+*Full 42-reference list with verified Crossref metadata: see the References
 section of `paper/KO-DRILL_IEEE.docx`. This file is a curated subset for
 quick literature-review reference, not a replacement for it.*

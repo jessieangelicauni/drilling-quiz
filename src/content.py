@@ -55,7 +55,7 @@ BODY = [
       "principle behind drill practice, and it is well supported: retrieval practice, in "
       "which the learner must produce an answer rather than merely re-read material, "
       "produces more durable memory than passive review, and scheduling that practice "
-      "according to a model of forgetting improves retention further still [28]."),
+      "according to a model of forgetting improves retention further still [26]."),
 
 ("P", "Korean presents a particularly strong case for drill practice, and a particularly "
       "awkward one for existing tools. Korean is an agglutinative language: grammatical "
@@ -65,7 +65,7 @@ BODY = [
       "both are grammatical but convey different emphasis, conjugate verbs that follow "
       "irregular patterns, and select an appropriate level of politeness for the social "
       "relationship being described. Corpus studies of learner writing confirm that these "
-      "are precisely the areas where errors concentrate and persist [24], [25]. They are "
+      "are precisely the areas where errors concentrate and persist [22], [23]. They are "
       "also areas that reward exactly the kind of high-volume, finely targeted practice "
       "that is tedious for a human teacher to prepare."),
 
@@ -74,8 +74,8 @@ BODY = [
       "with plausible wrong answers, is weeks of expert labour. Large language models (LLMs) "
       "have changed this: systematic reviews now document a large and rapidly maturing "
       "literature on automatic question generation, with models producing multiple-choice "
-      "items at a quality that is beginning to approach human-authored material [5], [6], "
-      "[7], [8]. The bottleneck has moved."),
+      "items at a quality that is beginning to approach human-authored material [2], [3], "
+      "[4]. The bottleneck has moved."),
 
 ("P", "Where it has moved to is the subject of this paper. A personalised drill system must "
       "answer two questions on every turn: how good is this learner, and how hard is this "
@@ -89,14 +89,14 @@ BODY = [
       "simulated-respondent studies find a single LLM reproduces human item parameters only "
       "partially—correlated at the item level, but with a narrower ability distribution and "
       "less response variability than real learners, improving only when several models are "
-      "pooled [12]—and small encoders fine-tuned specifically for difficulty regression "
-      "outperform far larger general-purpose models at the task outright [11]. One "
+      "pooled [8]—and small encoders fine-tuned specifically for difficulty regression "
+      "outperform far larger general-purpose models at the task outright [7]. One "
       "might instead reach for deep knowledge tracing, the dominant neural approach to "
-      "learner modelling [19], [20], [21]. But knowledge tracing learns from many learners "
+      "learner modelling [17], [18], [19]. But knowledge tracing learns from many learners "
       "answering the same items; with an item pool that is effectively infinite and a long "
       "tail of items seen a handful of times, there is nothing for it to learn from. This "
       "is the cold-start problem in an unusually severe form, affecting not a minority of "
-      "items but, in principle, all of them [33]."),
+      "items but, in principle, all of them [31]."),
 
 ("P", "This paper takes that problem as its starting point and makes four contributions."),
 
@@ -127,25 +127,24 @@ BODY = [
       "of transformer and LLM approaches to multiple-choice question generation finds "
       "consistent improvement over earlier template and rule-based pipelines, while noting "
       "that evaluation in the field remains dominated by surface metrics of fluency rather "
-      "than measures of pedagogical usefulness [5]. A broader 2026 survey reaches a similar "
-      "conclusion and identifies difficulty control as an open problem [6]. Applied work "
-      "confirms feasibility across subjects: Ling and Afzaal generate question–answer pairs "
-      "for higher education from pre-trained models [7], and Badenes-Olmedo and Eyzaguirre's "
-      "QuerIA system couples generation with evaluation in a university setting [8]. Dong "
+      "than measures of pedagogical usefulness [2]. A broader 2026 survey reaches a similar "
+      "conclusion and identifies difficulty control as an open problem [3]. Applied work "
+      "confirms feasibility: Badenes-Olmedo and Eyzaguirre's "
+      "QuerIA system couples generation with evaluation in a university setting [4]. Dong "
       "and Li address difficulty control directly, combining active learning for labelling "
-      "with low-rank adaptation to steer a model towards a requested difficulty level [9]."),
+      "with low-rank adaptation to steer a model towards a requested difficulty level [5]."),
 
 ("P", "Distractors—the plausible wrong answers in a multiple-choice item—have received "
       "separate attention, because they are harder to produce than the correct answer and "
       "matter more than is often appreciated. A wrong answer that nobody would ever choose "
       "contributes nothing; a wrong answer that is in fact also correct actively damages the "
       "test. Bitew et al. show that predictive prompting improves distractor plausibility "
-      "over prior approaches [10], but the reported ceiling—roughly half of generated "
+      "over prior approaches [6], but the reported ceiling—roughly half of generated "
       "distractors rated high quality by teachers—indicates how much room remains. Crucially, "
       "the entire line of work optimises for plausibility. None of it asks the question we "
       "think is more useful: what does the choice of a particular wrong answer tell us about "
       "the learner? A parallel line of work uses LLMs not to generate educational content but "
-      "to judge it, as Li et al. do for student-generated material in learnersourcing [14]; "
+      "to judge it, as Li et al. do for student-generated material in learnersourcing [10]; "
       "this is closer to the verification role we describe in Section IV-B, though it has not "
       "been applied to checking the grammatical validity of generated distractors."),
 
@@ -161,14 +160,14 @@ BODY = [
       "each LLM's simulated population is narrower and less variable than real test-takers—"
       "so only a pooled ensemble of several models approaches that distribution, and "
       "augmenting real human data with resampled LLM responses helps calibration only with "
-      "caveats [12]. The practical reading for a single-generator pipeline like ours is "
+      "caveats [8]. The practical reading for a single-generator pipeline like ours is "
       "narrower than \"LLMs can self-rate difficulty\": a single LLM is not a population of "
       "learners, and nothing in this result licenses asking one model to introspect about "
       "an item's difficulty on its own."),
 
 ("P", "The second strand is more encouraging and, for our purposes, decisive. Li et al. "
       "treat difficulty estimation as a supervised regression problem over item text and "
-      "fine-tune language models to solve it [11]. Their central finding is that small "
+      "fine-tune language models to solve it [7]. Their central finding is that small "
       "encoder models—BERT and RoBERTa, with hundreds of millions of parameters rather than "
       "tens of billions—outperform much larger models on this task, achieving a root mean "
       "squared error of 0.2926 and beating the winning entry of a shared-task competition. "
@@ -183,17 +182,17 @@ BODY = [
       "be. The deep learning tradition—knowledge tracing—treats the learner's history as a "
       "sequence and trains a neural network to predict the next response. Recent work in "
       "this line is sophisticated: Jiang et al. incorporate item difficulty into a "
-      "multi-view attention architecture [20]; Qian et al. ground an attention mechanism in "
-      "cognitive theory [21]; Tong and Ren combine knowledge tracing with cognitive load "
+      "multi-view attention architecture [18]; Qian et al. ground an attention mechanism in "
+      "cognitive theory [19]; Tong and Ren combine knowledge tracing with cognitive load "
       "estimation to generate learning paths, reporting 87.5% prediction accuracy and a "
-      "24.6% improvement in learning efficiency [19]. Cognitive diagnosis models pursue "
+      "24.6% improvement in learning efficiency [17]. Cognitive diagnosis models pursue "
       "interpretability within the same broad family, with NeuralCD imposing a monotonicity "
-      "constraint so that diagnostic output remains meaningful [22] and later work adding "
-      "multidimensional features [23]."),
+      "constraint so that diagnostic output remains meaningful [20] and later work adding "
+      "multidimensional features [21]."),
 
 ("P", "A related strand models the learner as a persistent profile rather than a response "
       "sequence: Aydın and Yurdugül construct a \u201clearner digital twin\u201d from accumulated "
-      "experience and use it to select instructional scaffolding [32]. This shares our "
+      "experience and use it to select instructional scaffolding [30]. This shares our "
       "motivation of maintaining an explicit, inspectable learner representation, though it "
       "does not address item calibration."),
 
@@ -210,11 +209,16 @@ BODY = [
       "number; after every response both numbers move towards or away from each other in "
       "proportion to how surprising the outcome was. It is trivial to implement, needs no "
       "training data, and updates in constant time, which is why it underpins deployed "
-      "adaptive platforms [18]. Section III-B explains why, despite these virtues, it is the "
-      "wrong choice for the system we are describing."),
+      "adaptive platforms [16]. Even inside such deployments, though, plain Elo keeps "
+      "needing patches: a recent audit of a large-scale deployed system finds item drift "
+      "and an unmodelled speed–accuracy tradeoff [14], and separate work finds its fixed "
+      "update size forces a tradeoff between tracking real ability change and rating "
+      "volatility, proposing a dynamically adjusted update size instead [15]. Section III-B "
+      "explains why, despite these virtues, it is the wrong choice for the system we are "
+      "describing."),
 
 ("P", "The Urnings algorithm offers an alternative with the same operational simplicity and "
-      "better statistical behaviour [16]. Each learner and item is represented not by a "
+      "better statistical behaviour [12]. Each learner and item is represented not by a "
       "point estimate but by an urn containing a fixed number of balls, some green and some "
       "red; the proportion of green balls is the current estimate and the number of balls "
       "controls its precision. Updates exchange balls between the learner's urn and the "
@@ -222,31 +226,28 @@ BODY = [
       "statistically honest. Because the urn has a fixed size, the estimate comes with a "
       "known standard error—something Elo cannot provide—and the algorithm explicitly "
       "corrects for the distortion introduced when items are chosen adaptively. It extends "
-      "naturally to tracking several abilities at once [16], and recent work augments it "
-      "with response times [17]."),
+      "naturally to tracking several abilities at once [12], and recent work augments it "
+      "with response times [13]."),
 
 ("H2", "D. Korean Language Technology and Learner Language"),
 
 ("P", "Korean-specific resources have matured considerably. Song et al. substantially enrich "
       "the Korean learner corpus for grammatical error correction and writing assessment "
-      "[24], building on earlier error-annotated collections; Chun and Kim analyse "
+      "[22], building on earlier error-annotated collections; Chun and Kim analyse "
       "substitution errors between topic and nominative markers in a learner corpus and "
-      "derive pedagogical applications from them [25]. On the modelling side, Yu et al.'s "
+      "derive pedagogical applications from them [23]. On the modelling side, Yu et al.'s "
       "KRongBERT demonstrates that explicitly accounting for Korean morphology in a "
-      "pre-trained encoder improves downstream performance [26], a reminder that Korean's "
+      "pre-trained encoder improves downstream performance [24], a reminder that Korean's "
       "agglutinative structure is not something a general multilingual model handles for "
       "free."),
 
-("P", "Work on AI in Korean language teaching has so far concentrated on conversation and "
-      "motivation rather than on structured assessment. Hong and Yang evaluate a "
-      "mobile-assisted blended Korean course and report gains in both proficiency and "
-      "affective outcomes [1]. Related work in second language learning more broadly "
-      "examines generative AI chatbots for speaking practice [3], vocabulary and reading "
-      "development [4], and the redistribution of agency between learner, teacher and "
-      "machine that generative tools bring about [2]. Assessment-focused studies, meanwhile, "
-      "concentrate on scoring learner production rather than generating practice: automated "
-      "essay scoring with LLMs has been examined for validity and reliability with mixed "
-      "conclusions [30], [31]."),
+("P", "Generative AI applied specifically to Korean language pedagogy is thin next to the "
+      "NLP resources above: the broader second-language-learning literature discusses the "
+      "redistribution of agency between learner, teacher and machine that generative tools "
+      "bring about [1], but structured, difficulty-calibrated assessment is not its focus. "
+      "Assessment-focused studies, meanwhile, concentrate on scoring learner production "
+      "rather than generating practice: automated essay scoring with LLMs has been examined "
+      "for validity and reliability with mixed conclusions [28], [29]."),
 
 ("H2", "E. Lessons from Large-Scale Deployed Systems"),
 
@@ -254,18 +255,18 @@ BODY = [
       "practice systems already do, since reviewers familiar with Duolingo or similar "
       "products will ask the same question. The honest answer is that there is no single "
       "industry standard — four of the most-cited systems solve the problem four different "
-      "ways. Duolingo's practice app schedules review using Half-Life Regression [28], a "
+      "ways. Duolingo's practice app schedules review using Half-Life Regression [26], a "
       "lightweight model trained on thirteen million learning traces, since evolved into "
       "Birdbrain, an LSTM-based system reported to process tens of billions of predictions "
-      "daily across the product's user base [37]. The Duolingo English Test, a separate "
+      "daily across the product's user base [35]. The Duolingo English Test, a separate "
       "system from the practice app, instead scores test-takers with classical item "
-      "response theory inside a computerised-adaptive-testing framework [38]. ALEKS, a "
+      "response theory inside a computerised-adaptive-testing framework [36]. ALEKS, a "
       "widely deployed mathematics tutor, uses neither: it is built on knowledge space "
       "theory, a combinatorial framework that represents a learner's state as the precise "
       "subset of skills mastered and selects items that move the learner to an adjacent "
-      "reachable state [39]. Math Garden uses the Elo-based design discussed in Section "
-      "III-B [40]. Anki's default scheduler, FSRS, fits a compact per-card memory model "
-      "from review history [41]."),
+      "reachable state [37]. Math Garden uses the Elo-based design discussed in Section "
+      "III-B [38]. Anki's default scheduler, FSRS, fits a compact per-card memory model "
+      "from review history [39]."),
 
 ("P", "Two things are notable about this list. First, none of these four systems trains a "
       "large neural network on the scale of Birdbrain unless it has Birdbrain's data volume "
@@ -302,7 +303,7 @@ BODY = [
       "by combining editorial labour with classical or lightly-parameterised statistical "
       "models. We therefore follow industry practice exactly where our data regime matches "
       "theirs — classical or lightweight trackers over learner ability, and a decay-based "
-      "scheduler over review timing, in the spirit of [28] and [41] — and depart from it "
+      "scheduler over review timing, in the spirit of [26] and [39] — and depart from it "
       "only where our resource constraint, not our technical ambition, forces a different "
       "answer: generating and calibrating items we cannot afford to commission."),
 
@@ -313,24 +314,24 @@ BODY = [
       "the last is precisely the gap that large-scale systems sidestep by not generating "
       "items at all."),
 
-("P", "G1. Wrong answers are wasted. Distractors are optimised to be plausible [10], not to "
+("P", "G1. Wrong answers are wasted. Distractors are optimised to be plausible [6], not to "
       "be informative. When a learner selects a particular wrong answer they have revealed "
       "something quite specific about their internal model of the grammar, and current "
       "systems discard that signal, recording only a binary outcome. Cognitive diagnosis "
-      "models would make use of it [22], [23], but they require a pre-specified mapping from "
+      "models would make use of it [20], [21], but they require a pre-specified mapping from "
       "items to skills that generated items do not come with."),
 
 ("P", "G2. Rating systems are used outside their validity conditions. Elo is deployed in "
-      "adaptive platforms [18] in the one configuration where its measurement properties "
+      "adaptive platforms [16] in the one configuration where its measurement properties "
       "break down—simultaneous adaptive item selection and dynamic item calibration—and this "
-      "has only recently been characterised precisely [15]. A generative item pool forces "
+      "has only recently been characterised precisely [11]. A generative item pool forces "
       "exactly that configuration, because items must be calibrated as they are used. We "
       "are not aware of any language learning system that uses Urnings."),
 
 ("P", "G3. Feedback is generated uniformly, and its benefits are not. Thomas et al., studying "
       "on-demand LLM explanatory feedback across seven lessons with 885 learners, found "
       "statistically significant benefits in only two of them, with effect sizes of 0.28 and "
-      "0.33 after adjusting for learners' propensity to request feedback [29]. Feedback is "
+      "0.33 after adjusting for learners' propensity to request feedback [27]. Feedback is "
       "not uniformly valuable, yet systems generate it uniformly, at uniform cost. No "
       "existing work allocates generative effort according to how much the system stands to "
       "learn from the interaction."),
@@ -361,7 +362,7 @@ BODY = [
       "instrument should be small. This is a supervised regression from a short text to a "
       "scalar, with training data measured in thousands rather than millions of examples. "
       "Li et al.'s finding that fine-tuned BERT-class encoders outperform far larger models "
-      "on precisely this task [11] is not an anomaly; it reflects the match between a "
+      "on precisely this task [7] is not an anomaly; it reflects the match between a "
       "compact discriminative model and a narrow mapping. A small encoder is also cheap "
       "enough to run on every generated item in real time, deterministic, and "
       "straightforward to recalibrate on local response data as it accumulates."),
@@ -387,10 +388,10 @@ BODY = [
 ("H2", "B. Is the Elo Rating System the Right Choice?"),
 
 ("P", "No—and this is the clearest-cut of the three questions. Elo is the default in "
-      "adaptive practice platforms [18] for good reasons: one number per learner, one per "
+      "adaptive practice platforms [16] for good reasons: one number per learner, one per "
       "item, constant-time updates, no training phase. But Bolsinova et al. have recently "
       "characterised its failure mode with precision, and the configuration in which it "
-      "fails is exactly the one a generative drill system is forced into [15]."),
+      "fails is exactly the one a generative drill system is forced into [11]."),
 
 ("P", "The mechanism is a feedback loop. Elo is well behaved when items are selected at "
       "random, and tolerable when item difficulties are held fixed. It misbehaves when "
@@ -415,12 +416,12 @@ BODY = [
       "notice; a system that selects items by predicted success probability will, because "
       "that prediction depends on the absolute scale."),
 
-("P", "Two remedies are available. Parallel Elo, proposed in [16], maintains "
+("P", "Two remedies are available. Parallel Elo, proposed in [12], maintains "
       "two independent rating chains updated on alternating responses and selects items "
       "using whichever chain is not currently being updated, which breaks the dependence "
       "between selection and current error. In our simulation it reduces terminal spread "
       "from 2.69 to 1.71 and terminal error from 1.70 to 0.73—a clear improvement that does "
-      "not fully resolve the problem. The Urnings algorithm [16] performs better still, "
+      "not fully resolve the problem. The Urnings algorithm [12] performs better still, "
       "holding spread at 1.11 against the true 1.04 and error at 0.43, flat rather than "
       "rising. Urnings also provides what the selection policy actually needs and Elo cannot "
       "give: a calibrated standard error. We adopt Urnings as the tracker, and retain Elo "
@@ -446,19 +447,19 @@ BODY = [
       "but Korean proficiency is not one thing. A learner may handle particles well and "
       "honorifics poorly. Collapsing this into a scalar discards the structure that makes "
       "personalisation worthwhile. Urnings extends naturally to tracking many abilities "
-      "simultaneously [16], which is what the diagnostic scheme in Section IV-B requires."),
+      "simultaneously [12], which is what the diagnostic scheme in Section IV-B requires."),
 
 ("H2", "C. Which Models for Which Role?"),
 
 ("P", "The role decomposition in Section III-A implies different models for different jobs, "
       "and we largely endorse a three-way split, with one refinement."),
 
-("P", "Korean generation: EXAONE. LG AI Research's EXAONE family [34] is trained with "
+("P", "Korean generation: EXAONE. LG AI Research's EXAONE family [32] is trained with "
       "Korean as a first-class language rather than as one of many, which matters in two "
       "concrete ways. Its tokeniser segments Hangul efficiently, reducing both cost and the "
       "morphological fragmentation that inflates sequence length for Korean in "
       "English-centric tokenisers—the same consideration that motivates KRongBERT's "
-      "morphological factorisation [26]. EXAONE's role in this system is generation only "
+      "morphological factorisation [24]. EXAONE's role in this system is generation only "
       "(item stems, verb lemmas), and its non-reasoning mode is sufficient for that "
       "narrow task throughout—we do not exercise its reasoning mode anywhere, so we do not "
       "claim its hybrid design as a property this system relies on. The escalation policy "
@@ -469,7 +470,7 @@ BODY = [
 
 ("P", "English explanatory feedback: Qwen3. The user-facing explanation is a cross-lingual "
       "task, not an English one: the model must reason about Korean morphology while writing "
-      "in English. This favours a model with strong multilingual grounding, and Qwen3 [35], "
+      "in English. This favours a model with strong multilingual grounding, and Qwen3 [33], "
       "pre-trained across 119 languages with a large vocabulary and documented strength on "
       "CJK languages, is a better fit than a model whose multilingual coverage is broad but "
       "shallower on Korean. Gemma-class models are a reasonable alternative where a smaller "
@@ -477,9 +478,9 @@ BODY = [
       "a commitment."),
 
 ("P", "Difficulty prediction: KLUE-RoBERTa. We endorse this without reservation as the "
-      "target architecture. A Korean encoder pre-trained on the KLUE benchmark suite [36] "
+      "target architecture. A Korean encoder pre-trained on the KLUE benchmark suite [34] "
       "and fine-tuned for difficulty regression is the right instrument for the reasons "
-      "given in Section III-A and directly supported by Li et al. [11]. Our one refinement "
+      "given in Section III-A and directly supported by Li et al. [7]. Our one refinement "
       "is that the encoder should not emit a point estimate. It should emit a mean and a "
       "variance, because that distribution becomes the prior for the psychometric tracker, "
       "and an item the encoder is unsure about should enter the pool with correspondingly "
@@ -522,7 +523,7 @@ BODY = [
       "information. Fig. 2 shows the design."),
 
 ("P", "Rather than inventing a project-specific error scheme, we ground the taxonomy ℳ in "
-      "KAGAS, the 14-category Korean Automatic Grammatical error Annotation System [24], "
+      "KAGAS, the 14-category Korean Automatic Grammatical error Annotation System [22], "
       "which already defines and independently validates categories spanning particle "
       "substitution, honorific agreement, and verb-conjugation errors, among others. Using "
       "an external, independently defined taxonomy rather than one we compiled ourselves "
@@ -533,8 +534,8 @@ BODY = [
       "the distractor with m_{j}."),
 
 ("P", "This inverts the usual relationship between item and skill mapping. Cognitive "
-      "diagnosis models require a matrix mapping items to skills, supplied by experts [22], "
-      "[23]; here the mapping is a by-product of generation, because the system knows which "
+      "diagnosis models require a matrix mapping items to skills, supplied by experts [20], "
+      "[21]; here the mapping is a by-product of generation, because the system knows which "
       "misconception it asked for. Diagnosis then becomes almost trivial: a learner who "
       "selects d_{j} has supplied evidence against skill m_{j} specifically, and only that "
       "dimension of their ability vector is updated. A drill item becomes a diagnostic "
@@ -649,12 +650,12 @@ BODY = [
       "goal is to help them learn: a 50% success rate is demoralising over a long "
       "practice session. Wilson et al. derive 85% as the optimal training accuracy for "
       "gradient-descent binary classifiers, and are explicit that this is not a universal "
-      "constant to target in every setting [27]—we do not claim stronger support from "
+      "constant to target in every setting [25]—we do not claim stronger support from "
       "that result than the authors themselves do. What does transfer is the qualitative "
       "shape of the argument, independently supported in human learning specifically by "
       "the desirable-difficulties literature: moderate, well-calibrated challenge "
       "produces more durable learning than either trivial or overwhelming difficulty "
-      "[44]. We treat 85% as a principled starting point motivated by both, not a "
+      "[42]. We treat 85% as a principled starting point motivated by both, not a "
       "value proven optimal for Korean grammar drilling, and the discrimination-index "
       "check below is in part how we verify this starting point is not actively harmful. "
       "We therefore select"),
@@ -674,7 +675,7 @@ BODY = [
       "rather than a qualitative one. The trade-off is real, as stated, but the items this "
       "policy serves remain psychometrically sound; this was not previously measured and is "
       "not assumed. Vocabulary scheduling across sessions follows a spacing model in the "
-      "tradition of half-life regression [28], with the tracker posterior supplying the "
+      "tradition of half-life regression [26], with the tracker posterior supplying the "
       "ability term; grammar skills are scheduled differently, stated plainly rather than "
       "left for a reader to assume the same mechanism applies to both. A generated grammar "
       "item is mostly non-repeating, so there is no fixed card for a half-life model to "
@@ -708,13 +709,13 @@ BODY = [
 ("EQ", "escalate  ⟺  w_{k} > τ   ∨   consecutive(m_{j}) ≥ 2\t(3)"),
 
 ("P", "This targets gap G3—that feedback is generated uniformly although its benefits are "
-      "not [29]—economically and pedagogically: reasoning-mode inference is substantially "
+      "not [27]—economically and pedagogically: reasoning-mode inference is substantially "
       "more expensive, and the finding that LLM feedback produced significant gains in only "
-      "two of seven lessons [29] suggests uniform feedback dilutes its own effect. We "
+      "two of seven lessons [27] suggests uniform feedback dilutes its own effect. We "
       "deliberately do not claim w_{k} is a calibrated estimate of the learner's absolute "
       "distance from their true ability; we tested that stronger claim directly and it does "
       "not hold at this urn size (a controlled simulation gives corr(w_{k}, true error) = "
-      "−0.76, and a regression-calibration check [42], [43] finds credible intervals built "
+      "−0.76, and a regression-calibration check [40], [41] finds credible intervals built "
       "from w_{k} are overconfident by 6–11 percentage points). What this policy spends "
       "computation on is ambiguity in the observable record, not estimation error, which is "
       "why Eq. 3 is reported here as a working application policy—measured to escalate on "
@@ -740,7 +741,7 @@ BODY = [
       "covering 7 of the 7 relevant KAGAS part-of-speech categories. The gap between "
       "120 and 11 is simply unimplemented coverage, not a claim about what has been "
       "tested—every number in Section V-B below is reported at the 11-skill scale, never "
-      "projected onto the full syllabus. The misconception taxonomy is KAGAS [24], the "
+      "projected onto the full syllabus. The misconception taxonomy is KAGAS [22], the "
       "14-category Korean grammatical error taxonomy, rather than a project-specific "
       "scheme, so that the diagnostic labels a generated distractor carries are "
       "independently defined and independently auditable. All generated items entering "
@@ -791,7 +792,7 @@ BODY = [
       "Fleiss' κ. Two measures matter most. First, the rate of items containing more than "
       "one defensible answer, since this is the failure the verifier gate in Section IV-B "
       "exists specifically to catch, and it is the one the general distractor-generation "
-      "literature does not report [10]. Second, agreement between the KAGAS label a "
+      "literature does not report [6]. Second, agreement between the KAGAS label a "
       "distractor was generated to realise and the label an instructor independently "
       "assigns after seeing only the distractor — this is the direct test of whether "
       "misconception-conditioning actually produces a usable diagnosis, or merely a "
@@ -835,7 +836,7 @@ BODY = [
       "as a foreign language at CEFR A2–B1 equivalent, block-randomised by placement score "
       "into three arms. Arm A receives a fixed expert-authored item bank in random order. "
       "Arm B receives the same fixed bank with Elo-based adaptive selection, representing "
-      "current good practice [18]. Arm C receives the full KO-DRILL system. Arms A and B "
+      "current good practice [16]. Arm C receives the full KO-DRILL system. Arms A and B "
       "share an item bank so that the effect of generation is separable from the effect of "
       "adaptivity. Running this pilot at the full scale implied by Fig. 5 — three arms of "
       "60 — is desirable but not required before the claims in Subsections B through C can "
@@ -850,7 +851,7 @@ BODY = [
       "judgement, and completion rate. We note plainly that a sample of 60 per arm gives "
       "80% power to detect a standardised between-arm difference of only d = 0.51 "
       "two-sided, or d = 0.59 Bonferroni-corrected across the three pairwise comparisons — "
-      "larger than the 0.28–0.33 range reported for LLM feedback alone [29]. This is a "
+      "larger than the 0.28–0.33 range reported for LLM feedback alone [27]. This is a "
       "known limitation of the pilot, not of the paper's technical claims, which is "
       "exactly why Subsections B through C are designed to stand independently of it."),
 
@@ -915,13 +916,9 @@ BODY = [
 ]
 
 REFERENCES = [
- "S.-H. Hong and S. C. Yang, “Enhancing Korean as a foreign language learning through a mobile-assisted blended course: A triarchic and motivational perspective,” <i>Language Teaching Research</i>, Sep. 2025, doi: 10.1177/13621688251368643.",
  "R. Godwin-Jones, “Distributed agency in second language learning and teaching through generative AI,” <i>Language Learning &amp; Technology</i>, vol. 28, no. 2, pp. 5–31, Jun. 2024, doi: 10.64152/10125/73570.",
- "T.-Y. Tai and H. H.-J. Chen, “Impact of generative AI chatbots and interaction modes on the speaking proficiency of adolescent EFL learners,” <i>Computer Assisted Language Learning</i>, pp. 1–30, Oct. 2025, doi: 10.1080/09588221.2025.2572999.",
- "S. Rashid, S. Malik, and F. Ghauri, “Ethically integrated generative AI for reading and vocabulary development in higher education: An experimental study of efficacy and learner perceptions,” <i>Asian-Pacific Journal of Second and Foreign Language Education</i>, vol. 11, no. 1, Sep. 2026, doi: 10.1186/s40862-026-00451-3.",
  "H. W. Awalurahman, R. F. Aji, and I. Budi, “Transformer and large language models for automatic multiple-choice question generation: A systematic literature review,” <i>IEEE Access</i>, vol. 13, pp. 127100–127112, 2025, doi: 10.1109/ACCESS.2025.3590423.",
  "R. Oliveira, A. Hernández, M. Garbin, J. Dos Reis, and R. Azevedo, “Automatic question generation with large language models: A survey,” <i>ACM Computing Surveys</i>, vol. 58, no. 15, pp. 1–34, Nov. 2026, doi: 10.1145/3832773.",
- "J. Ling and M. Afzaal, “Automatic question-answer pairs generation using pre-trained large language models in higher education,” <i>Computers and Education: Artificial Intelligence</i>, vol. 6, p. 100252, Jun. 2024, doi: 10.1016/j.caeai.2024.100252.",
  "C. Badenes-Olmedo and P. Eyzaguirre, “QuerIA: Adaptive question generation and evaluation in higher education using large language models and contextual learning,” <i>Expert Systems with Applications</i>, vol. 301, p. 130140, Mar. 2026, doi: 10.1016/j.eswa.2025.130140.",
  "X. Dong and Z. Li, “Efficient unified framework for difficulty-controllable question generation: Large language models enabling active learning labeling and prompt-based low-rank adaptation,” <i>IEEE Access</i>, vol. 14, pp. 76358–76371, 2026, doi: 10.1109/ACCESS.2026.3693277.",
  "S. K. Bitew, J. Deleu, C. Develder, and T. Demeester, “Distractor generation for multiple-choice questions with predictive prompting and large language models,” in <i>Communications in Computer and Information Science</i>, Cham, Switzerland: Springer, 2025, pp. 48–63, doi: 10.1007/978-3-031-74627-7_4.",
@@ -932,6 +929,8 @@ REFERENCES = [
  "M. Bolsinova, B. Gergely, and M. J. S. Brinkhuis, “Keeping Elo alive: Evaluating and improving measurement properties of learning systems based on Elo ratings,” <i>British Journal of Mathematical and Statistical Psychology</i>, vol. 79, no. 1, pp. 95–110, Feb. 2026, doi: 10.1111/bmsp.12395.",
  "M. Bolsinova, M. J. S. Brinkhuis, A. D. Hofman, and G. Maris, “Tracking a multitude of abilities as they develop,” <i>British Journal of Mathematical and Statistical Psychology</i>, vol. 75, no. 3, pp. 753–778, Nov. 2022, doi: 10.1111/bmsp.12276.",
  "B. Gergely and M. Bolsinova, “Toward psychometric learning analytics: Augmenting the Urnings algorithm with response times,” <i>Journal of Educational Measurement</i>, vol. 63, no. 1, Mar. 2026, doi: 10.1111/jedm.70026.",
+ "H. Vermeiren, J. Kruis, M. Bolsinova, H. L. J. van der Maas, and A. D. Hofman, “Psychometrics of an Elo-based large-scale online learning system,” <i>Computers and Education: Artificial Intelligence</i>, vol. 8, p. 100376, Jun. 2025, doi: 10.1016/j.caeai.2025.100376.",
+ "H. Vermeiren, A. D. Hofman, M. Bolsinova, H. L. J. van der Maas, and W. Van Den Noortgate, “Balancing stability and flexibility: Investigating a dynamic K value approach for the Elo rating system in adaptive learning environments,” <i>User Modeling and User-Adapted Interaction</i>, vol. 36, no. 1, Art. 4, Dec. 2025, doi: 10.1007/s11257-025-09439-z.",
  "B. Vesin, K. Mangaroska, K. Akhuseyinoglu, and M. Giannakos, “Adaptive assessment and content recommendation in online programming courses: On the use of Elo-rating,” <i>ACM Transactions on Computing Education</i>, vol. 22, no. 3, pp. 1–27, Sep. 2022, doi: 10.1145/3511886.",
  "C. Tong and C. Ren, “Deep knowledge tracing and cognitive load estimation for personalized learning path generation using neural network architecture,” <i>Scientific Reports</i>, vol. 15, no. 1, Jul. 2025, doi: 10.1038/s41598-025-10497-x.",
  "X. Jiang, B. Yang, and W. Liu, “DMAM: Difficulty-enhanced multi-view attention-based model for knowledge tracing,” <i>Knowledge-Based Systems</i>, vol. 324, p. 113736, Aug. 2025, doi: 10.1016/j.knosys.2025.113736.",
@@ -987,7 +986,7 @@ FIGURES = [
   "2.69 against a true value of 1.04 and is still rising; Urnings holds at 1.11. (b) Elo's "
   "error against true ability grows after roughly 15,000 responses, so the estimates get "
   "worse as more data arrives. This reproduces, at realistic scale, the failure characterised "
-  "analytically by Bolsinova et al. [15]; Section IV-C/V-C repeat it with a genuinely "
+  "analytically by Bolsinova et al. [11]; Section IV-C/V-C repeat it with a genuinely "
   "uncalibrated prior injected, Novelty 2's own evidence."),
  ("figures/fig5_experiment.png", 7.0,
   "Fig. 5. Human study design. Arms A and B share a fixed expert-authored item bank so that the "

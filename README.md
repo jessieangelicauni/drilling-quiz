@@ -2,7 +2,7 @@
 
 **Mulai dari sini:** [`docs/PRD.md`](docs/PRD.md) — semua alasan desain (kenapa Parallel Elo bukan DKT, kenapa EXAONE/Qwen3/KLUE-RoBERTa, tiga novelty riset, apa yang sengaja TIDAK dikerjakan) jadi satu acuan.
 
-**Literature review:** [`docs/literature-review-15.md`](docs/literature-review-15.md) — 15 curated sources (2024–2026, IEEE/Springer/Elsevier/Wiley/Taylor & Francis/SAGE only, no arXiv/MDPI) with DOI links and explicit research-gap mapping.
+**Literature review:** [`docs/literature-review-15.md`](docs/literature-review-15.md) — 13 curated sources (2024–2026, IEEE/Springer/Elsevier/Wiley/Taylor & Francis/SAGE only, no arXiv/MDPI) with DOI links and explicit research-gap mapping.
 
 Personalised Korean drill quizzes: a psychometrically grounded LLM pipeline.
 
