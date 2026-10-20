@@ -125,6 +125,7 @@ _VERB_PROMPT_HONORIFIC = (
 
 SKILL_SPECS = {
     "particle_loc": {
+        "kagas_code": "PART",  # official mapping, PRD §9.8
         "tag": "JKB",
         # Fixed by construction: "저는 [place] ___ [activity verb]." is an
         # activity-at-a-location frame, which always wants 에서 -- this
@@ -143,6 +144,7 @@ SKILL_SPECS = {
         },
     },
     "particle_obj": {
+        "kagas_code": "PART",  # official mapping, PRD §9.8
         "tag": "JKO",
         # Correct form is computed per-noun (batchim rule), not fixed.
         "correct_form": None,
@@ -166,6 +168,7 @@ SKILL_SPECS = {
         # (these nouns are honorific-worthy by social convention, not by
         # any rule kiwipiepy or an LLM could derive) plus the batchim rule.
         "kind": "verb_ending",
+        "kagas_code": "END",  # official mapping, PRD §9.8
         "tag": "EF",
         "slots": ("선생님", "할머니", "교수님", "사장님", "의사선생님"),
         "verb_prompt": _VERB_PROMPT_HONORIFIC,
@@ -186,6 +189,7 @@ SKILL_SPECS = {
         # detected from free text, same principle as particle_loc's fixed
         # "에서" for the activity-at-a-location frame.
         "kind": "paired_particle",
+        "kagas_code": "PART",  # official mapping, PRD §9.8
         "tag": "JX",
         "correct_form": "부터",
         "distractor_form": "까지",
@@ -207,6 +211,7 @@ SKILL_SPECS = {
         # only correct choice.
         "kind": "verb_ending",
         "variant": "tense",
+        "kagas_code": "END",  # official mapping, PRD §9.8
         "tag": "EF",
         "slots": ("밥", "영화", "책", "커피", "숙제"),
         "verb_prompt": (
@@ -241,6 +246,7 @@ SKILL_SPECS = {
         # harmony-correct ending the way kiwi.join() would, then it's
         # concatenated literally onto the uncontracted stem.
         "kind": "irregular_conj",
+        "kagas_code": "CONJ",  # official mapping, PRD §9.9
         "tag": "EF",
         "pairs": (
             ("머리를", "자르다"),
@@ -273,6 +279,7 @@ SKILL_SPECS = {
         # ㅂ/ㄹ/으 irregular contractions correctly by construction);
         # distractor_form is always the hand-built stem+는 concatenation.
         "kind": "adj_relativizer",
+        "kagas_code": "ADJ",  # official mapping, PRD §9.10
         "tag": "ETM",
         "pairs": (
             ("맵다", "음식"),    # ㅂ-irregular: 매운, not *맵는
@@ -306,6 +313,13 @@ SKILL_SPECS = {
         # gluing "제" (the contracted stem, only valid before 가) onto "는"
         # and producing the invalid "*제는".
         "kind": "subj_topic",
+        # NOT an official KAGAS code -- deliberately outside the KAGAS
+        # framework (PRD §9.11), built from a pedagogical convention (누가
+        # question-answer focus), not a KAGAS-annotated error type. None
+        # here, not a made-up code, so downstream consumers (e.g. the
+        # KAGAS-agreement proxy) can tell "not applicable" apart from a
+        # real category and skip/flag it rather than silently mis-score it.
+        "kagas_code": None,
         "tag": "JKS",
         "distractor_tag": "JX",
         "pairs": (
@@ -328,6 +342,7 @@ SKILL_SPECS = {
         # unchanged (see _build_verb_choice_item), same division of
         # responsibility as irregular_conj/honorific.
         "kind": "verb_choice",
+        "kagas_code": "VERB",  # official mapping, PRD §9.22
         "tag": "EF",
         "pairs": (
             ("숙제", "하다", "보다"),    # do homework, not "see" it
@@ -347,6 +362,7 @@ SKILL_SPECS = {
         # particle choice on the counted noun itself (already its own
         # skill, subj_topic) by using a fixed topic frame instead.
         "kind": "noun_counter",
+        "kagas_code": "NOUN",  # official mapping, PRD §9.22
         "tag": "NNB",
         "pairs": (
             ("사과", "개", "명"),
@@ -366,6 +382,7 @@ SKILL_SPECS = {
         # morphological skills than to the two lexical ones above, found
         # while designing this skill, not assumed going in.
         "kind": "mod_adverb",
+        "kagas_code": "MOD",  # official mapping, PRD §9.22
         "tag": "EC",
         "distractor_tag": "ETM",
         "pairs": (
@@ -386,6 +403,18 @@ class GeneratedItem:
     blank_marker: str
     options: dict[str, str]
     answer: str
+    # KAGAS misconception code the correct-vs-distractor pair is meant to
+    # realise (PRD §9.8), or None for subj_topic (deliberately outside the
+    # KAGAS framework, see SKILL_SPECS). Added so a KAGAS-agreement check
+    # -- human or LLM-proxy -- has something to compare its own judgement
+    # against; previously missing entirely (PRD §9.19).
+    kagas_code: str | None = None
+    # Which option label is the PRIMARY misconception distractor (as
+    # opposed to one of the 2 morphologically-safe fillers from
+    # _pick_fillers, which carry no intended misconception at all) --
+    # needed so a KAGAS-agreement rater is told which option to judge,
+    # not left to guess among 3 non-answer options.
+    primary_distractor_label: str | None = None
 
 
 def _extract_verb_lemma(text: str) -> str | None:
@@ -457,7 +486,9 @@ class ExaoneGrammarProvider:
 
         item_id = f"grammar-{skill_id}-{self._counter}"
         self._counter += 1
-        self.items[item_id] = GeneratedItem(skill_id, stem, "___", options, answer_label)
+        kagas_code = SKILL_SPECS.get(skill_id, {}).get("kagas_code")
+        self.items[item_id] = GeneratedItem(skill_id, stem, "___", options, answer_label,
+                                             kagas_code, primary_distractor_label=labels[1])
         return item_id
 
     def _generate_raw(self, messages: list[dict]) -> str:

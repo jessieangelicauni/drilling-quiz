@@ -10,7 +10,11 @@ Backs three PRD decisions (docs/PRD.md §2.1, §3.3):
   - Novelty 1: seed_item_from_encoder() converts an encoder's (mu_hat,
     sigma_hat2) difficulty prediction into initial urn composition/size.
   - Novelty 3: should_escalate() gates expensive feedback on urn width.
-  - Mastery criterion: is_mastered() reuses the same width primitive.
+  - Mastery criterion: is_mastered() is k/n alone (PRD §9.28) -- it used
+    to also gate on width, presented as reusing the escalation primitive
+    for a second independent signal; proven structurally impossible for
+    k >= n/2 at any n, not just mistuned, and dropped rather than
+    re-tuned. See is_mastered()'s own docstring for the proof.
 """
 from __future__ import annotations
 
@@ -136,15 +140,32 @@ def should_escalate(learner: UrnState, tau: float = 0.15) -> bool:
     return learner.width() > tau
 
 
-def is_mastered(learner: UrnState, k_threshold: float = 0.8,
-                 width_threshold: float = 0.15) -> bool:
-    """Mastery criterion (PRD §2.1): high estimate AND low uncertainty.
+def is_mastered(learner: UrnState, k_threshold: float = 0.8) -> bool:
+    """Mastery criterion (PRD §2.1, corrected PRD §9.28): k/n >= k_threshold.
 
-    Revocable by construction: if new wrong answers push k/n back down or
-    widen the urn again, this simply stops returning True on the next call
-    -- there is no separate "mastered" flag to unset.
+    Used to carry a second "AND width() < width_threshold" condition,
+    presented as an independent "high estimate AND low uncertainty" check
+    reusing the escalation primitive. Proven structurally impossible, not
+    just mistuned: width(k, n) = 2*sqrt(Beta(k+.5, n-k+.5) variance) is
+    monotonically DECREASING in k for every k >= n/2, for ANY n (the Beta
+    variance is maximal at the midpoint by construction) -- so a width<tau
+    condition on the SAME (k, n) pair the k/n condition reads is always
+    reducible to some other k-threshold, never an independent second
+    signal. Checked directly for n=32/64/128 at k_threshold=0.8,
+    width_threshold=0.15: width is already below 0.15 the moment k/n first
+    reaches 0.8, at every n tested -- the clause never excluded anything
+    the k/n clause didn't already exclude. Dropped rather than re-tuned,
+    since no width_threshold value could fix this for k >= n/2 -- if a
+    genuinely independent "how settled is this" signal is wanted later, it
+    needs a different source of evidence (e.g. recent k-trend volatility,
+    not a snapshot of current (k, n)), not a second snapshot-based
+    threshold on the same urn.
+
+    Revocable by construction: if new wrong answers push k/n back down,
+    this simply stops returning True on the next call -- there is no
+    separate "mastered" flag to unset.
     """
-    return learner.proportion() >= k_threshold and learner.width() < width_threshold
+    return learner.proportion() >= k_threshold
 
 
 class LearnerSkillProfile:

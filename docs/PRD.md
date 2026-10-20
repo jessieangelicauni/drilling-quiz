@@ -117,7 +117,7 @@ masing-masing punya karakteristik data yang beda dan butuh solusi beda.
 | **Posisi Parallel Elo** | Tidak dibuang — didokumentasikan sebagai alternatif "ringan" untuk deployment produksi nanti kalau proyek keluar dari tahap riset (lisensi/SLA/tim engineering kecil jadi pertimbangan saat itu), dan tetap jadi baseline pembanding di evaluasi (§5) supaya kontribusi Urnings terukur, bukan diasumsikan. |
 | **Ditolak** | Deep Knowledge Tracing (DKT/SAKT/AKT) — data terlalu kecil, tidak interpretable, tidak perlu untuk novelty riset kita. Cognitive diagnosis model (NeuralCD) — butuh matriks item-skill yang di-supply expert; taksonomi kita (§3.2) justru membuat mapping ini otomatis dari proses generate, jadi CDM jadi tidak perlu. **Glicko-2** — dipertimbangkan serius (lihat `src/simulate_drift.py`): punya rating deviation (RD) native, kontinu, tanpa masalah diskritisasi urn. Menang telak di simulasi ability statis, tapi begitu ability dibuat naik seiring waktu (regime sungguhan untuk drilling app), RD-nya mengecil lalu "terkunci" — makin lama makin tertinggal dari kemampuan asli yang membaik (RMSE akhir 1.05, hampir seburuk Elo polos). Konsekuensi produk konkret: kalau dipakai untuk status mastery (lihat baris **Mastery criterion** di bawah), siswa bisa macet di status "mastered" walau sudah mulai salah lagi — bertentangan langsung dengan fitur *"requeue wrong answer until mastered"* yang mengasumsikan status itu harus bisa dicabut. Tidak ada precedent literatur yang memakai Glicko di regime item-baru-tanpa-kalibrasi ini (lihat `docs/literature-review-15.md` gap G3) — keputusan ini murni dari simulasi sendiri, bukan dari otoritas sumber luar. |
 | **Multi-skill** | Satu learner punya **banyak** ability — satu per skill (partikel, honorifik, konjugasi, dst — lihat KAGAS §3.2), bukan satu angka tunggal. Urnings diperluas jadi vektor skill, bukan skalar. |
-| **Mastery criterion** | Satu dimensi skill dinyatakan **mastered** kalau `k/n ≥ ambang` (contoh: 0.8) **DAN** lebar urn `w_k < τ` — persis primitive yang sama dengan uncertainty-gated escalation (Novelty 3, §3.3), dipakai ulang untuk kegunaan ketiga. Status ini **harus bisa dicabut**: kalau urn bergerak turun lagi setelah jawaban salah berulang, status mastered hilang otomatis — konsisten dengan fitur *"requeue wrong answer until mastered"*. Ini salah satu alasan Glicko ditolak (lihat baris Ditolak) — urn yang terbatas selalu punya ruang gerak, RD Glicko yang mengecil terus tidak. |
+| **Mastery criterion** | **Diperbaiki 2026-10-20, lihat §9.28 — baris ini dulu salah.** Satu dimensi skill dinyatakan **mastered** kalau `k/n ≥ ambang` (0.8) SAJA. Dulu ditulis "DAN lebar urn `w_k < τ`", diklaim dua sinyal independen memakai ulang primitive escalation (Novelty 3, §3.3) untuk kegunaan ketiga — **terbukti mustahil secara struktural, bukan cuma salah kalibrasi**: `width(k,n)` monoton turun untuk k≥n/2 di SEMUA n, jadi kondisi width di atas urn yang sama selalu bisa direduksi ke suatu ambang-k lain, tidak pernah benar-benar independen. Dihapus, bukan dikalibrasi ulang (lihat §9.28 untuk pembuktian lengkap). Status tetap **harus bisa dicabut**: kalau k/n turun lagi setelah jawaban salah berulang, status mastered hilang otomatis — konsisten dengan fitur *"requeue wrong answer until mastered"*, dan ini TIDAK berubah dari penghapusan kondisi width (revocation selalu didorong oleh k/n, bukan width, lihat §9.28). Alasan Glicko ditolak (baris Ditolak) tetap berlaku tanpa berubah. |
 | **Kompetensi per topik (fitur produk)** | `k/n` per skill **langsung** jadi angka "kompetensi %" yang ditampilkan ke admin/guru (fitur *"Track per-user competency in each topic"*) — tidak perlu formula konversi tambahan, beda dari rating Elo/Glicko yang perlu dinormalisasi dulu sebelum bisa ditampilkan sebagai persentase. |
 
 ### 2.2 Scheduling (soal apa berikutnya, kapan diulang)
@@ -1806,6 +1806,133 @@ dilaporkan-jujur (width/kalibrasi, §9.24-9.25), satu positif (item
 discrimination, §9.26). Jangan biarkan nada investigasi terus-menerus
 negatif membuat user mengira semuanya bermasalah — laporkan temuan baik
 sama jujurnya dengan temuan buruk.
+
+---
+
+### 9.27 Field `kagas_code` ditambahkan ke `GeneratedItem` + proxy rating KAGAS pertama (bukan pengganti studi instruktur manusia)
+
+User minta dua hal: (1) tambah field kode KAGAS ke tiap skill/item — prasyarat
+yang sejak §9.19 sengaja belum dikerjakan; (2) pilih model yang tepat untuk
+proxy rating otomatis yang jujur soal keterbatasannya.
+
+**Field ditambahkan** (`src/exaone_provider.py`): `SKILL_SPECS` tiap skill
+sekarang punya `"kagas_code"` sesuai pemetaan resmi §9.8/§9.9/§9.10/§9.22 —
+particle_loc/particle_obj/time_range→PART, honorific/tense_past→END,
+irregular_conj→CONJ, adj_relativizer→ADJ, verb_choice→VERB, noun_counter→NOUN,
+mod_adverb→MOD, subj_topic→**None eksplisit** (bukan ditebak kode apa pun —
+§9.11 sudah bilang ini di luar kerangka KAGAS). `GeneratedItem` dataclass
+dapat 2 field baru: `kagas_code` (diisi dari spec di `_assemble_options`,
+titik konstruksi tunggal, jadi otomatis berlaku ke semua 11 skill) dan
+`primary_distractor_label` (label mana di antara 4 opsi yang distractor
+UTAMA — bukan salah satu dari 2 filler dari `_pick_fillers` yang sama sekali
+tidak dimaksudkan membawa misconception apa pun). Tanpa field kedua ini,
+rater (manusia atau proxy) tidak akan tahu opsi mana yang sebenarnya mau
+dinilai. Diverifikasi via `__main__` smoke test asli (GPU), bukan stub —
+5/5 semua skill, `kagas_code` dan `primary_distractor_label` muncul benar
+di output.
+
+**Pemilihan model untuk proxy**: satu-satunya model yang ter-cache di
+mesin ini (EXAONE-4.0-1.2B, EXAONE-3.5-2.4B, Qwen3-4B, Qwen3-1.7B) semuanya
+dari 2 keluarga yang SUDAH dipakai di generator/solver — pakai salah
+satunya lagi berarti bias keluarga-model yang sama persis dengan masalah
+yang mau dihindari. Memuat model ketiga cuma untuk tugas klasifikasi
+ringan ini dinilai tidak proporsional (biaya download+GPU besar untuk
+sinyal tambahan yang sejak awal cuma dimaksudkan sebagai bukti lemah,
+bukan pengganti rater manusia). **Dipilih: Claude (saya sendiri) sebagai
+rater independen** — arsitektur/perusahaan/data latih sama sekali berbeda
+dari EXAONE (LG AI) maupun Qwen (Alibaba), nol biaya infrastruktur
+tambahan, kompetensi bahasa Korea+linguistik cukup untuk tugas klasifikasi
+7-kategori ini.
+
+**Prosedur, dijaga buta sungguhan**: generate 30 item nyata (3/skill ×
+10 skill yang punya kode KAGAS resmi, subj_topic dikecualikan karena
+`kagas_code=None`), simpan ke file blind yang MENGHAPUS `true_kagas_code`
+DAN `skill_id` (skill_id 1:1 dengan kode jadi akan membocorkan jawaban),
+baca cuma file blind itu, putuskan kode KAGAS untuk tiap distractor utama
+tanpa melihat kunci, simpan keputusan ke file terpisah, BARU dibandingkan
+dengan kunci asli.
+
+**Hasil: 30/30 (100%) agreement.** Dilaporkan jujur dengan satu caveat
+penting, bukan dioversell: 100% ini sebagian besar karena kategori yang
+diuji (PART/END/CONJ/ADJ/VERB/NOUN/MOD) secara STRUKTURAL mudah dibedakan
+dari bentuk permukaannya saja (particle vs akhiran kata kerja vs batang
+tak-teratur vs akhiran relativizer vs kelas kata leksikal) — siapa pun
+(manusia atau LLM) yang tahu definisi 7 kategori ini kemungkinan besar
+akan setuju. **Ini memvalidasi bahwa pemetaan skill→KAGAS internal
+konsisten dan tidak asal tempel** — bukti bahwa infrastruktur dasarnya
+benar. **Ini TIDAK memvalidasi** pertanyaan yang lebih halus yang studi
+instruktur manusia (Fleiss' κ, Section V.B) dirancang untuk jawab:
+apakah misconception SPESIFIK yang direpresentasikan tiap distractor
+terasa alami/masuk akal bagi pelajar sungguhan untuk verb/kata tertentu
+itu — itu soal kualitas pedagogis dalam kategori, bukan soal kategori
+mana yang benar, dan 30/30 di sini tidak menyentuhnya sama sekali.
+
+**Belum ditambahkan ke teks paper** — ditahan sengaja sampai user
+memutuskan apakah proxy ini layak disebut di Section V (sebagai sinyal
+tambahan lemah, jelas dibedakan dari studi instruktur) atau cukup jadi
+bukti internal/PRD saja. Section V.A/V.B paper tidak diubah sesi ini.
+
+**File:** `src/exaone_provider.py` (`kagas_code`/`primary_distractor_label`
+di `SKILL_SPECS` dan `GeneratedItem`). Skrip rating ad-hoc dan hasil mentah
+disimpan di scratchpad sesi, belum jadi skrip permanen di `src/` — kalau
+studi ini mau diulang rutin (misalnya tiap kali skill baru ditambah),
+pertimbangkan jadi skrip permanen `validate_kagas_agreement.py`.
+
+---
+
+### 9.28 `is_mastered()`'s kondisi width — TERBUKTI mustahil secara struktural untuk SEMUA n, dihapus (bukan dikalibrasi ulang)
+
+Lanjutan follow-up yang di-flag di §9.24/perc akapan sebelumnya ("satu
+follow-up yang perlu di-flag... width<0.15 juga dipakai is_mastered()").
+User eksplisit minta diselesaikan sampai tuntas sebelum ada klaim paper
+yang menyentuhnya.
+
+**Temuan awal (sudah dicek giliran lalu)**: untuk n=32, k_threshold=0.8,
+width_threshold=0.15 — begitu `k/n≥0.8` (k≥26), `width<0.15` SELALU sudah
+benar juga (width(26)=0.1364). Kondisi width tidak pernah menyaring apa
+pun di luar yang k/n sudah saring.
+
+**Diperdalam sekarang — ternyata bukan soal kalibrasi angka, tapi
+struktural, berlaku untuk SEMUA ukuran urn:** `width(k,n) = 2√(Var Beta(k+.5,
+n-k+.5))`, dan `Var ∝ (k+.5)(n-k+.5)` dengan `(k+.5)+(n-k+.5) = n+1`
+KONSTAN (tidak bergantung k) — parabola terbuka ke bawah, maksimum di
+k=n/2, **monoton turun untuk setiap k≥n/2, untuk SEMUA n**. Dicek langsung
+(bukan cuma aljabar) di n=32/64/128: ketiganya monoton turun sempurna di
+rentang [n/2, n], dan di ketiganya width pada k=⌈0.8n⌉ SUDAH di bawah 0.15
+(0.1364 / 0.0970 / 0.0699). **Konsekuensi: TIDAK ADA pilihan
+`width_threshold` yang bisa membuat kondisi width menyaring sesuatu yang
+belum disaring `k_threshold` — karena kedua kondisi dibaca dari (k,n) yang
+SAMA, dan width monoton di k, kondisi width SELALU bisa direduksi jadi
+ambang-k lain.** Ini bukan masalah "angka 0.15 dan 0.8 kebetulan tidak
+cocok" (seperti bug `tau=0.2` di §9.24) — ini mustahil secara matematis
+untuk kombinasi APA PUN dari k_threshold≥0.5 dan width_threshold.
+
+**Keputusan, konsisten dengan prinsip yang baru disepakati user
+(hapus klaim yang tak terdukung, jangan dilunakkan/disembunyikan)**:
+kondisi width **dihapus** dari `is_mastered()`, bukan dikalibrasi ulang
+(tidak ada kalibrasi yang bisa memperbaikinya). `is_mastered()` sekarang
+cuma `proportion() >= k_threshold`. Docstring fungsi dan modul
+(`urnings_tracker.py`) ditulis ulang menjelaskan pembuktian ini secara
+eksplisit, bukan cuma menghapus diam-diam. Smoke test (`__main__`) tetap
+lulus tanpa perubahan — dicek langsung, tidak ada caller (`answer_processing.py`,
+`grammar_scheduler.py`) yang pernah memanggil dengan `width_threshold`
+custom, jadi perubahan default behavior ini aman.
+
+**Revocable mastery TIDAK rusak oleh penghapusan ini** — fitur "status
+hilang otomatis kalau jawaban salah berulang" selalu didorong oleh k/n
+turun, bukan oleh width (karena keduanya bergerak bersamaan, width cuma
+konfirmasi berlebih yang sekarang terbukti tidak pernah jadi faktor
+pembeda). Baris "Mastery criterion" di §2.1 (tabel keputusan) diperbaiki
+mengikuti temuan ini.
+
+**Kalau sinyal "seberapa settled" yang genuinely independen tetap
+diinginkan nanti**: perlu sumber bukti yang BUKAN snapshot (k,n) yang
+sama — misalnya volatilitas tren k dalam M respons terakhir — bukan
+ambang kedua di atas urn yang sama. Dicatat sebagai opsi masa depan,
+bukan dikerjakan sekarang (di luar scope yang diminta).
+
+**Paper (`src/content.py`) tidak perlu diubah** — dicek, tidak ada klaim
+mastery/width di teks paper, jadi perbaikan ini murni internal/PRD.
 
 ---
 
