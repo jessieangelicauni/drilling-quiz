@@ -378,6 +378,23 @@ SKILL_SPECS = {
         # 분 vs 명, a sharper pedagogical point than 분 vs 개 ever was) and
         # 권 vs 장 (book-counter vs sheet-counter, a genuine same-register
         # mix-up rather than a counter no one would confuse 책 for).
+        #
+        # Re-measured 2026-10-20 (PRD §9.46): 4/5 pairs pass; the ONE
+        # failure is 선생님/분/명 specifically (gap -0.86, the only
+        # negative gap of the five). This is NOT the same raw-frequency
+        # confound fixed above (분 vs 개) -- 명 is not a generic catch-all
+        # counter, it's the ordinary PERSON counter, so this is the
+        # honorific register itself (분) being invisible to a frequency
+        # signal, the identical root cause distractor_validator.py already
+        # documents for excluding honorific/tense_past from
+        # LM_PLAUSIBILITY_RELIABLE_SKILLS. Not fixable by swapping the
+        # noun or the distractor counter again -- any sentence testing
+        # 분's honorific-ness will have this same blind spot, and testing
+        # something other than the honorific nuance would defeat the
+        # point of including 분 at all. Left as-is and disclosed (overall
+        # 4/5 = 80%, one pair with a known, understood judge limitation)
+        # rather than reframed as a full pass or chased with another
+        # word-swap guess.
         "pairs": (
             ("사과", "개", "명"),
             ("학생", "명", "개"),
@@ -399,20 +416,25 @@ SKILL_SPECS = {
         "kagas_code": "MOD",  # official mapping, PRD §9.22
         "tag": "EC",
         "distractor_tag": "ETM",
-        # ("깨끗하다","청소해요") replaced 2026-10-20 (PRD §9.43):
-        # validate_log_likelihood.py found this the one failing pair
-        # (gap -0.62, distractor scored higher). 청소하다 is a 하다-compound
-        # (청소 + 하다), so the wrong attributive form "깨끗한" can attach to
-        # the embedded noun 청소 and still parse as a semi-natural "a clean
-        # cleaning" reading -- a structural opening the other, non-compound
-        # verbs (말하다 aside, which still passed) don't give it as readily.
-        # Replaced with 씻어요 (wash, a plain non-compound verb, no
-        # embedded noun for the wrong form to attach to), re-verified
-        # directly that the EC/ETM tag distinction still holds.
+        # ("깨끗하다","청소해요") replaced 2026-10-20 (PRD §9.43), then
+        # ("깨끗하다","씻어요") STILL failed the re-measurement (PRD §9.45) --
+        # the 청소하다-compound theory was wrong, or at least incomplete: the
+        # real cause survived swapping the VERB, so it must be specific to
+        # 깨끗하다 the ADJECTIVE. 깨끗하다 has an irregular, far more
+        # idiomatic adverb "깨끗이" ("손을 깨끗이 씻어요" is the natural
+        # phrasing) competing with the regular "-하게" form this skill
+        # tests ("깨끗하게") -- the regular form is grammatical but
+        # markedly less common than its own idiomatic rival in real text,
+        # which a frequency-based check can't help penalising regardless
+        # of which verb it's paired with. Replaced the ADJECTIVE itself
+        # with 늦다 (late), which has no competing irregular adverb --
+        # "늦게" is the one ordinary way to say it. Re-verified 2026-10-20
+        # (PRD §9.46): log-likelihood check now 5/5, confirming the
+        # 깨끗하다-specific theory rather than the earlier verb-swap guess.
         "pairs": (
             ("조용하다", "말해요"),
             ("많다", "먹어요"),
-            ("깨끗하다", "씻어요"),
+            ("늦다", "가요"),
             ("느리다", "걸어요"),
             ("빠르다", "달려요"),
         ),

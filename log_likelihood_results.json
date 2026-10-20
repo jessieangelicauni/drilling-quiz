@@ -137,7 +137,7 @@
     },
     "mod_adverb": {
       "n": 5,
-      "n_valid": 4,
+      "n_valid": 5,
       "rows": [
         {
           "stem": "저는 ___ 달려요",
@@ -156,12 +156,12 @@
           "reason": "correct form scores 14.35 higher, as expected"
         },
         {
-          "stem": "저는 ___ 청소해요",
-          "correct": "깨끗하게",
-          "distractor": "깨끗한",
-          "valid": false,
-          "gap": -0.6176900863647461,
-          "reason": "distractor scores 0.62 higher than the correct form -- suspect pair, flag for review"
+          "stem": "저는 ___ 가요",
+          "correct": "늦게",
+          "distractor": "늦은",
+          "valid": true,
+          "gap": 1.0927820205688477,
+          "reason": "correct form scores 1.09 higher, as expected"
         },
         {
           "stem": "저는 ___ 말해요",
@@ -184,7 +184,7 @@
     },
     "noun_counter": {
       "n": 5,
-      "n_valid": 3,
+      "n_valid": 4,
       "rows": [
         {
           "stem": "학생은 다섯 ___ 있어요.",
@@ -205,18 +205,18 @@
         {
           "stem": "책은 다섯 ___ 있어요.",
           "correct": "권",
-          "distractor": "개",
-          "valid": false,
-          "gap": -3.578786849975586,
-          "reason": "distractor scores 3.58 higher than the correct form -- suspect pair, flag for review (weaker than the other 9 skills: the generic counter 개 sometimes outscores a correct but rarer counter (권, 분) on raw frequency alone -- real risk, not noise.)"
+          "distractor": "장",
+          "valid": true,
+          "gap": 2.773491382598877,
+          "reason": "correct form scores 2.77 higher, as expected"
         },
         {
           "stem": "선생님은 다섯 ___ 있어요.",
           "correct": "분",
-          "distractor": "개",
+          "distractor": "명",
           "valid": false,
-          "gap": -0.10201835632324219,
-          "reason": "distractor scores 0.10 higher than the correct form -- suspect pair, flag for review (weaker than the other 9 skills: the generic counter 개 sometimes outscores a correct but rarer counter (권, 분) on raw frequency alone -- real risk, not noise.)"
+          "gap": -0.8633365631103516,
+          "reason": "distractor scores 0.86 higher than the correct form -- suspect pair, flag for review (weaker than the other 9 skills: the generic counter 개 sometimes outscores a correct but rarer counter (권, 분) on raw frequency alone -- real risk, not noise.)"
         },
         {
           "stem": "사과는 다섯 ___ 있어요.",
@@ -489,5 +489,5 @@
       "note": "unique curated stems may be fewer than n_per_skill"
     }
   },
-  "overall_pass_rate": 0.9423076923076923
+  "overall_pass_rate": 0.9807692307692307
 }

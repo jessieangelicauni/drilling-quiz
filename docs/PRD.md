@@ -2840,5 +2840,194 @@ benar sebelumnya), `paper/KO-DRILL_IEEE.pdf` (fix isi sungguhan).
 
 ---
 
+### 9.45 Fitur baru: admin upload kurikulum (.docx) → item di-generate dari situ, bukan hanya 11 skill hand-coded
+
+User minta fitur baru: admin bisa upload dokumen kurikulum (contoh
+konkret yang diberikan: `Korean_Grammar_Curriculum.docx` di root
+project, 524 poin grammar TOPIK level 1-6), dan soal harus dibuat dari
+dokumen itu — bukan hanya dari 11 skill yang sudah di-hand-code di
+`exaone_provider.py`. User juga minta kurikulum ini bisa mencakup
+"smart factory EV manufacturing" sebagai scope.
+
+Ditanya & diputuskan eksplisit lewat AskUserQuestion sebelum mulai
+implementasi (2026-10-20), supaya tidak menebak-nebak scope:
+1. **Target versi pertama**: dokumen 524-poin TOPIK yang sudah ada
+   dulu, bukan upload generik dari hari pertama (dipilih user).
+2. **Makna "smart factory EV manufacturing"**: substitusi
+   kosakata/konteks manufaktur di atas grammar TOPIK standar, BUKAN
+   kurikulum vokasional terpisah (dipilih user) — jadi grammar tetap
+   sama, hanya domain kata benda/konteks kalimat yang nanti diganti
+   (belum dibangun, lihat "Belum dikerjakan" di bawah).
+3. **Grammar point di luar 7 kategori "kind" yang sudah ter-hand-code**:
+   user secara eksplisit memilih **izinkan generasi LLM bebas dengan
+   validator longgar**, BUKAN rekomendasi saya (membangun kategori
+   terverifikasi satu per satu seperti 11 skill yang ada) — lihat
+   §9.46 untuk konsekuensi kualitas nyata dari pilihan ini, diukur
+   bukan diasumsikan.
+
+**`src/curriculum_provider.py`** (baru): parser `.docx` → kurikulum
+terstruktur. Diverifikasi langsung terhadap dokumen asli, bukan
+diasumsikan: body dokumen adalah urutan flat paragraf+tabel; "Heading 1"
+= level TOPIK, "Heading 2" = unit, tabel berikutnya dengan header pasti
+`["No.", "Grammar", "Meaning / Usage", "Example", "Translation"]` berisi
+data (tabel overview pertama, dengan header berbeda, dilewati). Smoke
+test (`__main__`) membuktikan parsing benar terhadap isi dokumen
+sungguhan: **524/524 entri**, 6 level, 36 unit, nomor unik, beberapa
+baris spot-check (`"17"` → `N이/가`, `"40"` → `-았/었/했-`) cocok dengan
+yang terlihat langsung di dokumen.
+
+**Temuan kuantitatif yang mendasari keputusan arsitektur berikutnya**:
+dari 524 entri, hanya **~53%** yang grammar-nya muncul sebagai literal
+substring di kalimat contohnya sendiri (dicek langsung, bukan
+diasumsikan) — sisanya butuh pemahaman morfologis untuk menemukan span
+mana di kalimat yang merealisasikan grammar point tersebut (misal
+`-았/었/했-` terealisasi sebagai `봤어요`, bukan string `-았/었/했-` itu
+sendiri). Ini alasan konkret kenapa generasi LLM-assisted (bukan regex
+sederhana) dibutuhkan untuk mayoritas entri — lihat §9.46.
+
+---
+
+### 9.46 Generator item dari kurikulum: diuji empiris di sampel representatif, BUKAN sampel pilihan tangan — rate produksi 32%, bukan 100% yang terlihat di sampel awal
+
+**Pilihan model, diuji bukan diasumsikan (konsisten dengan §9.36)**:
+EXAONE-4.0-1.2B dicoba PERTAMA (karena jadi default historis di codebase
+ini) untuk task ini — mayoritas gagal menemukan span literal di kalimat
+contoh sama sekali, kadang malah menjawab dengan deskripsi grammar point
+bukan span yang ditemukan. Qwen3-4B dipakai sebagai gantinya, cocok
+dengan temuan independen §9.36 (48.2% vs 87.5% pada task penilaian
+gramatikalitas yang berbeda) — pola yang sama muncul utuh untuk ketiga
+kalinya di task yang berbeda-beda, bukan kebetulan satu task.
+
+**`src/curriculum_item_generator.py`** (baru): untuk entri yang span-nya
+tidak bisa ditemukan via substring match (§9.45), model (Qwen3-4B)
+diminta (1) menemukan span yang merealisasikan grammar point di kalimat
+contoh, (2) membuat satu alternatif salah yang plausibel. Divalidasi
+dengan 5 check, EKSPLISIT lebih longgar dari 11 skill hand-coded dan
+didisclose demikian (bukan disajikan dengan percaya diri yang sama):
+- (a) span "asli" yang disebut model harus benar-benar ada di kalimat
+  contoh (sanity check anti-halusinasi) — kalau tidak, item dibuang.
+- (b) distractor harus beda dari jawaban benar dan tidak kosong.
+- (c) `solver_check.py`'s round-trip check (blind key-acceptance)
+  dijalankan dan direkam sebagai SINYAL untuk ditinjau, bukan gate yang
+  diam-diam membuang item — sama seperti perlakuan ke 11 skill
+  hand-coded.
+- (d) **filter gibberish** (ditemukan dari inspeksi manual, bukan
+  diasumsikan tidak ada masalah): pada sampel awal 12 entri, 2/7 item
+  yang "lolos" check (a)/(b) punya distractor yang bukan kesalahan
+  pembelajar sungguhan tapi string rusak (`"합니다니다"`, `"바르요"`) —
+  check (a)/(b) tidak bisa menangkap ini karena cuma mengecek string
+  beda-dan-tidak-kosong, bukan "apakah ini kata sungguhan". Diperbaiki
+  dengan reuse `distractor_validator.lm_plausibility_gap()` (§9.34) pada
+  kalimat utuh (bukan kata tunggal): 2 kasus gibberish di atas punya gap
+  18.2/9.8, sedangkan 5 distractor baik (kata sungguhan, cuma salah)
+  punya gap 0.1–4.1 — pemisahan bersih, diverifikasi bukan ditebak.
+  Ambang `gap > 8.0` (titik tengah pemisahan itu).
+- (e) **filter konteks-hilang** (ditemukan dari sampel yang lebih besar
+  di bawah, bukan terlihat di 12 sampel awal): beberapa grammar point
+  level menengah/lanjut (`-(으)며`, `-(으)ㄹ 듯 말 듯 하다`, `-(으)ㄹ
+  리(가) 만무하다`) menyambungkan DUA klausa penuh, jadi span yang
+  disebut model mencakup hampir seluruh kalimat — stem hasil blanking
+  jadi cuma `"___"`, nol konteks tersisa untuk solver maupun pembelajar.
+  Dibuang kalau yang tersisa di stem selain blank marker dan tanda baca
+  cuma string kosong.
+
+**Hasil pada sampel 12 (pilihan tangan awal, semua level 1-2)**: 7/12
+item terproduksi, solver round-trip 7/7 (100%). **Hasil awal ini
+menyesatkan** — ditemukan SETELAH diuji di sampel yang representatif
+(bukan diasumsikan generalisasi dari sampel kecil).
+
+**Hasil pada sampel 41 (setiap entri ke-13 dari 524, merata di semua 6
+level — representatif, bukan dipilih tangan)**: **13/41 item terproduksi
+(32%)**, solver round-trip **6/13 (46%)**. Jauh di bawah sampel awal.
+
+**Root cause rate solver yang jauh lebih rendah, diinvestigasi bukan
+dibiarkan sebagai angka tanpa penjelasan**: menginspeksi item yang
+`key_accepted=False` satu per satu (`-(으)ㄴ/는데도` vs distractor
+`"...불구하고"`, `N(이)란` vs `은`, `N에 비하면` vs `에 비해`, `-(으)ㄹ
+리(가) 만무하다` vs `리가 없다`, dst) menunjukkan pola konsisten: di
+level TOPIK menengah/lanjut, banyak grammar point adalah **sinonim-dekat
+satu sama lain** (bukan satu benar-satu-salah secara objektif) —
+distractor yang dibangun dari grammar point lain yang genuinely berbeda
+seringkali JUGA merupakan frasa natural yang diterima penutur asli,
+bukan kesalahan sungguhan. Item seperti ini menguji "textbook pilih
+sinonim mana", bukan benar/salah. **Tidak ada check otomatis di atas
+yang bisa membedakan ini** — didisclose di docstring modul sebagai
+limitasi kualitas yang diketahui, bukan disembunyikan atau direframe
+sebagai sukses.
+
+**Kesimpulan untuk keputusan user §9.45 poin 3** (izinkan generasi bebas
++ validator longgar, bukan rekomendasi saya membangun kategori
+terverifikasi satu-per-satu): pilihan ini SEKARANG punya data konkret,
+bukan cuma trade-off teoretis — mekanismenya BEKERJA (bisa parse
+dokumen asli, generate, dan validasi dasar), tapi kualitas konten
+menurun tajam begitu melewati grammar point level dasar (particle/ending
+tunggal) ke grammar point level lanjut (klausa-ke-klausa, sinonim-dekat).
+Rate produksi 32% dan rate agreement-solver 46% pada sampel representatif
+harus jadi baseline yang dikutip untuk fitur ini, BUKAN angka 100%/100%
+dari sampel 12 yang kebetulan semua level pemula.
+
+**Belum dikerjakan (lanjutan langsung dari sini)**:
+- Substitusi kosakata domain "smart factory EV manufacturing" (§9.45
+  poin 2) — belum dibangun sama sekali, menunggu pipeline dasar ini
+  stabil dulu.
+- Integrasi ke `ContentProvider`/`daily_drill.py` — saat ini
+  `curriculum_item_generator.py` berdiri sendiri, belum disambungkan ke
+  flow aplikasi.
+- `kagas_code` sengaja `None` untuk semua item dari modul ini (lihat
+  docstring) — pemetaan KAGAS 7-kode yang ada di-hand-derive untuk 11
+  skill lama dan tidak otomatis berlaku ke ~500 titik kurikulum lainnya.
+- Teks paper BELUM disentuh untuk fitur ini — paper saat ini hanya
+  mendeskripsikan 11 skill hand-coded; perlu bagian baru yang jujur
+  (prinsip "paper mengikuti apa yang kita temukan", bukan sebaliknya)
+  begitu pipeline ini dianggap cukup matang untuk didokumentasikan sebagai
+  kontribusi, dengan rate 32%/46% di atas dikutip apa adanya.
+
+**File:** `src/curriculum_provider.py` (baru), `src/curriculum_item_generator.py`
+(baru, reuse `distractor_validator.lm_plausibility_gap` dan `solver_check.py`).
+
+---
+
+### 9.47 Re-measurement `mod_adverb` & `noun_counter` setelah fix §9.43 — satu beres (5/5), satu limitasi genuine didisclose (4/5, bukan diganti lagi)
+
+Sebelum lanjut fitur kurikulum, verifikasi dua fix pending dari §9.43
+diselesaikan dengan GPU sungguhan (`validate_log_likelihood.py --n-per-skill 20`,
+bukan diasumsikan dari teori saja):
+
+**`mod_adverb` (늦다/가요, ganti dari 깨끗하다/씻어요)**: **5/5 (100%)**.
+Mengonfirmasi teori §9.46 (lihat komentar di `exaone_provider.py`): akar
+masalahnya memang 깨끗하다 sebagai ADJEKTIF (adverb idiomatik "깨끗이"
+bersaing dengan bentuk reguler "-하게"), bukan verb pasangannya — ganti
+verb saja (percobaan sebelumnya, 청소해요→씻어요) tidak cukup, ganti
+adjektif-nya baru menyelesaikan.
+
+**`noun_counter`**: **4/5 (80%)**. Satu-satunya yang gagal: pasangan
+`선생님/분/명` (gap **-0.86**, satu-satunya gap negatif dari 5). Ini BUKAN
+confound yang sama dengan yang diperbaiki di §9.43 (분 vs 개, dimana 개
+adalah counter generik frekuensi-tertinggi) — di sini distraktornya 명,
+counter ORANG biasa, bukan catch-all generik. Artinya akar masalahnya
+adalah register honorifik 분 itu sendiri yang tidak terlihat oleh sinyal
+frekuensi — akar masalah yang SAMA dengan yang sudah terdokumentasi di
+`distractor_validator.py` untuk alasan `honorific`/`tense_past`
+dikeluarkan dari `LM_PLAUSIBILITY_RELIABLE_SKILLS`.
+
+**Keputusan, konsisten dengan prinsip user (ganti metode kalau jelek,
+tapi disclose kalau memang tidak ada solusi)**: TIDAK diganti lagi.
+Mengganti kata benda atau counter pasangannya tidak akan mengubah apa pun
+karena masalahnya bukan pilihan kata tertentu — setiap kalimat yang
+menguji sifat honorifik 분 akan punya blind spot yang sama pada judge
+berbasis frekuensi ini, dan menguji sesuatu selain nuansa honorifik akan
+menghilangkan tujuan memasukkan 분 sama sekali. 80% keseluruhan dengan
+satu limitasi yang dipahami dan terdokumentasi diperlakukan sama seperti
+`honorific`/`tense_past`/`irregular_conj`/`subj_topic` — bukan 100% palsu,
+bukan juga dihapus/direframe.
+
+**File:** `src/exaone_provider.py` (komentar update untuk kedua skill),
+`log_likelihood_results.json` (hasil re-run terbaru, n=20/skill, seed=0,
+overall 98.1% across 10 skill — naik dari run sebelumnya karena
+`mod_adverb` sekarang penuh dan `noun_counter` 1 kasus lebih baik
+dipahami, bukan dihitung ulang secara berbeda).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
