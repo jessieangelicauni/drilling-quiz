@@ -66,7 +66,7 @@ from dataclasses import dataclass
 
 import torch
 from kiwipiepy import Kiwi
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from distractor_validator import (
     adj_relativizer_ending,
@@ -512,8 +512,16 @@ _CRITIC_VERB_PROMPT = (
 class ExaoneGrammarProvider:
     def __init__(self, model_name: str = _MODEL_NAME, seed: int | None = None):
         self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        # 4-bit quantized (PRD §9.53): EXAONE-3.5-7.8B in bf16 alone already
+        # uses ~15.6GB of this 15.57GB GPU, so this provider and
+        # CurriculumItemGenerator/SolverCheckProvider (same model, same
+        # swap) cannot coexist in one process unquantized -- confirmed by
+        # a real OOM, not assumed. Quantized, one instance measured at
+        # 7.30GB; two instances together measured at 14.61GB, both still
+        # generating correctly -- tested before adopting, not assumed safe.
+        _bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype=torch.bfloat16, trust_remote_code=True).to("cuda")
+            model_name, quantization_config=_bnb_config, trust_remote_code=True, device_map="cuda")
         self.rng = random.Random(seed)
         self._counter = 0
         self.items: dict[str, GeneratedItem] = {}
@@ -1001,7 +1009,7 @@ if __name__ == "__main__":
                         f"the matching counter word must be correct, got {item}")
                     assert sum(v in _NNB_FILLER_WORDS for v in non_answer.values()) == 2
                 if skill_id == "mod_adverb":
-                    assert item.options[item.answer] in ("조용하게", "많게", "깨끗하게", "느리게", "빠르게"), (
+                    assert item.options[item.answer] in ("조용하게", "많게", "늦게", "느리게", "빠르게"), (
                         f"the adverbial (-게/EC) form must be correct, got {item}")
                     assert sum(v in _EC_FILLER_WORDS for v in non_answer.values()) == 2
                     real_distractor = next(v for v in non_answer.values() if v not in _EC_FILLER_WORDS)
@@ -1010,7 +1018,7 @@ if __name__ == "__main__":
                     # same representation quirk already documented in SKILL_SPECS'
                     # adj_relativizer comment, so there is no separate trailing character
                     # to match here.
-                    assert real_distractor in ("조용한", "많은", "깨끗한", "느린", "빠른"), (
+                    assert real_distractor in ("조용한", "많은", "늦은", "느린", "빠른"), (
                         f"the distractor must be the attributive (ETM) overgeneralisation, got {item}")
         print(f"{skill_id}: {successes}/5 generations succeeded")
         assert successes >= 4, f"{skill_id}: expected the validated pipeline to succeed reliably, got {successes}/5"

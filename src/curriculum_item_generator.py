@@ -159,7 +159,7 @@ from dataclasses import dataclass, field
 
 import torch
 from kiwipiepy import Kiwi
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from curriculum_provider import CurriculumEntry
 from distractor_validator import lm_plausibility_gap
@@ -209,7 +209,10 @@ _GEN_PROMPT = (
     '원래표현: 예문에서 찾은 정확한 부분\n'
     '틀린표현: 이 문맥에서 비문이 되는, 학습자가 실수로 쓸 법한 표현'
 )
-_STRIP_CHARS = ' \t\n\r\'"“”[]()-'
+# Markdown bold markers (*) added to the strip set (PRD §9.53): EXAONE-3.5-7.8B
+# sometimes wraps its answer in "**word**" where Qwen3-4B didn't (found as a
+# real crash in domain_vocab_substitution.py's own _STRIP_CHARS, same bug class).
+_STRIP_CHARS = ' \t\n\r\'"“”[]()-*'
 
 
 @dataclass
@@ -247,8 +250,16 @@ def _parse_response(text: str) -> tuple[str, str] | None:
 class CurriculumItemGenerator:
     def __init__(self, model_name: str = _MODEL_NAME, seed: int | None = None):
         self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        # 4-bit quantized (PRD §9.53): same EXAONE-3.5-7.8B as
+        # ExaoneGrammarProvider/SolverCheckProvider -- unquantized, one
+        # instance alone already uses ~15.6GB of this 15.57GB GPU, so this
+        # generator cannot coexist with SolverCheckProvider in one process
+        # (confirmed by a real OOM when this file's own __main__ -- which
+        # instantiates both -- was run). Quantized, two instances measured
+        # together at 14.61GB, both still generating correctly.
+        _bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype=torch.bfloat16, trust_remote_code=True).to("cuda")
+            model_name, quantization_config=_bnb_config, trust_remote_code=True, device_map="cuda")
         self.model.eval()
         self.rng = random.Random(seed)
 

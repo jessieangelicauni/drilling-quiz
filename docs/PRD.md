@@ -3462,5 +3462,106 @@ python3 src/verify_exaone35_swap.py --skip-validate   # cuma smoke test
 
 ---
 
+### 9.53 Verifikasi swap EXAONE-3.5-7.8B di GPU nyata: OOM struktural ditemukan & diperbaiki (quantization 4-bit), 2 bug baru ditemukan (1 diperbaiki, 1 BELUM — butuh keputusan)
+
+Sesi ini (beda dari sesi cloud §9.51/9.52, sesi ini PUNYA akses GPU)
+menjalankan `src/verify_exaone35_swap.py` yang sebelumnya cuma bisa
+`py_compile`-checked oleh sesi cloud. Progres:
+
+**1. 2 bug lama (bukan dari swap) ditemukan & diperbaiki**: assert di
+`exaone_provider.py`'s smoke test untuk skill `mod_adverb` masih
+menyebut kata lama ("깨끗하게"/"깨끗한") dari SEBELUM perbaikan §9.47
+(yang mengganti pasangan ke 늦다/늦게) — assert-nya lupa diupdate waktu
+itu. Diperbaiki ke "늦게"/"늦은".
+
+**2. Masalah struktural NYATA ditemukan — OOM, bukan tabrakan proses**:
+satu instance EXAONE-3.5-7.8B (bf16) sendirian memakai ~15.6GB dari
+15.57GB total GPU. Dampaknya dikonfirmasi lewat eksekusi nyata, bukan
+dihitung di atas kertas saja:
+- `curriculum_item_generator.py`'s `__main__` memuat generator-nya
+  SENDIRI + `SolverCheckProvider()` dalam satu proses — setelah swap
+  §9.52, keduanya EXAONE-3.5-7.8B, jadi 2x ~15.6GB dalam satu proses.
+  OOM pasti terjadi, dikonfirmasi lewat run nyata (`torch.OutOfMemoryError`,
+  "14.89 GiB in use, 682.31 MiB free").
+- Lebih penting: `content_provider.DispatchingGrammarProvider` (jalur
+  PRODUKSI nyata, §9.49, menggabungkan `ExaoneGrammarProvider` + 
+  `CurriculumGrammarProvider`) punya masalah IDENTIK begitu kedua
+  provider itu di-swap ke model yang sama — bukan cuma masalah smoke
+  test/QA script.
+
+**3. Fix: quantization 4-bit (bitsandbytes), diuji sebelum diadopsi**:
+Ditanya ke user, pilihan: investigasi quantization dulu (bukan langsung
+turun ke model lebih kecil, bukan juga "terima saja tidak bisa jalan
+bersamaan"). Dites langsung: 1 instance EXAONE-3.5-7.8B quantized
+4-bit (`BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)`)
+memakai **7.30GB** (vs ~15.6GB bf16) — kurang dari separuh. **2 instance
+sekaligus diuji bersamaan, bukan diasumsikan**: total **14.61GB**,
+KEDUANYA tetap generate dengan benar. Diterapkan ke 4 file yang memuat
+EXAONE-3.5-7.8B sendiri: `exaone_provider.py`, `curriculum_item_generator.py`,
+`solver_check.py`, `domain_vocab_substitution.py`'s `Exaone35Generator`.
+`bitsandbytes==0.50.2` ditambahkan ke `requirements.txt`.
+
+**Caveat yang HARUS didisclose, bukan diabaikan**: quantization 4-bit
+mengubah precision komputasi model — ini relevan khusus untuk
+`solver_check.py`'s `sentence_logprob()` (basis `validate_log_likelihood.py`,
+dikutip di paper §9.35/9.36 sebagai 98.1%/87.5% dengan model BF16 TIDAK
+di-quantize). Re-run `validate_log_likelihood.py` dengan model baru
+(EXAONE-3.5-7.8B, QUANTIZED) mengubah DUA variabel sekaligus (model
+beda DAN precision beda) dibanding baseline yang dipublikasikan —
+PERBEDAAN HASIL NANTI (kalau ada) tidak bisa langsung diatribusikan ke
+salah satu saja. Belum dijalankan ulang validate_*.py sampai smoke test
+semua lolos dulu (lihat poin 5).
+
+**4. Setelah quantization diterapkan, re-run smoke test: OOM TERATASI
+(dikonfirmasi), tapi 2 kegagalan BARU muncul**:
+- `curriculum_item_generator.py` dan `solver_check.py`: **[OK]** — OOM
+  benar-benar teratasi, dikonfirmasi lewat run nyata bukan diasumsikan
+  dari angka memori saja.
+- `domain_vocab_substitution.py`: **[FAIL]** — `ValueError:
+  '**모듈**' last character is not a Hangul syllable block`. EXAONE-3.5-7.8B
+  kadang membungkus jawabannya dengan markdown bold (`**kata**`),
+  sesuatu yang Qwen3-4B (model lama) tidak/jarang lakukan — `_STRIP_CHARS`
+  belum mencakup `*`. **Diperbaiki**: `*` ditambahkan ke `_STRIP_CHARS`
+  di `domain_vocab_substitution.py` DAN `curriculum_item_generator.py`
+  (kerentanan identik, preventif meski belum crash di sana).
+- `exaone_provider.py`: **[FAIL] — BELUM diperbaiki, butuh keputusan
+  user**. Assert `blind_retries == [None, None, None]` untuk slot
+  "해변" (Novelty 2 critic-loop test, PRD §9.14) gagal: EXAONE-4.0-1.2B
+  (model lama) terbukti GAGAL TOTAL pada slot ini secara deterministik
+  (list `known_failures` di baris ~1060 ditemukan empiris dari
+  kegagalan model lama) — tapi EXAONE-3.5-7.8B (lebih besar, lebih
+  mampu) sekarang menjawab "노는다" tiga kali, bukan `None`. "노는다"
+  BUKAN bentuk kamus verba yang benar (bentuk present-tense 놀다 yang
+  benar adalah "논다", bukan "노는다") — tapi `_extract_verb_lemma()`
+  cuma mengecek "berakhir dengan 다 dan panjang ≥2", jadi string ini
+  LOLOS sebagai valid padahal salah. **Akar masalah**: `_extract_verb_lemma`
+  sudah longgar sejak awal (tidak membedakan bentuk kamus asli dari
+  konjugasi apa pun yang berakhir 다) — kelemahan ini TERSEMBUNYI
+  selama ini karena model lama yang lebih lemah selalu gagal dengan
+  cara yang jelas-jelas salah (bukan string yang *terlihat* valid),
+  jadi heuristik longgar ini tidak pernah benar-benar diuji oleh kasus
+  false-positive. Swap model yang mengungkapnya, bukan menyebabkannya.
+  **BELUM DIPUTUSKAN** (ditanya ke user, belum sempat dijawab sebelum
+  sesi harus berhenti): perketat `_extract_verb_lemma` (tolak akhiran
+  konjugasi present-tense umum seperti -는다/-ㄴ다, bukan cuma -다 polos)
+  vs update assert test untuk menerima perilaku baru model vs opsi lain.
+
+**5. Validasi penuh (`validate_novelty1.py` dkk., Step 2/2 skrip
+verifikasi) BELUM pernah dijalankan** — `verify_exaone35_swap.py`
+berhenti di smoke test (Step 1/2) karena kegagalan di atas, sesuai
+desain skripnya sendiri ("stopping before validation (fix the crash
+first)"). Urutan kerja berikutnya: selesaikan keputusan poin 4 di atas
+→ smoke test semua `[OK]` → jalankan Step 2/2 → bandingkan dengan 4
+baseline JSON yang sudah di-commit, dengan caveat poin 3 di atas
+tentang quantization.
+
+**File:** `src/exaone_provider.py` (2 fix assert mod_adverb + quantization,
+`_extract_verb_lemma` BELUM diubah), `src/curriculum_item_generator.py`
+(quantization + fix markdown strip), `src/solver_check.py` (quantization),
+`src/domain_vocab_substitution.py` (quantization + fix markdown strip),
+`requirements.txt` (+bitsandbytes==0.50.2).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

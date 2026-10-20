@@ -93,7 +93,7 @@ import re
 from dataclasses import dataclass
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 _MODEL_NAME = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"  # swapped from Qwen3-4B 2026-10-20, per
 # explicit user instruction ("pakai exaone 7.8b" -> "ketiganya" -> "lanjut"). THIS IS THE
@@ -163,8 +163,15 @@ class LogLikelihoodResult:
 class SolverCheckProvider:
     def __init__(self, model_name: str = _MODEL_NAME):
         self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        # 4-bit quantized (PRD §9.53): same EXAONE-3.5-7.8B as
+        # ExaoneGrammarProvider/CurriculumItemGenerator -- unquantized, one
+        # instance alone already uses ~15.6GB of this 15.57GB GPU, so this
+        # solver cannot coexist with a generator in one process (confirmed
+        # by a real OOM). Quantized, two instances measured together at
+        # 14.61GB, both still generating correctly.
+        _bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype=torch.bfloat16, trust_remote_code=True).to("cuda")
+            model_name, quantization_config=_bnb_config, trust_remote_code=True, device_map="cuda")
         self.model.eval()
 
     @torch.no_grad()

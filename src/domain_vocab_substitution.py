@@ -59,7 +59,7 @@ from dataclasses import replace
 
 import torch
 from kiwipiepy import Kiwi
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from curriculum_provider import CurriculumEntry
 from distractor_validator import has_batchim
@@ -77,7 +77,10 @@ _DOMAIN_PROMPT = (
     '원래단어: 문장에 있는 그대로의 명사\n'
     '바뀐단어: 스마트 팩토리/EV 제조 맥락에 맞는 새 단어'
 )
-_STRIP_CHARS = ' \t\n\r\'"“”[]()-'
+# Markdown bold markers (*) added to the strip set (PRD §9.53): EXAONE-3.5-7.8B
+# sometimes wraps its answer in "**word**" where Qwen3-4B didn't, found from a
+# real crash (has_batchim() rejecting "**모듈**" as not a Hangul-final string).
+_STRIP_CHARS = ' \t\n\r\'"“”[]()-*'
 
 # Particle allomorph pairs: (batchim-final form, vowel-final form). When
 # the substituted noun's batchim differs from the original word's, the
@@ -143,8 +146,15 @@ class Exaone35Generator:
 
     def __init__(self, model_name: str = _MODEL_NAME):
         self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        # 4-bit quantized (PRD §9.53): same EXAONE-3.5-7.8B used elsewhere
+        # in this codebase -- unquantized, one instance alone already uses
+        # ~15.6GB of this 15.57GB GPU, leaving no room for a second
+        # instance (confirmed by a real OOM when a generator + solver_check
+        # shared a process). Quantized, two instances measured together at
+        # 14.61GB, both still generating correctly.
+        _bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype=torch.bfloat16, trust_remote_code=True).to("cuda")
+            model_name, quantization_config=_bnb_config, trust_remote_code=True, device_map="cuda")
 
     def __call__(self, prompt: str, max_new_tokens: int = 80) -> str:
         messages = [{"role": "user", "content": prompt}]

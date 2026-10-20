@@ -9,5 +9,6 @@ torch==2.6.0+cu124
 transformers==5.20.1
 accelerate==1.15.0
 safetensors==0.8.0
+bitsandbytes==0.50.2
 kiwipiepy==0.24.0
 kiwipiepy_model==0.24.0
