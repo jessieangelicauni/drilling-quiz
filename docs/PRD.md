@@ -2506,5 +2506,36 @@ kalinya juga akurat menggambarkan implementasi.
 
 ---
 
+### 9.39 Klaim "half-life regression" scheduling ambigu — kedengarannya berlaku untuk grammar juga, padahal cuma vocab; grammar pakai mekanisme berbeda yang tidak pernah disebut
+
+Lanjutan audit. Section IV-D (dulu) menulis "Scheduling across sessions
+follows a spacing model in the tradition of half-life regression [28]"
+tepat setelah membahas kebijakan SELEKSI ITEM GRAMMAR — pembaca wajar
+menyimpulkan ini berlaku untuk grammar juga. Dicek `grammar_scheduler.py`
+langsung: **grammar SAMA SEKALI tidak pakai FSRS/half-life regression**
+— pakai `MASTERED_RECHECK_DAYS=30`, interval TETAP, eksplisit placeholder
+yang sudah lama didokumentasikan jujur di modul itu sendiri (dicoba
+turunkan dari matematika FSRS, GAGAL transfer — interval meledak jadi
+puluhan ribu hari karena FSRS mengasumsikan review terjeda, bukan banyak
+respons-benar-berturut di Urnings). Temuan nyata dan substantif ini
+**tidak pernah masuk teks paper sama sekali** — cuma ada di komentar
+kode dan PRD.
+
+**Diperbaiki**: paragraf ditulis ulang eksplisit memisahkan (a) vocab —
+half-life regression [28] genuinely dipakai (`vocab_scheduler.py` benar
+wrap `fsrs` library), (b) grammar — mekanisme berbeda (mastery-gated,
+interval tetap 30 hari, eksplisit placeholder), plus temuan FSRS-tidak-
+transfer dilaporkan sebagai hasil negatif yang jujur, bukan disembunyikan
+atau dibiarkan tersirat seolah mekanisme yang sama berlaku untuk
+keduanya.
+
+**Tidak ada perubahan kode** — ini murni soal keakuratan teks paper vs
+kode yang sudah benar dan sudah lama jujur tentang keterbatasannya
+sendiri, cuma belum pernah "naik" ke level paper.
+
+**File:** `src/content.py` saja (Section IV-D).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
