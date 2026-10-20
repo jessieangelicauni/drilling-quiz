@@ -4101,5 +4101,39 @@ Inggris + assertion kepatuhan-bahasa baru).
 
 ---
 
+### 9.65 Fix §9.64 TERBUKTI berhasil di GPU nyata — EXAONE dipertahankan untuk qwen_feedback.py, threshold Hangul dikalibrasi ulang dari data nyata
+
+**Hasil run user**: `fast [en]` dan `detailed [en]` KEDUANYA sepenuhnya
+dalam Bahasa Inggris, benar, dan berkualitas tinggi — one-shot example
+Inggris (§9.64) berhasil memperbaiki kepatuhan bahasa EXAONE-3.5-7.8B,
+PERSIS seperti yang sudah terbukti untuk Qwen3 dulu. Tidak ada
+kebocoran topik, partikel dikutip dengan tepat.
+
+**Tapi smoke test tetap gagal** — bukan karena bahasanya salah,
+melainkan threshold `_DETAILED_HANGUL_LIMIT=40` yang saya tulis
+sendiri sebagai "tebakan awal" (§9.64) ternyata terlalu ketat: jawaban
+`detailed [en]` yang BENAR dan berkualitas tinggi itu punya 89 karakter
+Hangul (4 kalimat contoh Korea yang memang diminta prompt — "one more
+example sentence contrasting both uses" — plus kutipan partikel
+berulang untuk kontras). False positive dari threshold yang belum
+dikalibrasi, bukan bug di fix bahasanya.
+
+**Diperbaiki**: `_DETAILED_HANGUL_LIMIT` dinaikkan dari 40 → 150,
+berdasarkan margin nyata di atas 89 yang terobservasi, bukan ditebak
+ulang.
+
+**Keputusan yang sebelumnya terbuka (§9.64) sekarang terjawab**: EXAONE
+TERBUKTI bisa diperbaiki, bukan infeasible — dipertahankan untuk
+`qwen_feedback.py`, TIDAK direvert ke Qwen3. Prinsip proyek ini
+("re-test sebelum menyimpulkan infeasible") terbukti benar lagi.
+
+**Belum diverifikasi**: path `[id]` (Bahasa Indonesia) — run user
+berhenti di assertion gagal sebelum sempat mencapai iterasi "id" di
+loop. Perlu run ulang untuk konfirmasi penuh kedua bahasa.
+
+**File:** `src/qwen_feedback.py` (threshold Hangul dikalibrasi ulang).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

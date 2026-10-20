@@ -201,12 +201,18 @@ if __name__ == "__main__":
     # requested LANGUAGE entirely) and the leak check alone does not catch
     # a response that's correctly on-topic but wholly in Korean, which is
     # the actual bug a live user hit after the EXAONE-3.5-7.8B swap.
-    # Thresholds are approximate (can't be calibrated without a GPU in the
-    # sandbox this was written in) -- a few embedded Hangul particles/words
-    # being explained ("에서", a short illustrative example) is expected and
-    # fine; a response that's substantially Korean prose is not.
+    # Thresholds calibrated 2026-10-20 from a real run (PRD §9.65), not
+    # guessed: a genuinely compliant, high-quality English detailed_feedback
+    # answer legitimately hit 89 Hangul chars (4 embedded Korean example
+    # sentences + repeated quoted-particle contrasts, exactly what "one more
+    # example sentence contrasting both uses" asks for) -- the original
+    # guess of 40 was simply too strict and flagged a correct answer as a
+    # false positive. Set with real headroom above the observed 89, not
+    # padded arbitrarily; still low enough to catch a response that's
+    # actually substantially Korean prose (which would run into the
+    # hundreds of characters for a multi-sentence explanation).
     _FAST_HANGUL_LIMIT = 15
-    _DETAILED_HANGUL_LIMIT = 40  # looser: an embedded contrastive example sentence is expected here
+    _DETAILED_HANGUL_LIMIT = 150
 
     for language in ("en", "id"):
         fast = provider.fast_feedback(stem, correct, wrong, language=language)
