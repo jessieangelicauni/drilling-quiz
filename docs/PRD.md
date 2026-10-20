@@ -2715,5 +2715,71 @@ termasuk gap yang perlu ditutup di sini.
 
 ---
 
+### 9.43 User minta: kalau eval metric jelek, GANTI metodenya — bukan direframe. 2 pasangan diganti, bukan ditutupi
+
+User eksplisit: kalau ada hasil eval metric yang jelek dan tidak
+mendukung novelty, ganti metodenya, jangan terlalu banyak reframe
+bahasa sampai argumennya jadi lemah. Diaudit ulang `log_likelihood_results.json`
+yang baru di-commit user (§9.42) untuk cari kandidat.
+
+**Ditemukan dua kasus gagal, BUKAN noise — masing-masing punya sebab
+spesifik yang bisa diperbaiki di sumbernya:**
+
+1. **`noun_counter` (3/5, bukan "cuma 1 skill lemah" seperti klaim lama
+   — lihat poin 3):** 2 dari 2 kegagalan **persis** pasangan yang
+   melawan konter 개 (konter paling umum di korpus Korea) dengan konter
+   benar yang lebih jarang (권 untuk buku, 분 untuk orang-dihormati).
+   3 pasangan lain (명 vs 개, 개 vs 명) lolos bersih dengan margin besar
+   (gap 5.5-11.3). Ini confound di METODE pengukuran (frekuensi korpus
+   mentah, bukan tata bahasa), bukan soal item-nya salah — keduanya
+   tetap valid secara konstruksi (tag NNB sama, diverifikasi deterministik).
+   **Diganti** (`exaone_provider.py` SKILL_SPECS): `("선생님","분","개")`
+   → `("선생님","분","명")` (lawan sama-sama konter orang, menguji nuansa
+   honorifik secara lebih presisi daripada sebelumnya), `("책","권","개")`
+   → `("책","권","장")` (lawan konter-lembaran vs konter-buku, kesalahan
+   sewajar daripada 권-vs-개 yang nyaris tidak pernah ditebak orang).
+
+2. **`mod_adverb` (4/5):** 1 kegagalan di pasangan (깨끗하다, 청소해요),
+   gap kecil (-0.62). Sebab: 청소하다 verba majemuk (청소+하다), jadi
+   bentuk salah "깨끗한" bisa menempel ke kata benda "청소" di dalamnya
+   dan terbaca semi-natural ("pembersihan yang bersih") — pembuka
+   struktural yang verba non-majemuk lain tidak punya. **Diganti**:
+   `청소해요` → `씻어요` (verba sederhana, tidak ada kata benda
+   tersembunyi untuk bentuk salah menempel), diverifikasi ulang
+   pembeda tag EC/ETM masih tegas.
+
+3. **Temuan tambahan sambil audit:** klaim lama "9 of 10 essentially
+   clean, only noun_counter weaker" sudah sedikit overclaim SEBELUM
+   perbaikan ini — `mod_adverb` juga gagal 1 pasangan (4/5, bukan 5/5),
+   jadi seharusnya "8 dari 10 bersih sempurna", bukan 9. Diperbaiki di
+   `src/content.py` (dua tempat, Section IV-B dan V-B) sekalian dengan
+   perbaikan pasangan di atas.
+
+**Yang SENGAJA tidak diganti** (beda kategori dari dua di atas):
+`irregular_conj` dan `subj_topic` (10% masing-masing di check (c) lama,
+§9.20/§9.21) — itu bukan confound metode, itu solver/judge genuinely
+tidak tahu tata bahasa Korea yang diuji (dikonfirmasi lewat pick-
+distribution tracking konten, bukan posisi). Mengganti item di sana
+untuk menghindari kegagalan itu = menghindari konten yang justru paling
+berharga dibuktikan, sama persis prinsip yang sudah ditegakkan di
+§9.20/§9.21 sebelumnya.
+
+**Diverifikasi tanpa GPU** (pola sama seperti §9.21/§9.22): stub
+`torch`/`transformers`, jalankan `__main__` via `runpy` — 5/5 sukses di
+SEMUA 11 skill dengan pasangan baru. `python3 -m py_compile` lolos,
+`build_docx.py` rebuild tanpa error.
+
+**Belum diverifikasi** (dicatat eksplisit, bukan diasumsikan beres):
+`log_likelihood_results.json` yang sudah ter-commit (§9.42) masih
+menggambarkan PASANGAN LAMA — angka 94.2%/49-of-52 itu valid untuk kode
+SEBELUM fix ini, bukan untuk kode sekarang. Teks paper sudah diubah
+untuk menyatakan ini eksplisit ("re-measuring the replacements is
+recorded as outstanding, not assumed resolved by the fix alone") —
+bukan diam-diam dibiarkan klaim lama seolah masih berlaku. User perlu
+jalankan ulang `validate_log_likelihood.py` di GPU dan commit hasil
+baru supaya artefak dan kode kembali sinkron.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
