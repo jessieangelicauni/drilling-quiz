@@ -2382,5 +2382,44 @@ Diverifikasi di PDF halaman demi halaman, Fig. 1-5 tetap tepat 1x.
 
 ---
 
+### 9.36 "Kenapa tidak pakai EXAONE?" — dicek, EXAONE jauh lebih buruk untuk tugas ini meski Korea-first, pilihan Qwen3 ternyata benar tapi sebelumnya tidak diverifikasi
+
+User tanya kenapa `log_likelihood_check` (§9.35) pakai Qwen3-4B, bukan
+EXAONE — padahal paper sendiri (Section III-C) berargumen EXAONE lebih
+baik untuk Korea karena Korea-first training. Pertanyaan sah: pilihan
+Qwen3 sebelumnya cuma warisan dari `solver_check.py` yang sudah ada
+(dipilih untuk alasan independensi dari generator di check (c)), bukan
+hasil perbandingan langsung untuk tugas scoring yang baru ini.
+
+**Diuji langsung** — EXAONE-4.0-1.2B dengan metode sama persis (log-
+probability teacher-forced) di N=20/skill, 11 skill:
+
+| Model | Overall |
+|---|---|
+| Qwen3-4B | 49/56 = 87.5% |
+| EXAONE-4.0-1.2B | **27/56 = 48.2%** |
+
+**EXAONE jauh lebih buruk** — bahkan DI BAWAH 50% (lebih buruk dari
+tebak acak) khusus di `particle_loc` (0/7!). Kemungkinan penyebab:
+ukuran model (1.2B vs 4B) lebih dominan daripada keunggulan Korea-first
+training untuk tugas nuansa gramatikal halus semacam ini — bukan
+assumption, EXAONE memang dilatih Korea-first (per Section III-C), tapi
+kapasitas parameter yang jauh lebih kecil kalah telak di tugas ini.
+
+**Kesimpulan: pilihan Qwen3 tetap benar, sekarang dengan bukti, bukan
+kebetulan warisan kode lama.** Ditambahkan 1 kalimat jujur di Section
+IV-B paper: EXAONE dicek, bukan diasumsikan, dan hasilnya dilaporkan
+apa adanya (48.2% vs 87.5%) — termasuk temuan spesifik yang
+counter-intuitive (model Korea-first bisa kalah dari model multilingual
+lebih besar untuk tugas tertentu) alih-alih diam-diam dipilih tanpa
+penjelasan.
+
+**File:** `src/content.py` saja (IV-B). Tidak ada perubahan kode — ini
+investigasi perbandingan model, bukan implementasi baru. Skrip uji
+ad-hoc di scratchpad, tidak dipermanenkan (hasil negatif untuk EXAONE,
+tidak perlu direproduksi rutin).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
