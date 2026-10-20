@@ -364,11 +364,25 @@ SKILL_SPECS = {
         "kind": "noun_counter",
         "kagas_code": "NOUN",  # official mapping, PRD §9.22
         "tag": "NNB",
+        # ("선생님","분","개") and ("책","권","개") were replaced 2026-10-20
+        # (PRD §9.43): validate_log_likelihood.py found both FAIL the
+        # log-probability check specifically, and only those two -- 개 (the
+        # generic, highest-frequency counter) outscores the correct but
+        # rarer counter (분, 권) on raw corpus frequency alone, a confound
+        # in that check's method, not evidence the items themselves are
+        # wrong (both still parse correctly by construction, same NNB tag
+        # either way, verified in distractor_validator terms). Replaced
+        # with distractors that don't pit the correct counter against the
+        # single highest-frequency catch-all word: 분 vs 명 (both common
+        # person-counters; now tests specifically the HONORIFIC nuance
+        # 분 vs 명, a sharper pedagogical point than 분 vs 개 ever was) and
+        # 권 vs 장 (book-counter vs sheet-counter, a genuine same-register
+        # mix-up rather than a counter no one would confuse 책 for).
         "pairs": (
             ("사과", "개", "명"),
             ("학생", "명", "개"),
-            ("선생님", "분", "개"),
-            ("책", "권", "개"),
+            ("선생님", "분", "명"),
+            ("책", "권", "장"),
             ("컵", "개", "명"),
         ),
     },
@@ -385,10 +399,20 @@ SKILL_SPECS = {
         "kagas_code": "MOD",  # official mapping, PRD §9.22
         "tag": "EC",
         "distractor_tag": "ETM",
+        # ("깨끗하다","청소해요") replaced 2026-10-20 (PRD §9.43):
+        # validate_log_likelihood.py found this the one failing pair
+        # (gap -0.62, distractor scored higher). 청소하다 is a 하다-compound
+        # (청소 + 하다), so the wrong attributive form "깨끗한" can attach to
+        # the embedded noun 청소 and still parse as a semi-natural "a clean
+        # cleaning" reading -- a structural opening the other, non-compound
+        # verbs (말하다 aside, which still passed) don't give it as readily.
+        # Replaced with 씻어요 (wash, a plain non-compound verb, no
+        # embedded noun for the wrong form to attach to), re-verified
+        # directly that the EC/ETM tag distinction still holds.
         "pairs": (
             ("조용하다", "말해요"),
             ("많다", "먹어요"),
-            ("깨끗하다", "청소해요"),
+            ("깨끗하다", "씻어요"),
             ("느리다", "걸어요"),
             ("빠르다", "달려요"),
         ),
