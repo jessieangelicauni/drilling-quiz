@@ -2597,5 +2597,65 @@ di proses peer review.
 
 ---
 
+### 9.41 Audit lanjutan: 3 sisa inkonsistensi ditemukan setelah branch disinkronkan — nama sitasi, docstring basi, dokumen sekunder basi
+
+User minta audit diteruskan ("jangan karena di paper/PRD tidak ada, malah
+tidak diperbaiki... investigasi, kalau meyakinkan go for it"). Hasil
+setelah branch disinkronkan ke `jessie-local-work` (§9.40 dst — sebagian
+besar temuan session itu sudah solid, bukan reframe lemah, lihat
+verifikasi di bawah):
+
+1. **`validate_novelty2.py`'s docstring basi** — klaim `corr(width,
+   error) = -0.81/-0.78/-0.78` untuk n=32/64/128 ternyata TIDAK cocok
+   lagi dengan output aktual skrip (dijalankan 2x, deterministik,
+   seed tetap): **-0.755/-0.849/-0.040**. Kemungkinan besar karena
+   `urnings_tracker.py` berubah (dari fix tau + consecutive-misconception
+   tracking) setelah docstring ditulis. Klaim di PAPER (-0.76 untuk n=32)
+   tetap benar/cocok dengan kode saat ini — cuma dokumentasi internal
+   skrip yang basi. Diperbaiki: angka diganti ke hasil aktual, klaim
+   "reproduced at n=64/128" dan "+0.09 at n=256" dihapus (tidak lagi bisa
+   direproduksi dari skrip ini saat ini — n=256 bahkan tidak diuji skrip
+   permanen ini sama sekali), diganti deskripsi jujur: kuat negatif di
+   n=32/64, nyaris nol di n=128, bukan tren mulus seperti klaim lama.
+
+2. **Nama penulis "Lin et al." tersisa di body text** meski nomor sitasi
+   [29] sudah diarahkan ke paper yang benar (Thomas et al.) oleh session
+   sebelumnya — cuma SATU baris di Section II-F (gap G3), tapi tetap
+   inkonsistensi nyata (pembaca yang cek nomor [29] di References akan
+   lihat "Thomas et al." sementara teksnya bilang "Lin et al."). Diperbaiki.
+
+3. **`docs/literature-review-15.md` ketinggalan jauh** — dokumen kurasi
+   terpisah ini masih pakai skema lama sepenuhnya: G1-G4 (4 gap, bukan
+   3), "Novelty 1/2/3" versi lama (sebelum Novelty 1 lama dihapus §9.18
+   dan Novelty 2 diganti jadi robustness), DAN entri #10 masih salah
+   total (metadata "J. Lin... Retrieval-Augmented Lesson Generation"
+   padahal deskripsinya tentang temuan 885-learner/2-dari-7-lesson milik
+   Thomas et al. — sitasi [29] di paper utama sudah benar, tapi dokumen
+   sekunder ini belum ikut diperbaiki). **Ditulis ulang menyeluruh**:
+   G1-G4→G1-G3 (gap lama soal "generation/calibration dipisah" dihapus,
+   bukan disimpan sebagai entri yatim), semua referensi "Novelty 1/2/3"
+   lama diganti ke penomoran saat ini (2 novelty: distractor=1,
+   robustness=2; eskalasi bukan novelty), entri #10 diganti metadata
+   lengkap ke Thomas et al. dengan catatan koreksi eksplisit, entri #4
+   (Liu et al.) diperbaiki sinkron dengan fix §9.40 di `content.py`,
+   "Net observation" diperbarui "tiga novelty"→"dua novelty".
+
+**Diverifikasi:** `python3 -m py_compile src/content.py
+src/validate_novelty2.py` lolos; `python3 src/build_docx.py` rebuild
+`paper/KO-DRILL_IEEE.docx` tanpa error.
+
+**Area lain yang dicek dan ditemukan SOLID, bukan reframe lemah** (dicatat
+supaya tidak diperiksa ulang tanpa alasan baru): paragraf 85%-target vs
+discrimination-index (angka 0.41 vs 0.34, "18% relative drop" — ada
+metodologi simulasi konkret di baliknya, bukan klaim kosong); demosi
+eskalasi dari novelty jadi application policy (didukung bukti negatif
+langsung, bukan dihindari); caption Fig. 3 sudah konsisten "application
+policy" bukan "Novelty 2"; Discussion/Conclusion (Section VI) konsisten
+dengan state saat ini; scope-note growing-pool-regime (Section III-B)
+jujur soal keterbatasan non-monotonic yang belum dipahami penuh,
+bukan ditutupi.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

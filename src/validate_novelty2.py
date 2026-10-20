@@ -36,12 +36,26 @@ what Section V-C assumes it measures:
   intervention is the one least likely to ever trigger it. A learner near
   the pool's centre (theta=0) gets the WIDEST urn (0.16-0.17, "most
   uncertain") while carrying middling, unremarkable error. Across a grid
-  of theta values this gives corr(width, error) = -0.81 at n=32 -- not
-  noise, reproduced at n=64 and n=128 (-0.78 both), and only turns mildly
-  positive (+0.09, on 7 points, not conclusive) at n=256, suggesting this
-  is specifically an n=32 discretisation-floor problem (§9.13 already
-  independently found n=32's terminal RMSE floor is ~0.45 logit units --
-  consistent with the ~0.4-0.6 error floor found here regardless of
+  of theta values this gives corr(width, error) = -0.755 at n=32, -0.849
+  at n=64 -- strongly negative at both, not noise, but NOT monotonically
+  shrinking towards zero either (these numbers were re-verified directly
+  against this script's current output, not copied from an earlier run;
+  an earlier draft of this docstring reported -0.81/-0.78/-0.78 for
+  n=32/64/128 and a since-unreproduced +0.09 at n=256 -- those are stale
+  relative to urnings_tracker.py's current update() behaviour and are not
+  restated here). At n=128 the correlation nearly vanishes (-0.040,
+  verified below, run `python3 validate_novelty2.py`) -- consistent with
+  the general direction (the problem does not get WORSE as n grows), but
+  the exact shape is noisier than a clean "shrinks smoothly to positive"
+  story, and no n=256 result is currently reproduced by this script to
+  check whether the earlier mildly-positive reading still holds. The
+  paper (Section IV-C) cites only the n=32 figure, which this script
+  continues to support (-0.76 after rounding); it does not rely on the
+  n=64/128/256 trend, so this docstring's correction does not change the
+  paper's claim, only this module's own account of its robustness check.
+  §9.13 already independently found n=32's terminal RMSE floor is ~0.45
+  logit units -- consistent with the ~0.4-0.6 error floor found here
+  regardless of
   position, which leaves width very little real signal to track).
 
   Implication: the escalation novelty's justification needs ONE of two

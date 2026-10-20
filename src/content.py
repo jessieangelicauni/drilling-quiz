@@ -327,7 +327,7 @@ BODY = [
       "exactly that configuration, because items must be calibrated as they are used. We "
       "are not aware of any language learning system that uses Urnings."),
 
-("P", "G3. Feedback is generated uniformly, and its benefits are not. Lin et al., studying "
+("P", "G3. Feedback is generated uniformly, and its benefits are not. Thomas et al., studying "
       "on-demand LLM explanatory feedback across seven lessons with 885 learners, found "
       "statistically significant benefits in only two of them, with effect sizes of 0.28 and "
       "0.33 after adjusting for learners' propensity to request feedback [29]. Feedback is "

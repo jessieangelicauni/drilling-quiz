@@ -57,11 +57,18 @@ role.
 Y. Liu, S. Bhandari, Z. A. Pardos — *British Journal of Educational Technology*, 56(3), 1028–1052, May 2025. Wiley.
 **Link:** https://doi.org/10.1111/bjet.13570
 
-Simulates test-takers with LLMs and compares the resulting response
-patterns against real psychometric data: systematic divergence found.
-Evidence that asking an LLM to self-report how hard its own generated item
-is produces unreliable estimates — motivates Novelty 1 (seed the prior
-from an external encoder, not from the generator's own judgment).
+Simulates test-takers with LLMs and calibrates item parameters from the
+responses: a single LLM's item-level parameters correlate well with
+human-calibrated ones (Spearman above 0.8 for the strongest model
+tested), but no single model reproduces the full human ability
+distribution — each model's simulated population is narrower and less
+variable than real test-takers, closed only by pooling several models.
+**Not** "systematic divergence from human data" (an earlier draft of
+this review mischaracterised it that way, corrected 2026-10-20 after
+re-checking the source directly). The paper's actual use of this
+source (Section I) is narrower than "LLMs can't judge difficulty": a
+single LLM is not a population of learners, so nothing here licenses
+one model self-rating its own generated item's difficulty.
 
 ---
 
@@ -116,15 +123,28 @@ counter-example showing generative AI research in language learning
 currently concentrates on conversational practice, not structured,
 difficulty-calibrated assessment items.
 
-### 10. Retrieval-Augmented Lesson Generation with Large Language Models for Scenario-Based Tutor Training
-J. Lin, S. Y. Zhao, A. Gurung, X. Meng, K. R. Koedinger — *Journal of Computer Assisted Learning*, 42(6), Dec. 2026. Wiley.
-**Link:** https://doi.org/10.1002/jcal.70343
+### 10. LLM-Generated Feedback Supports Learning if Learners Choose to Use It
+D. R. Thomas, C. Borchers, S. Bhushan, E. Gatz, S. Gupta, K. R. Koedinger — *Lecture Notes in Computer Science*, vol. 16063, Springer, 2026.
+**Link:** https://doi.org/10.1007/978-3-032-03870-8_33
 
 Across 2,600+ lesson completions and 885 learners, on-demand LLM
 explanatory feedback produced statistically significant learning gains in
 only **two of seven** lessons after adjusting for selection bias. Direct
-empirical motivation for Novelty 3 (uncertainty-gated escalation): uniform
-LLM feedback is not uniformly worth its cost.
+empirical motivation for the uncertainty-gated escalation *policy* (paper
+Section IV-D) — uniform LLM feedback is not uniformly worth its cost — but
+that policy is reported as an application decision, not promoted to a
+research novelty, so this source motivates a design choice, not one of
+the paper's two novelty claims.
+
+**Correction (2026-10-20):** this entry previously cited a different
+paper — J. Lin, S. Y. Zhao, A. Gurung, X. Meng & K. R. Koedinger,
+"Retrieval-Augmented Lesson Generation for Scenario-Based Tutor
+Training," *Journal of Computer Assisted Learning*, 42(6), Dec. 2026
+(doi: 10.1002/jcal.70343) — under this same slot, with the 885-learner/
+2-of-7-lesson finding wrongly attributed to it. That paper is about
+generating training materials for human tutors, not measuring feedback
+effectiveness on learners, and is not cited anywhere else in this
+review or the paper's reference list once removed from this slot.
 
 ---
 
@@ -136,8 +156,9 @@ H. W. Awalurahman, R. F. Aji, I. Budi — *IEEE Access*, 13, 127100–127112, 20
 
 Recent systematic review confirming the field evaluates generated
 questions mostly on fluency/surface metrics, not on psychometric or
-pedagogical usefulness — the gap (G1 in the paper) that motivates treating
-generation and calibration as one loop rather than two separate problems.
+pedagogical usefulness — general context for why automatic item
+generation research hasn't closed the diagnosis gap (G1) or the
+tracker-validity gap (G2) below on its own.
 
 ### 12. Distractor Generation for Multiple-Choice Questions with Predictive Prompting and Large Language Models
 S. K. Bitew, J. Deleu, C. Develder, T. Demeester — in *Communications in Computer and Information Science*, Springer, 2025, pp. 48–63. (Springer-published peer-reviewed proceedings volume, not a standalone journal — flagged for transparency.)
@@ -146,8 +167,8 @@ S. K. Bitew, J. Deleu, C. Develder, T. Demeester — in *Communications in Compu
 State-of-the-art distractor generation via predictive prompting — but only
 ~53% of generated distractors were rated high-quality by teachers.
 Distractors here are optimized purely for *plausibility*, never for
-diagnosing *which* misconception a wrong answer reveals — the gap Novelty 2
-(KAGAS-conditioned distractors) directly addresses.
+diagnosing *which* misconception a wrong answer reveals — the gap
+Novelty 1 (misconception-conditioned distractors) directly addresses.
 
 ### 13. Efficient Unified Framework for Difficulty-Controllable Question Generation
 X. Dong, Z. Li — *IEEE Access*, 14, 76358–76371, 2026. IEEE (gold OA).
@@ -156,9 +177,14 @@ X. Dong, Z. Li — *IEEE Access*, 14, 76358–76371, 2026. IEEE (gold OA).
 Combines active-learning labeling with LoRA-based prompting to steer
 generation toward a requested difficulty. One of the few papers to treat
 difficulty control as a first-class generation objective rather than an
-afterthought — closest prior work to Novelty 1, but still relies on the
-generator's own difficulty judgment rather than an independent calibration
-loop.
+afterthought — but still relies on the generator's own difficulty
+judgment, the same self-rating weakness source [4] documents directly;
+general context, not the closest prior work to either of this paper's
+two novelties specifically (an earlier draft of this review called it
+the closest prior work to a difficulty-calibration novelty that has
+since been removed from the paper entirely, see §9.18 in the project's
+own decision log; corrected here rather than left pointing at something
+that no longer exists).
 
 ### 14. Automatic Question-Answer Pairs Generation Using Pre-Trained Large Language Models in Higher Education
 J. Ling, M. Afzaal — *Computers and Education: Artificial Intelligence*, 6, 100252, Jun. 2024. Elsevier.
@@ -166,8 +192,8 @@ J. Ling, M. Afzaal — *Computers and Education: Artificial Intelligence*, 6, 10
 
 Establishes feasibility of LLM-generated QA pairs for higher-education
 assessment at scale — representative baseline of "generate without
-calibrate" (gap G1), the pattern this paper's Generate–Calibrate–Select
-loop is built to close.
+calibrate," general context for the same self-rating weakness [4]
+documents directly; not tied to a specific numbered gap below.
 
 ### 15. QuerIA: Adaptive Question Generation and Evaluation in Higher Education Using Large Language Models and Contextual Learning
 C. Badenes-Olmedo, P. Eyzaguirre — *Expert Systems with Applications*, 301, 130140, Mar. 2026. Elsevier.
@@ -182,26 +208,26 @@ paper's contribution turns on.
 
 ## Research Gaps Identified
 
-Reading the 15 sources together, four gaps emerge — each one is evidenced
-by at least two independent, recent (2025–2026) sources above, not asserted
-from a single paper.
+**Renumbered 2026-10-20** to match the paper's current state: an earlier
+draft of both this review and the paper itself had a fourth, first gap
+("generation and calibration studied as two separate problems") that
+motivated a difficulty-calibration novelty since removed from the paper
+entirely (PRD §9.18 — tested directly, the core claim did not hold).
+That gap is dropped here too, not kept as an orphaned entry pointing at
+a novelty that no longer exists. The paper now argues two novelties
+against three gaps, not three against four; G1–G3 below are renumbered
+to match the paper's own G1–G3 one-to-one, each evidenced by at least
+two independent, recent (2025–2026) sources above, not asserted from a
+single paper.
 
-### G1 — Generation and calibration are studied as two separate problems
-Evidenced by: [11] (systematic review confirms evaluation stays at the
-fluency/surface level), [14], [15] (both generate and evaluate output
-quality, neither calibrates against a learner-ability model), [13]
-(closest attempt at difficulty-aware generation, but still self-judged by
-the generator). **No source in this set treats generation and calibration
-as a single closed loop.**
-
-### G2 — Distractors are optimized for plausibility, not diagnosis
+### G1 — Distractors are optimized for plausibility, not diagnosis
 Evidenced by: [12] (predictive prompting improves plausibility, ceiling
 ~53% teacher-rated quality; no diagnostic labeling of *why* a distractor is
 wrong). Cross-checked against Korean-specific error data in [5] — a
 taxonomy of real, attested Korean learner errors exists and is
 under-exploited by the distractor-generation literature.
 
-### G3 — Psychometric rating systems are deployed outside their proven validity conditions
+### G2 — Psychometric rating systems are deployed outside their proven validity conditions
 Evidenced by: [1] (analytically proves Elo's specific failure mode:
 simultaneous adaptive selection + dynamic item calibration), [2] (the fix,
 from the same research lineage that runs a major Elo-based deployment).
@@ -209,18 +235,30 @@ from the same research lineage that runs a major Elo-based deployment).
 Urnings or any Elo alternative — all assume either a fixed pre-calibrated
 bank or do not address item-level adaptivity at all.**
 
-### G4 — LLM-generated feedback is applied uniformly though its benefit is not
+### G3 — LLM-generated feedback is applied uniformly though its benefit is not
 Evidenced by: [10] (significant learning gains in only 2 of 7 lessons,
 quantified with propensity-adjusted effect sizes of 0.28–0.33). Cross-
 checked against the broader generative-AI-in-Korean/L2 set [7]–[9], none
 of which gate or ration feedback generation by measurement uncertainty —
-feedback is generated the same way for every learner, every time.
+feedback is generated the same way for every learner, every time. This
+gap motivates the uncertainty-gated escalation *policy* in the paper
+(Section IV-D), reported as an application decision rather than a third
+research novelty — the policy's own width-tracks-error premise was
+tested directly and did not hold at the urn size this system uses
+(validate_novelty2.py, corr(width, true error) ≈ −0.76 to −0.85
+depending on urn size), so the paper deliberately claims only that the
+policy targets observable-record ambiguity, not absolute measurement
+error.
 
 **Net observation:** every gap sits at the *intersection* of two literatures
 that currently don't cite each other — psychometrics (A, B) and generative
 NLP for education (D, E) — plus a Korean-specific data gap (C) that neither
 literature currently draws on. That intersection is where this paper's
-three novelties (Section IV of `paper/KO-DRILL_IEEE.docx`) are positioned.
+two novelties (Section IV of `paper/KO-DRILL_IEEE.docx`) are
+positioned — misconception-conditioned distractors (G1) and Urnings'
+demonstrated robustness to an uncalibrated item-difficulty prior (G2).
+G3 is addressed by an application policy, not claimed as a third
+novelty (see above).
 
 ---
 
