@@ -3729,5 +3729,60 @@ apakah threshold 0.43 masih pas di skala produksi (baru dikalibrasi di
 
 ---
 
+### 9.58 Investigasi korpus KoLLA v2.0 untuk mining error partikel nyata (persiapan fine-tuning vs kurasi berbasis frekuensi)
+
+**Konteks**: lanjutan audit §9.57 — user tanya spesifik apakah pakai
+korpus ini artinya fine-tuning/training model sungguhan, atau cuma
+analisis data. Dijelaskan: 2 jalur beda level — (A) analisis frekuensi
+murni (bukan training, cuma informasikan kurasi tabel distraktor yang
+sudah ada) vs (B) fine-tune classifier kecil (KLUE-RoBERTa) pakai
+anotasi error korpus sebagai label asli. User: "mau, apakah menurut
+anda itu best to try? apakah ada corpus yang lebih tepat dan cocok?"
+
+**Pencarian alternatif korpus** (websearch, bukan diasumsikan KoLLA
+satu-satunya): tidak ditemukan korpus Korea lain yang (a) anotasi error
+gramatikal LEBIH LUAS dari partikel saja DAN (b) bisa diunduh langsung
+tanpa proses aplikasi/persetujuan. NIKL's "모두의 말뭉치" (Everyone's
+Corpus) punya korpus pembelajar Korea, tapi: butuh isi perjanjian
+online + persetujuan dulu (bukan unduh langsung), dan yang terkonfirmasi
+tersedia adalah anotasi MORFOLOGI (POS tagging), BUKAN anotasi error
+gramatikal — tidak jelas apakah anotasi error-nya didistribusikan
+resmi sama sekali. **Kesimpulan**: KoLLA v2.0 tetap pilihan PRAKTIS
+terbaik saat ini — bukan karena scope-nya ideal (sudah dikonfirmasi
+sempit, cuma partikel, §9.57), tapi karena satu-satunya yang
+dikonfirmasi bisa diunduh langsung (Zenodo, GPLv3, tanpa aplikasi).
+
+**Download diblokir di sandbox ini juga**: `zenodo.org` ternyata SAMA
+diblokir seperti `huggingface.co` (dicek lewat endpoint status proxy —
+kebijakan, bukan transient). Ditulis
+`src/investigate_kolla_corpus.py` untuk dijalankan user di mesin
+dengan akses internet: download via Zenodo API resmi, ekstrak file M2
+(format anotasi GEC standar), survei SEMUA tag error_type yang
+benar-benar ada (bukan diasumsikan dari deskripsi prosa di paper —
+paper cuma bilang "omission/substitution/addition/ordering" tapi tidak
+mengonfirmasi string tag M2 yang sesungguhnya dipakai), lalu hitung
+instance per jenis substitusi partikel yang relevan ke proyek ini
+(이/가, 을/를, 은/는, 에/에서, 과/와, 로/으로).
+
+**Diverifikasi di sandbox ini** (tanpa akses network, logic murni):
+regex parser M2 dites terhadap sampel sintetis mengikuti format M2
+standar (`S ...` / `A start end|||etype|||correction|||...`) — berhasil
+ekstrak etype dan correction dengan benar. **BELUM diverifikasi**:
+apakah taksonomi tag KoLLA yang sesungguhnya cocok dengan asumsi
+regex ini (butuh file nyata, tidak bisa diunduh di sini) — makanya
+skrip SENGAJA mensurvei semua tag yang ada dulu (bukan langsung
+filter dengan asumsi), supaya kalau asumsi salah, user/sesi berikutnya
+bisa lihat taksonomi asli dan sesuaikan filternya.
+
+**Aturan keputusan yang ditulis eksplisit di skrip**: kalau mayoritas
+jenis partikel punya <~30 instance, jalur B (fine-tuning) tidak
+realistis (risiko overfitting), jalur A (kurasi berbasis frekuensi,
+tanpa training) jadi pilihan yang masuk akal. Belum diputuskan sampai
+hasil nyata didapat.
+
+**File:** `src/investigate_kolla_corpus.py` (baru).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
