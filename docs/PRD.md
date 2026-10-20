@@ -2145,5 +2145,62 @@ direproduksi).
 
 ---
 
+### 9.32 Bug nyata ditemukan dari sisi "user"/personalisasi — kode serving produksi diam-diam pakai target 50%, bukan 85% yang diklaim paper, DIPERBAIKI DI KODE (bukan paper)
+
+User minta audit lanjutan dari sisi lain (distractor, rating system,
+question, **answer, user**). Dicek jalur seleksi item sungguhan
+(`question_bank.py::BankContentProvider.next_new_grammar_item` — satu-
+satunya tempat seleksi adaptif nyata terjadi, `ExaoneGrammarProvider`
+tidak pernah memilih di antara kandidat karena generate satu per
+panggilan) terhadap klaim Section IV-D Eq. 2 (target sukses 85%, demi
+pedagogi, bukan 50% demi presisi pengukuran).
+
+**Ditemukan: kode produksi diam-diam mengimplementasikan target 50%
+(mencocokkan item persis ke kemampuan learner, `abs(beta_hat - theta)`,
+TANPA offset apa pun), bukan 85%.** Komentar kode sendiri bahkan jujur
+menyebut ini "sama persis prinsip target ~50% sukses seperti
+`simulate_trackers.pick_adaptive`" — defaultnya memang 0.5. Ini **beda
+arah** dari temuan sebelumnya (KLUE-RoBERTa, minimal-pair-probe): di
+sana PAPER yang mengklaim sesuatu yang tidak ada di kode; di sini KODE
+yang diam-diam melakukan hal berbeda dari yang diklaim paper DAN
+divalidasi (`validate_item_discrimination.py` yang saya bangun sendiri
+mengukur biaya kebijakan 85% — tapi kebijakan itu TIDAK PERNAH benar-
+benar jalan di jalur serving produksi).
+
+**Diperbaiki di KODE, bukan paper** — karena argumen desain 85%
+(Wilson et al. [27], "desirable difficulty") sudah benar dan sudah
+divalidasi lewat discrimination index (§9.26: masih "good" di 0.34 vs
+0.408 maksimal-informasi). Target=50% yang sebelumnya jalan diam-diam
+justru persis "classical adaptive testing" yang paper argumentasikan
+MELAWAN. `question_bank.py`: tambah `_TARGET_SUCCESS=0.85` +
+`_LOGIT_OFFSET=log(0.85/0.15)` sebagai konstanta eksplisit (bukan angka
+ajaib tersebar), sort key diubah dari `abs(beta_hat - theta)` jadi
+`abs(beta_hat - (theta - _LOGIT_OFFSET))` — formula sama persis dengan
+yang sudah divalidasi di `simulate_elo_item_prior.py`'s `pick_adaptive`.
+
+**Smoke test diverifikasi ulang, bukan diasumsikan tetap lulus**:
+dihitung manual dulu (logit_estimate tiap urn di `difficulty_spread`)
+sebelum ubah kode — ketemu bahwa assersi lama untuk `strong_picks`
+(`⊆ {hard-1,hard-2,medium}`) akan PECAH di target 85%, karena learner
+kuat sekarang benar-benar diarahkan ke item yang memberi ~85% sukses
+BUKAN item sesulit kemampuannya sendiri (yang cuma kasih ~50%) — `hard-2`
+digantikan `easy-2` di top-3. Ini bukan bug baru, ini PERSIS perilaku
+yang diinginkan Eq. 2: learner kuat tidak lagi diberi item paling sulit
+yang tersedia, tapi item yang bikin dia "merasa berhasil" ~85% dari
+waktu. Assersi diperbarui sesuai perhitungan, dijalankan ulang
+(`question_bank.py`, `daily_drill.py`, `answer_processing.py`), semua
+smoke test lulus dengan GPU asli, bukan stub.
+
+**Paper TIDAK perlu diubah** — berbeda dari temuan-temuan sebelumnya,
+klaim paper (Eq. 2, Section IV-D, analisis discrimination index) sudah
+BENAR dari awal; yang salah adalah implementasinya. Setelah fix ini,
+untuk pertama kalinya klaim 85% itu benar-benar match dengan apa yang
+diserve ke user sungguhan — sebelumnya cuma benar di simulasi validasi,
+sekarang juga benar di jalur produksi.
+
+**File:** `src/question_bank.py` saja.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

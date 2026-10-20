@@ -17,10 +17,19 @@ urnings_tracker.py/streak.py -- swappable for a real database later
 """
 from __future__ import annotations
 
+import math
 import random
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+
+# Section IV-D Eq. 2's actual target (85% success, not maximum-information
+# 50%) -- the logit offset such that sigma(theta - (theta - _LOGIT_OFFSET))
+# = 0.85. Shared constant so the offset used here can never silently drift
+# from the one validate_item_discrimination.py/validate_novelty2.py assume
+# when they report this policy's measured cost.
+_TARGET_SUCCESS = 0.85
+_LOGIT_OFFSET = math.log(_TARGET_SUCCESS / (1.0 - _TARGET_SUCCESS))
 
 from difficulty_heuristic import estimate_difficulty
 from exaone_provider import ExaoneGrammarProvider, GeneratedItem
@@ -134,14 +143,18 @@ class BankContentProvider:
         if learner_urn is None:
             return self.rng.choice(candidates)  # no ability info -- fall back to uniform
 
-        # Adaptive selection: same "target ~50% success" principle as
-        # simulate_trackers.pick_adaptive (Fig. 5's already-validated
-        # simulation), applied to real served content instead of
-        # simulated data. item_urn's logit, negated, is the item's
-        # implied difficulty (same sign convention as
+        # Adaptive selection targeting 85% success (Section IV-D Eq. 2),
+        # NOT the 50%/maximum-information target simulate_trackers.pick_adaptive
+        # uses -- found and fixed as a real bug (PRD §9.32): this used to
+        # sort by raw |beta_hat - theta| with no offset at all, i.e. silently
+        # implemented the 50% target the paper explicitly argues against,
+        # while validate_item_discrimination.py/validate_novelty2.py (and
+        # Eq. 2 itself) all assumed 0.85. item_urn's logit, negated, is the
+        # item's implied difficulty (same sign convention as
         # simulate_trackers.run_urnings's beta_hat = -_logit_urn(...)).
         theta = learner_urn.logit_estimate()
-        candidates.sort(key=lambda iid: abs(-self.bank.entries[iid].item_urn.logit_estimate() - theta))
+        want = theta - _LOGIT_OFFSET
+        candidates.sort(key=lambda iid: abs(-self.bank.entries[iid].item_urn.logit_estimate() - want))
         # Pick randomly among the closest few, not always the single best
         # match -- a single best-match item_urn estimate is noisy (small
         # urn, possibly just seeded), and always returning the literal
@@ -234,8 +247,15 @@ if __name__ == "__main__":
                   for _ in range(20)}
     strong_picks = {adapt_provider.next_new_grammar_item("adapt_test", learner_urn=strong_learner)
                     for _ in range(20)}
+    # Expected sets recomputed for the 85%-target offset (PRD §9.32), not
+    # guessed: at 85%, a learner's closest-3 by |beta_hat - (theta - logit_offset)|
+    # skews toward items a bit EASIER than the learner, not items matched to
+    # their raw ability -- e.g. a strong learner's own ability-matched item
+    # ("hard-2") only gives them ~50% success, which Eq. 2 deliberately
+    # avoids; "easy-2" at 85% is closer to their actual 85%-success target
+    # than "hard-2" is, so it replaces "hard-2" in the closest-3 set.
     assert weak_picks <= {"easy-1", "easy-2", "medium"}, f"a weak learner must be served easier items, got {weak_picks}"
-    assert strong_picks <= {"hard-1", "hard-2", "medium"}, f"a strong learner must be served harder items, got {strong_picks}"
+    assert strong_picks <= {"medium", "hard-1", "easy-2"}, f"a strong learner must be served items near their 85%-success point, got {strong_picks}"
     assert weak_picks != strong_picks, "weak and strong learners must not get the same item distribution"
 
     seen = set()
