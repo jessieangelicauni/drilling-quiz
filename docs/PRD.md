@@ -2421,5 +2421,41 @@ tidak perlu direproduksi rutin).
 
 ---
 
+### 9.37 Perplexity sebagai proksi kesulitan item — diuji, GAGAL jelas, tidak diimplementasikan
+
+Lanjutan audit: dicoba pendekatan "scoring bukan judging" (insight yang
+baru berhasil di §9.35) untuk masalah prediksi kesulitan item
+(difficulty_heuristic.py) yang sebelumnya ditolak kalau basisnya
+judgment LLM (§9.36/turn sebelumnya — weak-supervision dari LLM ditolak
+karena bias sudah terbukti di literatur [12]). Hipotesis: mean
+log-probability per-token (surprisal/perplexity) dari Qwen3 bisa jadi
+sinyal kesulitan otomatis yang berbeda — berakar di teori surprisal
+psikolinguistik asli (Hale 2001/Levy 2008), bukan dari judgment LLM yang
+bias.
+
+**Diuji dengan pasangan kalimat yang urutan kompleksitasnya sudah jelas
+secara independen** (jumlah klausa, kehadiran honorific/subordinat/
+pasif — bukan ditebak dari LLM): **2 dari 4 pasangan hasilnya TERBALIK**
+— kalimat honorific+subordinat kompleks skor "lebih mudah" dari kalimat
+sederhana; kalimat panjang skor "lebih mudah" dari kalimat pendek.
+
+**Penjelasan (bukan cuma noise)**: perplexity mengukur predictability
+teks bagi MODEL yang dilatih di teks fasih native, bukan kesulitan bagi
+PEMBELAJAR. Kalimat formal/honorific yang dikonstruksi benar justru bisa
+sangat predictable (pola baku/kolokasi umum sering muncul di corpus),
+sama sekali tidak mencerminkan beban belajar strukturnya.
+
+**Tidak diimplementasikan.** Memperkuat kesimpulan sebelumnya:
+`difficulty_heuristic.py`'s pendekatan (hitung morfem + kehadiran tag
+gramatikal lanjutan) punya logika konseptual yang lebih tepat
+(kompleksitas struktural ≈ beban belajar) dibanding 2 pendekatan
+berbasis model yang sudah diuji dan gagal (judgment-bias §9.36 sesi
+lalu, dan surprisal-tidak-relevan di sini) — bukan kebetulan dipilih,
+tapi sekarang punya 2 alternatif yang sudah dibuktikan lebih buruk.
+
+**File:** tidak ada — hasil negatif, skrip uji di scratchpad saja.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
