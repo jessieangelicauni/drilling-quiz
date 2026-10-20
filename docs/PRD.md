@@ -2265,5 +2265,64 @@ benar untuk dilakukan.
 
 ---
 
+### 9.34 Cek "not also correct" otomatis genuinely berfungsi ditemukan — bukan LLM, murni skor parsing corpus kiwipiepy — menutup sebagian gap §9.30
+
+User minta implementasikan hal yang masih tertunda. Dicoba 1 arah yang
+sebelumnya dicatat "belum dicoba, butuh corpus eksternal" (§9.31) —
+ternyata TIDAK butuh corpus eksternal sama sekali: `kiwipiepy`'s
+`Kiwi.analyze()` sudah mengembalikan skor (log-probability-like) dari
+language model internal yang dilatih di corpus Korea — sinyal
+corpus-frequency asli, BUKAN LLM judge, arsitektur sama sekali berbeda
+dari 3 percobaan yang sudah gagal (§9.16, §9.31).
+
+**Diuji dulu secara empiris** (bukan diasumsikan) di 4 tipe skill pakai
+kasus yang kebenarannya pasti: `irregular_conj` (gap benar vs salah:
++3.0), `adj_relativizer` (+12.3 — gap besar), `particle_loc` (+4.8),
+`honorific` (**-1.9, terbalik** — sesuai dugaan: honorific bergantung
+konteks sosial yang tidak terwakili di frekuensi lokal).
+
+**Diuji skala N=20/skill di seluruh pasangan terkurasi 8 skill same-tag**
+(skill yang sebelumnya TIDAK punya cek otomatis apa pun untuk "distractor
+juga tidak kebetulan benar"): HASIL BERSIH TERBELAH — 5 skill reliable
+(particle_loc 7/7, time_range 5/5, irregular_conj 3/3, adj_relativizer
+6/6, verb_choice 5/5 — semua gap positif konsisten), 3 skill TIDAK
+reliable (honorific 1/5, tense_past 2/5, noun_counter 2/5 — gap negatif
+rata-rata, sinyal justru terbalik). Pola ini masuk akal: 5 skill reliable
+semua soal struktur kalimat LOKAL (partikel vs frasa langsung sekitarnya,
+konjugasi), 3 skill tidak reliable semua butuh petunjuk EKSTERNAL
+(register sosial honorific, penanda waktu terpisah, konvensi kelas kata
+benda arbitrer) yang tidak terwakili di skor frekuensi lokal.
+
+**Diimplementasikan**: `distractor_validator.py` dapat fungsi baru
+`lm_plausibility_gap()` + `validate_lm_plausibility(skill_id, ...)` —
+secara eksplisit SKIP (valid=True dengan alasan jelas, bukan diam-diam
+lolos) untuk skill di luar `LM_PLAUSIBILITY_RELIABLE_SKILLS` (set 5
+skill di atas), supaya caller yang cek semua skill seragam tidak diam-
+diam mempercayai sinyal yang sudah terbukti salah arah untuk 3 skill
+lainnya. Smoke test baru memverifikasi KEDUANYA — skill reliable harus
+lolos via gap positif ASLI, skill honorific harus lolos via jalur SKIP
+eksplisit (bukan kebetulan benar).
+
+**Skrip validasi permanen baru**: `validate_lm_plausibility.py` (CPU-only
+untuk pengecekan sendiri, GPU cuma untuk constructor `ExaoneGrammarProvider`
+yang generate item nyata) — dijalankan di N=20/skill untuk 5 skill
+reliable, hasil: **26/26 (100%)** — ini SELURUH pasangan terkurasi yang
+ada untuk 5 skill itu saat ini (bukan sampel), jadi angka ini akan
+berubah KOMPOSISINYA (bukan rate-nya) begitu pasangan baru dikurasi.
+
+**Paper diupdate** (Section IV-B + V-B): sekarang eksplisit menyebutkan
+3 framing LLM-judge yang dicoba dan gagal (bukan cuma 1 seperti
+sebelumnya) DAN cek non-LLM baru yang berhasil untuk 5/8 skill. Gap
+"tidak ada cek otomatis" sekarang menyusut dari 8 skill jadi 3 skill
+(honorific, tense_past, noun_counter) yang MEMANG genuinely butuh
+konteks eksternal yang tidak bisa diwakili sinyal lokal apa pun —
+bukan kegagalan mencari, tapi batasan struktural yang sudah dibuktikan.
+
+**File:** `src/distractor_validator.py` (fungsi baru + smoke test),
+`src/validate_lm_plausibility.py` (baru), `src/content.py` (IV-B, V-B).
+Diverifikasi di PDF halaman demi halaman, Fig. 1-5 tetap tepat 1x.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

@@ -289,6 +289,59 @@ def correct_korean_conjugation(text: str) -> str:
     return _HANGUL_SPAN.sub(_fix_span, text)
 
 
+# Skills where kiwipiepy's parse score is an empirically confirmed signal
+# for "correct form more plausible than distractor" (PRD §9.34) -- NOT a
+# general-purpose semantic checker, scoped exactly to where it was tested
+# and shown reliable. Deliberately excludes honorific/tense_past/
+# noun_counter: tested on real curated pairs and found the SAME bias
+# direction every time (plain/more-frequent form outscores the
+# contextually-correct one) because correctness there depends on a social
+# or temporal cue external to local n-gram frequency (honorific register,
+# a time adverb elsewhere in the sentence, an arbitrary noun-class
+# convention) -- exactly the kind of context a frequency-based parse score
+# cannot see. Do not add a skill to this set without first checking it
+# empirically the same way (see __main__), not by assuming it transfers.
+LM_PLAUSIBILITY_RELIABLE_SKILLS = frozenset({
+    "particle_loc", "time_range", "irregular_conj", "adj_relativizer", "verb_choice",
+})
+
+
+def lm_plausibility_gap(correct_sentence: str, distractor_sentence: str) -> float:
+    """kiwipiepy's own analyze() score (log-probability-like, from its
+    internal language model -- a genuine corpus-frequency signal, not an
+    LLM judge) for the correct-filled sentence minus the distractor-filled
+    one. Positive means the correct form is more plausible per the corpus
+    LM; this is the raw signal validate_lm_plausibility() thresholds at 0.
+
+    Tried after two LLM-judge framings for "is this distractor also
+    correct" both failed empirically (PRD §9.31, Qwen3-4B: yes-biased
+    under direct judgment, below-chance under pairwise comparison) --
+    this is a structurally different approach (no LLM call at all) that
+    was tested, not assumed, before being added: see PRD §9.34 for the
+    N=20/skill validation run this threshold is based on.
+    """
+    correct_score = _KIWI.analyze(correct_sentence, top_n=1)[0][1]
+    distractor_score = _KIWI.analyze(distractor_sentence, top_n=1)[0][1]
+    return correct_score - distractor_score
+
+
+def validate_lm_plausibility(skill_id: str, correct_sentence: str,
+                              distractor_sentence: str) -> ValidationResult:
+    """Only meaningful for skills in LM_PLAUSIBILITY_RELIABLE_SKILLS --
+    returns valid=True (no opinion, not a false pass) for any other skill,
+    so a caller that checks every skill uniformly does not silently start
+    trusting a signal known to point the wrong way for honorific/
+    tense_past/noun_counter.
+    """
+    if skill_id not in LM_PLAUSIBILITY_RELIABLE_SKILLS:
+        return ValidationResult(True, f"lm_plausibility not validated for skill '{skill_id}', skipped")
+    gap = lm_plausibility_gap(correct_sentence, distractor_sentence)
+    if gap > 0:
+        return ValidationResult(True, f"correct form scores {gap:.2f} higher, as expected")
+    return ValidationResult(False, f"distractor scores {-gap:.2f} higher than the correct form -- "
+                                    f"suspect pair, flag for review rather than ship silently")
+
+
 if __name__ == "__main__":
     stem = "나는 학교___ 갔다."
 
@@ -374,5 +427,20 @@ if __name__ == "__main__":
     assert postn_topic.valid, "the particle right after 저 (저는, no contraction) must validate as JX"
     postn_bad = validate_postnominal_tag("제가 커피를 마셔요?", "저", "JX")
     assert not postn_bad.valid, "제가's particle is JKS, must not pass a JX check"
+
+    # lm_plausibility (PRD §9.34): must correctly favor the correct form
+    # for the 5 confirmed-reliable skills, and must stay neutral (not
+    # silently wrong) for the 3 known-unreliable ones instead of being
+    # applied there anyway.
+    lm_particle = validate_lm_plausibility("particle_loc", "저는 학교에서 공부해요.", "저는 학교에 공부해요.")
+    assert lm_particle.valid, f"particle_loc: correct form (에서) must score higher, got {lm_particle.reason}"
+    lm_irregular = validate_lm_plausibility("irregular_conj", "저는 머리를 잘라요.", "저는 머리를 자르어요.")
+    assert lm_irregular.valid, f"irregular_conj: contracted form must score higher, got {lm_irregular.reason}"
+    lm_adj = validate_lm_plausibility("adj_relativizer", "저는 매운 음식을 좋아해요.", "저는 맵는 음식을 좋아해요.")
+    assert lm_adj.valid, f"adj_relativizer: correct relativizer must score higher, got {lm_adj.reason}"
+    lm_honorific = validate_lm_plausibility("honorific", "할머니께서 쉬세요.", "할머니께서 쉬어요.")
+    assert lm_honorific.valid and "skipped" in lm_honorific.reason, (
+        "honorific is a known-unreliable skill -- must return valid=True via the explicit "
+        f"skip path, not by coincidentally scoring correctly, got {lm_honorific.reason}")
 
     print("all smoke tests passed")
