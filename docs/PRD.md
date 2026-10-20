@@ -2324,5 +2324,63 @@ Diverifikasi di PDF halaman demi halaman, Fig. 1-5 tetap tepat 1x.
 
 ---
 
+### 9.35 User: "jangan berhenti karena belum tercatat di paper/PRD, paper harus ikuti diskusi kita" — ditemukan solusi lebih kuat dari §9.34, cakupan naik dari 5/8 jadi 10/11 skill
+
+User eksplisit: kalau sesuatu belum ada di paper/PRD, itu bukan alasan
+berhenti — investigasi terus, dan kalau perlu sumber daya tambahan
+(corpus eksternal) untuk hasil bagus, go for it. Direspons dengan
+investigasi dulu APAKAH corpus eksternal benar-benar yang dibutuhkan
+untuk 3 skill yang gagal di §9.34 (honorific/tense_past/noun_counter) —
+ternyata BUKAN. Masalahnya bukan "kurang data corpus", tapi kiwipiepy's
+scoring model terlalu sederhana (statistik lokal, tidak benar-benar
+"mengingat" konteks jauh seperti kata "어제" atau subjek berhormat
+beberapa kata sebelumnya).
+
+**Dicoba pendekatan berbeda**: bukan tanya LLM "apakah ini benar?" (yang
+3 kali terbukti gagal karena bias — §9.16, §9.31), tapi baca langsung
+**log-probability Qwen3-4B sendiri** untuk kalimat yang sudah diisi,
+teacher-forced — ini SCORING, bukan JUDGING, jadi acquiescence bias tidak
+berlaku sama sekali (tidak ada pertanyaan untuk "disetujui").
+
+**Diuji di 5 kasus known-truth dulu**: SEMUA 5 benar, termasuk 3 yang
+gagal di kiwipiepy (honorific, tense_past, noun_counter-style). **Diuji
+skala N=20/skill di SEMUA 11 skill**: 49/56 (87.5%) pada run pertama,
+dengan pola jelas — `subj_topic` gagal total (0/4, SESUAI DUGAAN, bukan
+kegagalan metode — independen mengkonfirmasi ulang §9.11 bahwa itu
+konvensi tekstual bukan aturan keras), `noun_counter` lemah (3/5,
+diselidiki lebih jauh: counter generik 개 kadang mengalahkan counter
+spesifik-tapi-jarang seperti 권/분 murni soal frekuensi mentah — pola
+yang bisa dijelaskan, bukan noise).
+
+**Diimplementasikan di `solver_check.py`** (reuse Qwen3-4B yang sudah
+dimuat untuk check (c), tidak ada model baru): `sentence_logprob()` +
+`log_likelihood_check(skill_id, ...)`, `LOGPROB_RELIABLE_SKILLS` (10 dari
+11 skill, `subj_topic` dikecualikan by design) + `LOGPROB_SKILL_NOTES`
+untuk mendokumentasikan keterbatasan noun_counter secara eksplisit.
+Smoke test baru memverifikasi kedua jalur (skill reliable lolos via gap
+asli, subj_topic lolos via skip eksplisit, bukan kebetulan).
+
+**Skrip validasi permanen**: `validate_log_likelihood.py`, dijalankan
+N=20/skill di 10 skill: **49/52 (94.2%)** — 9 dari 10 skill nyaris
+sempurna, `noun_counter` 3/5 dengan alasan jelas.
+
+**Ini LEBIH KUAT dari §9.34's hasil kiwipiepy (5/8 skill)** — cakupan
+naik ke **10/11 skill** (dari sebelumnya cuma 3/11 lewat tag mismatch).
+Gap "tidak ada cek otomatis untuk distractor juga-benar" sekarang
+tersisa HANYA untuk `subj_topic` — dan itu BUKAN gap yang perlu
+ditutup, karena item itu memang secara desain tidak punya satu jawaban
+benar yang keras (§9.11).
+
+**Paper diupdate** (Section IV-B + V-B): narasi sekarang menjelaskan
+progresi penuh — 3 framing LLM-judge gagal → insight "scoring bukan
+judging" → kiwipiepy (5/8) → Qwen3 log-prob (10/11, lebih kuat karena
+pemahaman kontekstual lebih dalam dari parser statistik sederhana).
+
+**File:** `src/solver_check.py` (fungsi baru + smoke test),
+`src/validate_log_likelihood.py` (baru), `src/content.py` (IV-B, V-B).
+Diverifikasi di PDF halaman demi halaman, Fig. 1-5 tetap tepat 1x.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

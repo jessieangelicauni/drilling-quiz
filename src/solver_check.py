@@ -54,13 +54,38 @@ History (found empirically, not assumed -- §9.16):
     `unambiguous` verdict (see below) -- a check with a known yes-bias
     would make every item look falsely safe, which is worse than not
     running it at all.
+  - Two further JUDGMENT framings tried later (PRD §9.31) also failed:
+    context-anchored forced-choice (worse than the original -- wrong in
+    both directions now, not just consistently yes-biased) and pairwise
+    comparison (below chance, and reasoning mode never finished within
+    300 tokens). Three judgment framings, three different failure modes
+    -- treated as confirmation this model cannot reliably JUDGE this
+    distinction when asked directly, not as "the right prompt hasn't
+    been found yet."
+  - What DOES work (PRD §9.34/§9.35), found by changing the TASK rather
+    than the wording: SCORING instead of judging. sentence_logprob()
+    below asks nothing -- it teacher-forces the model over the filled
+    sentence and reads off its own log-probability, which cannot be
+    acquiescence-biased because there is no question to agree with. "Is
+    the correct form more probable than the distractor under the
+    model's own distribution" turned out to be answerable even though
+    "is the distractor also acceptable, yes or no" was not. Tested at
+    N=20/skill across all 11 skills: 100% for 9 skills, explainably
+    weaker for noun_counter (the generic counter 개 sometimes
+    outscores a correct but rarer counter like 권/분 on raw frequency),
+    and a clean 0% for subj_topic -- which is not a failure of the
+    method, it independently reconfirms PRD §9.11's own honest framing
+    that subj_topic's correctness is a pedagogical convention, not a
+    hard rule a trained model's natural distribution would reflect.
 
 This is a judge, not ground truth -- a solver disagreement is a signal to
 investigate (same spirit as every other validator in this codebase),
 not an automatic verdict that flips an item's status. Check (c) is
 usable as implemented; check (b) is reported for reference only -- its
 known yes-bias means a "no also-acceptable options found" result here
-must NOT be read as "this item is confirmed unambiguous."
+must NOT be read as "this item is confirmed unambiguous." log_likelihood_check
+is the one to actually use for "is this distractor also correct",
+scoped to LOGPROB_RELIABLE_SKILLS.
 """
 from __future__ import annotations
 
@@ -84,6 +109,26 @@ _ALSO_ACCEPTABLE_PROMPT = (
 )
 _ANSWER_LETTER_RE = re.compile(r"([A-Z])")
 
+# PRD §9.34/§9.35: skills where "correct form scores higher log-prob than
+# the distractor" was empirically confirmed reliable, at N~=20/skill
+# against every currently curated pair. subj_topic is deliberately
+# excluded -- its 0% isn't a method failure, it independently confirms
+# PRD §9.11 (no hard rule for the model's own distribution to reflect).
+# noun_counter is included despite being weaker than the other 9 (the
+# generic counter 개 can outscore a correct but rarer counter on raw
+# frequency) because it is still far better than chance and the failure
+# mode is understood, not mysterious -- callers that need the stronger
+# guarantee can filter it out themselves using LOGPROB_SKILL_NOTES.
+LOGPROB_RELIABLE_SKILLS = frozenset({
+    "particle_loc", "particle_obj", "honorific", "time_range", "tense_past",
+    "irregular_conj", "adj_relativizer", "verb_choice", "mod_adverb", "noun_counter",
+})
+LOGPROB_SKILL_NOTES = {
+    "noun_counter": "weaker than the other 9 skills: the generic counter 개 "
+                     "sometimes outscores a correct but rarer counter (권, 분) "
+                     "on raw frequency alone -- real risk, not noise.",
+}
+
 
 @dataclass
 class SolverResult:
@@ -93,10 +138,46 @@ class SolverResult:
                                         # known yes-bias (see module docstring), reference only
 
 
+@dataclass
+class LogLikelihoodResult:
+    valid: bool        # True if correct form scored higher, OR skill is out of scope (skipped)
+    gap: float | None  # correct_logprob - distractor_logprob; None if skipped
+    reason: str
+
+
 class SolverCheckProvider:
     def __init__(self, model_name: str = _MODEL_NAME):
         self.tok = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda")
+        self.model.eval()
+
+    @torch.no_grad()
+    def sentence_logprob(self, sentence: str) -> float:
+        """Total log-probability of `sentence` under the model's own next-
+        token distribution, teacher-forced -- a pure scoring call, not a
+        judgment prompt, so acquiescence/yes-bias (see module docstring)
+        cannot apply. Reuses the same already-loaded model as check (c),
+        no extra model dependency.
+        """
+        enc = self.tok(sentence, return_tensors="pt").to("cuda")
+        ids = enc["input_ids"]
+        n_tokens = ids.shape[1] - 1
+        out = self.model(ids, labels=ids)
+        return -out.loss.item() * n_tokens
+
+    def log_likelihood_check(self, skill_id: str, stem: str, blank_marker: str,
+                              correct_text: str, distractor_text: str) -> LogLikelihoodResult:
+        if skill_id not in LOGPROB_RELIABLE_SKILLS:
+            return LogLikelihoodResult(True, None,
+                                        f"log-likelihood check not validated for skill '{skill_id}', skipped")
+        filled_correct = stem.replace(blank_marker, correct_text, 1)
+        filled_distractor = stem.replace(blank_marker, distractor_text, 1)
+        gap = self.sentence_logprob(filled_correct) - self.sentence_logprob(filled_distractor)
+        if gap > 0:
+            return LogLikelihoodResult(True, gap, f"correct form scores {gap:.2f} higher, as expected")
+        note = f" ({LOGPROB_SKILL_NOTES[skill_id]})" if skill_id in LOGPROB_SKILL_NOTES else ""
+        return LogLikelihoodResult(False, gap, f"distractor scores {-gap:.2f} higher than the correct "
+                                                f"form -- suspect pair, flag for review{note}")
 
     def _generate(self, prompt: str, max_new_tokens: int) -> str:
         messages = [{"role": "user", "content": prompt}]
@@ -175,4 +256,16 @@ if __name__ == "__main__":
     print("(check (b) 'also_acceptable' printed above for reference only -- known yes-bias, see module docstring)")
 
     assert total > 0, "the solver check must have actually run against real generated items"
+
+    print("\n--- log_likelihood_check (PRD §9.35, the working replacement for check (b)) ---")
+    ll_honorific = solver.log_likelihood_check("honorific", "할머니께서 ___.", "___", "쉬세요", "쉬어요")
+    assert ll_honorific.valid and ll_honorific.gap is not None and ll_honorific.gap > 0, (
+        f"honorific is a confirmed-reliable skill, correct form must score higher, got {ll_honorific.reason}")
+    print(f"[OK] honorific: {ll_honorific.reason}")
+    ll_subj = solver.log_likelihood_check("subj_topic", "질문: 누가 커피를 마셔요? 답: ___ 마셔요.", "___", "제가", "저는")
+    assert ll_subj.valid and ll_subj.gap is None, (
+        "subj_topic must be valid=True via the explicit SKIP path (gap=None), not by coincidentally "
+        f"scoring correctly -- got {ll_subj.reason}")
+    print(f"[OK] subj_topic correctly skipped (not scored): {ll_subj.reason}")
+
     print("\nall smoke tests passed (mechanism verified; see summary above for actual pass rates)")
