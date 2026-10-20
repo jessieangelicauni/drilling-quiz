@@ -2,3 +2,10 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# Downloaded third-party corpus (GPLv3, different license from this project;
+# re-downloadable via investigate_kolla_corpus.py's download_and_extract()),
+# plus any ad-hoc validation diff output -- not original work, shouldn't be
+# committed.
+kolla_corpus_download/
+_new_*.json
