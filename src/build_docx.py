@@ -166,7 +166,7 @@ def add_fullwidth_figure(path, width_in, caption):
 ANCHORS = [
     ("Fig. 1 shows the architecture.", 0),
     ("This inverts the usual relationship", 1),
-    ("That is, when the system is genuinely uncertain", 2),
+    ("This targets gap G3", 2),
     ("Two remedies are available.", 3),
     ("Participants complete a TOPIK-aligned pre-test", 4),
 ]

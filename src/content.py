@@ -30,12 +30,13 @@ ABSTRACT = (
     "value of 1.0 and still rising, while the Urnings algorithm remains calibrated at 1.1. "
     "Third, we propose two novelties: "
     "misconception-conditioned distractors that turn each wrong answer into a specific "
-    "diagnosis rather than an undifferentiated error; and an uncertainty-gated escalation "
-    "policy that spends expensive model capacity only where measurement is least certain. "
-    "Both personalise below the grain a selection policy alone can reach: diagnosis tailored "
-    "to the specific misconception an individual answer reveals, and intervention depth "
-    "tailored to how uncertain the system is about that learner on that skill—neither "
-    "available to a system built around a fixed, pre-calibrated item bank. "
+    "diagnosis rather than an undifferentiated error; and a direct demonstration that "
+    "Urnings stays calibrated when seeded from a deliberately uncalibrated item-difficulty "
+    "prior—exactly the situation a generative item pool creates—while Elo and Parallel Elo "
+    "degrade substantially more under the identical prior. Personalisation on a generative "
+    "pool needs both: a diagnosis finer than a selection policy alone can reach, and a "
+    "tracker trustworthy enough to act on from an item's first response, before anyone has "
+    "validated its difficulty. "
     "We validate each novelty with a single targeted comparison rather than a broad ablation grid, and set out an exploratory classroom pilot as secondary evidence."
 )
 
@@ -101,10 +102,11 @@ BODY = [
 ("L", "A simulation, also in Section III, showing concretely that the Elo rating system—the "
       "most widely deployed tracker in adaptive practice platforms—fails in exactly the "
       "regime a generative item pool creates, and quantifying how badly."),
-("L", "Two architectural novelties, set out in Section IV, that personalise below the "
-      "grain a selection policy alone can reach: diagnosis tailored to the specific "
-      "misconception an answer reveals, and intervention cost tailored to per-skill "
-      "measurement uncertainty."),
+("L", "Two architectural novelties, set out in Section IV: a diagnosis finer than a "
+      "selection policy alone can reach, tailored to the specific misconception an "
+      "answer reveals; and a tracker shown to remain calibrated on a deliberately "
+      "uncalibrated item-difficulty prior, the precondition personalisation needs on "
+      "a pool no one has pre-tested."),
 ("L", "A pre-registered experimental design, in Section V, capable of distinguishing the "
       "contribution of each component rather than only evaluating the system as a whole."),
 
@@ -423,6 +425,13 @@ BODY = [
       "respectively. Urn size is therefore a tunable accuracy–responsiveness trade-off, "
       "since larger urns also adapt more slowly to genuine change in ability."),
 
+("P", "This comparison starts every item from a flat, uninformative prior for all three "
+      "trackers. Section IV-C describes a second, independent novelty that goes further: it "
+      "re-runs this same comparison with items seeded from a genuinely uncalibrated "
+      "difficulty prior—the condition this system is actually in, since no human rater has "
+      "checked any generated item's difficulty—and asks which tracker tolerates that prior "
+      "being wrong."),
+
 ("P", "A further argument against Elo is dimensional. Elo assigns one number per learner, "
       "but Korean proficiency is not one thing. A learner may handle particles well and "
       "honorifics poorly. Collapsing this into a scalar discards the structure that makes "
@@ -441,7 +450,7 @@ BODY = [
       "English-centric tokenisers—the same consideration that motivates KRongBERT's "
       "morphological factorisation [26]. And its hybrid design, offering both a fast "
       "non-reasoning mode and a slower reasoning mode, maps unusually well onto the "
-      "escalation policy we describe in Section IV-C. The main caveat is licensing: EXAONE "
+      "escalation policy we describe in Section IV-D. The main caveat is licensing: EXAONE "
       "is released under terms restricting commercial use, which is unproblematic for "
       "research but must be disclosed, and which is a reason to retain a permissively "
       "licensed fallback."),
@@ -528,44 +537,41 @@ BODY = [
       "verification fails, in exchange for converging on a valid item faster than blind "
       "resampling does."),
 
-("H2", "C. Novelty 2: Uncertainty-Gated Escalation"),
+("H2", "C. Novelty 2: Robustness to an Uncalibrated Item-Difficulty Prior"),
 
-("P", "The second novelty addresses gap G3: that feedback is generated uniformly although its "
-      "benefits are not [29]. Fig. 3 shows the policy."),
+("P", "The second novelty addresses gap G2 directly, at the one point where this system's "
+      "own architecture forces it: KLUE-RoBERTa's difficulty estimate is, by its own "
+      "docstring, not calibrated to any real difficulty scale—no human rater has checked a "
+      "generated item's difficulty before it is served. Every new item therefore hands the "
+      "tracker a prior of unknown, possibly poor, quality. What happens next depends "
+      "entirely on which tracker receives it."),
 
-("P", "Each skill dimension k of a learner carries an urn whose size determines the width "
-      "w_{k} of the posterior—a direct, natively available signal of how evenly matched the "
-      "learner's recent record has been against the items they faced on this skill, maximal "
-      "when that record sits near a coin flip and smaller the further it drifts toward "
-      "consistent success or failure. We deliberately do not claim w_{k} is a calibrated "
-      "estimate of absolute distance from the learner's true ability—Section V-C reports a "
-      "direct test of that stronger claim, and it does not hold. What the gate below spends "
-      "computation on is ambiguity in the recent record, not estimation error, a distinction "
-      "worth stating plainly rather than eliding. By default the system takes a routine path: "
-      "generation in EXAONE's fast non-reasoning mode and short, cached feedback. It "
-      "escalates—to reasoning-mode generation of a minimal-pair probe and a contrastive "
-      "English explanation naming the specific misconception—only when the recent record is "
-      "ambiguous enough, or persistent enough, to be worth the cost:"),
+("P", "We repeat Section III-B's simulation—same 400-item, 300-learner, 120,000-response "
+      "fixed pool, same Rasch generating model, same simultaneous adaptive selection—but "
+      "seed every item from a prior whose correlation with its true difficulty ranges from "
+      "0.96 (a good encoder) down to 0.47 (a poor one), rather than starting every item flat. "
+      "Urnings' terminal RMSE moves from 0.417 (neutral start) to 0.424, 0.437, and 0.438 as "
+      "the prior gets worse—a 5% spread across the entire range. Elo moves from 1.722 to "
+      "1.827, 1.874, and 2.123 over the same range—a 23% spread from an already worse "
+      "baseline. Parallel Elo, usually the remedy of choice once Elo's drift is known, is "
+      "worse still in relative terms: 0.703 to 0.820, 0.866, and 1.133—a 61% spread, the "
+      "largest of the three despite starting from the best neutral baseline."),
 
-("EQ", "escalate  ⟺  w_{k} > τ   ∨   consecutive(m_{j}) ≥ 2\t(2)"),
+("P", "The mechanism is the one Section III-B already describes for adaptive selection "
+      "alone, now compounded by an untrustworthy starting point: Elo and Parallel Elo apply "
+      "the same fixed-step update to every item regardless of how credible its seed was, so "
+      "a badly seeded item keeps distorting the estimate of every learner who answers it "
+      "until enough real responses outweigh the bad prior. Urnings' sigma_hat2-driven urn "
+      "sizing does the opposite by construction: an uncertain prior gets a smaller urn, "
+      "which real responses overwrite faster, bounding the damage a bad guess can do before "
+      "it is corrected. This is not a claim that an informed prior speeds up convergence—we "
+      "tested that directly in earlier work and it did not hold for Urnings at this urn size—"
+      "it is the narrower, and for a generative pool more load-bearing, claim that a prior of "
+      "unknown quality cannot make Urnings worse than starting with no prior at all, while it "
+      "measurably can for Elo and Parallel Elo. We are not aware of a language learning "
+      "system that has characterised this specific property of Urnings."),
 
-("P", "That is, when the learner's recent performance on this skill has been genuinely mixed "
-      "against the items they were matched to, or when the learner has repeated the same "
-      "diagnosed misconception and a persistent misunderstanding is therefore indicated. Both "
-      "conditions are about ambiguity and persistence in the observable record, not about an "
-      "unobservable true-ability gap that no deployed system can check itself against."),
-
-("P", "The argument for this is both economic and pedagogical. Economically, reasoning-mode "
-      "inference is substantially more expensive than standard decoding, and spending it "
-      "uniformly is waste. Pedagogically, the finding that LLM feedback produced significant "
-      "gains in only two of seven lessons [29] suggests that uniform feedback dilutes effect: "
-      "much of it goes to learners who did not need it. Routing elaborate explanation towards "
-      "persistent, specifically diagnosed misconceptions is a principled way to concentrate "
-      "it where it should do most good. We are not aware of prior work that allocates "
-      "generative compute in an educational system according to this kind of psychometric "
-      "ambiguity signal."),
-
-("H2", "D. Selection Policy: Measurement Versus Learning"),
+("H2", "D. Application Policies: Item Selection and Escalation"),
 
 ("P", "One further design decision deserves explicit defence because it departs from "
       "convention. Classical adaptive testing selects the item that maximises information "
@@ -577,7 +583,7 @@ BODY = [
       "about 85% [27], and the pedagogical literature on desirable difficulty points the "
       "same way. We therefore select"),
 
-("EQ", "i* = argmin_{i} | σ(θ̂_{p} − β̂_{i}) − 0.85 |\t(3)"),
+("EQ", "i* = argmin_{i} | σ(θ̂_{p} − β̂_{i}) − 0.85 |\t(2)"),
 
 ("P", "restricted to items targeting the skill with the greatest expected pedagogical return. "
       "This deliberately sacrifices measurement efficiency for learning efficiency, and we "
@@ -587,13 +593,40 @@ BODY = [
       "simulate a field-test population (θ ~ N(0,1), 2000 learners, 40 replications per "
       "difficulty) and evaluate it at the item difficulty each policy implies for an "
       "average-ability learner. The maximum-information target (β=0, 50% success) gives "
-      "discrimination 0.41; our 85%-target policy (β=θ̂−logit(0.15), by Eq. 3) gives 0.34—"
+      "discrimination 0.41; our 85%-target policy (β=θ̂−logit(0.15), by Eq. 2) gives 0.34—"
       "both comfortably in the conventionally \"good\" range (≥0.30), an 18% relative drop "
       "rather than a qualitative one. The trade-off is real, as stated, but the items this "
       "policy serves remain psychometrically sound; this was not previously measured and is "
       "not assumed. Scheduling across sessions follows a spacing model "
       "in the tradition of half-life regression [28], with the tracker posterior supplying "
       "the ability term."),
+
+("P", "A second application policy, uniform-cost feedback, is also worth replacing, though "
+      "we do not claim the replacement as a research novelty on its own. Each skill "
+      "dimension k of a learner carries an urn whose posterior width w_{k} is a natively "
+      "available signal of how evenly matched the learner's recent record has been against "
+      "the items they faced, maximal when that record sits near a coin flip. By default the "
+      "system takes a routine path—fast non-reasoning generation and short, cached "
+      "feedback—and escalates to reasoning-mode generation of a minimal-pair probe and a "
+      "contrastive explanation only when the recent record is ambiguous enough, or a "
+      "misconception has persisted enough, to be worth the cost:"),
+
+("EQ", "escalate  ⟺  w_{k} > τ   ∨   consecutive(m_{j}) ≥ 2\t(3)"),
+
+("P", "This targets gap G3—that feedback is generated uniformly although its benefits are "
+      "not [29]—economically and pedagogically: reasoning-mode inference is substantially "
+      "more expensive, and the finding that LLM feedback produced significant gains in only "
+      "two of seven lessons [29] suggests uniform feedback dilutes its own effect. We "
+      "deliberately do not claim w_{k} is a calibrated estimate of the learner's absolute "
+      "distance from their true ability; we tested that stronger claim directly and it does "
+      "not hold at this urn size (a controlled simulation gives corr(w_{k}, true error) = "
+      "−0.76, and a regression-calibration check [42], [43] finds credible intervals built "
+      "from w_{k} are overconfident by 6–11 percentage points). What this policy spends "
+      "computation on is ambiguity in the observable record, not estimation error, which is "
+      "why Eq. 3 is reported here as a working application policy—measured to escalate on "
+      "76–82% of interactions, saving 18–24% of reasoning-mode calls against an "
+      "always-escalate baseline—rather than promoted to a third novelty requiring the "
+      "stronger claim."),
 
 ("H1", "V. Experimental Design"),
 
@@ -631,39 +664,35 @@ BODY = [
       "misconception-conditioning actually produces a usable diagnosis, or merely a "
       "plausible wrong answer with a label attached."),
 
-("H2", "C. Validating Novelty 2: Uncertainty-Gated Escalation"),
+("H2", "C. Validating Novelty 2: Robustness to an Uncalibrated Prior"),
 
-("P", "Two questions. First, does w_{k} actually track absolute estimation error "
-      "|θ̂_{p} − θ_{p}|, the stronger claim Section IV-C explicitly declines to make? We test "
-      "this directly rather than assume it: a single simulated learner per fixed true θ, "
-      "run against an exactly-known item pool to equilibrium, removing every population and "
-      "item-estimation confound. The result is decisive and negative. At n=32, the urn size "
-      "used throughout this system, a learner at an extreme true ability converges to one of "
-      "the NARROWEST urns—looking most confident—while carrying the LARGEST true error of "
-      "any position tested; a learner near the pool's centre gets the WIDEST urn while "
-      "carrying unremarkable error. Across a grid of θ values this gives corr(w_{k}, error) = "
-      "−0.76 at n=32, reproduced at n=64 (−0.85), weakening only at n=128 (−0.04). We "
-      "quantify this formally with the regression-calibration method of [43] (the continuous "
-      "analogue of [42]'s classifier calibration error): at every nominal confidence level "
-      "tested, the urn's own credible interval for θ, transformed from the proportion to the "
-      "logit scale, contains the true value LESS often than claimed—a nominal 90% interval "
-      "contains truth only 76-83% of the time, a nominal 50% interval only 34-43% of the "
-      "time, a mean calibration error of 6-11 percentage points depending on population. "
-      "w_{k} is systematically overconfident as an absolute uncertainty estimate, not merely "
-      "uncorrelated with one, because it is a function of the learner's current position "
-      "within the urn's fixed range rather than of accumulated evidence quantity. We take "
-      "this as settled for n=32 and report it plainly rather than retrofit a weaker claim "
-      "the data does not support: the trigger in Eq. 2 targets ambiguous recent performance, "
-      "as Section IV-C now states, and should not be read as targeting poorly-measured "
-      "learners in any absolute sense. Second, is the gating worth its complexity regardless "
-      "of that distinction: because update() does not depend on which feedback path produced "
-      "an interaction, the learner's measured trajectory is IDENTICAL whether a given "
-      "interaction was escalated or not—gating changes only what is shown to the learner, "
-      "never the tracker's arithmetic—so there is no measurement-precision cost to compare. "
-      "What is worth reporting is how much compute gating actually saves: across a simulated "
-      "practice history of 120,000 responses from 300 learners, the gate fires on 76-82% of "
-      "interactions depending on population mix, saving 18-24% of reasoning-mode calls "
-      "against an always-escalate baseline at zero measured cost to tracking."),
+("P", "One question, answered by one comparison, repeated for rigor rather than run once: "
+      "given an item-difficulty prior of unknown quality—the condition this system is "
+      "actually in—does the choice of tracker change how much damage a bad prior can do? "
+      "We run the fixed-pool simulation of Section IV-C under four prior-quality conditions "
+      "(neutral, and three noise levels giving correlations of 0.96, 0.78, and 0.47 with "
+      "true difficulty), eight independent replications per condition with fresh learners, "
+      "items, and response streams each time, and report terminal RMSE as mean ± SD across "
+      "replications."),
+
+("P", "Urnings: 0.417±0.018 (neutral), 0.424±0.015, 0.437±0.019, 0.438±0.016 (worst prior)—"
+      "a 5% spread, the conditions overlapping within one SD of each other. Elo: "
+      "1.722±0.024, 1.827±0.042, 1.874±0.040, 2.123±0.040—a 23% spread, each condition "
+      "clearly separated from the last. Parallel Elo: 0.703±0.022, 0.820±0.022, 0.866±0.022, "
+      "1.133±0.031—a 61% spread, the largest of the three despite the best neutral baseline. "
+      "The ordering is consistent across all eight replications of every condition, not an "
+      "artifact of one noisy run. This directly operationalises gap G2 as stated in Section "
+      "II-F: a prior of unknown quality is exactly the regime this system's own encoder "
+      "forces, and the three trackers tolerate it by measurably different amounts, with "
+      "Urnings tolerating it best."),
+
+("P", "A note on scope, stated rather than left for a reviewer to find: a different, "
+      "growing-pool regime closer to live deployment (items mostly new, rarely revisited) "
+      "produces a more dramatic gap between Elo/Parallel Elo's neutral and worst-prior "
+      "conditions, but also a non-monotonic result for Urnings across the same prior-quality "
+      "grid that we do not yet have a complete account of. We report the fixed-pool regime "
+      "here because it is fully understood end to end; the growing-pool regime is left for "
+      "future work rather than included partially explained."),
 
 ("H2", "D. Exploratory Classroom Pilot"),
 
@@ -721,7 +750,9 @@ BODY = [
       "practitioner would most naturally check."),
 
 ("P", "The remedies we propose are deliberately modest in their use of deep learning. A "
-      "small encoder predicts difficulty well enough to initialise a psychometric prior; an "
+      "small encoder predicts difficulty well enough to initialise a psychometric prior—not "
+      "well enough to be trusted, which is precisely the condition Novelty 2 shows Urnings "
+      "tolerates and Elo does not; an "
       "explicit urn-based model, not a neural network, maintains learner state and supplies "
       "the uncertainty that both item selection and compute allocation depend on; and the "
       "large generative models are confined to the two jobs they are uniquely good at, "
@@ -804,16 +835,18 @@ FIGURES = [
   "failure mode of generated distractors—an option that is accidentally also correct—and "
   "a failed item is revised by a critic rather than discarded and resampled blindly."),
  ("figures/fig3_escalation.png", 7.0,
-  "Fig. 3. Uncertainty-gated escalation (Novelty 2). Expensive reasoning-mode generation and "
-  "contrastive feedback are spent only where the posterior is wide or a misconception has "
-  "persisted, rather than uniformly across all interactions."),
+  "Fig. 3. Uncertainty-gated escalation (application policy, Section IV-D). Expensive "
+  "reasoning-mode generation and contrastive feedback are spent only where the posterior is "
+  "wide or a misconception has persisted, rather than uniformly across all interactions."),
  ("figures/fig4_simulation.png", 7.0,
-  "Fig. 4. Motivating simulation: 120,000 responses, 300 learners, 400 items, Rasch generating "
-  "model, with adaptive selection and simultaneous item calibration — the regime a generative "
-  "item pool forces. (a) Elo's rating spread inflates to 2.69 against a true value of 1.04 and "
-  "is still rising; Urnings holds at 1.11. (b) Elo's error against true ability grows after "
-  "roughly 15,000 responses, so the estimates get worse as more data arrives. This reproduces, "
-  "at realistic scale, the failure characterised analytically by Bolsinova et al. [15]."),
+  "Fig. 4. Motivating simulation, no item-difficulty prior injected: 120,000 responses, 300 "
+  "learners, 400 items, Rasch generating model, with adaptive selection and simultaneous item "
+  "calibration — the regime a generative item pool forces. (a) Elo's rating spread inflates to "
+  "2.69 against a true value of 1.04 and is still rising; Urnings holds at 1.11. (b) Elo's "
+  "error against true ability grows after roughly 15,000 responses, so the estimates get "
+  "worse as more data arrives. This reproduces, at realistic scale, the failure characterised "
+  "analytically by Bolsinova et al. [15]; Section IV-C/V-C repeat it with a genuinely "
+  "uncalibrated prior injected, Novelty 2's own evidence."),
  ("figures/fig5_experiment.png", 7.0,
   "Fig. 5. Human study design. Arms A and B share a fixed expert-authored item bank so that the "
   "effect of generation is separable from the effect of adaptivity; Arm C receives the full "

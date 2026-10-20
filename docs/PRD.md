@@ -1936,5 +1936,89 @@ mastery/width di teks paper, jadi perbaikan ini murni internal/PRD.
 
 ---
 
+### 9.29 Novelty 2 DIGANTI (bukan direframe lagi): dari "uncertainty-gated escalation" jadi "Urnings robust terhadap prior kesulitan item yang tidak terkalibrasi"
+
+User eksplisit: terlalu banyak reframe di Novelty 2 (escalation) membuatnya
+lemah — minta GANTI, bukan reframe lagi. Diputuskan bersama: angkat
+temuan §9.13 (robustness Urnings vs Elo terhadap prior yang salah) dari
+"design rationale" di Section III-B jadi Novelty 2 resmi, menggantikan
+escalation. Escalation TIDAK dihapus dari kode — turun status jadi fitur
+aplikasi nyata di Section IV-D (digabung dengan Selection Policy), bukan
+novelty riset. Pola yang sama persis dengan "Select" setelah Novelty 1
+lama dihapus (§9.18).
+
+**Temuan penting SEBELUM menulis apa pun (investigasi, bukan asumsi)**:
+angka "Elo meledak 3-6x" yang saya sebut di awal ternyata dari regime
+**pool TUMBUH** (`simulate_item_coldstart_elo.py`) — regime yang justru
+Urnings SENDIRI berperilaku non-monoton/membingungkan di situ (§9.13's
+Simulasi 2, §9.17's diagnosis artefak saturasi). Mencampur angka Elo dari
+regime itu dengan angka Urnings dari regime **pool TETAP**
+(`simulate_item_prior.py`) akan jadi perbandingan yang tidak apple-to-apple.
+
+**Dibangun skrip baru `src/simulate_elo_item_prior.py`** — companion
+pool-tetap untuk Elo/Parallel Elo (sebelumnya cuma ada untuk Urnings),
+dijalankan dengan harness IDENTIK (400 item, 300 learner, 120.000 respons,
+kondisi prior sama: korelasi 0.96/0.78/0.47). Hasil (8 replikasi,
+mean±SD) — angka netral COCOK PERSIS dengan yang sudah terbit di paper
+(Elo 1.722 vs 1.70 lama, Parallel Elo 0.703 vs 0.73 lama, memvalidasi
+skrip baru ini setara dengan yang sudah ada):
+
+| Tracker | netral | prior terburuk (corr 0.47) | spread relatif |
+|---|---|---|---|
+| Urnings | 0.417±0.018 | 0.438±0.016 | +5% |
+| Elo | 1.722±0.024 | 2.123±0.040 | +23% |
+| Parallel Elo | 0.703±0.022 | 1.133±0.031 | +61% |
+
+**Efeknya jauh kurang dramatis** dari "meledak 3-6x" (itu cuma muncul di
+regime pool-tumbuh yang bermasalah sendiri) — tapi BERSIH, monoton,
+urutan konsisten di semua 8 replikasi, dan tidak akan pernah butuh
+dilunakkan lagi karena regime pool-tetap sudah dipahami penuh ujung ke
+ujung (tidak seperti pool-tumbuh yang masih ada artefak belum selesai
+dijelaskan). **Keputusan eksplisit, disetujui user**: pakai angka
+pool-tetap ini sebagai bukti Novelty 2, JANGAN sebut regime pool-tumbuh
+di paper sama sekali (tidak diklaim, tidak dibantah) — cukup dicatat di
+sini untuk kejujuran historis.
+
+**Perubahan di `src/content.py`:**
+- Abstrak + bullet kontribusi Section I: novelty kedua sekarang "Urnings
+  tetap terkalibrasi dari prior yang sengaja tidak terkalibrasi".
+- Section III-B: ditambah 1 paragraf jembatan ke Novelty 2 baru.
+- Section IV-C: ditulis ulang total jadi "Novelty 2: Robustness to an
+  Uncalibrated Item-Difficulty Prior" — menyasar gap G2 (bukan G3 lagi).
+- Section IV-D: judul jadi "Application Policies: Item Selection and
+  Escalation" — escalation (dulu IV-C) dipindah ke sini, status diturunkan
+  jadi fitur, temuan kalibrasi (§9.24/§9.25) dipadatkan jadi beberapa
+  kalimat, bukan dihapus — tetap disclosed, cuma tidak lagi jadi beban
+  novelty.
+- Section V-C: ditulis ulang total jadi validasi Novelty 2 baru (tabel di
+  atas, 8 replikasi, mean±SD), termasuk catatan eksplisit soal regime
+  pool-tumbuh yang disengaja TIDAK dimasukkan sebagai klaim.
+- Persamaan dirapikan ulang: (1) Rasch, (2) seleksi 85%, (3) escalate
+  (dulu (2)/(3) tertukar karena urutan section berubah) — semua referensi
+  "Eq. N" di teks dicek dan disesuaikan.
+- 2 sitasi baru [42]/[43] (Guo et al. 2017, Kuleshov et al. 2018, sudah
+  diverifikasi §9.25) sekarang benar-benar dikutip di teks (sebelumnya
+  ditahan karena belum ada tempatnya).
+- Fig. 3 (escalation) caption diperbarui, bukan lagi berlabel "(Novelty 2)".
+  Fig. 4 caption diperjelas "no item-difficulty prior injected" supaya
+  tidak tertukar dengan angka prior-injection yang baru.
+
+**Bug ditemukan dan diperbaiki saat verifikasi PDF (bukan cuma percaya
+build sukses — workflow yang sudah berulang kali terbukti perlu)**:
+`build_docx.py`'s `ANCHORS` mencocokkan prefix teks tetap
+("That is, when the system is genuinely uncertain") untuk menyisipkan
+Fig. 3 — prefix itu hilang begitu paragraf escalation ditulis ulang, jadi
+Fig. 3 **diam-diam tidak pernah disisipkan** di build pertama (sama
+persis pola bug ANCHORS yang sudah pernah ditemukan sebelumnya, tercatat
+di "Workflow practice worth repeating" di memori project). Diperbaiki:
+anchor diganti ke `"This targets gap G3"` (teks yang sekarang benar-benar
+ada). Diverifikasi ulang: Fig. 1-5 semua muncul tepat 1x, PDF dibaca
+halaman demi halaman (bukan cuma grep), penempatan figure masuk akal.
+
+**File:** `src/content.py`, `src/build_docx.py` (fix ANCHORS),
+`src/simulate_elo_item_prior.py` (baru), `paper/KO-DRILL_IEEE.docx`/`.pdf`.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
