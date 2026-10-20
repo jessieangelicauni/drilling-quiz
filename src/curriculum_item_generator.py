@@ -61,19 +61,28 @@ existing skills and does not generalise automatically to the other ~500
 curriculum points without the same care, so guessing one here would be a
 false precision this module does not claim.
 
-Known remaining quality limitation, NOT fixed by any check above (PRD
-§9.46): at intermediate/advanced TOPIK levels, many grammar points are
-near-synonyms of each other (e.g. "-(으)ㄹ 리(가) 만무하다" vs "-(으)ㄹ
-리가 없다", "N에 비하면" vs "N에 비해"), so a distractor built from a
-genuinely different grammar point is often ALSO an acceptable native
-phrasing, not a true error -- the pair ends up testing "which synonym did
-the textbook pick" rather than a right/wrong distinction. This is why the
-representative 41-sample run's solver round-trip rate (7/16, see
-__main__) is far below the hand-picked 12-sample's 7/7: that sample was
-unintentionally all beginner-level, unambiguous points. No automatic
-check here distinguishes "wrong" from "a different correct synonym" --
-flagged for human review, not silently shipped as equal-confidence to the
-11 hand-coded skills.
+Known remaining quality limitation, partially (not fully) mitigated by
+prompting (PRD §9.48): at intermediate/advanced TOPIK levels, many
+grammar points are near-synonyms of each other (e.g. "-(으)ㄹ 리(가)
+만무하다" vs "-(으)ㄹ 리가 없다", "N에 비하면" vs "N에 비해"), so a
+distractor built from a genuinely different grammar point is often ALSO
+an acceptable native phrasing, not a true error -- the pair ends up
+testing "which synonym did the textbook pick" rather than a right/wrong
+distinction. The representative 41-sample run first measured this at
+13/41 produced, 6/13 (46%) solver round-trip agreement (PRD §9.46).
+_GEN_PROMPT was then revised to explicitly forbid swapping in a
+different-but-also-correct expression, with concrete examples of what
+NOT to do -- re-measured at 14/41 produced, 9/14 (64%) agreement (PRD
+§9.48): a real improvement (and several previously-bad items, e.g.
+"-아/어 봤자" and "-(으)ㄹ 리(가) 만무하다", now self-reject via check
+(a)/(b)/(d) instead of shipping a flawed pair), but NOT a full fix --
+"N에 비하면" vs "에 비해", "N(이)란" vs "은", and "하지만" vs its own
+near-synonyms still slip through for the same underlying reason: some
+TOPIK grammar points genuinely don't have a "wrong" near-neighbor to
+contrast against, only other correct ones. No automatic check here
+distinguishes "wrong" from "a different correct synonym" in the general
+case -- flagged for human review, not silently shipped as
+equal-confidence to the 11 hand-coded skills.
 """
 from __future__ import annotations
 
@@ -93,11 +102,17 @@ _GEN_PROMPT = (
     '한국어 문법 학습 문제를 만들어줘.\n'
     '문법 포인트: {grammar} ({meaning})\n'
     '예문: "{example}"\n\n'
-    '이 예문에서 "{grammar}" 문법을 실현하는 정확한 부분(어절 또는 조사/어미)을 찾아줘.\n'
-    '그 다음, 학습자가 흔히 저지르는 실수로 그 부분 대신 쓸 법한 틀린 표현 하나를 만들어줘.\n\n'
+    '1단계: 이 예문에서 "{grammar}" 문법을 실현하는 정확한 부분(어절 또는 조사/어미)을 찾아줘.\n'
+    '2단계: 그 부분 대신 쓰면 이 문맥에서 실제로 비문(문법적으로 틀린 문장)이 되는 표현을 하나 만들어줘.\n\n'
+    '중요-- "틀린표현"은 반드시 이 문맥에서 비문이어야 해. 절대로 하면 안 되는 것:\n'
+    '- 의미가 같거나 비슷한 다른 정식 문법/어미로 바꾸는 것 (예: "-(으)ㄹ 리가 만무하다"를 "-(으)ㄹ 리가 없다"로, '
+    '"N에 비하면"을 "N에 비해"로 바꾸는 식 -- 둘 다 자연스러운 정답이라서 안 됨)\n'
+    '- 문맥상 똑같이 자연스럽게 들리는 다른 표현으로 바꾸는 것\n'
+    '허용되는 흔한 학습자 실수: 틀린 시제, 틀린 존댓말 레벨, 조사 생략/오용, 불규칙 활용을 틀리게 적용, '
+    '비슷하게 생겼지만 뜻이 다른 문법과 혼동.\n\n'
     '다음 형식으로만 답해줘, 따옴표나 괄호 없이:\n'
     '원래표현: 예문에서 찾은 정확한 부분\n'
-    '틀린표현: 학습자가 실수로 쓸 법한 틀린 표현'
+    '틀린표현: 이 문맥에서 비문이 되는, 학습자가 실수로 쓸 법한 표현'
 )
 _STRIP_CHARS = ' \t\n\r\'"“”[]()-'
 

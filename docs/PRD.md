@@ -3029,5 +3029,62 @@ dipahami, bukan dihitung ulang secara berbeda).
 
 ---
 
+### 9.48 Perbaikan prompt generator kurikulum: solver-agreement naik 46%→64% — dicoba dulu sebelum disclose sebagai limitasi permanen (§9.46)
+
+User minta cek prioritas sebelum lanjut fitur EV/integrasi. Rekomendasi
+saya: perbaiki dulu masalah sinonim-dekat §9.46 dengan mencoba perbaikan
+prompt (belum pernah dicoba, baru didiagnosis) sebelum menyerah dan
+mendisclose sebagai limitasi permanen — konsisten dengan prinsip
+"investigasi metode lain, kalau meyakinkan bagus go for it". User
+setuju ("mau").
+
+**Perubahan**: `_GEN_PROMPT` di `curriculum_item_generator.py` direvisi
+dari sekadar "buat kesalahan yang mungkin dibuat pembelajar" menjadi
+instruksi eksplisit yang MELARANG model menukar ke ekspresi lain yang
+sama-sama benar, dengan contoh konkret pelanggaran yang dilarang
+("-(으)ㄹ 리가 만무하다"→"-(으)ㄹ 리가 없다", "N에 비하면"→"N에 비해") dan
+daftar kesalahan pembelajar yang DIPERBOLEHKAN (salah tense, salah level
+honorifik, partikel hilang/salah, konjugasi tidak beraturan diterapkan
+salah, tertukar dengan grammar lain yang bentuknya mirip tapi beda arti).
+
+**Hasil, diukur pada sweep representatif yang SAMA (41 entri, setiap
+ke-13 dari 524) supaya apple-to-apple dengan §9.46**:
+
+| | Sebelum (§9.46) | Setelah (prompt baru) |
+|---|---|---|
+| Item terproduksi | 13/41 (32%) | 14/41 (34%) |
+| Solver round-trip agreement | 6/13 (46%) | **9/14 (64%)** |
+
+**Perbaikan nyata, bukan cuma angka naik tanpa penjelasan**: diperiksa
+satu per satu, beberapa item yang SEBELUMNYA lolos tapi gagal solver
+(`-아/어 봤자`, `-(으)ㄹ 리(가) 만무하다`, `N을/를 무릅쓰고`,
+`-았/었더니`) sekarang malah DITOLAK SENDIRI oleh check (a)/(b)/(d) —
+model, dilarang menukar ke sinonim, kalau tidak bisa menemukan kesalahan
+genuine lebih memilih gagal format daripada memaksa sinonim sebagai
+"jawaban salah". Ini perilaku yang diinginkan: mencegah item cacat
+terkirim, bukan cuma menyembunyikan masalah.
+
+**TIDAK sepenuhnya menghilangkan masalah** (jujur, bukan overclaim):
+`N에 비하면` vs `에 비해`, `N(이)란` vs `은`, `-(으)ㄹ 때` vs turunannya,
+`-느니` vs `-려고` masih lolos sebagai pasangan sinonim-dekat meski sudah
+dilarang eksplisit di prompt — beberapa grammar point TOPIK level lanjut
+memang tidak punya "tetangga yang salah" untuk dikontraskan, hanya
+tetangga yang sama-sama benar. Satu regresi kecil juga terjadi (entri 287,
+`-(으)ㄴ/는 만큼`, dulu lolos sekarang di-skip) — dalam batas wajar untuk
+perubahan prompt, tidak diinvestigasi lebih lanjut karena bukan pola
+yang berulang.
+
+**Keputusan**: cukup satu iterasi ini, tidak lanjut reframe/iterasi
+prompt lagi (konsisten dengan prinsip user: jangan terlalu banyak
+reframe sehingga menjadi lemah). 64% dengan limitasi near-synonym yang
+dipahami dan terdokumentasi lebih baik daripada mengejar 100% dengan
+prompt yang makin rumit untuk kasus yang secara linguistik memang tidak
+punya jawaban salah yang natural.
+
+**File:** `src/curriculum_item_generator.py` (`_GEN_PROMPT` + docstring
+update).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
