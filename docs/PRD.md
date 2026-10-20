@@ -2537,5 +2537,65 @@ sendiri, cuma belum pernah "naik" ke level paper.
 
 ---
 
+### 9.40 Sitasi Liu et al. [12] salah representasi — paper bilang "divergensi sistematis", aslinya korelasi tinggi dengan data manusia
+
+Melanjutkan pengecekan yang session lokal lain sempat mulai tapi kena
+limit sesi di tengah jalan (lihat riwayat §9.39 — transcript yang
+dikutip user berhenti tepat di langkah ini). Diverifikasi ulang dari
+nol di sini, bukan dipercaya dari transcript: dua pencarian web
+independen terhadap paper asli (Liu, Bhandari & Pardos, "Leveraging
+LLM-Respondents for Item Evaluation," arXiv 2407.10899 / BJET 2025,
+DOI 10.1111/bjet.13570 — versi jurnal sendiri tidak berhasil diambil
+langsung karena WebFetch gagal resolve DNS di sandbox ini, jadi
+mengandalkan preprint arXiv + ringkasan independen kedua, bukan cuma
+satu sumber).
+
+**Klaim di paper kita (sebelum fix), dua tempat:**
+- Introduction: *"LLM self-estimates of item difficulty are poorly
+  calibrated, systematically biased towards judging items easier than
+  they are, and unreliable at the level of the individual item [11],
+  [12]."*
+- Section III-B: *"Liu et al. ... find systematic divergence from
+  human response data [12]. Independent evaluations... report accuracy
+  well below what operational use would require, with a consistent
+  bias towards rating items as easier than they prove to be."* (kalimat
+  kedua ini malah TIDAK punya sitasi sama sekali).
+
+**Temuan asli Liu et al. (dikonfirmasi 2x, konsisten):** parameter item
+yang dikalibrasi dari respons LLM punya korelasi TINGGI dengan
+kalibrasi manusia (Spearman >0.8 untuk model terbaik yang diuji, naik
+ke 0.93 dengan augmentasi resampling) — **bukan divergensi sistematis**.
+Keterbatasan sebenarnya jauh lebih sempit: satu LLM punya distribusi
+kemampuan yang lebih narrow & kurang variatif dari populasi manusia
+asli, butuh ENSEMBLE beberapa model untuk menyamai distribusi itu.
+Tidak ada temuan "bias menilai soal lebih mudah" di paper ini sama
+sekali — klaim itu sepertinya salah atribusi (mungkin genuinely milik
+sumber lain, tidak diverifikasi di sini, atau generalisasi penulis yang
+tidak bersumber).
+
+**Fix:** kedua paragraf ditulis ulang supaya akurat ke temuan asli —
+korelasi item-level tinggi, keterbatasan di distribusi kemampuan
+populasi/variabilitas respons (bukan "divergensi" blanket), dan
+argumen diperjelas: yang relevan untuk pipeline SATU-generator seperti
+sistem kita bukan "LLM tidak bisa menilai kesulitan", tapi "satu LLM
+bukan populasi pembelajar — hasil Liu et al. tidak melisensikan
+LLM-tunggal menilai kesulitan soalnya sendiri". Argumen inti paper
+(encoder kecil [11] lebih baik dari LLM besar untuk regresi kesulitan)
+tidak berubah — itu klaim terpisah, sudah diverifikasi benar
+sebelumnya di sesi ini.
+
+**Diverifikasi:** `python3 -m py_compile src/content.py` lolos,
+`python3 src/build_docx.py` rebuild `paper/KO-DRILL_IEEE.docx` tanpa
+error.
+
+**Belum diverifikasi** (dicatat jujur, bukan diam-diam dilewati): versi
+JURNAL (BJET 2025, bukan preprint arXiv 2024) tidak berhasil diakses
+langsung karena keterbatasan jaringan sandbox — kemungkinan kecil ada
+perbedaan angka antara preprint dan versi final, meski arah temuan
+(korelasi tinggi, bukan divergensi) sangat tidak mungkin berbalik total
+di proses peer review.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
