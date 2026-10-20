@@ -4135,5 +4135,57 @@ loop. Perlu run ulang untuk konfirmasi penuh kedua bahasa.
 
 ---
 
+### 9.66 Siapkan 3 pengujian tertunda sekaligus: unblock smoke test exaone_provider.py, buat script head-to-head qwen_feedback.py vs Qwen3
+
+**Konteks**: user minta ketiga item tertunda diuji sekaligus (Step 2/2
+untuk `exaone_provider.py`/`solver_check.py`, perbandingan head-to-head
+`qwen_feedback.py` vs Qwen3). Tidak bisa dijalankan di sandbox ini
+(tidak ada GPU) — jadi fokus sesi ini: siapkan SEMUA tool-nya supaya
+user tinggal jalankan berurutan.
+
+**1. Unblock smoke test `exaone_provider.py`**: assertion keras untuk
+'교도소' (§9.66 sebelumnya ditemukan, belum diputuskan: "수감하다"
+kemungkinan salah transitivitas, bukan fix sungguhan) diubah dari
+`assert` keras jadi laporan lunak (print peringatan, lanjut) — supaya
+Step 1/2 tidak lagi macet di pertanyaan yang belum terjawab, bisa
+lanjut ke Step 2/2. Keputusan transitivitas '교도소' TETAP terbuka,
+cuma tidak lagi memblokir pengujian lain.
+
+**2. `src/compare_feedback_models.py`** (baru): head-to-head
+EXAONE-3.5-7.8B (config saat ini) vs Qwen3-4B (config asli yang sudah
+tervalidasi) pada 4 item test (lebih dari 1 kasus yang dipakai smoke
+test sendiri), kedua bahasa (en/id), kedua jalur (fast/detailed) —
+total 16 perbandingan. **Sengaja TIDAK reuse `QwenFeedbackProvider.__init__`
+untuk sisi Qwen3** — constructor itu sekarang hardcode
+`trust_remote_code=True` + quantization 4-bit (ditambahkan untuk
+EXAONE), yang akan mengubah konfigurasi Qwen3-4B dari yang sudah
+tervalidasi (bf16 polos, ~8GB). Tiap model di-load dengan konfigurasi
+MASING-MASING yang benar (`object.__new__` + set `.tok`/`.model` manual),
+tapi tetap reuse method `fast_feedback`/`detailed_feedback`/`_generate`
+yang sama persis — supaya teks prompt yang dibandingkan identik, tidak
+ada logic yang didup likasi dan bisa out-of-sync.
+
+**Bukan verdict otomatis** — kualitas teks feedback itu prosa bebas,
+proyek ini tidak punya automated grader untuk itu (beda dari
+solver-check/log-likelihood yang bisa diskor). Script ini menghasilkan
+"reading pack" — user baca berdampingan, nilai: kebenaran faktual,
+kejelasan, apakah ada yang salah/menyesatkan (kegagalan paling
+penting untuk dicek).
+
+**Diverifikasi**: `py_compile` lolos untuk kedua file yang diubah/dibuat.
+Tidak bisa dites end-to-end (tidak ada GPU di sandbox ini).
+
+**Urutan yang disarankan untuk user jalankan**:
+1. `python3 src/verify_exaone35_swap.py` — sekarang seharusnya lolos
+   Step 1/2 (termasuk peringatan lunak '교도소', bukan crash), lanjut
+   ke Step 2/2 (4 skrip validasi + diff vs baseline paper).
+2. `python3 src/compare_feedback_models.py` — baca hasil perbandingan
+   16 kasus, laporkan pola yang terlihat (atau campur aduk).
+
+**File:** `src/exaone_provider.py` (known_failures jadi soft-report),
+`src/compare_feedback_models.py` (baru).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
