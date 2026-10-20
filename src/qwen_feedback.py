@@ -44,31 +44,11 @@ from __future__ import annotations
 from typing import Literal
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from distractor_validator import correct_korean_conjugation
 
-_MODEL_NAME = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"  # swapped from Qwen3-4B 2026-10-20,
-# per explicit user instruction ("pakai exaone 7.8b" -> "ketiganya" -> "lanjut"), NOT because
-# this task's own quality was re-measured on this model. Two things are genuinely unverified:
-#   1. trust_remote_code=True is required (EXAONE-3.5's custom modeling_exaone.py) and that file
-#      has a known transformers-version bug -- run src/patch_exaone35_remote_code.py AFTER the
-#      first load (see that script's docstring) or generation will fail with a create_causal_mask
-#      TypeError.
-#   2. enable_thinking is a Qwen3-specific chat-template toggle; EXAONE-3.5's template has no
-#      reasoning-mode concept, so detailed_feedback()'s enable_thinking=True below is expected to
-#      be a silent no-op (undefined Jinja var), not a hard error -- NOT confirmed on real hardware.
-# Lower risk than the other two swapped files: this module's output (free-form learner feedback
-# text) is not the basis of any published psychometric claim in the paper, unlike solver_check.py.
-#
-# 4-bit quantized (PRD §9.55, same fix as PRD §9.53's exaone_provider.py/
-# solver_check.py and two other files later removed in a codebase cleanup,
-# PRD §9.60): this file was
-# MISSED by that earlier quantization pass -- it kept running unquantized bf16 (~15.6GB on a
-# 15.57GB GPU) and only appeared to pass its smoke test because the GPU happened to be clean at
-# that moment, not because it was actually safe. detailed_feedback()'s 1200-token budget needs
-# more KV-cache than the other files' shorter generations, so it was the single most likely of
-# the five to resurface this OOM. Quantized now for consistency with the other four.
+_MODEL_NAME = "Qwen/Qwen3-4B"
 _DETAILED_MIN_TOKENS = 1200  # empirically the minimum that reliably finishes; see qwen_feedback history
 
 Language = Literal["en", "id"]
@@ -96,10 +76,8 @@ _ID_DETAILED_EXAMPLE = (
 
 class QwenFeedbackProvider:
     def __init__(self, model_name: str = _MODEL_NAME):
-        self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        _bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, quantization_config=_bnb_config, trust_remote_code=True, device_map="cuda")
+        self.tok = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda")
 
     def fast_feedback(self, stem: str, correct: str, wrong: str, language: Language = "en") -> str:
         """Default path: short, cheap. No reasoning mode."""

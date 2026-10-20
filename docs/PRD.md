@@ -4010,5 +4010,47 @@ dikonfirmasi.
 
 ---
 
+### 9.63 Regresi nyata dari swap EXAONE-3.5-7.8B dilaporkan user: `qwen_feedback.py` balas pakai Korea, bukan English — direvert khusus file ini
+
+**Laporan user**: feedback/explanation yang seharusnya Bahasa Inggris
+keluar dalam Bahasa Korea.
+
+**Diagnosis** (dari docstring `qwen_feedback.py` sendiri, bukan
+tebakan): modul ini punya riwayat kegagalan PERSIS seperti ini —
+"Qwen3-1.7B, asked to answer in Indonesian directly, ignored the
+instruction and answered in Korean instead" — diperbaiki waktu itu
+lewat teknik one-shot example (2 kalimat kontras, menghindari model
+mengkopi topik contoh) yang **diuji dan divalidasi khusus untuk
+Qwen3**. Swap ke EXAONE-3.5-7.8B (§9.51, `_MODEL_NAME` diganti,
+mekanisme prompt lain dibiarkan sama) TIDAK PERNAH menguji ulang
+kepatuhan bahasa untuk model baru ini — risiko yang sudah diberi
+peringatan generik ("NOT confirmed on real hardware") tapi tidak
+spesifik soal bahasa. Laporan user mengonfirmasi: risiko itu
+benar-benar terjadi, EXAONE-3.5-7.8B mengulang kegagalan asli Qwen3-1.7B.
+
+**Keputusan**: revert `qwen_feedback.py` SAJA (bukan ketiga file)
+kembali ke `Qwen/Qwen3-4B`, bf16 (tanpa quantization — ukuran asli
+~8GB nyaman di budget 16GB, tidak perlu quantization yang baru
+dipasang §9.55). File ini dipilih untuk direvert lebih dulu karena
+riwayat kepatuhan-bahasanya SECARA SPESIFIK sudah tervalidasi untuk
+Qwen3, bukan model lain — mencoba rekayasa ulang teknik serupa untuk
+EXAONE berisiko lebih tinggi dan lebih lama dibanding kembali ke
+solusi yang sudah terbukti bekerja.
+
+**Keputusan `exaone_provider.py`/`solver_check.py` BELUM diubah** —
+masih menunggu hasil Step 2/2 (`verify_exaone35_swap.py`) yang user
+sedang jalankan di GPU-nya, terpisah dari masalah ini.
+
+**Diverifikasi**: diff eksplisit antara versi saat ini dan versi
+pre-swap (`git show ab81d8a:src/qwen_feedback.py`) dicek dulu untuk
+pastikan hanya `_MODEL_NAME`+kode loading yang berbeda (bukan ada
+perubahan lain yang ikut hilang kalau direvert) — dikonfirmasi bersih,
+cuma 2 blok (konstanta model+komentar, cara load model). `py_compile`
+lolos setelah revert.
+
+**File:** `src/qwen_feedback.py` (dikembalikan ke `Qwen/Qwen3-4B`, bf16).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
