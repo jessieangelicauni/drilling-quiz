@@ -2657,5 +2657,45 @@ bukan ditutupi.
 
 ---
 
+### 9.42 Audit reproducibility: 3 dari 5 skrip validasi tidak punya artefak hasil tersimpan — dijalankan & dicommit sekarang, 2 sisanya butuh GPU user
+
+User minta audit untuk menguatkan novelty berdasarkan hasil eval metric.
+Dicek: dari 5 skrip validasi permanen (`validate_novelty1.py`,
+`validate_novelty2.py`, `validate_item_discrimination.py`,
+`validate_lm_plausibility.py`, `validate_log_likelihood.py`), cuma
+`validate_novelty1.py` yang pernah punya hasil ter-commit
+(`1_validation_results.json`). Tiga lainnya menghasilkan angka yang
+dikutip langsung di paper (0.41/0.34 discrimination index, 76-82%
+escalation rate, 18-24% hemat biaya, 100% lm_plausibility di 5 skill)
+tanpa artefak apa pun untuk diverifikasi ulang — persis jenis gap yang
+sudah dua kali ditemukan sebagai masalah nyata (§9.40, §9.41: klaim
+paper vs kode/dokumentasi yang diam-diam melenceng seiring waktu).
+
+**Dijalankan dan dicommit sekarang** (2 dari 3 tidak butuh GPU sama
+sekali, 1 pakai teknik stub torch/transformers yang sudah terbukti di
+§9.21/§9.22 untuk menghindari `ExaoneGrammarProvider.__init__`'s
+`.to("cuda")`):
+- `item_discrimination_results.json` — murni numpy, langsung jalan.
+  Hasil: 50%-target discrimination=0.408, 85%-target=0.335, relative
+  drop=17.9% — **cocok persis** dengan klaim paper (0.41/0.34/18%).
+- `2_validation_results.json` — murni numpy (Urnings tracker). Hasil
+  escalation rate 82.2%, hemat biaya 17.8% (≈18%, tepat di ujung bawah
+  rentang klaim paper 76-82%/18-24% — konsisten, bukan penyimpangan).
+- `lm_plausibility_results.json` — via stub, generate 5 skill
+  (particle_loc, time_range, irregular_conj, adj_relativizer,
+  verb_choice) lewat jalur kurasi. Hasil: **100% persis** cocok dengan
+  klaim paper soal 5 skill yang reliable untuk check ini.
+
+**Belum bisa diverifikasi di sini** (butuh forward-pass model asli,
+bukan cuma instansiasi — teknik stub tidak cukup): `validate_log_likelihood.py`
+(94.2%/49-of-52, dan perbandingan Qwen3 87.5% vs EXAONE 48.2%) butuh
+`SolverCheckProvider` yang benar-benar menjalankan Qwen3-4B. User perlu
+jalankan `python3 src/validate_log_likelihood.py` di mesin GPU dan
+commit hasilnya, sama seperti `1_validation_results.json` sebelumnya,
+supaya SEMUA angka yang dikutip paper punya artefak ter-verifikasi,
+bukan cuma 3 dari 5.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
