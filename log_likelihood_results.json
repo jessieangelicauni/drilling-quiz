@@ -1,0 +1,493 @@
+{
+  "n_per_skill": 20,
+  "seed": 0,
+  "per_skill": {
+    "adj_relativizer": {
+      "n": 6,
+      "n_valid": 6,
+      "rows": [
+        {
+          "stem": "저는 ___ 머리를 좋아해요.",
+          "correct": "긴",
+          "distractor": "길는",
+          "valid": true,
+          "gap": 11.648991584777832,
+          "reason": "correct form scores 11.65 higher, as expected"
+        },
+        {
+          "stem": "저는 ___ 옷을 좋아해요.",
+          "correct": "예쁜",
+          "distractor": "예쁘는",
+          "valid": true,
+          "gap": 13.043999910354614,
+          "reason": "correct form scores 13.04 higher, as expected"
+        },
+        {
+          "stem": "저는 ___ 음식을 좋아해요.",
+          "correct": "매운",
+          "distractor": "맵는",
+          "valid": true,
+          "gap": 12.262008666992188,
+          "reason": "correct form scores 12.26 higher, as expected"
+        },
+        {
+          "stem": "저는 ___ 집을 좋아해요.",
+          "correct": "큰",
+          "distractor": "크는",
+          "valid": true,
+          "gap": 7.995805263519287,
+          "reason": "correct form scores 8.00 higher, as expected"
+        },
+        {
+          "stem": "저는 ___ 시계를 좋아해요.",
+          "correct": "비싼",
+          "distractor": "비싸는",
+          "valid": true,
+          "gap": 3.0804176330566406,
+          "reason": "correct form scores 3.08 higher, as expected"
+        },
+        {
+          "stem": "저는 ___ 가방을 좋아해요.",
+          "correct": "작은",
+          "distractor": "작는",
+          "valid": true,
+          "gap": 12.68793535232544,
+          "reason": "correct form scores 12.69 higher, as expected"
+        }
+      ],
+      "note": "unique curated stems may be fewer than n_per_skill"
+    },
+    "honorific": {
+      "n": 5,
+      "n_valid": 5,
+      "rows": [
+        {
+          "stem": "선생님께서 ___.",
+          "correct": "가르치세요",
+          "distractor": "가르쳐요",
+          "valid": true,
+          "gap": 7.313295364379883,
+          "reason": "correct form scores 7.31 higher, as expected"
+        },
+        {
+          "stem": "사장님께서 ___.",
+          "correct": "일하세요",
+          "distractor": "일해요",
+          "valid": true,
+          "gap": 7.089597225189209,
+          "reason": "correct form scores 7.09 higher, as expected"
+        },
+        {
+          "stem": "할머니께서 ___.",
+          "correct": "쉬세요",
+          "distractor": "쉬어요",
+          "valid": true,
+          "gap": 1.3533387184143066,
+          "reason": "correct form scores 1.35 higher, as expected"
+        },
+        {
+          "stem": "교수님께서 ___.",
+          "correct": "연구하세요",
+          "distractor": "연구해요",
+          "valid": true,
+          "gap": 5.600412845611572,
+          "reason": "correct form scores 5.60 higher, as expected"
+        },
+        {
+          "stem": "의사선생님께서 ___.",
+          "correct": "진료하세요",
+          "distractor": "진료해요",
+          "valid": true,
+          "gap": 7.070290565490723,
+          "reason": "correct form scores 7.07 higher, as expected"
+        }
+      ],
+      "note": "unique curated stems may be fewer than n_per_skill"
+    },
+    "irregular_conj": {
+      "n": 3,
+      "n_valid": 3,
+      "rows": [
+        {
+          "stem": "저는 노래를 ___.",
+          "correct": "불러요",
+          "distractor": "부르어요",
+          "valid": true,
+          "gap": 10.008800506591797,
+          "reason": "correct form scores 10.01 higher, as expected"
+        },
+        {
+          "stem": "저는 머리를 ___.",
+          "correct": "잘라요",
+          "distractor": "자르어요",
+          "valid": true,
+          "gap": 9.338226318359375,
+          "reason": "correct form scores 9.34 higher, as expected"
+        },
+        {
+          "stem": "저는 답을 ___.",
+          "correct": "몰라요",
+          "distractor": "모르어요",
+          "valid": true,
+          "gap": 10.288378715515137,
+          "reason": "correct form scores 10.29 higher, as expected"
+        }
+      ],
+      "note": "unique curated stems may be fewer than n_per_skill"
+    },
+    "mod_adverb": {
+      "n": 5,
+      "n_valid": 4,
+      "rows": [
+        {
+          "stem": "저는 ___ 달려요",
+          "correct": "빠르게",
+          "distractor": "빠른",
+          "valid": true,
+          "gap": 6.105352878570557,
+          "reason": "correct form scores 6.11 higher, as expected"
+        },
+        {
+          "stem": "저는 ___ 걸어요",
+          "correct": "느리게",
+          "distractor": "느린",
+          "valid": true,
+          "gap": 14.348963737487793,
+          "reason": "correct form scores 14.35 higher, as expected"
+        },
+        {
+          "stem": "저는 ___ 청소해요",
+          "correct": "깨끗하게",
+          "distractor": "깨끗한",
+          "valid": false,
+          "gap": -0.6176900863647461,
+          "reason": "distractor scores 0.62 higher than the correct form -- suspect pair, flag for review"
+        },
+        {
+          "stem": "저는 ___ 말해요",
+          "correct": "조용하게",
+          "distractor": "조용한",
+          "valid": true,
+          "gap": 1.649770736694336,
+          "reason": "correct form scores 1.65 higher, as expected"
+        },
+        {
+          "stem": "저는 ___ 먹어요",
+          "correct": "많게",
+          "distractor": "많은",
+          "valid": true,
+          "gap": 5.618997573852539,
+          "reason": "correct form scores 5.62 higher, as expected"
+        }
+      ],
+      "note": "unique curated stems may be fewer than n_per_skill"
+    },
+    "noun_counter": {
+      "n": 5,
+      "n_valid": 3,
+      "rows": [
+        {
+          "stem": "학생은 다섯 ___ 있어요.",
+          "correct": "명",
+          "distractor": "개",
+          "valid": true,
+          "gap": 5.484958648681641,
+          "reason": "correct form scores 5.48 higher, as expected"
+        },
+        {
+          "stem": "컵은 다섯 ___ 있어요.",
+          "correct": "개",
+          "distractor": "명",
+          "valid": true,
+          "gap": 10.587233304977417,
+          "reason": "correct form scores 10.59 higher, as expected"
+        },
+        {
+          "stem": "책은 다섯 ___ 있어요.",
+          "correct": "권",
+          "distractor": "개",
+          "valid": false,
+          "gap": -3.578786849975586,
+          "reason": "distractor scores 3.58 higher than the correct form -- suspect pair, flag for review (weaker than the other 9 skills: the generic counter 개 sometimes outscores a correct but rarer counter (권, 분) on raw frequency alone -- real risk, not noise.)"
+        },
+        {
+          "stem": "선생님은 다섯 ___ 있어요.",
+          "correct": "분",
+          "distractor": "개",
+          "valid": false,
+          "gap": -0.10201835632324219,
+          "reason": "distractor scores 0.10 higher than the correct form -- suspect pair, flag for review (weaker than the other 9 skills: the generic counter 개 sometimes outscores a correct but rarer counter (권, 분) on raw frequency alone -- real risk, not noise.)"
+        },
+        {
+          "stem": "사과는 다섯 ___ 있어요.",
+          "correct": "개",
+          "distractor": "명",
+          "valid": true,
+          "gap": 11.294681549072266,
+          "reason": "correct form scores 11.29 higher, as expected"
+        }
+      ],
+      "note": "unique curated stems may be fewer than n_per_skill"
+    },
+    "particle_loc": {
+      "n": 7,
+      "n_valid": 7,
+      "rows": [
+        {
+          "stem": "저는 도서관___ 공부해요.",
+          "correct": "에서",
+          "distractor": "에",
+          "valid": true,
+          "gap": 5.048952102661133,
+          "reason": "correct form scores 5.05 higher, as expected"
+        },
+        {
+          "stem": "저는 병원___ 진료해요.",
+          "correct": "에서",
+          "distractor": "에",
+          "valid": true,
+          "gap": 0.3002166748046875,
+          "reason": "correct form scores 0.30 higher, as expected"
+        },
+        {
+          "stem": "저는 학교___ 공부해요.",
+          "correct": "에서",
+          "distractor": "에",
+          "valid": true,
+          "gap": 5.265252590179443,
+          "reason": "correct form scores 5.27 higher, as expected"
+        },
+        {
+          "stem": "저는 식당___ 식사해요.",
+          "correct": "에서",
+          "distractor": "에",
+          "valid": true,
+          "gap": 2.832449436187744,
+          "reason": "correct form scores 2.83 higher, as expected"
+        },
+        {
+          "stem": "저는 회사___ 일해요.",
+          "correct": "에서",
+          "distractor": "에",
+          "valid": true,
+          "gap": 4.054319381713867,
+          "reason": "correct form scores 4.05 higher, as expected"
+        },
+        {
+          "stem": "저는 공원___ 놀아요.",
+          "correct": "에서",
+          "distractor": "에",
+          "valid": true,
+          "gap": 2.567427158355713,
+          "reason": "correct form scores 2.57 higher, as expected"
+        },
+        {
+          "stem": "저는 카페___ 마셔요.",
+          "correct": "에서",
+          "distractor": "에",
+          "valid": true,
+          "gap": 2.6803808212280273,
+          "reason": "correct form scores 2.68 higher, as expected"
+        }
+      ],
+      "note": "unique curated stems may be fewer than n_per_skill"
+    },
+    "particle_obj": {
+      "n": 6,
+      "n_valid": 6,
+      "rows": [
+        {
+          "stem": "저는 커피___ 마셔요.",
+          "correct": "를",
+          "distractor": "에",
+          "valid": true,
+          "gap": 6.382932662963867,
+          "reason": "correct form scores 6.38 higher, as expected"
+        },
+        {
+          "stem": "저는 영화___ 봐요.",
+          "correct": "를",
+          "distractor": "에",
+          "valid": true,
+          "gap": 12.457332611083984,
+          "reason": "correct form scores 12.46 higher, as expected"
+        },
+        {
+          "stem": "저는 책___ 읽어요.",
+          "correct": "을",
+          "distractor": "에",
+          "valid": true,
+          "gap": 15.141541481018066,
+          "reason": "correct form scores 15.14 higher, as expected"
+        },
+        {
+          "stem": "저는 사과___ 먹어요.",
+          "correct": "를",
+          "distractor": "에",
+          "valid": true,
+          "gap": 14.344350814819336,
+          "reason": "correct form scores 14.34 higher, as expected"
+        },
+        {
+          "stem": "저는 빵___ 먹어요.",
+          "correct": "을",
+          "distractor": "에",
+          "valid": true,
+          "gap": 12.493553638458252,
+          "reason": "correct form scores 12.49 higher, as expected"
+        },
+        {
+          "stem": "저는 라면___ 먹어요.",
+          "correct": "을",
+          "distractor": "에",
+          "valid": true,
+          "gap": 11.634328365325928,
+          "reason": "correct form scores 11.63 higher, as expected"
+        }
+      ],
+      "note": "unique curated stems may be fewer than n_per_skill"
+    },
+    "tense_past": {
+      "n": 5,
+      "n_valid": 5,
+      "rows": [
+        {
+          "stem": "저는 어제 밥을 ___.",
+          "correct": "먹었어요",
+          "distractor": "먹어요",
+          "valid": true,
+          "gap": 2.6430625915527344,
+          "reason": "correct form scores 2.64 higher, as expected"
+        },
+        {
+          "stem": "저는 어제 영화를 ___.",
+          "correct": "봤어요",
+          "distractor": "봐요",
+          "valid": true,
+          "gap": 10.992059707641602,
+          "reason": "correct form scores 10.99 higher, as expected"
+        },
+        {
+          "stem": "저는 어제 책을 ___.",
+          "correct": "읽었어요",
+          "distractor": "읽어요",
+          "valid": true,
+          "gap": 3.6519103050231934,
+          "reason": "correct form scores 3.65 higher, as expected"
+        },
+        {
+          "stem": "저는 어제 숙제를 ___.",
+          "correct": "했어요",
+          "distractor": "해요",
+          "valid": true,
+          "gap": 5.648530960083008,
+          "reason": "correct form scores 5.65 higher, as expected"
+        },
+        {
+          "stem": "저는 어제 커피를 ___.",
+          "correct": "마셨어요",
+          "distractor": "마셔요",
+          "valid": true,
+          "gap": 7.096961975097656,
+          "reason": "correct form scores 7.10 higher, as expected"
+        }
+      ],
+      "note": "unique curated stems may be fewer than n_per_skill"
+    },
+    "time_range": {
+      "n": 5,
+      "n_valid": 5,
+      "rows": [
+        {
+          "stem": "3월___ 5월까지 여행해요.",
+          "correct": "부터",
+          "distractor": "까지",
+          "valid": true,
+          "gap": 8.97707462310791,
+          "reason": "correct form scores 8.98 higher, as expected"
+        },
+        {
+          "stem": "월요일___ 금요일까지 일해요.",
+          "correct": "부터",
+          "distractor": "까지",
+          "valid": true,
+          "gap": 9.643341064453125,
+          "reason": "correct form scores 9.64 higher, as expected"
+        },
+        {
+          "stem": "두 시___ 네 시까지 회의해요.",
+          "correct": "부터",
+          "distractor": "까지",
+          "valid": true,
+          "gap": 4.508403778076172,
+          "reason": "correct form scores 4.51 higher, as expected"
+        },
+        {
+          "stem": "아침___ 저녁까지 운동해요.",
+          "correct": "부터",
+          "distractor": "까지",
+          "valid": true,
+          "gap": 5.2207183837890625,
+          "reason": "correct form scores 5.22 higher, as expected"
+        },
+        {
+          "stem": "아홉 시___ 열 시까지 공부해요.",
+          "correct": "부터",
+          "distractor": "까지",
+          "valid": true,
+          "gap": 11.051854133605957,
+          "reason": "correct form scores 11.05 higher, as expected"
+        }
+      ],
+      "note": "unique curated stems may be fewer than n_per_skill"
+    },
+    "verb_choice": {
+      "n": 5,
+      "n_valid": 5,
+      "rows": [
+        {
+          "stem": "저는 숙제를 ___.",
+          "correct": "해요",
+          "distractor": "봐요",
+          "valid": true,
+          "gap": 3.3195910453796387,
+          "reason": "correct form scores 3.32 higher, as expected"
+        },
+        {
+          "stem": "저는 음악을 ___.",
+          "correct": "들어요",
+          "distractor": "봐요",
+          "valid": true,
+          "gap": 6.0513916015625,
+          "reason": "correct form scores 6.05 higher, as expected"
+        },
+        {
+          "stem": "저는 영화를 ___.",
+          "correct": "봐요",
+          "distractor": "먹어요",
+          "valid": true,
+          "gap": 5.5443243980407715,
+          "reason": "correct form scores 5.54 higher, as expected"
+        },
+        {
+          "stem": "저는 사진을 ___.",
+          "correct": "찍어요",
+          "distractor": "먹어요",
+          "valid": true,
+          "gap": 11.39879560470581,
+          "reason": "correct form scores 11.40 higher, as expected"
+        },
+        {
+          "stem": "저는 밥을 ___.",
+          "correct": "먹어요",
+          "distractor": "마셔요",
+          "valid": true,
+          "gap": 9.834600448608398,
+          "reason": "correct form scores 9.83 higher, as expected"
+        }
+      ],
+      "note": "unique curated stems may be fewer than n_per_skill"
+    }
+  },
+  "overall_pass_rate": 0.9423076923076923
+}
