@@ -2020,5 +2020,70 @@ halaman demi halaman (bukan cuma grep), penempatan figure masuk akal.
 
 ---
 
+### 9.30 Audit lanjutan ("cek lainnya") — 2 ketidaksesuaian klaim-vs-implementasi ditemukan dan diperbaiki, BUKAN soal bukti lemah
+
+User minta cek bagian lain supaya tidak ada yang perlu di-reframe lagi di
+masa depan. Beda kategori dari temuan Novelty 1/2 sebelumnya: dua hal ini
+bukan "bukti belum cukup kuat" tapi **paper mengklaim sesuatu yang beda
+dari yang sungguh dibangun** — lebih serius, harus diperbaiki terlepas
+dari apakah hasilnya "melemahkan" kedengarannya, karena ini soal akurasi
+faktual bukan soal kekuatan bukti riset.
+
+**Temuan #1: KLUE-RoBERTa diklaim ter-deploy ("fine-tuned for difficulty
+regression"), padahal yang sungguh jalan di `answer_processing.py`/
+`question_bank.py` adalah `difficulty_heuristic.py` — heuristic
+deterministik (jumlah morfem + kiwipiepy), BUKAN KLUE-RoBERTa sama
+sekali.** Dicek langsung import statement di kode produksi, bukan
+diasumsikan dari nama file. Section III-C/Fig. 1 lama menulis seolah
+KLUE-RoBERTa sudah di-fine-tune dan dipakai — PRD sendiri sudah lama
+jujur soal ini (§2.3: "benar-benar tidak ada dataset kalibrasi... bukan
+soal waktu/usaha") tapi disclosure itu TIDAK PERNAH masuk ke teks paper.
+
+**Diperbaiki, dan ini JUSTRU memperkuat Novelty 2, bukan melemahkannya**:
+ditambah 1 paragraf jujur di Section III-C ("Stated plainly, not left for
+a reader to discover in the code...") + Fig. 1 caption diperjelas
+("target architecture KLUE-RoBERTa; a deterministic placeholder in the
+evaluated system") + pembukaan Novelty 2 (IV-C) diperbaiki supaya tidak
+lagi bilang "KLUE-RoBERTa's difficulty estimate... not calibrated" (salah
+atribusi) jadi "the difficulty-prior estimator this system actually
+runs... standing in for KLUE-RoBERTa". Argumennya: skenario "prior yang
+tidak terkalibrasi" yang jadi dasar Novelty 2 bukan hipotetis — itu
+PERSIS kondisi nyata sistem ini sekarang.
+
+**Temuan #2: Section IV-B (verifier gate) mengklaim "morphological
+analyser confirms distractor is not itself a correct answer" seolah
+berlaku seragam untuk semua skill — padahal cuma benar untuk 3 dari 11
+skill.** Dicek `SKILL_SPECS` langsung: hanya `particle_obj`, `subj_topic`,
+`mod_adverb` punya tag correct/distractor yang BEDA (sehingga tag
+mismatch benar-benar bisa menolak distractor yang kebetulan juga benar).
+8 skill lain (particle_loc, honorific, time_range, tense_past,
+irregular_conj, adj_relativizer, verb_choice, noun_counter) correct DAN
+distractor-nya **tag SAMA** — keunikan jawaban di situ murni jaminan
+desain template (diverifikasi manual saat skill dibangun, §9.9/§9.10/
+§9.21/§9.22), BUKAN dicek otomatis per-item. Satu-satunya usaha membuat
+cek semantik otomatis untuk ini (`solver_check.py`'s check (b)) sudah
+lama diketahui yes-biased dan dikecualikan (§9.16) — tapi Section IV-B
+lama tidak pernah mengakui keterbatasan ini, menulis seolah "morphological
+analyser" menangani semuanya.
+
+**Diperbaiki**: IV-B ditulis ulang eksplisit membedakan 3-skill
+(tag-beda, benar-benar dicek otomatis) vs 8-skill (tag-sama, jaminan
+desain + disclosure soal check (b) yang yes-biased). Section V-B (dulu
+cuma rencana studi instruktur, belum ada angka sama sekali) ditambah 1
+paragraf melaporkan SEMUA angka otomatis yang sudah ada (gen pass 100%,
+solver key-accept 66.4%, critic 0 kali terpicu dengan alasannya, check
+(b) dikecualikan dengan alasannya) — supaya pembaca tidak perlu menebak
+dari PRD, semua ada di paper.
+
+**Verifikasi PDF halaman-demi-halaman (bukan cuma grep)**: Fig. 1-5 tetap
+masing-masing muncul tepat 1x setelah build ulang, persamaan (1)(2)(3)
+tetap berurutan benar, tidak ada ANCHOR yang pecah lagi.
+
+**File:** `src/content.py` saja (Section III-C, Fig. 1 caption, IV-B,
+IV-C pembukaan, V-B). Tidak ada perubahan kode produksi — murni
+menyamakan teks paper dengan kode yang sudah ada.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

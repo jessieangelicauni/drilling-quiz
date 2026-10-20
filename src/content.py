@@ -464,15 +464,27 @@ BODY = [
       "footprint or vision input is required; we treat the choice as an ablation rather than "
       "a commitment."),
 
-("P", "Difficulty prediction: KLUE-RoBERTa. We endorse this without reservation. A Korean "
-      "encoder pre-trained on the KLUE benchmark suite [36] and fine-tuned for difficulty "
-      "regression is the right instrument for the reasons given in Section III-A and "
-      "directly supported by Li et al. [11]. Our one refinement is that the encoder should "
-      "not emit a point estimate. It should emit a mean and a variance, because that "
-      "distribution becomes the prior for the psychometric tracker, and an item the encoder "
-      "is unsure about should enter the pool with correspondingly wide uncertainty rather "
-      "than with false confidence. This feeds directly into the adaptive selection policy "
-      "described in Section IV-D."),
+("P", "Difficulty prediction: KLUE-RoBERTa. We endorse this without reservation as the "
+      "target architecture. A Korean encoder pre-trained on the KLUE benchmark suite [36] "
+      "and fine-tuned for difficulty regression is the right instrument for the reasons "
+      "given in Section III-A and directly supported by Li et al. [11]. Our one refinement "
+      "is that the encoder should not emit a point estimate. It should emit a mean and a "
+      "variance, because that distribution becomes the prior for the psychometric tracker, "
+      "and an item the encoder is unsure about should enter the pool with correspondingly "
+      "wide uncertainty rather than with false confidence. This feeds directly into the "
+      "adaptive selection policy described in Section IV-D."),
+
+("P", "Stated plainly, not left for a reader to discover in the code: fine-tuning this "
+      "encoder needs a Korean item set with real difficulty labels, which does not exist "
+      "for this syllabus and cannot be produced by engineering effort alone. The system we "
+      "evaluate therefore runs a deterministic placeholder behind the identical (μ̂, σ̂²) "
+      "interface—morpheme count and grammatical-complexity tag density from a rule-based "
+      "parser, deliberately reported with high σ̂² so it never looks more confident than a "
+      "trained model would be—swappable for the trained encoder with no downstream change "
+      "once calibration data exists. This is not a weaker version of Novelty 2's claim; it "
+      "is Novelty 2's precondition made concrete. The experiment in Section IV-C does not "
+      "assume a prior might be uncalibrated—it is evaluating the prior this system actually "
+      "serves."),
 
 ("H1", "IV. Proposed Method: KO-DRILL"),
 
@@ -518,14 +530,25 @@ BODY = [
 
 ("P", "This only works if the distractors are trustworthy, which is why the verifier gate is "
       "part of the novelty rather than an implementation detail. It enforces three "
-      "conditions. First, a morphological analyser confirms that the distractor actually "
-      "realises the intended misconception and not some other error. Second—the most "
-      "important check, and the dominant failure mode of LLM-generated distractors—it "
-      "confirms that the distractor is not itself a correct answer. Korean makes this "
-      "failure easy to commit: many particle substitutions that look wrong in isolation are "
-      "acceptable in some reading, so a naive generator will regularly produce items with "
-      "two correct options. Third, a round-trip check requires a solver model to still "
-      "select the intended key."),
+      "conditions, and we are precise about which is automated per item and which is a "
+      "design guarantee, rather than claiming uniform automated coverage. First, a "
+      "morphological analyser confirms that the distractor actually realises the intended "
+      "misconception and not some other error. Second—the dominant failure mode of "
+      "LLM-generated distractors, and the hardest to catch—the distractor must not itself "
+      "be a correct answer. Korean makes this failure easy to commit: many particle "
+      "substitutions that look wrong in isolation are acceptable in some reading. For the 3 "
+      "of our 11 skills where the correct form and the distractor carry different "
+      "grammatical tags, the same morphological analyser enforces this directly: a "
+      "distractor that also satisfies the correct tag is rejected before it is ever shown. "
+      "For the remaining 8, both forms share a tag kiwipiepy cannot discriminate by itself, "
+      "so uniqueness instead rests on the sentence template being constructed so only one "
+      "reading is semantically acceptable, verified by direct inspection when each skill was "
+      "built rather than checked automatically per item. We did build and test an automated "
+      "semantic check for this—a solver model judging whether a distractor is also "
+      "acceptable—and it showed a confirmed, unfixable bias toward answering yes even for "
+      "genuinely wrong distractors; we report this honestly in Section V-B rather than use "
+      "a check we know to be unreliable. Third, a round-trip check requires a solver model, "
+      "blind to the key, to still select it."),
 
 ("P", "An item failing any check is not simply discarded and resampled from scratch, which "
       "wastes the useful part of a near-miss generation. Instead it passes to a critic: a "
@@ -540,9 +563,11 @@ BODY = [
 ("H2", "C. Novelty 2: Robustness to an Uncalibrated Item-Difficulty Prior"),
 
 ("P", "The second novelty addresses gap G2 directly, at the one point where this system's "
-      "own architecture forces it: KLUE-RoBERTa's difficulty estimate is, by its own "
-      "docstring, not calibrated to any real difficulty scale—no human rater has checked a "
-      "generated item's difficulty before it is served. Every new item therefore hands the "
+      "own architecture forces it: the difficulty-prior estimator this system actually "
+      "runs—the deterministic placeholder described in Section III-C, standing in for "
+      "KLUE-RoBERTa until a calibration dataset exists—is, by its own docstring, not "
+      "calibrated to any real difficulty scale, and no human rater has checked a generated "
+      "item's difficulty before it is served either. Every new item therefore hands the "
       "tracker a prior of unknown, possibly poor, quality. What happens next depends "
       "entirely on which tracker receives it."),
 
@@ -652,6 +677,23 @@ BODY = [
 
 ("H2", "B. Validating Novelty 1: Misconception-Conditioned Distractors"),
 
+("P", "Two kinds of evidence are reported here: what has already been measured "
+      "automatically, at N=20 items per skill across all 11 skills, and what the human "
+      "study below still needs to establish. Generation passes the morphological gate 100% "
+      "of the time (220/220); a solver model blind to the key still selects it 66.4% of the "
+      "time overall, ranging from 95% on particle_obj down to 10% on irregular_conj and "
+      "subj_topic—both low scores traced to a known solver limitation (blindness to "
+      "르-irregular contraction, and insensitivity to the pedagogical convention subj_topic "
+      "relies on, Section IV-B) rather than to the items themselves. The critic step "
+      "(Section IV-B) is exercised zero times at this N, because every slot in the current "
+      "11 skills is covered by a curated lookup table rather than open generation; its 40% "
+      "recovery rate is measured separately, on 20 deliberately uncurated slots, and has "
+      "not yet been reproduced at the scale reported here. The solver-based semantic check "
+      "for whether a distractor is also correct, mentioned in Section IV-B, was tested on "
+      "known cases in two prompt framings and under reasoning mode; it answered yes in "
+      "every case regardless of whether the distractor was actually ambiguous, and is "
+      "therefore excluded from this verdict rather than quoted as supporting evidence."),
+
 ("P", "Item quality is rated by three independent Korean language instructors on four "
       "dimensions — grammaticality of the stem, uniqueness of the key, plausibility of "
       "each distractor, and correctness of the KAGAS label — with agreement reported as "
@@ -662,7 +704,8 @@ BODY = [
       "distractor was generated to realise and the label an instructor independently "
       "assigns after seeing only the distractor — this is the direct test of whether "
       "misconception-conditioning actually produces a usable diagnosis, or merely a "
-      "plausible wrong answer with a label attached."),
+      "plausible wrong answer with a label attached. Neither measure is available yet; "
+      "this subsection is the protocol, not a result."),
 
 ("H2", "C. Validating Novelty 2: Robustness to an Uncalibrated Prior"),
 
@@ -823,10 +866,11 @@ REFERENCES = [
 FIGURES = [
  ("figures/fig1_architecture.png", 6.3,
   "Fig. 1. The KO-DRILL architecture. Four model roles are kept separate: a Korean generator "
-  "(EXAONE), a diagnostic distractor generator, a difficulty-prior encoder (KLUE-RoBERTa), and "
-  "an English explainer (Qwen3). Learner state is held by an explicit multidimensional Urnings "
-  "tracker rather than by a neural network, so that every ability estimate carries a known "
-  "standard error."),
+  "(EXAONE), a diagnostic distractor generator, a difficulty-prior encoder (target "
+  "architecture KLUE-RoBERTa; a deterministic placeholder in the evaluated system, Section "
+  "III-C), and an English explainer (Qwen3). Learner state is held by an explicit "
+  "multidimensional Urnings tracker rather than by a neural network, so that every ability "
+  "estimate carries a known standard error."),
  ("figures/fig2_distractors.png", 6.4,
   "Fig. 2. Misconception-conditioned distractor generation (Novelty 1). Each distractor is "
   "generated from, and tagged with, a specific misconception category drawn from KAGAS, an "
