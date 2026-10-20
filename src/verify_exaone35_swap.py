@@ -27,10 +27,11 @@ _SRC = Path(__file__).resolve().parent
 
 # Order matters: cheapest/lowest-risk swapped file first (PRD §9.51),
 # exaone_provider.py (highest blast radius, PRD §9.52) last.
+# domain_vocab_substitution.py/curriculum_item_generator.py removed from
+# this list (PRD §9.60 codebase cleanup -- the curriculum-upload feature
+# they belonged to was never connected to the paper and was deleted).
 _SMOKE_TEST_FILES = [
     "qwen_feedback.py",
-    "domain_vocab_substitution.py",
-    "curriculum_item_generator.py",
     "solver_check.py",
     "exaone_provider.py",
 ]

@@ -62,7 +62,8 @@ _MODEL_NAME = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"  # swapped from Qwen3-4B 20
 # text) is not the basis of any published psychometric claim in the paper, unlike solver_check.py.
 #
 # 4-bit quantized (PRD §9.55, same fix as PRD §9.53's exaone_provider.py/
-# curriculum_item_generator.py/solver_check.py/domain_vocab_substitution.py): this file was
+# solver_check.py and two other files later removed in a codebase cleanup,
+# PRD §9.60): this file was
 # MISSED by that earlier quantization pass -- it kept running unquantized bf16 (~15.6GB on a
 # 15.57GB GPU) and only appeared to pass its smoke test because the GPU happened to be clean at
 # that moment, not because it was actually safe. detailed_feedback()'s 1200-token budget needs

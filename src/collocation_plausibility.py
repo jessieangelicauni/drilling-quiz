@@ -24,8 +24,12 @@ user's GPU machine before being implemented here: 10 known-good pairs
 GOOD mean=0.5575, BAD mean=0.3180, only 7/100 pairwise comparisons had a
 bad pair scoring above a good pair. Could not be run in the cloud sandbox
 this module was written in (huggingface.co is blocked by that session's
-network policy -- a policy denial, not a transient failure); run via
-src/investigate_sbert_plausibility.py if this needs re-validating.
+network policy -- a policy denial, not a transient failure). The
+calibration script (investigate_sbert_plausibility.py) was removed in a
+later codebase cleanup (PRD §9.60) once this was implemented and its
+result recorded here -- recreate a similar script (10 good/10 bad pairs,
+jhgan/ko-sroberta-multitask cosine similarity) if this needs
+re-validating from scratch.
 
 Threshold (_PLAUSIBILITY_THRESHOLD = 0.43) is a conservative split of the
 calibration data above, not a value exactly between the means: chosen to
@@ -97,11 +101,11 @@ def is_plausible_collocation(noun: str, verb: str) -> bool:
 
 
 if __name__ == "__main__":
-    # Smoke test only -- the real calibration run is
-    # src/investigate_sbert_plausibility.py, not this.
+    # Smoke test only -- the real calibration run's results are recorded
+    # in this module's docstring (PRD §9.57), not reproduced here.
     assert is_plausible_collocation("아무개", "아무거나") is True, (
         "must fail OPEN (never block) when the model can't be reached, e.g. in a "
         "sandbox without internet access to huggingface.co")
     print("fail-open behavior confirmed in this sandbox (no internet to huggingface.co). "
           "Real plausibility-separation behavior needs a machine with internet access -- "
-          "see src/investigate_sbert_plausibility.py's results instead.")
+          "see this module's docstring (PRD §9.57) for the calibration results instead.")

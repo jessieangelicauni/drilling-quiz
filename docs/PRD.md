@@ -3828,5 +3828,75 @@ fine-tuning) masih pending run berikutnya.
 
 ---
 
+### 9.60 Cleanup codebase: hapus fitur yang tidak pernah terhubung ke paper, hapus script investigasi yang tujuannya sudah tercapai
+
+**Instruksi user**: "sebelum lanjut, saya ingin meng-clean codingan
+dulu agar rapi dan ga kompleks, saya hanya mau fokus pada code yang
+mendukung paper" — diucapkan tepat setelah hasil run nyata
+`investigate_kolla_corpus.py` v2 masuk (329 instance perubahan
+partikel relevan proyek, mengonfirmasi opsi kurasi-berbasis-frekuensi
+realistis, opsi fine-tuning tidak) — investigasi KoLLA SENGAJA
+DIJEDA, bukan dihentikan, akan dilanjutkan setelah cleanup ini.
+
+**Verifikasi sebelum hapus apa pun**: grep eksplisit `content.py`
+(teks paper) untuk nama file/konsep fitur kurikulum — HASIL: 0 hit
+bermakna (`curriculum_provider.py` dkk. tidak disebut sama sekali;
+satu-satunya kemunculan kata "curriculum" generik, tidak berhubungan).
+Dikonfirmasi: fitur upload-kurikulum + substitusi domain
+EV/smart-factory (dibangun §9.46-9.49, lalu ikut di-swap model di
+§9.51-9.56) memang TIDAK PERNAH ditulis ke paper sejak dibuat.
+
+**Scope dikonfirmasi ke user via AskUserQuestion** (2 pertanyaan,
+dijawab "no preference" — diinterpretasikan sebagai setuju opsi yang
+sudah ditandai "(Recommended)" di pertanyaan itu sendiri, bukan
+diasumsikan tanpa dasar):
+1. Fitur kurikulum: **dihapus** (bukan dipindah/didiamkan) — paling
+   sesuai "fokus ke yang mendukung paper"; riwayat tetap ada di git
+   log kalau perlu dikembalikan.
+2. `investigate_sbert_plausibility.py`: **dihapus** — tujuannya
+   (kalibrasi threshold `collocation_plausibility.py`) sudah tercapai
+   dan hasilnya permanen tercatat di docstring modul itu + PRD §9.57.
+
+**File dihapus**: `src/curriculum_provider.py`,
+`src/curriculum_item_generator.py`, `src/curriculum_grammar_provider.py`,
+`src/domain_vocab_substitution.py`, `src/investigate_sbert_plausibility.py`.
+
+**Dependensi yang diikut-bersihkan** (supaya tidak ada import
+menggantung/referensi rusak ke file yang dihapus):
+- `content_provider.py`: hapus class `DispatchingGrammarProvider`
+  (wiring khusus curriculum) dan blok smoke-test "mixed-source" di
+  `__main__` yang meng-import `CurriculumGrammarProvider`.
+  `CombinedContentProvider` (vocab+grammar murni, yang benar-benar
+  dipakai production/paper) TIDAK disentuh.
+- `verify_exaone35_swap.py`: hapus `domain_vocab_substitution.py` dan
+  `curriculum_item_generator.py` dari `_SMOKE_TEST_FILES` (file itu
+  sudah tidak ada, akan gagal kalau tetap dicoba dijalankan).
+- `qwen_feedback.py`, `collocation_plausibility.py`: komentar yang
+  menyebut nama file yang sudah dihapus diperbarui supaya tidak
+  menunjuk ke file yang tidak ada lagi (riwayat keputusannya tetap
+  akurat, cuma referensi filenya diperbaiki).
+
+**Diverifikasi**: `py_compile` SEMUA file di `src/` (bukan cuma yang
+diedit) — lolos semua. Grep ulang seluruh `src/` untuk import modul
+yang dihapus — nol hasil.
+
+**Belum dihapus, sengaja ditinggalkan**: `Korean_Grammar_Curriculum.docx`
+di root repo — ini file yang di-upload user sendiri (data, bukan
+kode), bukan kompleksitas kode yang jadi concern user — dibiarkan
+kecuali user minta dihapus juga.
+
+**Investigasi yang TIDAK dihentikan** (aktif, sengaja dijeda):
+`src/investigate_kolla_corpus.py` tetap ada — ini bukan bagian fitur
+kurikulum yang dihapus, melainkan investigasi terpisah untuk
+memperkuat skill `particle_loc`/`particle_obj` yang MEMANG didukung
+paper, dan user secara eksplisit mau melanjutkannya setelah cleanup
+ini.
+
+**File:** `src/content_provider.py`, `src/verify_exaone35_swap.py`,
+`src/qwen_feedback.py`, `src/collocation_plausibility.py` (diedit); 5
+file dihapus (lihat atas).
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*
