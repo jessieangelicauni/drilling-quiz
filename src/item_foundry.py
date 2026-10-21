@@ -7,10 +7,12 @@ not only that they were wrong.
 The LLM writes the content; code only VERIFIES it and LABELS it:
 
   1. Item (MisconceptionItemGenerator.generate): EXAONE writes one natural
-     sentence using the grammar point, marks the tested span, and writes
-     three wrong versions of that span, each a different error a learner
-     typically makes -- one of them, when asked, the error the learner
-     currently makes most (personalisation).
+     sentence using the grammar point and three wrong copies of it, each
+     with a different error a learner typically makes -- one of them, when
+     asked, the error the learner currently makes most (personalisation).
+     The blank is where the wrong copies differ from the sentence (_blank):
+     the model only writes sentences, the form it handles most reliably
+     (PRD §9.78).
   2. Label: each distractor's misconception code is the KAGAS edit that
      turns the key sentence into the distractor sentence
      (kagas_annotator.annotate), e.g. PART:에서>에 or END:었>았. The code is
@@ -44,7 +46,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable
 
-from kagas_annotator import annotate
+from kagas_annotator import _KIWI, annotate
 
 Chat = Callable[[list[dict]], str]
 Scorer = Callable[[str], float]
@@ -189,8 +191,8 @@ def single_edit(skill: Skill, correct: str, wrong: str):
     """The one edit turning `correct` into `wrong`, or (None, reason)."""
     edits = annotate(correct, wrong)
     if len(edits) != 1:
-        return None, (f"not-minimal: it changes {len(edits)} places in the sentence; "
-                      f"it must replace only the bracketed part")
+        return None, (f"not-minimal: it differs from the correct sentence in {len(edits)} places; "
+                      f"it must differ in exactly one")
     edit = edits[0]
     if edit.category not in skill.categories:
         wanted = " or ".join(_category_words(c) for c in sorted(skill.categories))
@@ -204,37 +206,35 @@ def single_edit(skill: Skill, correct: str, wrong: str):
 
 # ------------------------------------------------------------------ items
 
-_SYSTEM_PROMPT = """You write multiple-choice Korean grammar questions for Indonesian learners at {level} level.
-A question is one Korean sentence with one part in square brackets. The learner sees the sentence
-with that part blanked out and picks it from four options: the correct part and three distractors.
+_SYSTEM_PROMPT = """You write Korean grammar exercises for Indonesian learners at {level} level.
+
+You get a grammar point. Write:
+- "sentence": one natural, everyday Korean sentence that uses the grammar point correctly.
+- "wrong_sentences": three copies of that same sentence, each with exactly ONE mistake in the
+  grammar point, the kind of mistake learners really make. Change only that one particle, ending
+  or word; keep every other word exactly the same. The three mistakes must be different.
 
 Rules:
-1. The sentence is natural, everyday Korean, written in Hangul only: no romanisation, no translation.
-2. Exactly one pair of square brackets, inside the sentence, around the SHORTEST part that shows the
-   grammar point: a particle, a verb or adjective ending, or one word. Never bracket a whole phrase.
-3. Everything outside the brackets is correct and stays the same for all four options.
-4. Each distractor is only the text that replaces the bracketed part, not a whole sentence.
-5. Put a distractor in the brackets and the sentence must become wrong, and wrong ONLY because of
-   the grammar point being tested.
-6. The three distractors are three different mistakes that learners really make with this
-   grammar point.
-7. Output one JSON object and nothing else: no explanation, no comments, no markdown.
+1. Hangul only: no romanisation, no translation, no brackets.
+2. The sentence is short and correct; each wrong sentence is wrong only because of the one mistake.
+3. Output one JSON object and nothing else: no explanation, no comments, no markdown.
 
 Output format:
-{{"sentence": "<Korean sentence with one [bracketed] part>", "distractors": ["<wrong 1>", "<wrong 2>", "<wrong 3>"]}}"""
+{{"sentence": "...", "wrong_sentences": ["...", "...", "..."]}}"""
 
 _ITEM_PROMPT = """Grammar point: {description}.{target_line}
 {example_note}
 {example}
-Write a new question.{avoid}"""
+Write a new exercise.{avoid}"""
 
 # The example until a skill has an accepted item of its own; after that, the
 # skill's latest accepted item is the example (on-skill, not fixed).
-_FORMAT_EXAMPLE = '{"sentence": "동생이 공원[에서] 축구를 해요.", "distractors": ["에", "을", "이"]}'
+_FORMAT_EXAMPLE = ('{"sentence": "동생이 공원에서 축구를 해요.", "wrong_sentences": '
+                   '["동생이 공원에 축구를 해요.", "동생이 공원을 축구를 해요.", "동생이 공원이 축구를 해요."]}')
 
-_REVISION_PROMPT = """This question was rejected:
+_REVISION_PROMPT = """This exercise was rejected:
 {reasons}
-Write a new question that follows every rule. Output the JSON object only."""
+Write a new exercise that follows every rule. Output the JSON object only."""
 
 
 def describe_code(code: str) -> str:
@@ -250,40 +250,31 @@ def describe_code(code: str) -> str:
     return f"'{wrong}' written where '{correct}' is needed"
 
 
-def _wrong_sentence(distractor: str, before: str, target: str, after: str) -> str | None:
-    """The full wrong sentence a distractor stands for. Generators answer in
-    three shapes, all accepted: the replacement for the bracketed part
-    ("에서"), the whole word that contains it ("카페에서" for 카페[에]), or the
-    whole wrong sentence. Whether the result is a minimal edit of the key is
-    then checked by the annotator, as for any distractor."""
-    d = korean_only(distractor.replace("[", "").replace("]", ""))
-    if not d:
+def _blank(sentence: str, wrongs: list[str]) -> tuple[int, int] | None:
+    """(start, end) of the blank in `sentence`: the span where the wrong
+    sentences differ from it, widened to whole morphemes, or to the whole
+    word when a wrong sentence only leaves something out (no empty option).
+    None if the span crosses a space (more than one word)."""
+    p = min(next((i for i, (a, b) in enumerate(zip(sentence, w)) if a != b), min(len(sentence), len(w)))
+            for w in wrongs)
+    q = min(next((i for i, (a, b) in enumerate(zip(sentence[::-1], w[::-1])) if a != b),
+                 min(len(sentence), len(w))) for w in wrongs)
+    q = min(q, len(sentence) - p, *(len(w) - p for w in wrongs))
+    start, end = p, len(sentence) - q
+    for t in _KIWI.tokenize(sentence):  # widen to whole morphemes
+        if t.start <= start < t.start + t.len:
+            start = min(start, t.start)
+        if start < end and t.start < end <= t.start + t.len:
+            end = max(end, t.start + t.len)
+    if start == end or any(len(w) - (len(sentence) - end) == start for w in wrongs):
+        start = sentence.rfind(" ", 0, start) + 1  # an option would be empty: blank the word
+        end = (sentence + " ").find(" ", end)
+    while end > start + 1 and sentence[end - 1] in ".?!," and all(
+            w[len(w) - (len(sentence) - end) - 1] == sentence[end - 1] for w in wrongs):
+        end -= 1  # keep sentence punctuation out of the options
+    if " " in sentence[start:end].strip():
         return None
-    sentence = before + target + after
-    if len(d) >= len(sentence) / 2:
-        return d
-    prefix = before.rsplit(" ", 1)[-1]           # start of the bracketed word
-    suffix = after.split(" ", 1)[0]               # its end
-    if prefix and d.startswith(prefix):
-        start = before[:len(before) - len(prefix)]
-        last = sentence.split()[-1]
-        if d != last and d.endswith(last):        # the rest of the sentence from that word on
-            return start + d
-        return start + d + after[len(suffix):]
-    return before + d + after
-
-
-def _shared_blank(sentence: str, wrongs: list[str], before: str, after: str):
-    """(before, after) of the blank every distractor fills: the bracketed
-    span if every wrong sentence differs only there, else the whole word
-    around it; None if a distractor changes the sentence elsewhere."""
-    word_before = before[:len(before) - len(before.rsplit(" ", 1)[-1])]
-    word_after = after[len(after.split(" ", 1)[0]):]
-    for b, a in ((before, after), (word_before, word_after)):
-        if all(w.startswith(b) and w.endswith(a) and len(w) > len(b) + len(a) - 1 for w in wrongs):
-            if len(sentence) >= len(b) + len(a):
-                return b, a
-    return None
+    return start, end
 
 
 class MisconceptionItemGenerator:
@@ -305,63 +296,53 @@ class MisconceptionItemGenerator:
         skill = SKILLS[skill_id]
         if not isinstance(reply, dict):
             return None, ["format: the reply was not a JSON object"]
-        marked, distractors = reply.get("sentence"), reply.get("distractors")
-        if not (isinstance(marked, str) and isinstance(distractors, list)):
-            return None, ["format: needs a sentence and a list of distractors"]
-        marked = korean_only(marked.replace("*", ""))   # **[께]** markdown
-        if marked is None:
+        sentence, wrongs_in = reply.get("sentence"), reply.get("wrong_sentences")
+        if not (isinstance(sentence, str) and isinstance(wrongs_in, list)):
+            return None, ['format: needs a "sentence" and a list of "wrong_sentences"']
+        clean = lambda t: korean_only(re.sub(r"[\[\]*]", "", t).strip()) if isinstance(t, str) else None
+        sentence = clean(sentence)
+        if not sentence:
             return None, ["format: the sentence must be Korean only, without romanisation or translation"]
-        spans = re.findall(r"\[([^\[\]]*)\]", marked)
-        if len(spans) != 1 or not spans[0].strip():
-            return None, ["target: put square brackets around exactly one part of the sentence"]
-        target = spans[0]
-        before, after = marked.split(f"[{target}]", 1)
-        if not before.strip() or before.rstrip()[-1] in ".?!":
-            return None, ["target: the brackets must be inside the sentence, not after it"]
-        sentence = before + target + after
-        if len(distractors) < N_DISTRACTORS:
-            return None, [f"format: {N_DISTRACTORS} distractors are needed, got {len(distractors)}"]
+        if len(wrongs_in) < N_DISTRACTORS:
+            return None, [f"format: {N_DISTRACTORS} wrong sentences are needed, got {len(wrongs_in)}"]
 
         reasons, wrongs, codes = [], [], []
-        for d in distractors:
-            wrong = _wrong_sentence(d, before, target, after) if isinstance(d, str) else None
-            if wrong is None or wrong == sentence or wrong in wrongs:
-                reasons.append(f"duplicate: distractor '{d}' is empty, the key, or a repeat")
+        for w in wrongs_in:
+            wrong = clean(w)
+            if not wrong or wrong == sentence or wrong in wrongs:
+                reasons.append(f"duplicate: wrong sentence '{w}' is empty, the correct sentence, or a repeat")
                 continue
             edit, why = single_edit(skill, sentence, wrong)
             if edit is None:
                 tag, _, text = why.partition(": ")
-                reasons.append(f"{tag}: distractor '{d}' -- {text}")
+                reasons.append(f"{tag}: wrong sentence '{wrong}' -- {text}")
                 continue
             if edit.code in codes:
-                reasons.append(f"distinct: '{wrong}' makes the same mistake as another distractor "
+                reasons.append(f"distinct: '{wrong}' makes the same mistake as another wrong sentence "
                                f"({describe_code(edit.code)})")
                 continue
             wrongs.append(wrong)
             codes.append(edit.code)
         if target_code is not None and target_code not in codes:
-            reasons.append(f"target-misconception: no distractor has {describe_code(target_code)}")
+            reasons.append(f"target-misconception: no wrong sentence has {describe_code(target_code)}")
         if len(codes) < N_DISTRACTORS or (target_code is not None and target_code not in codes):
             return None, reasons
-        # More valid distractors than needed: keep the requested one and the first others.
+        # More valid wrong sentences than needed: keep the requested one and the first others.
         keep = sorted(range(len(codes)), key=lambda i: (codes[i] != target_code, i))[:N_DISTRACTORS]
         wrongs, codes = [wrongs[i] for i in sorted(keep)], [codes[i] for i in sorted(keep)]
-        blank = _shared_blank(sentence, wrongs, before, after)
-        if blank is None:
-            return None, ["target: each distractor must change only the bracketed part"]
-        before, after = blank
-        target = sentence[len(before):len(sentence) - len(after)]
+        span = _blank(sentence, wrongs)
+        if span is None:
+            return None, ["target: the mistakes must all be in the same word of the sentence"]
+        before, target, after = sentence[:span[0]], sentence[span[0]:span[1]], sentence[span[1]:]
         texts = [w[len(before):len(w) - len(after)] for w in wrongs]
-        if any(" " in t.strip() for t in [target, *texts]):
-            return None, ["target: the tested part must be one word or less, not a phrase"]
         reasons = []
 
         if skill.logprob_gate and self.sentence_logprob is not None:
             key_score = self.sentence_logprob(sentence)
-            for text in texts:
-                if self.sentence_logprob(before + text + after) >= key_score:
-                    reasons.append(f"ambiguous: '{text}' reads at least as naturally as the key "
-                                   f"'{target}'; it may also be correct")
+            for wrong, text in zip(wrongs, texts):
+                if self.sentence_logprob(wrong) >= key_score:
+                    reasons.append(f"ambiguous: '{wrong}' reads at least as naturally as the correct "
+                                   f"sentence; it may also be correct")
             if reasons:
                 return None, reasons
         return (before, target, after, texts, codes), []
@@ -371,11 +352,11 @@ class MisconceptionItemGenerator:
         skill = SKILLS[skill_id]
         target_line = ""
         if target_code is not None:
-            target_line = f"\nOne of the three distractors MUST be this mistake: {describe_code(target_code)}."
+            target_line = f"\nOne of the three wrong sentences MUST make this mistake: {describe_code(target_code)}."
         recent = self._recent.get(skill_id, [])[-8:]
         avoid = f" Use a different sentence from these: {'; '.join(recent)}" if recent else ""
         example = self._example.get(skill_id)
-        note = ("A good question for this grammar point:" if example else
+        note = ("A good exercise for this grammar point:" if example else
                 "Example of the output shape only (it tests a different grammar point):")
         return _ITEM_PROMPT.format(description=skill.description, target_line=target_line,
                                    avoid=avoid, example_note=note, example=example or _FORMAT_EXAMPLE)
@@ -417,8 +398,9 @@ class MisconceptionItemGenerator:
         option_codes = dict(sorted(option_codes.items()))
         stem = before + BLANK + after
         self._recent.setdefault(skill_id, []).append(before + target + after)
-        self._example[skill_id] = json.dumps({"sentence": f"{before}[{target}]{after}", "distractors": texts},
-                                             ensure_ascii=False)
+        self._example[skill_id] = json.dumps(
+            {"sentence": before + target + after, "wrong_sentences": [before + t + after for t in texts]},
+            ensure_ascii=False)
         categories = sorted(SKILLS[skill_id].categories)
         return GeneratedItem(skill_id, stem, BLANK, options, labels[0], categories[0], option_codes)
 
@@ -477,8 +459,9 @@ if __name__ == "__main__":
     assert describe_code("PART:에서>에") == "'에' written where '에서' is needed"
     assert describe_code("END:었>") == "'었' left out"
 
-    good = {"sentence": "동생이 공원[에서] 축구를 해요.", "distractors": ["에", "을", "이"]}
-    repeated = {**good, "distractors": ["에", "에", "이"]}
+    W = lambda *ps: ["동생이 공원" + p + " 축구를 해요." for p in ps]
+    good = {"sentence": "동생이 공원에서 축구를 해요.", "wrong_sentences": W("에", "을", "이")}
+    repeated = {**good, "wrong_sentences": W("에", "에", "이")}
     replies = iter([json.dumps(repeated, ensure_ascii=False), json.dumps(good, ensure_ascii=False)])
     seen_prompts = []
 
@@ -491,63 +474,59 @@ if __name__ == "__main__":
     item_id = gen.next_new_grammar_item("particle_loc", target_misconception="PART:에서>이")
     assert item_id is not None, gen.stats
     item = gen.items[item_id]
-    assert item.stem == "동생이 공원___ 축구를 해요." and item.options[item.answer] == "에서"
+    # The blank is found from where the wrong sentences differ, not marked by the generator.
+    assert item.stem == "동생이 공원___ 축구를 해요." and item.options[item.answer] == "에서", item
     # Codes come from the annotator, so the same error gets the same code in any item.
     assert sorted(c for c in item.option_codes.values() if c) == ["PART:에서>에", "PART:에서>을", "PART:에서>이"]
     assert item.option_codes[item.answer] is None
-    assert "MUST be this mistake: '이' written where '에서' is needed" in seen_prompts[0]
+    assert "MUST make this mistake: '이' written where '에서' is needed" in seen_prompts[0]
     assert "duplicate:" in seen_prompts[1], "the critic must be told exactly why the first reply failed"
     assert gen.stats["particle_loc"].rejected and gen.stats["particle_loc"].rejected[0]["reasons"]
     assert gen.stats["particle_loc"].revisions_used == 1
 
-    # The bracket fixes the position even when the target also occurs elsewhere (에 in 에서).
-    fields, _ = MisconceptionItemGenerator(chat, None).verify(
-        "particle_loc", {"sentence": "학교에서 집[에] 가요.", "distractors": ["에서", "을", "이"]})
-    assert fields is not None and fields[0] == "학교에서 집" and fields[1] == "에", fields
-    _, reasons = gen.verify("particle_loc", {"sentence": "동생이 공원에서 축구를 해요.", "distractors": ["에", "을", "이"]})
-    assert reasons and reasons[0].startswith("target"), reasons
-
-    # The three reply shapes seen from EXAONE (PRD §9.76): replacement, whole word, whole sentence.
     plain = MisconceptionItemGenerator(chat, None)
-    shapes = {"sentence": "친구가 카페[에서] 책을 읽어요.",
-              "distractors": ["카페에", "친구가 카페[를] 책을 읽어요.", "가"]}
-    fields, reasons = plain.verify("particle_loc", shapes)
-    assert fields is not None, reasons
-    before, target, after, texts, codes = fields
-    # All three differ only in the particle, so the blank stays the bracketed span.
-    assert (before, target, after) == ("친구가 카페", "에서", " 책을 읽어요."), fields
-    assert texts == ["에", "를", "가"] and codes == ["PART:에서>에", "PART:에서>을", "PART:에서>이"]
-    # A word-level distractor that changes the noun too widens the blank to the whole word.
-    fields, _ = plain.verify("noun_counter", {"sentence": "사과 세 [개]를 샀어요.",
-                                              "distractors": ["명", "권을", "마리"]})
-    assert fields is None or fields[1] in ("개", "개를"), fields
-    # A fourth valid distractor is tolerated; the requested one is kept.
-    fields, reasons = plain.verify("particle_loc", {**good, "distractors": ["에", "을", "도", "이"]},
+    # All three start with 에 (에, 에게, 에다): the blank still covers the whole particle.
+    fields, reasons = plain.verify("particle_loc", {**good, "wrong_sentences": W("에", "에게", "을")})
+    assert fields is not None and fields[1] == "에서" and fields[3] == ["에", "에게", "을"], (fields, reasons)
+    # A wrong sentence that only leaves something out blanks the whole word (no empty option).
+    past = {"sentence": "어제 영화를 봤어요.", "wrong_sentences": ["어제 영화를 봐요.", "어제 영화를 보았어요요.",
+                                                                "어제 영화를 볼 거예요."]}
+    fields, reasons = plain.verify("tense_past", past)
+    assert fields is None or all(fields[3]), (fields, reasons)
+    # Mistakes in different words cannot share one blank.
+    fields, reasons = plain.verify("particle_loc", {"sentence": "동생이 공원에서 축구를 해요.", "wrong_sentences": [
+        "동생이 공원에 축구를 해요.", "동생이 공원을 축구를 해요.", "동생이 공원에서 축구가 해요."]})
+    assert fields is None, fields
+    # Brackets or markdown the generator adds anyway are ignored.
+    fields, _ = plain.verify("particle_loc", {**good, "sentence": "동생이 공원[에서] 축구를 해요."})
+    assert fields is not None and fields[1] == "에서", fields
+    # A fourth valid wrong sentence is tolerated; the requested one is kept.
+    fields, reasons = plain.verify("particle_loc", {**good, "wrong_sentences": W("에", "을", "도", "이")},
                                    target_code="PART:에서>이")
     assert fields is not None and "PART:에서>이" in fields[4] and len(fields[4]) == 3, (fields, reasons)
-    # A whole sentence that changes something else is still rejected.
-    _, reasons = plain.verify("particle_loc", {**good, "distractors": ["에", "을", "형이 공원에서 야구를 해요."]})
+    # A wrong sentence that changes something else as well is rejected.
+    _, reasons = plain.verify("particle_loc", {**good, "wrong_sentences": W("에", "을") + ["형이 공원에서 야구를 해요."]})
     assert any(r.startswith("not-minimal") for r in reasons), reasons
 
-    # Two distractors that make the same mistake (allomorphs 을/를) are one misconception.
-    _, reasons = gen.verify("particle_loc", {**good, "distractors": ["을", "를", "이"]})
+    # Two wrong sentences that make the same mistake (allomorphs 을/를) are one misconception.
+    _, reasons = gen.verify("particle_loc", {**good, "wrong_sentences": W("을", "를", "이")})
     assert any(r.startswith("distinct") for r in reasons), reasons
 
-    # The requested misconception must be among the distractors.
+    # The requested misconception must be among the wrong sentences.
     _, reasons = gen.verify("particle_loc", good, target_code="PART:에서>도")
     assert any(r.startswith("target-misconception") for r in reasons), reasons
 
-    # Ambiguity is caught by scoring: a distractor that reads as naturally as the key.
+    # Ambiguity is caught by scoring: a wrong sentence that reads as naturally as the key.
     flat = MisconceptionItemGenerator(lambda m: json.dumps(good, ensure_ascii=False), lambda s: 0.0, seed=0)
     assert flat.generate("particle_loc") is None
     assert flat.stats["particle_loc"].reasons.get("ambiguous", 0) > 0
 
-    # A distractor that edits something other than the tested category is rejected.
-    _, reasons = gen.verify("particle_loc", {**good, "distractors": ["에", "을", "에서 축구"]})
+    # A wrong sentence that edits something other than the tested category is rejected.
+    _, reasons = gen.verify("particle_loc", {**good, "wrong_sentences": W("에", "을") + ["동생이 공원에서 축구를 해."]})
     assert any(r.startswith("wrong-category") for r in reasons), reasons
 
     # Open-class skills get the lexical edit as their code.
-    verb = {"sentence": "저는 물을 [마셔요].", "distractors": ["먹어요", "봐요", "입어요"]}
+    verb = {"sentence": "저는 물을 마셔요.", "wrong_sentences": ["저는 물을 먹어요.", "저는 물을 봐요.", "저는 물을 입어요."]}
     fields, reasons = MisconceptionItemGenerator(chat, None).verify("verb_choice", verb)
     assert fields is not None and "VERB:마시>먹" in fields[4], (fields, reasons)
     print("all smoke tests passed")

@@ -557,8 +557,9 @@ BODY = [
       "The labels are therefore deterministic and auditable from the item alone."),
 
 ("P", "Generating items. For each item, EXAONE writes a new sentence using the grammar "
-      "point, marks the span that tests it, and writes three wrong versions of that span, "
-      "each a different mistake learners typically make. When the learner model already "
+      "point and three wrong copies of it, each with a different mistake learners typically "
+      "make; the blank is computed as the span where the copies differ from the sentence, "
+      "widened to whole morphemes, so the generator never has to mark or cut out a span. When the learner model already "
       "knows which misconception a learner currently holds for the skill, the request "
       "requires one distractor to make that mistake, stated to the generator in words from "
       "its code: the next item then confronts that error "

@@ -154,8 +154,9 @@ def _surface_word_edit(correct: str, wrong: str) -> Edit | None:
     if len(cats) != 1 or not c_diff:
         return None
     cat = cats.pop()
-    return Edit(cat, op, _ALLOMORPH.get(c_diff, c_diff) if cat == "PART" else c_diff,
-                _ALLOMORPH.get(w_diff, w_diff) if cat == "PART" else w_diff, cat in FUNCTIONAL)
+    if cat == "PART" and _ALLOMORPH.get(c_diff, c_diff) != _ALLOMORPH.get(w_diff, w_diff):
+        c_diff, w_diff = _ALLOMORPH.get(c_diff, c_diff), _ALLOMORPH.get(w_diff, w_diff)
+    return Edit(cat, op, c_diff, w_diff, cat in FUNCTIONAL)
 
 
 def annotate(correct: str, wrong: str) -> list[Edit]:

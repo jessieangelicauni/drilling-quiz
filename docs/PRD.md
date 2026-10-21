@@ -4404,6 +4404,12 @@ Run ini masih memakai kode sebelum §9.76. Selain itu EXAONE sering keluar dari 
 - Annotator (langkah 4) diperluas ke kata benda + partikel. Partikel yang salah bentuk (`학교으로`, `학교이`) dipecah kiwi menjadi morfem aneh dan diberi label MULTI. Akibatnya distraktor partikel yang bagus ditolak sebagai wrong-category, dan ini penyebab penolakan terbanyak. Sekarang kategorinya diambil dari morfem benar yang diganti (`PART:에>으로`).
 - Sebaliknya, kata isi yang ditempel ke kata lain (`늦[게]` → `늦일찍`, `천천히빠르게읽어요`) tidak lagi dibaca sebagai satu kesalahan ending. Sebelumnya dua item seperti itu lolos di cek cepat.
 
+### 9.78 Generator hanya menulis kalimat; bagian kosong dihitung oleh kode
+
+Cek cepat dengan prompt §9.77: 6/44 diterima, tetapi hampir semuanya tidak layak. Contohnya: kunci di posisi aneh (`책을 [에서] 읽었습니다`); soal honorific yang menguji 습니다/어요, bukan -(으)시-; opsi rusak (`보러갔어요`). Jawaban yang ditolak menunjukkan EXAONE-7.8B tidak bisa memakai kurung siku dengan benar (`[을/를]`, kata benda dikurung untuk honorific). Selain itu, EXAONE terus menulis distraktor sebagai kalimat utuh walaupun diminta potongan saja. jc memutuskan generator tetap EXAONE.
+
+**Keputusan:** tugasnya disesuaikan dengan kemampuan EXAONE. Generator menulis `{"sentence": kalimat benar, "wrong_sentences": [3 salinan, masing-masing dengan satu kesalahan]}`, tanpa kurung siku dan tanpa potongan. Kode yang menghitung bagian kosong (`_blank`): span tempat ketiga kalimat salah berbeda dari kalimat benar, diperlebar ke morfem utuh, atau ke kata utuh kalau ada opsi yang kosong. Tanda baca akhir tidak ikut. Kalau kesalahan ada di kata yang berbeda, soal ditolak. Verifikasi lainnya tetap: annotator (satu edit, kategori skill), kode berbeda, gate log-prob, critic. `_wrong_sentence`/`_shared_blank` dihapus.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

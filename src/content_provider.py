@@ -34,8 +34,9 @@ if __name__ == "__main__":
     from vocab_provider import VocabCurriculum
 
     # CPU stand-ins for EXAONE and Qwen3-4B, as in question_bank.py's smoke test.
-    reply = json.dumps({"sentence": "친구가 공원[에서] 축구를 해요.",
-                        "distractors": ["에", "을", "이"]}, ensure_ascii=False)
+    reply = json.dumps({"sentence": "친구가 공원에서 축구를 해요.",
+                        "wrong_sentences": [f"친구가 공원{p} 축구를 해요." for p in ("에", "을", "이")]},
+                       ensure_ascii=False)
     grammar = MisconceptionItemGenerator(lambda m: reply, lambda s: 0.0 if "에서" in s else -5.0,
                                          seed=0)
 
