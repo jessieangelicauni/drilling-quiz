@@ -4323,6 +4323,27 @@ dipertimbangkan revert juga.
 
 **File:** `src/item_foundry.py`, `src/kagas_annotator.py`, `src/validate_item_foundry.py`, `src/solver_check.py`, `src/qwen_feedback.py`, `src/benchmark_checker.py` (baru), `data/misconception_codebook.json`, `codebook_reverified_results.json` (baru), README.
 
+### 9.72 Hasil benchmark checker: Qwen3-4B tetap dipakai
+
+**Run pertama** (400 pasangan KoLLA): semua model ~57%. Ini bug di `benchmark_checker.py`, bukan kelemahan model: set itu memuat error "kata hilang/berlebih" (M:/U:), di mana kalimat koreksi lebih panjang, dan total log-prob selalu memenangkan kalimat yang lebih pendek. Diperbaiki: hanya penggantian satu kata (R:, 1 token), dikelompokkan partikel / ejaan / lainnya.
+
+**Run ulang** (52 kurasi, 246 KoLLA, 32 codebook; aturan gate: log-prob kalimat benar > salah):
+
+| Model | Kurasi | KoLLA (CI 95%) | Codebook | VRAM |
+|---|---|---|---|---|
+| Qwen3-4B (bf16) | 51/52 = 98,1% | 215/246 = 87,4% (82,7–91,0) | 29/32 | 8,2 GB |
+| Qwen3-4B-Base | 96,2% | 217 = 88,2% (83,6–91,7) | 30/32 | 8,2 GB |
+| Qwen3-8B (4-bit) | 98,1% | 209 = 85,0% (80,0–88,9) | 30/32 | 6,5 GB |
+| Qwen3-8B-Base (4-bit) | 94,2% | 217 = 88,2% (83,6–91,7) | 30/32 | 6,5 GB |
+| Kanana-1.5-8B-base (4-bit) | 94,2% | 211 = 85,8% (80,9–89,6) | 30/32 | 6,2 GB |
+| Gemma-3-12B-pt (4-bit) | 50/52 = 96,2% | 218 = 88,6% (84,0–92,0) | 30/32 | 8,5 GB |
+
+Gemma per jenis: partikel 99/114 = 86,8%, ejaan 118/131 = 90,1%. (Rincian per jenis untuk 5 model lain menunggu `checker_benchmark_results.json` run ulang di-push; file yang ada di repo masih run pertama.)
+
+**Keputusan:** semua CI tumpang tindih, jadi tidak ada model yang terbukti lebih baik. Qwen3-4B dipertahankan karena tertinggi di kurasi, dan bobot yang sama dipakai untuk explainer (dua model di GPU, bukan tiga). **Temuan untuk paper:** gate kuat pada distraktor buatan (98%) tapi melewatkan ~1 dari 8 error pelajar nyata (87%), jadi rating instruktur tetap diperlukan. Paper Section IV-B diperbarui dengan angka ini.
+
+**File:** `src/benchmark_checker.py`, `gemma_benchmark_results.json`, `src/content.py`.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
