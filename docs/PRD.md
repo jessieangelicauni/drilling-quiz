@@ -4650,6 +4650,22 @@ Di v2.4, judge Qwen3-4B jadi bottleneck. Ia meloloskan distraktor gabungan (`조
 - `--judge Qwen/Qwen3-4B` mengembalikan setelan lama untuk ablation.
 
 
+### 9.93 Hasil v2.5 dan v2.6: generasi kembali ke v2.4, judge melabeli tiap opsi (2026-10-21)
+
+**Hasil v2.5** (commit fbeb748, judge Qwen3-8B NF4): diterima 11/66 (17%), turun dari 27% di v2.4. Hampir semua item yang lolos punya distraktor rusak (`센서를해요`, `다섯명의센서가`, `공장은다섯명의센`), dan di noun_counter jawabannya salah pilih kata (`다섯` padahal seharusnya `개의`).
+
+Penyebabnya dua:
+1. **Regresi dari perubahan cache (§9.91), bukan dari judge.** Jawaban dan distraktor dipisah ke decode masing-masing. Prompt jawaban tanpa contoh memilih kata yang salah. Prompt distraktor yang hanya diberi stem membuat EXAONE menempelkan kata-kata sesudah blank ke distraktor.
+2. **Judge 8B tetap meloloskan opsi rusak.** Format "sebutkan huruf yang plausible" terlalu longgar: model cukup menyebut opsi apa saja, tanpa harus menilai satu per satu.
+
+v2.4 dan v2.5 berbeda di generator dan judge sekaligus, jadi pengaruh 8B vs 4B belum bisa dipisahkan dari hasil ini.
+
+**Perubahan v2.6:**
+- Generasi dikembalikan ke v2.4: satu decode untuk jawaban (enum) + distraktor. Cache tetap dipakai: vocabulary dikonversi sekali, dan skema kalimat dikompilasi sekali; skema item dikompilasi per item karena enum-nya berubah.
+- **Judge melabeli setiap opsi:** satu baris per opsi, `correct | learner error | broken`, ditambah baris `Objective`. Tidak ada opsi yang bisa terlewat. Opsi yang tidak diberi label dihitung broken.
+- **Perbandingan berpasangan 8B vs 4B:** generasi memakai seed yang sama, jadi dua run dengan `--judge` berbeda menilai item yang sama. Ini jadi ablation judge untuk paper.
+
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

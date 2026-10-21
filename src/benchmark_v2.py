@@ -3,12 +3,14 @@ Measures the model-only item pipeline (Versi 2, PRD §9.80) before it
 replaces item_foundry's verification code. Every step is a model or a
 library; nothing is parsed, diffed or labelled by our own rules.
 
-  1. Generate: EXAONE-3.5-7.8B through Outlines with JSON schemas, in three
+  1. Generate: EXAONE-3.5-7.8B through Outlines with JSON schemas, in two
      constrained decodes, so the output is valid by construction. First one
      short correct Korean sentence. Then the answer -- a schema enum of the
      sentence's own words, so it is always one whole word of it (asked for
      in one schema, it glued several words together in 31/66 items, §9.91)
-     -- then three distractors, each a whole word that replaces it. The stem
+     -- and three distractors, each a whole word that replaces it, in the
+     same decode (asked for the distractors in a decode of their own, given
+     the stem, it glued the next words onto them, §9.93). The stem
      is the sentence with that word blanked; writing the sentence first and
      choosing the word after is the order an LLM writes well (§9.82).
      Each distractor states its learner mistake (one English sentence)
@@ -16,10 +18,10 @@ library; nothing is parsed, diffed or labelled by our own rules.
      writes it, instead of writing a word and explaining it after (§9.90).
      All curated examples of the objective, from log_likelihood_results.json,
      are shown in both prompts.
-  2. Judge: one Qwen3-8B (NF4) reasoning call per item (§9.88, §9.92) names the options
-     that make a correct sentence, the learning objective the item tests, and
-     the wrong options a real learner could choose. A distractor fails when
-     it is named correct, when it is not named plausible (v2.2 kept glued
+  2. Judge: one Qwen3-8B (NF4) reasoning call per item (§9.88, §9.92) labels
+     every option correct, learner error or broken (§9.93), and names the
+     learning objective the item tests. A distractor fails when it is
+     labelled correct, when it is labelled broken (v2.2 kept glued
      fragments such as 공장에서는다섯개 because they are wrong, §9.90), or
      when its filled stem has a higher log-probability than the key's (BLiMP-style minimal pairs;
      51/52 on the curated pairs, PRD §9.68).
@@ -79,11 +81,11 @@ class Sentence(BaseModel):
     sentence: str = Field(pattern=HANGUL_SENTENCE)
 
 
-def _answer_schema(words: list[str]) -> type[BaseModel]:
+def _item_schema(words: list[str]) -> type[BaseModel]:
     """The answer can only be one of the sentence's own words (v2.3 glued
-    several words into one answer in 31/66 items, PRD §9.91). A schema of
-    its own, so the one that changes with every sentence is tiny to compile."""
-    return create_model("Answer", answer=(Literal[tuple(words)], ...))
+    several words into one answer in 31/66 items, PRD §9.91)."""
+    return create_model("Item", answer=(Literal[tuple(words)], ...),
+                        distractors=(list[Distractor], Field(min_length=N_DISTRACTORS, max_length=N_DISTRACTORS)))
 
 
 @functools.cache  # the same class each time, so _Exaone compiles it once
@@ -97,16 +99,13 @@ Setting: {context}; {topic}. Use one word of the setting.
 {examples}
 Do not reuse these sentences: {avoid}"""
 
-_ANSWER_PROMPT = """Objective: {objective}
-Korean sentence: {sentence}
-answer: the word of the sentence the objective is about."""
-
-_DISTRACTOR_PROMPT = """Korean fill-in-the-blank item for {level} learners. Objective: {objective}
+_ITEM_PROMPT = """Turn this Korean sentence into a fill-in-the-blank item for {level} learners. Objective: {objective}
+Sentence: {sentence}
 {examples}
-Stem: {stem}   Answer: {answer}
-Write 3 wrong replacements for the answer, each from a different learner mistake:
-- mistake: one English sentence naming the mistake.
-- text: the single wrong word it produces (wrong particle, ending or form). It must make the sentence wrong."""
+- answer: the word of the sentence the objective is about.
+- distractors: 3 wrong replacements for that word, each from a different learner mistake:
+  - mistake: one English sentence naming the mistake.
+  - text: the single wrong word it produces (wrong particle, ending or form). It must make the sentence wrong."""
 
 _REPAIR_PROMPT = """Korean fill-in-the-blank item for {level} learners. Objective: {objective}
 {examples}
@@ -128,10 +127,13 @@ Options:
 Learning objectives:
 {objectives}
 
-Answer in exactly three lines:
-Correct: <letters of the options that give a grammatical, natural sentence>
-Objective: <number of the objective this item tests>
-Plausible: <letters of the wrong options a real learner might choose, not broken or random text; or none>"""
+Label every option, with the blank filled by it:
+- correct: a grammatical, natural Korean sentence
+- learner error: wrong, in a way a real learner of Korean makes
+- broken: random, glued-together or nonsense text
+Answer in exactly these lines:
+{label_lines}
+Objective: <number of the objective this item tests>"""
 _LETTERS = "ABCD"
 
 
@@ -172,23 +174,25 @@ class _Exaone:
         self.model = outlines.from_transformers(self.chat.model, self.chat.tok)
         # outlines.Generator(model, schema) converts the whole vocabulary and
         # compiles the schema on every call; Outlines 1.3 caches neither. The
-        # vocabulary is converted once here and each schema compiled once.
+        # vocabulary is converted once here and each fixed schema compiled
+        # once; the item schema changes with every sentence (its answer enum).
         self.backend = OutlinesCoreBackend(self.model)
         self.generators: dict[str, object] = {}
         return self
 
-    def __call__(self, content: str, schema: type[BaseModel], seed: int) -> str:
+    def __call__(self, content: str, schema: type[BaseModel], seed: int, cache: bool = True) -> str:
         import outlines
         import torch
 
         key = json.dumps(schema.model_json_schema(), sort_keys=True)
-        if key not in self.generators:
-            self.generators[key] = outlines.Generator(
-                self.model, processor=self.backend.get_json_schema_logits_processor(key))
+        generator = self.generators.get(key) or outlines.Generator(
+            self.model, processor=self.backend.get_json_schema_logits_processor(key))
+        if cache:
+            self.generators[key] = generator
         prompt = self.chat.tok.apply_chat_template([{"role": "user", "content": content}],
                                                    tokenize=False, add_generation_prompt=True)
         torch.manual_seed(seed)
-        return self.generators[key](prompt, max_new_tokens=800, do_sample=True, temperature=0.6, top_p=0.95)
+        return generator(prompt, max_new_tokens=800, do_sample=True, temperature=0.6, top_p=0.95)
 
     def __exit__(self, *exc):
         import gc
@@ -201,8 +205,8 @@ class _Exaone:
 
 
 def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
-    """Three constrained decodes with the same model: the sentence, the answer
-    (one of its words, by schema; a few tokens) and the distractors."""
+    """Two constrained decodes with the same model: the sentence, then the
+    answer (one of its words, by schema) and the distractors."""
     rng = random.Random(seed)
     examples = curated_examples()
     items = []
@@ -226,21 +230,18 @@ def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
                 if not unique:
                     items.append({**base, "sentence": sentence, "format_ok": False})
                     continue
-                answer = _answer_schema(unique).model_validate_json(exaone(
-                    _ANSWER_PROMPT.format(objective=objective, sentence=sentence), _answer_schema(unique),
-                    rng.randrange(2**31))).answer
-                stem = " ".join("___" if w == answer else w for w in sentence[:-1].split()) + sentence[-1]
-                raw = exaone(_DISTRACTOR_PROMPT.format(level=cur["level"], objective=objective, stem=stem,
-                                                       answer=answer, examples=examples.get(oid, "")),
-                             _replacements(N_DISTRACTORS), rng.randrange(2**31))
+                schema = _item_schema(unique)
+                raw = exaone(_ITEM_PROMPT.format(level=cur["level"], objective=objective, sentence=sentence,
+                                                 examples=examples.get(oid, "")), schema, rng.randrange(2**31),
+                             cache=False)
                 try:
-                    distractors = _replacements(N_DISTRACTORS).model_validate_json(raw).distractors
+                    item = schema.model_validate_json(raw).model_dump()
                 except ValueError:
-                    items.append({**base, "sentence": sentence, "answer": answer, "raw": raw, "format_ok": False})
+                    items.append({**base, "sentence": sentence, "raw": raw, "format_ok": False})
                     continue
                 seen.append(sentence)
-                items.append({**base, "stem": stem, "sentence": sentence, "answer": answer,
-                              "distractors": [d.model_dump() for d in distractors], "format_ok": True})
+                stem = " ".join("___" if w == item["answer"] else w for w in sentence[:-1].split()) + sentence[-1]
+                items.append({**base, "stem": stem, "sentence": sentence, **item, "format_ok": True})
     return items
 
 
@@ -267,21 +268,26 @@ def check_items(items: list[dict], cur: dict, judge_model: str = "Qwen/Qwen3-8B"
         return tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).split("</think>")[-1]
 
     def judge(stem: str, texts: list[str]) -> tuple[set[str], str, set[str]]:
-        """One reasoning call: the correct options, the objective tested, and
-        the wrong options a learner could plausibly choose. Only the answer
-        lines are read, not the explanation around them."""
+        """One reasoning call: a label for every option, and the objective
+        tested. A label per option, instead of a list of letters per
+        question, leaves the model no option to skip (§9.93). Only the
+        answer lines are read, not the explanation around them."""
         letters = _LETTERS[:len(texts)]
         shown = "\n".join(f"{letters[i]}. {t}" for i, t in enumerate(texts))
-        reply = reason(_JUDGE_PROMPT.format(stem=stem, options=shown, objectives=objectives))
+        reply = reason(_JUDGE_PROMPT.format(
+            stem=stem, options=shown, objectives=objectives,
+            label_lines="\n".join(f"{x}: <correct | learner error | broken>" for x in letters)))
 
-        def options_on(label: str) -> set[str]:
-            line = re.search(rf"{label}:([^\n]*)", reply)
-            return {texts[letters.index(x)] for x in re.findall(rf"\b([{letters}])\b", line.group(1))} if line else set()
+        def label(letter: str) -> str:
+            line = re.search(rf"^\W*{letter}\W*:\s*\W*(correct|learner error|broken)", reply, re.M | re.I)
+            return line.group(1).lower() if line else "broken"
 
+        labels = {t: label(x) for x, t in zip(letters, texts)}
         objective_line = re.search(r"Objective:\D*(\d+)", reply)
         number = int(objective_line.group(1)) if objective_line else 0
-        return (options_on("Correct"), oids[number - 1] if 1 <= number <= len(oids) else "none",
-                options_on("Plausible"))
+        return ({t for t, v in labels.items() if v == "correct"},
+                oids[number - 1] if 1 <= number <= len(oids) else "none",
+                {t for t, v in labels.items() if v == "learner error"})
 
     for it in items:
         fill = lambda text: it["stem"].replace("___", text, 1)
