@@ -82,51 +82,41 @@ def _replacements(n: int) -> type[BaseModel]:
     return create_model(f"Replacements{n}", distractors=(list[Distractor], Field(min_length=n, max_length=n)))
 
 
-_PROMPT = """Write one multiple-choice Korean exercise for {level} learners whose first language is Indonesian.
-Course: {context}. Topic: {topic}
-Learning objective: {objective}
+_PROMPT = """Create one Korean fill-in-the-blank item for {level} learners (first language: Indonesian).
+Objective: {objective}
+Setting: {context}; {topic}
 {examples}
-- "sentence": one short, simple, correct Korean sentence (at most 8 words) that uses the learning
-  objective. Use one everyday word from the topic; keep the grammar at the learners' level.
-- "answer": the whole word of the sentence (between two spaces, with its particle or ending attached)
-  that the learning objective is about, copied exactly.
-- "distractors": three wrong whole words that replace the answer word and make the sentence ungrammatical.
-  For each, first "mistake": in one English sentence, a mistake learners really make with this
-  learning objective; then "text": the wrong form that mistake produces (a wrong particle, ending or
-  form of the same word). Three DIFFERENT mistakes; never another correct word, never more than one word.
-Write a new sentence, different from: {avoid}"""
+- sentence: a short, correct Korean sentence (at most 8 words) that uses the objective and one word of the setting.
+- answer: the one word of the sentence the objective is about, copied exactly, with its particle or ending.
+- distractors: 3 wrong replacements for that word, each from a different learner mistake:
+  - mistake: one English sentence naming the mistake.
+  - text: the single wrong word it produces (wrong particle, ending or form). It must make the sentence wrong.
+Do not reuse these sentences: {avoid}"""
 
-_REPAIR_PROMPT = """A Korean multiple-choice exercise for {level} learners. Learning objective: {objective}
+_REPAIR_PROMPT = """Korean fill-in-the-blank item for {level} learners. Objective: {objective}
 {examples}
-Sentence: {sentence}
-Answer: {answer}   Stem: {stem}
-Distractors that work: {kept}
-Rejected distractors: {rejected}
+Stem: {stem}   Answer: {answer}
+Keep: {kept}
+Rejected: {rejected}
+Write {n} replacement distractor(s), each from a learner mistake not listed above:
+- mistake: one English sentence naming the mistake.
+- text: the single wrong word it produces. It must make the sentence wrong."""
 
-Write {n} new wrong form(s) to replace the rejected ones. For each, first "mistake": in one English
-sentence, a mistake learners really make with this learning objective, different from the ones above;
-then "text": the wrong form that mistake produces. It must make the sentence ungrammatical, never be
-another correct word, and be one word."""
+_EXAMPLES = "Examples (correct / learner error):\n{pairs}\n"
 
-_EXAMPLES = "Examples of this objective (correct / what learners write):\n{pairs}\n"
-
-_JUDGE_PROMPT = """A Korean multiple-choice exercise. Fill the blank with each option.
-
+_JUDGE_PROMPT = """Korean fill-in-the-blank item:
 {stem}
 
+Options:
 {options}
 
 Learning objectives:
 {objectives}
 
-1. Which options give a grammatically correct, natural Korean sentence?
-2. Which learning objective does choosing among these options test?
-3. Which of the wrong options are mistakes a real learner of Korean could make (not random or broken text)?
-
 Answer in exactly three lines:
-Correct: <letters, separated by commas>
-Objective: <number>
-Plausible: <letters, separated by commas>"""
+Correct: <letters of the options that give a grammatical, natural sentence>
+Objective: <number of the objective this item tests>
+Plausible: <letters of the wrong options a real learner might choose, not broken or random text; or none>"""
 _LETTERS = "ABCD"
 
 
@@ -296,7 +286,7 @@ def repair_items(items: list[dict], cur: dict, seed: int) -> list[dict]:
             n = N_DISTRACTORS - len(kept)
             content = _REPAIR_PROMPT.format(
                 level=cur["level"], objective=cur["objectives"][it["objective"]],
-                examples=examples.get(it["objective"], ""), sentence=it["sentence"], answer=it["answer"],
+                examples=examples.get(it["objective"], ""), answer=it["answer"],
                 stem=it["stem"], kept=", ".join(f"{d['text']} ({d['mistake']})" for d in kept) or "(none)",
                 rejected="; ".join(f"{t}: {why}" for t, why in it["rejected"].items()), n=n)
             schema = _replacements(n)

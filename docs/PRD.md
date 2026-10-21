@@ -4618,6 +4618,9 @@ Penyebab yang ditemukan:
 - Laporan: `accepted_before_repair`, `accepted`, dan `repaired` per objective.
 
 
+- **Prompt dirapikan** (permintaan jc): ketiga prompt dipersingkat sekitar sepertiga. Spesifikasi per field ditulis sebagai daftar pendek, tanpa pengulangan; prompt repair tidak lagi mengulang kalimat (stem + jawaban sudah cukup); prompt judge menaruh pertanyaan langsung di template tiga baris jawabannya, sehingga Qwen3 tidak perlu memetakan pertanyaan bernomor ke baris jawaban.
+
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
