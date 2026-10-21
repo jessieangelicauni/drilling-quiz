@@ -4435,6 +4435,10 @@ Kesimpulan: KAGAS andal untuk "tepat satu edit" dan posisinya. Span-nya per kata
 
 GEC dan classifier butuh GPU dan Hugging Face, jadi dijalankan jc.
 
+**Hasil run jc (83908c3), 52 pasangan kurasi:**
+- KoBART GEC: kalimat benar dibiarkan 42/52 (81%); kalimat salah dikembalikan ke kunci 28/52 (54%). Model ini sering menulis ulang kalimat (`가르쳐요` → `가르쳐 주셨어요`, `책은` → `이 책은`) dan tidak membetulkan `부르어요`. Di bawah target 90%, jadi **tidak dipakai**.
+- Classifier skill Qwen3-4B (stem + kunci + satu distraktor): 37/52 (71%). Kesalahannya sistematis: setiap stem yang mengandung 을/를 diberi label particle_obj. Pada 11 item hasil generator, hasil classifier sama dengan penilaian manual (§9.79): 7 item sesuai skill dipertahankan, 4 item di luar skill ditolak. Prompt diubah supaya membandingkan dua kalimat utuh (benar vs salah) dan perlu diukur ulang.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

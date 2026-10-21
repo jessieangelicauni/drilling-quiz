@@ -123,11 +123,10 @@ def run_kagas(pairs: list[dict], kagas_dir: Path, python: str) -> dict:
 
 # -- 3. Skill classifier ----------------------------------------------------
 _LETTERS = "ABCDEFGHIJK"
-_CLASSIFY_PROMPT = """Which grammar point does this Korean exercise test?
+_CLASSIFY_PROMPT = """A learner wrote the wrong Korean sentence below. Which grammar point is the mistake about?
 
-Exercise: {stem}
-Correct answer: {key}
-Wrong answer: {wrong}
+Correct: {correct}
+Wrong:   {wrong}
 
 Grammar points:
 {options}
@@ -148,8 +147,10 @@ def run_classifier(pairs: list[dict], items: list[dict]) -> dict:
 
     @torch.no_grad()
     def classify(stem: str, key: str, wrong: str) -> str:
-        messages = [{"role": "user", "content": _CLASSIFY_PROMPT.format(stem=stem, key=key, wrong=wrong,
-                                                                        options=options)}]
+        # The two whole sentences, so the model compares them instead of
+        # reading the stem alone (on a stem with 을/를 it then says particle_obj).
+        messages = [{"role": "user", "content": _CLASSIFY_PROMPT.format(
+            correct=stem.replace("___", key, 1), wrong=stem.replace("___", wrong, 1), options=options)}]
         enc = tok.apply_chat_template(messages, add_generation_prompt=True, enable_thinking=False,
                                       return_tensors="pt", return_dict=True).to("cuda")
         logits = model(**enc).logits[0, -1]
