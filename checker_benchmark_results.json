@@ -1,0 +1,6307 @@
+{
+  "settings": {
+    "models": "all",
+    "kolla_max": 400,
+    "seed": 0,
+    "out": "checker_benchmark_results.json"
+  },
+  "n_pairs": {
+    "curated": 52,
+    "kolla": 400,
+    "codebook": 32
+  },
+  "models": {
+    "qwen3-4b": {
+      "hf_id": "Qwen/Qwen3-4B",
+      "4bit": false,
+      "curated": {
+        "accuracy": {
+          "k": 51,
+          "n": 52,
+          "rate": 0.9807692307692307,
+          "ci95": [
+            0.8988,
+            0.9966
+          ]
+        },
+        "mean_margin": 7.262693313451914,
+        "per_skill": {
+          "adj_relativizer": {
+            "k": 6,
+            "n": 6,
+            "rate": 1.0,
+            "ci95": [
+              0.6097,
+              1.0
+            ]
+          },
+          "honorific": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "irregular_conj": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "mod_adverb": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "noun_counter": {
+            "k": 4,
+            "n": 5,
+            "rate": 0.8,
+            "ci95": [
+              0.3755,
+              0.9638
+            ]
+          },
+          "particle_loc": {
+            "k": 7,
+            "n": 7,
+            "rate": 1.0,
+            "ci95": [
+              0.6457,
+              1.0
+            ]
+          },
+          "particle_obj": {
+            "k": 6,
+            "n": 6,
+            "rate": 1.0,
+            "ci95": [
+              0.6097,
+              1.0
+            ]
+          },
+          "tense_past": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "time_range": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "verb_choice": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.0417517194381127,
+        "failures": [
+          {
+            "skill": "noun_counter",
+            "correct": "선생님은 다섯 분 있어요.",
+            "wrong": "선생님은 다섯 명 있어요.",
+            "margin": -0.8633365631103516,
+            "ok": false
+          }
+        ]
+      },
+      "kolla": {
+        "accuracy": {
+          "k": 228,
+          "n": 400,
+          "rate": 0.57,
+          "ci95": [
+            0.521,
+            0.6176
+          ]
+        },
+        "mean_margin": NaN,
+        "per_skill": {
+          "kolla/M:ADJ ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:ADJ AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADJ NOUN": {
+            "k": 1,
+            "n": 7,
+            "rate": 0.14285714285714285,
+            "ci95": [
+              0.0257,
+              0.5131
+            ]
+          },
+          "kolla/M:ADJ NOUN ADV CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADJ PUNCT X PUNCT AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV ADJ ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV ADV SCONJ NOUN VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV VERB": {
+            "k": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244
+            ]
+          },
+          "kolla/M:ADV VERB AUX NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:CCONJ ADJ NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:CCONJ ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:DET NOUN": {
+            "k": 0,
+            "n": 5,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.4345
+            ]
+          },
+          "kolla/M:DET NOUN ADJ VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET NOUN ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/M:NOUN ADJ NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ NOUN CCONJ NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADV": {
+            "k": 0,
+            "n": 7,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3543
+            ]
+          },
+          "kolla/M:NOUN ADV NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADV VERB VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN CCONJ": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NOUN NOUN": {
+            "k": 1,
+            "n": 10,
+            "rate": 0.1,
+            "ci95": [
+              0.0179,
+              0.4042
+            ]
+          },
+          "kolla/M:NOUN NOUN NOUN ADV ADV SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN NOUN NOUN VERB AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN VERB": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NOUN VERB SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM ADJ NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NUM NOUN": {
+            "k": 1,
+            "n": 3,
+            "rate": 0.3333333333333333,
+            "ci95": [
+              0.0615,
+              0.7923
+            ]
+          },
+          "kolla/M:NUM SYM NUM ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM SYM NUM NOUN NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN NOUN": {
+            "k": 0,
+            "n": 3,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.5615
+            ]
+          },
+          "kolla/M:PROPN NOUN ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN VERB": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:PUNCT ADV PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT NOUN PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT X ADV PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT X X PUNCT": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:SCONJ DET": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:SCONJ VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:SCONJ VERB VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB AUX": {
+            "k": 1,
+            "n": 7,
+            "rate": 0.14285714285714285,
+            "ci95": [
+              0.0257,
+              0.5131
+            ]
+          },
+          "kolla/M:VERB NOUN": {
+            "k": 4,
+            "n": 15,
+            "rate": 0.26666666666666666,
+            "ci95": [
+              0.109,
+              0.5195
+            ]
+          },
+          "kolla/M:VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN NOUN SCONJ PRON ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN VERB ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB VERB": {
+            "k": 1,
+            "n": 10,
+            "rate": 0.1,
+            "ci95": [
+              0.0179,
+              0.4042
+            ]
+          },
+          "kolla/M:VERB VERB NOUN": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/M:X ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:X CCONJ NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:X NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:ADJ+ADP -> ADJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:ADV -> NOUN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:ADV+ADP -> ADV+ADP": {
+            "k": 12,
+            "n": 12,
+            "rate": 1.0,
+            "ci95": [
+              0.7575,
+              1.0
+            ]
+          },
+          "kolla/R:ADV+ADP -> CCONJ+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:ADV+ADP -> NOUN": {
+            "k": 3,
+            "n": 4,
+            "rate": 0.75,
+            "ci95": [
+              0.3006,
+              0.9544
+            ]
+          },
+          "kolla/R:ADV+ADP -> NOUN+ADP": {
+            "k": 3,
+            "n": 5,
+            "rate": 0.6,
+            "ci95": [
+              0.2307,
+              0.8824
+            ]
+          },
+          "kolla/R:ADV+ADP -> NUM+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:CCONJ+ADP -> CCONJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:DET -> PRON+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:NOUN -> ADV+ADP": {
+            "k": 3,
+            "n": 4,
+            "rate": 0.75,
+            "ci95": [
+              0.3006,
+              0.9544
+            ]
+          },
+          "kolla/R:NOUN -> NOUN+ADP": {
+            "k": 21,
+            "n": 25,
+            "rate": 0.84,
+            "ci95": [
+              0.6535,
+              0.936
+            ]
+          },
+          "kolla/R:NOUN -> PROPN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:NOUN+ADP -> NOUN": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:NOUN+ADP -> NOUN+ADP": {
+            "k": 17,
+            "n": 18,
+            "rate": 0.9444444444444444,
+            "ci95": [
+              0.7424,
+              0.9901
+            ]
+          },
+          "kolla/R:PRON -> PRON+ADP": {
+            "k": 4,
+            "n": 6,
+            "rate": 0.6666666666666666,
+            "ci95": [
+              0.3,
+              0.9032
+            ]
+          },
+          "kolla/R:PRON+ADP -> PRON+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:SCONJ+ADP -> NOUN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:SCONJ+ADP -> SCONJ+ADP": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "kolla/R:SPELL": {
+            "k": 132,
+            "n": 165,
+            "rate": 0.8,
+            "ci95": [
+              0.7325,
+              0.8539
+            ]
+          },
+          "kolla/R:VERB+ADP -> SCONJ+ADP": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "kolla/R:VERB+ADP -> VERB+ADP": {
+            "k": 9,
+            "n": 9,
+            "rate": 1.0,
+            "ci95": [
+              0.7008,
+              1.0
+            ]
+          },
+          "kolla/R:X -> NOUN+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/U:ADV": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.03843822062015533,
+        "failures": [
+          {
+            "skill": "kolla/M:NOUN ADJ NOUN CCONJ NOUN VERB",
+            "correct": "하지만 재미 없는 공부를 하고 숙제를 해요 .",
+            "wrong": "하지만 .",
+            "margin": -47.95937204360962,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "제 친구가 \" Tyrone에 \" 살아요 .",
+            "wrong": "제 진구가 살아요 .",
+            "margin": -24.83877468109131,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "사거리를 건너세요 .",
+            "wrong": "네거리를 건너세요 .",
+            "margin": -0.028707504272460938,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:SCONJ DET",
+            "correct": "그 말은 돈이 있다고 해도 사랑을 못 받다면 무슨 소용이 있겠어요 ?",
+            "wrong": "그 말은 돈이 있다고 해도 사랑을 못 소용이 있겠어요 ?",
+            "margin": -2.852438449859619,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PROPN NOUN",
+            "correct": "아침에 , 밥하고 중국 반찬을 먹어요 .",
+            "wrong": "아침에 , 밥하고 먹어요 .",
+            "margin": -13.952600479125977,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:PRON -> PRON+ADP",
+            "correct": "우리는 먹은 다음에 노래방에 갔습니다 .",
+            "wrong": "우리 먹은 다음에 노래방에 갔습니다 .",
+            "margin": -0.1315450668334961,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "아홉 시에 동생은 초등학교에 가요 .",
+            "wrong": "동생을 초등학교에 가요 .",
+            "margin": -24.552335739135742,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PROPN NOUN",
+            "correct": "그리고 , 중국 음식을 같이 먹을 수 있어요 .",
+            "wrong": "그리고 , 같이 먹을 수 있어요 .",
+            "margin": -11.010434627532959,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN ADJ VERB",
+            "correct": "이 분이 제 친구예요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "아이 옷에 원색이나 동색을 썼지만요 .",
+            "wrong": "원색이나 동색을 썼지만요 .",
+            "margin": -23.26682186126709,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADV VERB",
+            "correct": "잘 지냈어요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PUNCT ADV PUNCT",
+            "correct": "\" Jump처럼 \" 한국에서 온 연극이에요 .",
+            "wrong": "한국에서 온 연극이에요 .",
+            "margin": -33.667126178741455,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:NOUN -> NOUN+ADP",
+            "correct": "한국어 선생님이 좋아요 .",
+            "wrong": "한국어 선생님 좋아요 .",
+            "margin": -2.125100612640381,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB VERB",
+            "correct": "물어 보지 마세요 .",
+            "wrong": "물어 .",
+            "margin": -7.492341041564941,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "저는 영화 보기가 좋아요 .",
+            "wrong": "저는 영화 보기 좋아요 .",
+            "margin": -5.104111671447754,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "조금 재미가 없지만 돈이 많이 없어서 일해야 해요 .",
+            "wrong": "조금 돈 많이 없어서 일해야 해요 .",
+            "margin": -18.913272857666016,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN",
+            "correct": "사는 집이 아주 커요 .",
+            "wrong": "아주 커요 .",
+            "margin": -6.648768901824951,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN NOUN",
+            "correct": "이 년 동안 많이 배웠어요 .",
+            "wrong": "많이 배웠어요 .",
+            "margin": -13.903942584991455,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN ADV",
+            "correct": "제가 이 년 전에 대학교를 졸업했어요 .",
+            "wrong": "제가 대학교를 졸업했어요 .",
+            "margin": -15.118422746658325,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADJ NOUN",
+            "correct": "그리고 어렸을 때는 행복과 양상한 것은 사탕이다 .",
+            "wrong": "그리고 행복과 양상한 것은 사탕이다 .",
+            "margin": -15.688004493713379,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN",
+            "correct": "물이 맑아서 수영하는 것이 좋더라고요 !",
+            "wrong": "물이 맑아서 좋더라고요 !",
+            "margin": -13.895970344543457,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:NOUN -> NOUN+ADP",
+            "correct": "고등학교 친구들을 자주 만나요 ?",
+            "wrong": "고등학교 친구들 자주 만나요 ?",
+            "margin": -3.213235855102539,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN",
+            "correct": "어떤 때 이런 생각을 합니다 .",
+            "wrong": "이런 생각을 합니다 .",
+            "margin": -15.654731750488281,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "삼분 동안 끓이세요 .",
+            "wrong": "끄르세요 .",
+            "margin": -17.40175724029541,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:X NOUN",
+            "correct": "Zhenya 씨 부모님은 러시아에서 살아요 .",
+            "wrong": "부모님은 러시아에서 살아요 .",
+            "margin": -22.250305652618408,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN ADJ",
+            "correct": "그렇지만 공기가 매우 깨끗하니까 잘 숨쉴 수 있어요 .",
+            "wrong": "그렇지만 공기가 매우 깨끗하니까 잘 .",
+            "margin": -10.925694465637207,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADV VERB",
+            "correct": "안녕히 계세요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADJ NOUN",
+            "correct": "제가 어렸을 때는 이런 생각을 했지요 .",
+            "wrong": "제가 이런 생각을 했지요 .",
+            "margin": -12.116804122924805,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "사람이 살면서 성숙해질 때까지 수많은 성격 변화를 경험하지요 .",
+            "wrong": "사람이 살면서 수만은 성격 변화를 경험하지요 .",
+            "margin": -7.076213836669922,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "예를 들면 미국 인디언들이 훨씬 평균보다 자살을 많이 하고 폭음과 우울증이 인디언에게 훨씬 더 심하다 .",
+            "wrong": "예를 들면 미국 인디언들이 훨씬 평균보다 자살을 많이 하고 폭음과 훨씬 더 심하다 .",
+            "margin": -8.711851119995117,
+            "ok": false
+          }
+        ]
+      },
+      "codebook": {
+        "accuracy": {
+          "k": 29,
+          "n": 32,
+          "rate": 0.90625,
+          "ci95": [
+            0.7578,
+            0.9676
+          ]
+        },
+        "mean_margin": 8.944593861699104,
+        "per_skill": {
+          "adj_relativizer": {
+            "k": 2,
+            "n": 3,
+            "rate": 0.6666666666666666,
+            "ci95": [
+              0.2077,
+              0.9385
+            ]
+          },
+          "honorific": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "irregular_conj": {
+            "k": 4,
+            "n": 4,
+            "rate": 1.0,
+            "ci95": [
+              0.5101,
+              1.0
+            ]
+          },
+          "mod_adverb": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "noun_counter": {
+            "k": 6,
+            "n": 7,
+            "rate": 0.8571428571428571,
+            "ci95": [
+              0.4869,
+              0.9743
+            ]
+          },
+          "particle_loc": {
+            "k": 2,
+            "n": 3,
+            "rate": 0.6666666666666666,
+            "ci95": [
+              0.2077,
+              0.9385
+            ]
+          },
+          "particle_obj": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "subj_topic": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "tense_past": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "time_range": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.03718279302120209,
+        "failures": [
+          {
+            "skill": "particle_loc",
+            "correct": "그는 집으로 돌아왔습니다.",
+            "wrong": "그는 집에서 돌아왔습니다.",
+            "margin": -1.1971535682678223,
+            "ok": false
+          },
+          {
+            "skill": "adj_relativizer",
+            "correct": "그 선생님은 친절합니다.",
+            "wrong": "그 선생님은 친절해요",
+            "margin": -0.530440092086792,
+            "ok": false
+          },
+          {
+            "skill": "noun_counter",
+            "correct": "책 여섯 권을 샀다.",
+            "wrong": "책 여섯 개를 샀다.",
+            "margin": -1.1998939514160156,
+            "ok": false
+          }
+        ]
+      },
+      "peak_vram_gb": 8.184841728
+    },
+    "qwen3-4b-base": {
+      "hf_id": "Qwen/Qwen3-4B-Base",
+      "4bit": false,
+      "curated": {
+        "accuracy": {
+          "k": 50,
+          "n": 52,
+          "rate": 0.9615384615384616,
+          "ci95": [
+            0.8702,
+            0.9894
+          ]
+        },
+        "mean_margin": 5.830375847908167,
+        "per_skill": {
+          "adj_relativizer": {
+            "k": 6,
+            "n": 6,
+            "rate": 1.0,
+            "ci95": [
+              0.6097,
+              1.0
+            ]
+          },
+          "honorific": {
+            "k": 4,
+            "n": 5,
+            "rate": 0.8,
+            "ci95": [
+              0.3755,
+              0.9638
+            ]
+          },
+          "irregular_conj": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "mod_adverb": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "noun_counter": {
+            "k": 4,
+            "n": 5,
+            "rate": 0.8,
+            "ci95": [
+              0.3755,
+              0.9638
+            ]
+          },
+          "particle_loc": {
+            "k": 7,
+            "n": 7,
+            "rate": 1.0,
+            "ci95": [
+              0.6457,
+              1.0
+            ]
+          },
+          "particle_obj": {
+            "k": 6,
+            "n": 6,
+            "rate": 1.0,
+            "ci95": [
+              0.6097,
+              1.0
+            ]
+          },
+          "tense_past": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "time_range": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "verb_choice": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.036905843477982744,
+        "failures": [
+          {
+            "skill": "honorific",
+            "correct": "할머니께서 쉬세요.",
+            "wrong": "할머니께서 쉬어요.",
+            "margin": -0.44493675231933594,
+            "ok": false
+          },
+          {
+            "skill": "noun_counter",
+            "correct": "선생님은 다섯 분 있어요.",
+            "wrong": "선생님은 다섯 명 있어요.",
+            "margin": -2.2915313243865967,
+            "ok": false
+          }
+        ]
+      },
+      "kolla": {
+        "accuracy": {
+          "k": 230,
+          "n": 400,
+          "rate": 0.575,
+          "ci95": [
+            0.5261,
+            0.6225
+          ]
+        },
+        "mean_margin": NaN,
+        "per_skill": {
+          "kolla/M:ADJ ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:ADJ AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADJ NOUN": {
+            "k": 0,
+            "n": 7,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3543
+            ]
+          },
+          "kolla/M:ADJ NOUN ADV CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADJ PUNCT X PUNCT AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV ADJ ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV ADV SCONJ NOUN VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV VERB": {
+            "k": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244
+            ]
+          },
+          "kolla/M:ADV VERB AUX NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:CCONJ ADJ NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:CCONJ ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:DET NOUN": {
+            "k": 0,
+            "n": 5,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.4345
+            ]
+          },
+          "kolla/M:DET NOUN ADJ VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET NOUN ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ NOUN CCONJ NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADV": {
+            "k": 0,
+            "n": 7,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3543
+            ]
+          },
+          "kolla/M:NOUN ADV NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADV VERB VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN CCONJ": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NOUN NOUN": {
+            "k": 1,
+            "n": 10,
+            "rate": 0.1,
+            "ci95": [
+              0.0179,
+              0.4042
+            ]
+          },
+          "kolla/M:NOUN NOUN NOUN ADV ADV SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN NOUN NOUN VERB AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN VERB": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NOUN VERB SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM ADJ NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NUM NOUN": {
+            "k": 1,
+            "n": 3,
+            "rate": 0.3333333333333333,
+            "ci95": [
+              0.0615,
+              0.7923
+            ]
+          },
+          "kolla/M:NUM SYM NUM ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM SYM NUM NOUN NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN NOUN": {
+            "k": 0,
+            "n": 3,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.5615
+            ]
+          },
+          "kolla/M:PROPN NOUN ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN VERB": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:PUNCT ADV PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT NOUN PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT X ADV PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT X X PUNCT": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:SCONJ DET": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/M:SCONJ VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:SCONJ VERB VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB AUX": {
+            "k": 1,
+            "n": 7,
+            "rate": 0.14285714285714285,
+            "ci95": [
+              0.0257,
+              0.5131
+            ]
+          },
+          "kolla/M:VERB NOUN": {
+            "k": 5,
+            "n": 15,
+            "rate": 0.3333333333333333,
+            "ci95": [
+              0.1518,
+              0.5829
+            ]
+          },
+          "kolla/M:VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN NOUN SCONJ PRON ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN VERB ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB VERB": {
+            "k": 1,
+            "n": 10,
+            "rate": 0.1,
+            "ci95": [
+              0.0179,
+              0.4042
+            ]
+          },
+          "kolla/M:VERB VERB NOUN": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/M:X ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:X CCONJ NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:X NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:ADJ+ADP -> ADJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:ADV -> NOUN+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:ADV+ADP -> ADV+ADP": {
+            "k": 11,
+            "n": 12,
+            "rate": 0.9166666666666666,
+            "ci95": [
+              0.6461,
+              0.9851
+            ]
+          },
+          "kolla/R:ADV+ADP -> CCONJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:ADV+ADP -> NOUN": {
+            "k": 4,
+            "n": 4,
+            "rate": 1.0,
+            "ci95": [
+              0.5101,
+              1.0
+            ]
+          },
+          "kolla/R:ADV+ADP -> NOUN+ADP": {
+            "k": 3,
+            "n": 5,
+            "rate": 0.6,
+            "ci95": [
+              0.2307,
+              0.8824
+            ]
+          },
+          "kolla/R:ADV+ADP -> NUM+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:CCONJ+ADP -> CCONJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:DET -> PRON+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:NOUN -> ADV+ADP": {
+            "k": 3,
+            "n": 4,
+            "rate": 0.75,
+            "ci95": [
+              0.3006,
+              0.9544
+            ]
+          },
+          "kolla/R:NOUN -> NOUN+ADP": {
+            "k": 22,
+            "n": 25,
+            "rate": 0.88,
+            "ci95": [
+              0.7004,
+              0.9583
+            ]
+          },
+          "kolla/R:NOUN -> PROPN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:NOUN+ADP -> NOUN": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:NOUN+ADP -> NOUN+ADP": {
+            "k": 17,
+            "n": 18,
+            "rate": 0.9444444444444444,
+            "ci95": [
+              0.7424,
+              0.9901
+            ]
+          },
+          "kolla/R:PRON -> PRON+ADP": {
+            "k": 4,
+            "n": 6,
+            "rate": 0.6666666666666666,
+            "ci95": [
+              0.3,
+              0.9032
+            ]
+          },
+          "kolla/R:PRON+ADP -> PRON+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:SCONJ+ADP -> NOUN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:SCONJ+ADP -> SCONJ+ADP": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "kolla/R:SPELL": {
+            "k": 133,
+            "n": 165,
+            "rate": 0.806060606060606,
+            "ci95": [
+              0.7391,
+              0.8591
+            ]
+          },
+          "kolla/R:VERB+ADP -> SCONJ+ADP": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "kolla/R:VERB+ADP -> VERB+ADP": {
+            "k": 9,
+            "n": 9,
+            "rate": 1.0,
+            "ci95": [
+              0.7008,
+              1.0
+            ]
+          },
+          "kolla/R:X -> NOUN+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/U:ADV": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.03840680062770843,
+        "failures": [
+          {
+            "skill": "kolla/M:NOUN ADJ NOUN CCONJ NOUN VERB",
+            "correct": "하지만 재미 없는 공부를 하고 숙제를 해요 .",
+            "wrong": "하지만 .",
+            "margin": -41.686086893081665,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "제 친구가 \" Tyrone에 \" 살아요 .",
+            "wrong": "제 진구가 살아요 .",
+            "margin": -27.650565147399902,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PROPN NOUN",
+            "correct": "아침에 , 밥하고 중국 반찬을 먹어요 .",
+            "wrong": "아침에 , 밥하고 먹어요 .",
+            "margin": -14.829590797424316,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:PRON -> PRON+ADP",
+            "correct": "우리는 먹은 다음에 노래방에 갔습니다 .",
+            "wrong": "우리 먹은 다음에 노래방에 갔습니다 .",
+            "margin": -0.948676586151123,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "아홉 시에 동생은 초등학교에 가요 .",
+            "wrong": "동생을 초등학교에 가요 .",
+            "margin": -36.33610963821411,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PROPN NOUN",
+            "correct": "그리고 , 중국 음식을 같이 먹을 수 있어요 .",
+            "wrong": "그리고 , 같이 먹을 수 있어요 .",
+            "margin": -11.045795679092407,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN ADJ VERB",
+            "correct": "이 분이 제 친구예요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "아이 옷에 원색이나 동색을 썼지만요 .",
+            "wrong": "원색이나 동색을 썼지만요 .",
+            "margin": -19.582951068878174,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADV VERB",
+            "correct": "잘 지냈어요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PUNCT ADV PUNCT",
+            "correct": "\" Jump처럼 \" 한국에서 온 연극이에요 .",
+            "wrong": "한국에서 온 연극이에요 .",
+            "margin": -42.90368843078613,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:NOUN -> NOUN+ADP",
+            "correct": "한국어 선생님이 좋아요 .",
+            "wrong": "한국어 선생님 좋아요 .",
+            "margin": -0.04358673095703125,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB VERB",
+            "correct": "물어 보지 마세요 .",
+            "wrong": "물어 .",
+            "margin": -5.08062744140625,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "저는 영화 보기가 좋아요 .",
+            "wrong": "저는 영화 보기 좋아요 .",
+            "margin": -1.2014012336730957,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "조금 재미가 없지만 돈이 많이 없어서 일해야 해요 .",
+            "wrong": "조금 돈 많이 없어서 일해야 해요 .",
+            "margin": -15.983211517333984,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN",
+            "correct": "사는 집이 아주 커요 .",
+            "wrong": "아주 커요 .",
+            "margin": -9.258517265319824,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN NOUN",
+            "correct": "이 년 동안 많이 배웠어요 .",
+            "wrong": "많이 배웠어요 .",
+            "margin": -16.22031021118164,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:ADV+ADP -> ADV+ADP",
+            "correct": "파티는 보스톤에서 있었어요 .",
+            "wrong": "파티는 보스톤에 있었어요 .",
+            "margin": -0.1917586326599121,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN ADV",
+            "correct": "제가 이 년 전에 대학교를 졸업했어요 .",
+            "wrong": "제가 대학교를 졸업했어요 .",
+            "margin": -13.347998142242432,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADJ NOUN",
+            "correct": "그리고 어렸을 때는 행복과 양상한 것은 사탕이다 .",
+            "wrong": "그리고 행복과 양상한 것은 사탕이다 .",
+            "margin": -14.390562057495117,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN",
+            "correct": "물이 맑아서 수영하는 것이 좋더라고요 !",
+            "wrong": "물이 맑아서 좋더라고요 !",
+            "margin": -12.612101554870605,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:NOUN -> NOUN+ADP",
+            "correct": "고등학교 친구들을 자주 만나요 ?",
+            "wrong": "고등학교 친구들 자주 만나요 ?",
+            "margin": -1.759680986404419,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN",
+            "correct": "어떤 때 이런 생각을 합니다 .",
+            "wrong": "이런 생각을 합니다 .",
+            "margin": -6.3275580406188965,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "삼분 동안 끓이세요 .",
+            "wrong": "끄르세요 .",
+            "margin": -16.778706550598145,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:X NOUN",
+            "correct": "Zhenya 씨 부모님은 러시아에서 살아요 .",
+            "wrong": "부모님은 러시아에서 살아요 .",
+            "margin": -22.61958074569702,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN ADJ",
+            "correct": "그렇지만 공기가 매우 깨끗하니까 잘 숨쉴 수 있어요 .",
+            "wrong": "그렇지만 공기가 매우 깨끗하니까 잘 .",
+            "margin": -0.2172846794128418,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADV VERB",
+            "correct": "안녕히 계세요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADJ NOUN",
+            "correct": "제가 어렸을 때는 이런 생각을 했지요 .",
+            "wrong": "제가 이런 생각을 했지요 .",
+            "margin": -6.095550060272217,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "사람이 살면서 성숙해질 때까지 수많은 성격 변화를 경험하지요 .",
+            "wrong": "사람이 살면서 수만은 성격 변화를 경험하지요 .",
+            "margin": -7.727665901184082,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "예를 들면 미국 인디언들이 훨씬 평균보다 자살을 많이 하고 폭음과 우울증이 인디언에게 훨씬 더 심하다 .",
+            "wrong": "예를 들면 미국 인디언들이 훨씬 평균보다 자살을 많이 하고 폭음과 훨씬 더 심하다 .",
+            "margin": -9.14228105545044,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "대화는 많이 없는데 춤 때문에 아직 잘 이해할 수 있어요 .",
+            "wrong": "대화는 많이 없는데 아직 잘 이해할 수 있어요 .",
+            "margin": -21.308545112609863,
+            "ok": false
+          }
+        ]
+      },
+      "codebook": {
+        "accuracy": {
+          "k": 30,
+          "n": 32,
+          "rate": 0.9375,
+          "ci95": [
+            0.7985,
+            0.9827
+          ]
+        },
+        "mean_margin": 8.3535296022892,
+        "per_skill": {
+          "adj_relativizer": {
+            "k": 2,
+            "n": 3,
+            "rate": 0.6666666666666666,
+            "ci95": [
+              0.2077,
+              0.9385
+            ]
+          },
+          "honorific": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "irregular_conj": {
+            "k": 4,
+            "n": 4,
+            "rate": 1.0,
+            "ci95": [
+              0.5101,
+              1.0
+            ]
+          },
+          "mod_adverb": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "noun_counter": {
+            "k": 6,
+            "n": 7,
+            "rate": 0.8571428571428571,
+            "ci95": [
+              0.4869,
+              0.9743
+            ]
+          },
+          "particle_loc": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "particle_obj": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "subj_topic": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "tense_past": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "time_range": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.03720618039369583,
+        "failures": [
+          {
+            "skill": "adj_relativizer",
+            "correct": "그 선생님은 친절합니다.",
+            "wrong": "그 선생님은 친절해요",
+            "margin": -2.2597010135650635,
+            "ok": false
+          },
+          {
+            "skill": "noun_counter",
+            "correct": "책 여섯 권을 샀다.",
+            "wrong": "책 여섯 개를 샀다.",
+            "margin": -0.015306472778320312,
+            "ok": false
+          }
+        ]
+      },
+      "peak_vram_gb": 8.184841728
+    },
+    "qwen3-8b": {
+      "hf_id": "Qwen/Qwen3-8B",
+      "4bit": true,
+      "curated": {
+        "accuracy": {
+          "k": 51,
+          "n": 52,
+          "rate": 0.9807692307692307,
+          "ci95": [
+            0.8988,
+            0.9966
+          ]
+        },
+        "mean_margin": 7.859195608359117,
+        "per_skill": {
+          "adj_relativizer": {
+            "k": 6,
+            "n": 6,
+            "rate": 1.0,
+            "ci95": [
+              0.6097,
+              1.0
+            ]
+          },
+          "honorific": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "irregular_conj": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "mod_adverb": {
+            "k": 4,
+            "n": 5,
+            "rate": 0.8,
+            "ci95": [
+              0.3755,
+              0.9638
+            ]
+          },
+          "noun_counter": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "particle_loc": {
+            "k": 7,
+            "n": 7,
+            "rate": 1.0,
+            "ci95": [
+              0.6457,
+              1.0
+            ]
+          },
+          "particle_obj": {
+            "k": 6,
+            "n": 6,
+            "rate": 1.0,
+            "ci95": [
+              0.6097,
+              1.0
+            ]
+          },
+          "tense_past": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "time_range": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "verb_choice": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.05580437183380127,
+        "failures": [
+          {
+            "skill": "mod_adverb",
+            "correct": "저는 많게 먹어요",
+            "wrong": "저는 많은 먹어요",
+            "margin": -0.2447047233581543,
+            "ok": false
+          }
+        ]
+      },
+      "kolla": {
+        "accuracy": {
+          "k": 222,
+          "n": 400,
+          "rate": 0.555,
+          "ci95": [
+            0.506,
+            0.603
+          ]
+        },
+        "mean_margin": NaN,
+        "per_skill": {
+          "kolla/M:ADJ ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:ADJ AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADJ NOUN": {
+            "k": 1,
+            "n": 7,
+            "rate": 0.14285714285714285,
+            "ci95": [
+              0.0257,
+              0.5131
+            ]
+          },
+          "kolla/M:ADJ NOUN ADV CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADJ PUNCT X PUNCT AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV ADJ ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV ADV SCONJ NOUN VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV VERB": {
+            "k": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244
+            ]
+          },
+          "kolla/M:ADV VERB AUX NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:CCONJ ADJ NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:CCONJ ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:DET NOUN": {
+            "k": 0,
+            "n": 5,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.4345
+            ]
+          },
+          "kolla/M:DET NOUN ADJ VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET NOUN ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ NOUN CCONJ NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADV": {
+            "k": 0,
+            "n": 7,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3543
+            ]
+          },
+          "kolla/M:NOUN ADV NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADV VERB VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN CCONJ": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NOUN NOUN": {
+            "k": 1,
+            "n": 10,
+            "rate": 0.1,
+            "ci95": [
+              0.0179,
+              0.4042
+            ]
+          },
+          "kolla/M:NOUN NOUN NOUN ADV ADV SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN NOUN NOUN VERB AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN VERB": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NOUN VERB SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM ADJ NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM ADV": {
+            "k": 1,
+            "n": 2,
+            "rate": 0.5,
+            "ci95": [
+              0.0945,
+              0.9055
+            ]
+          },
+          "kolla/M:NUM NOUN": {
+            "k": 0,
+            "n": 3,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.5615
+            ]
+          },
+          "kolla/M:NUM SYM NUM ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM SYM NUM NOUN NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN NOUN": {
+            "k": 0,
+            "n": 3,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.5615
+            ]
+          },
+          "kolla/M:PROPN NOUN ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN VERB": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:PUNCT ADV PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT NOUN PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT X ADV PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT X X PUNCT": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:SCONJ DET": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/M:SCONJ VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:SCONJ VERB VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB AUX": {
+            "k": 1,
+            "n": 7,
+            "rate": 0.14285714285714285,
+            "ci95": [
+              0.0257,
+              0.5131
+            ]
+          },
+          "kolla/M:VERB NOUN": {
+            "k": 5,
+            "n": 15,
+            "rate": 0.3333333333333333,
+            "ci95": [
+              0.1518,
+              0.5829
+            ]
+          },
+          "kolla/M:VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN NOUN SCONJ PRON ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN VERB ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB VERB": {
+            "k": 1,
+            "n": 10,
+            "rate": 0.1,
+            "ci95": [
+              0.0179,
+              0.4042
+            ]
+          },
+          "kolla/M:VERB VERB NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:X ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:X CCONJ NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:X NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:ADJ+ADP -> ADJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:ADV -> NOUN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:ADV+ADP -> ADV+ADP": {
+            "k": 12,
+            "n": 12,
+            "rate": 1.0,
+            "ci95": [
+              0.7575,
+              1.0
+            ]
+          },
+          "kolla/R:ADV+ADP -> CCONJ+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:ADV+ADP -> NOUN": {
+            "k": 4,
+            "n": 4,
+            "rate": 1.0,
+            "ci95": [
+              0.5101,
+              1.0
+            ]
+          },
+          "kolla/R:ADV+ADP -> NOUN+ADP": {
+            "k": 3,
+            "n": 5,
+            "rate": 0.6,
+            "ci95": [
+              0.2307,
+              0.8824
+            ]
+          },
+          "kolla/R:ADV+ADP -> NUM+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:CCONJ+ADP -> CCONJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:DET -> PRON+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:NOUN -> ADV+ADP": {
+            "k": 2,
+            "n": 4,
+            "rate": 0.5,
+            "ci95": [
+              0.15,
+              0.85
+            ]
+          },
+          "kolla/R:NOUN -> NOUN+ADP": {
+            "k": 18,
+            "n": 25,
+            "rate": 0.72,
+            "ci95": [
+              0.5242,
+              0.8572
+            ]
+          },
+          "kolla/R:NOUN -> PROPN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:NOUN+ADP -> NOUN": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:NOUN+ADP -> NOUN+ADP": {
+            "k": 17,
+            "n": 18,
+            "rate": 0.9444444444444444,
+            "ci95": [
+              0.7424,
+              0.9901
+            ]
+          },
+          "kolla/R:PRON -> PRON+ADP": {
+            "k": 2,
+            "n": 6,
+            "rate": 0.3333333333333333,
+            "ci95": [
+              0.0968,
+              0.7
+            ]
+          },
+          "kolla/R:PRON+ADP -> PRON+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:SCONJ+ADP -> NOUN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:SCONJ+ADP -> SCONJ+ADP": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "kolla/R:SPELL": {
+            "k": 130,
+            "n": 165,
+            "rate": 0.7878787878787878,
+            "ci95": [
+              0.7193,
+              0.8433
+            ]
+          },
+          "kolla/R:VERB+ADP -> SCONJ+ADP": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "kolla/R:VERB+ADP -> VERB+ADP": {
+            "k": 9,
+            "n": 9,
+            "rate": 1.0,
+            "ci95": [
+              0.7008,
+              1.0
+            ]
+          },
+          "kolla/R:X -> NOUN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/U:ADV": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.05635705828666687,
+        "failures": [
+          {
+            "skill": "kolla/M:NOUN ADJ NOUN CCONJ NOUN VERB",
+            "correct": "하지만 재미 없는 공부를 하고 숙제를 해요 .",
+            "wrong": "하지만 .",
+            "margin": -45.66268968582153,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "제 친구가 \" Tyrone에 \" 살아요 .",
+            "wrong": "제 진구가 살아요 .",
+            "margin": -19.12130641937256,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PROPN NOUN",
+            "correct": "아침에 , 밥하고 중국 반찬을 먹어요 .",
+            "wrong": "아침에 , 밥하고 먹어요 .",
+            "margin": -16.247933387756348,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "아홉 시에 동생은 초등학교에 가요 .",
+            "wrong": "동생을 초등학교에 가요 .",
+            "margin": -15.825204372406006,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PROPN NOUN",
+            "correct": "그리고 , 중국 음식을 같이 먹을 수 있어요 .",
+            "wrong": "그리고 , 같이 먹을 수 있어요 .",
+            "margin": -11.044918775558472,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN ADJ VERB",
+            "correct": "이 분이 제 친구예요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "아이 옷에 원색이나 동색을 썼지만요 .",
+            "wrong": "원색이나 동색을 썼지만요 .",
+            "margin": -15.291633605957031,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADV VERB",
+            "correct": "잘 지냈어요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PUNCT ADV PUNCT",
+            "correct": "\" Jump처럼 \" 한국에서 온 연극이에요 .",
+            "wrong": "한국에서 온 연극이에요 .",
+            "margin": -29.081729412078857,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB VERB",
+            "correct": "물어 보지 마세요 .",
+            "wrong": "물어 .",
+            "margin": -10.298710823059082,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "저는 영화 보기가 좋아요 .",
+            "wrong": "저는 영화 보기 좋아요 .",
+            "margin": -1.3023614883422852,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "조금 재미가 없지만 돈이 많이 없어서 일해야 해요 .",
+            "wrong": "조금 돈 많이 없어서 일해야 해요 .",
+            "margin": -14.0440092086792,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN",
+            "correct": "사는 집이 아주 커요 .",
+            "wrong": "아주 커요 .",
+            "margin": -10.70904541015625,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN NOUN",
+            "correct": "이 년 동안 많이 배웠어요 .",
+            "wrong": "많이 배웠어요 .",
+            "margin": -13.941106796264648,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN ADV",
+            "correct": "제가 이 년 전에 대학교를 졸업했어요 .",
+            "wrong": "제가 대학교를 졸업했어요 .",
+            "margin": -18.25630211830139,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADJ NOUN",
+            "correct": "그리고 어렸을 때는 행복과 양상한 것은 사탕이다 .",
+            "wrong": "그리고 행복과 양상한 것은 사탕이다 .",
+            "margin": -23.261033535003662,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN",
+            "correct": "물이 맑아서 수영하는 것이 좋더라고요 !",
+            "wrong": "물이 맑아서 좋더라고요 !",
+            "margin": -8.978108406066895,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB VERB NOUN",
+            "correct": "다른 사람을 많이 도와 주는 만큼 행복도 많아진다고 생각하는 사람이다 .",
+            "wrong": "다른 사람을 많이 행복도 많아진다고 생각하는 사람이다 .",
+            "margin": -2.2735941410064697,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:NOUN -> NOUN+ADP",
+            "correct": "고등학교 친구들을 자주 만나요 ?",
+            "wrong": "고등학교 친구들 자주 만나요 ?",
+            "margin": -3.4671669006347656,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN",
+            "correct": "어떤 때 이런 생각을 합니다 .",
+            "wrong": "이런 생각을 합니다 .",
+            "margin": -10.280871868133545,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "삼분 동안 끓이세요 .",
+            "wrong": "끄르세요 .",
+            "margin": -16.920458793640137,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:X NOUN",
+            "correct": "Zhenya 씨 부모님은 러시아에서 살아요 .",
+            "wrong": "부모님은 러시아에서 살아요 .",
+            "margin": -21.57612419128418,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN ADJ",
+            "correct": "그렇지만 공기가 매우 깨끗하니까 잘 숨쉴 수 있어요 .",
+            "wrong": "그렇지만 공기가 매우 깨끗하니까 잘 .",
+            "margin": -7.484348773956299,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADV VERB",
+            "correct": "안녕히 계세요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADJ NOUN",
+            "correct": "제가 어렸을 때는 이런 생각을 했지요 .",
+            "wrong": "제가 이런 생각을 했지요 .",
+            "margin": -8.279972076416016,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "사람이 살면서 성숙해질 때까지 수많은 성격 변화를 경험하지요 .",
+            "wrong": "사람이 살면서 수만은 성격 변화를 경험하지요 .",
+            "margin": -4.871187686920166,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "예를 들면 미국 인디언들이 훨씬 평균보다 자살을 많이 하고 폭음과 우울증이 인디언에게 훨씬 더 심하다 .",
+            "wrong": "예를 들면 미국 인디언들이 훨씬 평균보다 자살을 많이 하고 폭음과 훨씬 더 심하다 .",
+            "margin": -17.56136178970337,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "대화는 많이 없는데 춤 때문에 아직 잘 이해할 수 있어요 .",
+            "wrong": "대화는 많이 없는데 아직 잘 이해할 수 있어요 .",
+            "margin": -34.74283695220947,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "방문했던 명소 중에 한 곳을 소개 드리도록 하겠습니다 .",
+            "wrong": "방문했던 한 곳을 소개 드리도록 하겠습니다 .",
+            "margin": -3.9591150283813477,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADV VERB",
+            "correct": "서울로 자동차로 갔습니다 .",
+            "wrong": "서울로 .",
+            "margin": -21.32646083831787,
+            "ok": false
+          }
+        ]
+      },
+      "codebook": {
+        "accuracy": {
+          "k": 30,
+          "n": 32,
+          "rate": 0.9375,
+          "ci95": [
+            0.7985,
+            0.9827
+          ]
+        },
+        "mean_margin": 8.438543770462275,
+        "per_skill": {
+          "adj_relativizer": {
+            "k": 2,
+            "n": 3,
+            "rate": 0.6666666666666666,
+            "ci95": [
+              0.2077,
+              0.9385
+            ]
+          },
+          "honorific": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "irregular_conj": {
+            "k": 4,
+            "n": 4,
+            "rate": 1.0,
+            "ci95": [
+              0.5101,
+              1.0
+            ]
+          },
+          "mod_adverb": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "noun_counter": {
+            "k": 6,
+            "n": 7,
+            "rate": 0.8571428571428571,
+            "ci95": [
+              0.4869,
+              0.9743
+            ]
+          },
+          "particle_loc": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "particle_obj": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "subj_topic": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "tense_past": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "time_range": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.0560787171125412,
+        "failures": [
+          {
+            "skill": "adj_relativizer",
+            "correct": "그 선생님은 친절합니다.",
+            "wrong": "그 선생님은 친절해요",
+            "margin": -0.6754231452941895,
+            "ok": false
+          },
+          {
+            "skill": "noun_counter",
+            "correct": "책 여섯 권을 샀다.",
+            "wrong": "책 여섯 개를 샀다.",
+            "margin": -0.6646804809570312,
+            "ok": false
+          }
+        ]
+      },
+      "peak_vram_gb": 6.501392384
+    },
+    "qwen3-8b-base": {
+      "hf_id": "Qwen/Qwen3-8B-Base",
+      "4bit": true,
+      "curated": {
+        "accuracy": {
+          "k": 49,
+          "n": 52,
+          "rate": 0.9423076923076923,
+          "ci95": [
+            0.8436,
+            0.9802
+          ]
+        },
+        "mean_margin": 6.05466091632843,
+        "per_skill": {
+          "adj_relativizer": {
+            "k": 6,
+            "n": 6,
+            "rate": 1.0,
+            "ci95": [
+              0.6097,
+              1.0
+            ]
+          },
+          "honorific": {
+            "k": 4,
+            "n": 5,
+            "rate": 0.8,
+            "ci95": [
+              0.3755,
+              0.9638
+            ]
+          },
+          "irregular_conj": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "mod_adverb": {
+            "k": 4,
+            "n": 5,
+            "rate": 0.8,
+            "ci95": [
+              0.3755,
+              0.9638
+            ]
+          },
+          "noun_counter": {
+            "k": 4,
+            "n": 5,
+            "rate": 0.8,
+            "ci95": [
+              0.3755,
+              0.9638
+            ]
+          },
+          "particle_loc": {
+            "k": 7,
+            "n": 7,
+            "rate": 1.0,
+            "ci95": [
+              0.6457,
+              1.0
+            ]
+          },
+          "particle_obj": {
+            "k": 6,
+            "n": 6,
+            "rate": 1.0,
+            "ci95": [
+              0.6097,
+              1.0
+            ]
+          },
+          "tense_past": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "time_range": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "verb_choice": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.055743863949408896,
+        "failures": [
+          {
+            "skill": "honorific",
+            "correct": "선생님께서 가르치세요.",
+            "wrong": "선생님께서 가르쳐요.",
+            "margin": -0.4317359924316406,
+            "ok": false
+          },
+          {
+            "skill": "mod_adverb",
+            "correct": "저는 많게 먹어요",
+            "wrong": "저는 많은 먹어요",
+            "margin": -3.199866771697998,
+            "ok": false
+          },
+          {
+            "skill": "noun_counter",
+            "correct": "선생님은 다섯 분 있어요.",
+            "wrong": "선생님은 다섯 명 있어요.",
+            "margin": -0.23391437530517578,
+            "ok": false
+          }
+        ]
+      },
+      "kolla": {
+        "accuracy": {
+          "k": 228,
+          "n": 400,
+          "rate": 0.57,
+          "ci95": [
+            0.521,
+            0.6176
+          ]
+        },
+        "mean_margin": NaN,
+        "per_skill": {
+          "kolla/M:ADJ ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:ADJ AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADJ NOUN": {
+            "k": 0,
+            "n": 7,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3543
+            ]
+          },
+          "kolla/M:ADJ NOUN ADV CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADJ PUNCT X PUNCT AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV ADJ ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV ADV SCONJ NOUN VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV VERB": {
+            "k": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244
+            ]
+          },
+          "kolla/M:ADV VERB AUX NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:CCONJ ADJ NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:CCONJ ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:DET NOUN": {
+            "k": 0,
+            "n": 5,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.4345
+            ]
+          },
+          "kolla/M:DET NOUN ADJ VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET NOUN ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ NOUN CCONJ NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADV": {
+            "k": 0,
+            "n": 7,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3543
+            ]
+          },
+          "kolla/M:NOUN ADV NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADV VERB VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN CCONJ": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NOUN NOUN": {
+            "k": 2,
+            "n": 10,
+            "rate": 0.2,
+            "ci95": [
+              0.0567,
+              0.5098
+            ]
+          },
+          "kolla/M:NOUN NOUN NOUN ADV ADV SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN NOUN NOUN VERB AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN VERB": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NOUN VERB SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM ADJ NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NUM NOUN": {
+            "k": 0,
+            "n": 3,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.5615
+            ]
+          },
+          "kolla/M:NUM SYM NUM ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM SYM NUM NOUN NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN NOUN": {
+            "k": 0,
+            "n": 3,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.5615
+            ]
+          },
+          "kolla/M:PROPN NOUN ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN VERB": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:PUNCT ADV PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT NOUN PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT X ADV PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT X X PUNCT": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:SCONJ DET": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/M:SCONJ VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:SCONJ VERB VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB AUX": {
+            "k": 1,
+            "n": 7,
+            "rate": 0.14285714285714285,
+            "ci95": [
+              0.0257,
+              0.5131
+            ]
+          },
+          "kolla/M:VERB NOUN": {
+            "k": 6,
+            "n": 15,
+            "rate": 0.4,
+            "ci95": [
+              0.1982,
+              0.6425
+            ]
+          },
+          "kolla/M:VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN NOUN SCONJ PRON ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN VERB ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB VERB": {
+            "k": 1,
+            "n": 10,
+            "rate": 0.1,
+            "ci95": [
+              0.0179,
+              0.4042
+            ]
+          },
+          "kolla/M:VERB VERB NOUN": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/M:X ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:X CCONJ NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:X NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:ADJ+ADP -> ADJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:ADV -> NOUN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:ADV+ADP -> ADV+ADP": {
+            "k": 10,
+            "n": 12,
+            "rate": 0.8333333333333334,
+            "ci95": [
+              0.552,
+              0.953
+            ]
+          },
+          "kolla/R:ADV+ADP -> CCONJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:ADV+ADP -> NOUN": {
+            "k": 4,
+            "n": 4,
+            "rate": 1.0,
+            "ci95": [
+              0.5101,
+              1.0
+            ]
+          },
+          "kolla/R:ADV+ADP -> NOUN+ADP": {
+            "k": 2,
+            "n": 5,
+            "rate": 0.4,
+            "ci95": [
+              0.1176,
+              0.7693
+            ]
+          },
+          "kolla/R:ADV+ADP -> NUM+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:CCONJ+ADP -> CCONJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:DET -> PRON+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:NOUN -> ADV+ADP": {
+            "k": 3,
+            "n": 4,
+            "rate": 0.75,
+            "ci95": [
+              0.3006,
+              0.9544
+            ]
+          },
+          "kolla/R:NOUN -> NOUN+ADP": {
+            "k": 20,
+            "n": 25,
+            "rate": 0.8,
+            "ci95": [
+              0.6087,
+              0.9114
+            ]
+          },
+          "kolla/R:NOUN -> PROPN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:NOUN+ADP -> NOUN": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:NOUN+ADP -> NOUN+ADP": {
+            "k": 17,
+            "n": 18,
+            "rate": 0.9444444444444444,
+            "ci95": [
+              0.7424,
+              0.9901
+            ]
+          },
+          "kolla/R:PRON -> PRON+ADP": {
+            "k": 5,
+            "n": 6,
+            "rate": 0.8333333333333334,
+            "ci95": [
+              0.4365,
+              0.9699
+            ]
+          },
+          "kolla/R:PRON+ADP -> PRON+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:SCONJ+ADP -> NOUN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:SCONJ+ADP -> SCONJ+ADP": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "kolla/R:SPELL": {
+            "k": 132,
+            "n": 165,
+            "rate": 0.8,
+            "ci95": [
+              0.7325,
+              0.8539
+            ]
+          },
+          "kolla/R:VERB+ADP -> SCONJ+ADP": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "kolla/R:VERB+ADP -> VERB+ADP": {
+            "k": 9,
+            "n": 9,
+            "rate": 1.0,
+            "ci95": [
+              0.7008,
+              1.0
+            ]
+          },
+          "kolla/R:X -> NOUN+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/U:ADV": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.05637048482894898,
+        "failures": [
+          {
+            "skill": "kolla/M:NOUN ADJ NOUN CCONJ NOUN VERB",
+            "correct": "하지만 재미 없는 공부를 하고 숙제를 해요 .",
+            "wrong": "하지만 .",
+            "margin": -39.59496021270752,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "제 친구가 \" Tyrone에 \" 살아요 .",
+            "wrong": "제 진구가 살아요 .",
+            "margin": -19.87716007232666,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PROPN NOUN",
+            "correct": "아침에 , 밥하고 중국 반찬을 먹어요 .",
+            "wrong": "아침에 , 밥하고 먹어요 .",
+            "margin": -12.249192237854004,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:PRON -> PRON+ADP",
+            "correct": "우리는 먹은 다음에 노래방에 갔습니다 .",
+            "wrong": "우리 먹은 다음에 노래방에 갔습니다 .",
+            "margin": -0.007283210754394531,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "아홉 시에 동생은 초등학교에 가요 .",
+            "wrong": "동생을 초등학교에 가요 .",
+            "margin": -7.063955545425415,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:ADV+ADP -> NOUN+ADP",
+            "correct": "온라인 쇼핑이 장점은 많아요 .",
+            "wrong": "온라인 쇼핑에 장점은 많아요 .",
+            "margin": -1.6828389167785645,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PROPN NOUN",
+            "correct": "그리고 , 중국 음식을 같이 먹을 수 있어요 .",
+            "wrong": "그리고 , 같이 먹을 수 있어요 .",
+            "margin": -8.864354372024536,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN ADJ VERB",
+            "correct": "이 분이 제 친구예요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "아이 옷에 원색이나 동색을 썼지만요 .",
+            "wrong": "원색이나 동색을 썼지만요 .",
+            "margin": -12.240609645843506,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADV VERB",
+            "correct": "잘 지냈어요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PUNCT ADV PUNCT",
+            "correct": "\" Jump처럼 \" 한국에서 온 연극이에요 .",
+            "wrong": "한국에서 온 연극이에요 .",
+            "margin": -30.146880626678467,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB VERB",
+            "correct": "물어 보지 마세요 .",
+            "wrong": "물어 .",
+            "margin": -4.978910446166992,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "저는 영화 보기가 좋아요 .",
+            "wrong": "저는 영화 보기 좋아요 .",
+            "margin": -0.04929685592651367,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "조금 재미가 없지만 돈이 많이 없어서 일해야 해요 .",
+            "wrong": "조금 돈 많이 없어서 일해야 해요 .",
+            "margin": -13.6443030834198,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN",
+            "correct": "사는 집이 아주 커요 .",
+            "wrong": "아주 커요 .",
+            "margin": -10.416025638580322,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:ADV+ADP -> ADV+ADP",
+            "correct": "한국으로 여행하실 계획이 있으십니까 ?",
+            "wrong": "한국에 여행하실 계획이 있으십니까 ?",
+            "margin": -0.3803877830505371,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN NOUN",
+            "correct": "이 년 동안 많이 배웠어요 .",
+            "wrong": "많이 배웠어요 .",
+            "margin": -22.74220323562622,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:ADV+ADP -> ADV+ADP",
+            "correct": "파티는 보스톤에서 있었어요 .",
+            "wrong": "파티는 보스톤에 있었어요 .",
+            "margin": -0.5723791122436523,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN ADV",
+            "correct": "제가 이 년 전에 대학교를 졸업했어요 .",
+            "wrong": "제가 대학교를 졸업했어요 .",
+            "margin": -13.670830488204956,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADJ NOUN",
+            "correct": "그리고 어렸을 때는 행복과 양상한 것은 사탕이다 .",
+            "wrong": "그리고 행복과 양상한 것은 사탕이다 .",
+            "margin": -13.549324989318848,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN",
+            "correct": "물이 맑아서 수영하는 것이 좋더라고요 !",
+            "wrong": "물이 맑아서 좋더라고요 !",
+            "margin": -12.990771770477295,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "제 이유는 아주 간단합니다 .",
+            "wrong": "저 이유는 아주 간단합니다 .",
+            "margin": -0.9344940185546875,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:NOUN -> NOUN+ADP",
+            "correct": "고등학교 친구들을 자주 만나요 ?",
+            "wrong": "고등학교 친구들 자주 만나요 ?",
+            "margin": -2.276184558868408,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN",
+            "correct": "어떤 때 이런 생각을 합니다 .",
+            "wrong": "이런 생각을 합니다 .",
+            "margin": -6.594318866729736,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "삼분 동안 끓이세요 .",
+            "wrong": "끄르세요 .",
+            "margin": -13.080986022949219,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:X NOUN",
+            "correct": "Zhenya 씨 부모님은 러시아에서 살아요 .",
+            "wrong": "부모님은 러시아에서 살아요 .",
+            "margin": -22.695673942565918,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN ADJ",
+            "correct": "그렇지만 공기가 매우 깨끗하니까 잘 숨쉴 수 있어요 .",
+            "wrong": "그렇지만 공기가 매우 깨끗하니까 잘 .",
+            "margin": -4.089111328125,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADV VERB",
+            "correct": "안녕히 계세요 .",
+            "wrong": ".",
+            "margin": NaN,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADJ NOUN",
+            "correct": "제가 어렸을 때는 이런 생각을 했지요 .",
+            "wrong": "제가 이런 생각을 했지요 .",
+            "margin": -6.038058519363403,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "사람이 살면서 성숙해질 때까지 수많은 성격 변화를 경험하지요 .",
+            "wrong": "사람이 살면서 수만은 성격 변화를 경험하지요 .",
+            "margin": -2.816903829574585,
+            "ok": false
+          }
+        ]
+      },
+      "codebook": {
+        "accuracy": {
+          "k": 30,
+          "n": 32,
+          "rate": 0.9375,
+          "ci95": [
+            0.7985,
+            0.9827
+          ]
+        },
+        "mean_margin": 8.000573795288801,
+        "per_skill": {
+          "adj_relativizer": {
+            "k": 2,
+            "n": 3,
+            "rate": 0.6666666666666666,
+            "ci95": [
+              0.2077,
+              0.9385
+            ]
+          },
+          "honorific": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "irregular_conj": {
+            "k": 4,
+            "n": 4,
+            "rate": 1.0,
+            "ci95": [
+              0.5101,
+              1.0
+            ]
+          },
+          "mod_adverb": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "noun_counter": {
+            "k": 6,
+            "n": 7,
+            "rate": 0.8571428571428571,
+            "ci95": [
+              0.4869,
+              0.9743
+            ]
+          },
+          "particle_loc": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "particle_obj": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "subj_topic": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "tense_past": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "time_range": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.056054532527923584,
+        "failures": [
+          {
+            "skill": "adj_relativizer",
+            "correct": "그 선생님은 친절합니다.",
+            "wrong": "그 선생님은 친절해요",
+            "margin": -1.1570320129394531,
+            "ok": false
+          },
+          {
+            "skill": "noun_counter",
+            "correct": "책 여섯 권을 샀다.",
+            "wrong": "책 여섯 개를 샀다.",
+            "margin": -0.2184295654296875,
+            "ok": false
+          }
+        ]
+      },
+      "peak_vram_gb": 6.501392384
+    },
+    "kanana-1.5-8b-base": {
+      "hf_id": "kakaocorp/kanana-1.5-8b-base",
+      "4bit": true,
+      "curated": {
+        "accuracy": {
+          "k": 49,
+          "n": 52,
+          "rate": 0.9423076923076923,
+          "ci95": [
+            0.8436,
+            0.9802
+          ]
+        },
+        "mean_margin": 5.5588919795476475,
+        "per_skill": {
+          "adj_relativizer": {
+            "k": 6,
+            "n": 6,
+            "rate": 1.0,
+            "ci95": [
+              0.6097,
+              1.0
+            ]
+          },
+          "honorific": {
+            "k": 4,
+            "n": 5,
+            "rate": 0.8,
+            "ci95": [
+              0.3755,
+              0.9638
+            ]
+          },
+          "irregular_conj": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "mod_adverb": {
+            "k": 4,
+            "n": 5,
+            "rate": 0.8,
+            "ci95": [
+              0.3755,
+              0.9638
+            ]
+          },
+          "noun_counter": {
+            "k": 4,
+            "n": 5,
+            "rate": 0.8,
+            "ci95": [
+              0.3755,
+              0.9638
+            ]
+          },
+          "particle_loc": {
+            "k": 7,
+            "n": 7,
+            "rate": 1.0,
+            "ci95": [
+              0.6457,
+              1.0
+            ]
+          },
+          "particle_obj": {
+            "k": 6,
+            "n": 6,
+            "rate": 1.0,
+            "ci95": [
+              0.6097,
+              1.0
+            ]
+          },
+          "tense_past": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "time_range": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "verb_choice": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.049730970309330866,
+        "failures": [
+          {
+            "skill": "honorific",
+            "correct": "선생님께서 가르치세요.",
+            "wrong": "선생님께서 가르쳐요.",
+            "margin": -0.20518875122070312,
+            "ok": false
+          },
+          {
+            "skill": "mod_adverb",
+            "correct": "저는 많게 먹어요",
+            "wrong": "저는 많은 먹어요",
+            "margin": -1.4834136962890625,
+            "ok": false
+          },
+          {
+            "skill": "noun_counter",
+            "correct": "선생님은 다섯 분 있어요.",
+            "wrong": "선생님은 다섯 명 있어요.",
+            "margin": -0.36777257919311523,
+            "ok": false
+          }
+        ]
+      },
+      "kolla": {
+        "accuracy": {
+          "k": 228,
+          "n": 400,
+          "rate": 0.57,
+          "ci95": [
+            0.521,
+            0.6176
+          ]
+        },
+        "mean_margin": -0.9428077459335327,
+        "per_skill": {
+          "kolla/M:ADJ ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:ADJ AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADJ NOUN": {
+            "k": 0,
+            "n": 7,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3543
+            ]
+          },
+          "kolla/M:ADJ NOUN ADV CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADJ PUNCT X PUNCT AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV ADJ ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV ADV SCONJ NOUN VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:ADV VERB": {
+            "k": 0,
+            "n": 8,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3244
+            ]
+          },
+          "kolla/M:ADV VERB AUX NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:CCONJ ADJ NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:CCONJ ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:DET NOUN": {
+            "k": 0,
+            "n": 5,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.4345
+            ]
+          },
+          "kolla/M:DET NOUN ADJ VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET NOUN ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:DET VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADJ NOUN CCONJ NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADV": {
+            "k": 0,
+            "n": 7,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.3543
+            ]
+          },
+          "kolla/M:NOUN ADV NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN ADV VERB VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN CCONJ": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NOUN NOUN": {
+            "k": 2,
+            "n": 10,
+            "rate": 0.2,
+            "ci95": [
+              0.0567,
+              0.5098
+            ]
+          },
+          "kolla/M:NOUN NOUN NOUN ADV ADV SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN NOUN NOUN VERB AUX": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NOUN VERB": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NOUN VERB SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM ADJ NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM ADV": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:NUM NOUN": {
+            "k": 1,
+            "n": 3,
+            "rate": 0.3333333333333333,
+            "ci95": [
+              0.0615,
+              0.7923
+            ]
+          },
+          "kolla/M:NUM SYM NUM ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:NUM SYM NUM NOUN NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN CCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN NOUN": {
+            "k": 0,
+            "n": 3,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.5615
+            ]
+          },
+          "kolla/M:PROPN NOUN ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PROPN VERB": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:PUNCT ADV PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT NOUN PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT X ADV PUNCT": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:PUNCT X X PUNCT": {
+            "k": 0,
+            "n": 2,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.6576
+            ]
+          },
+          "kolla/M:SCONJ DET": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/M:SCONJ VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:SCONJ VERB VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB AUX": {
+            "k": 1,
+            "n": 7,
+            "rate": 0.14285714285714285,
+            "ci95": [
+              0.0257,
+              0.5131
+            ]
+          },
+          "kolla/M:VERB NOUN": {
+            "k": 6,
+            "n": 15,
+            "rate": 0.4,
+            "ci95": [
+              0.1982,
+              0.6425
+            ]
+          },
+          "kolla/M:VERB NOUN ADJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN NOUN SCONJ PRON ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN VERB": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB NOUN VERB ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB SCONJ": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:VERB VERB": {
+            "k": 0,
+            "n": 10,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.2775
+            ]
+          },
+          "kolla/M:VERB VERB NOUN": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/M:X ADV": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:X CCONJ NOUN NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/M:X NOUN": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:ADJ+ADP -> ADJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:ADV -> NOUN+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:ADV+ADP -> ADV+ADP": {
+            "k": 10,
+            "n": 12,
+            "rate": 0.8333333333333334,
+            "ci95": [
+              0.552,
+              0.953
+            ]
+          },
+          "kolla/R:ADV+ADP -> CCONJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:ADV+ADP -> NOUN": {
+            "k": 2,
+            "n": 4,
+            "rate": 0.5,
+            "ci95": [
+              0.15,
+              0.85
+            ]
+          },
+          "kolla/R:ADV+ADP -> NOUN+ADP": {
+            "k": 2,
+            "n": 5,
+            "rate": 0.4,
+            "ci95": [
+              0.1176,
+              0.7693
+            ]
+          },
+          "kolla/R:ADV+ADP -> NUM+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:CCONJ+ADP -> CCONJ+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:DET -> PRON+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:NOUN -> ADV+ADP": {
+            "k": 3,
+            "n": 4,
+            "rate": 0.75,
+            "ci95": [
+              0.3006,
+              0.9544
+            ]
+          },
+          "kolla/R:NOUN -> NOUN+ADP": {
+            "k": 18,
+            "n": 25,
+            "rate": 0.72,
+            "ci95": [
+              0.5242,
+              0.8572
+            ]
+          },
+          "kolla/R:NOUN -> PROPN+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/R:NOUN+ADP -> NOUN": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:NOUN+ADP -> NOUN+ADP": {
+            "k": 17,
+            "n": 18,
+            "rate": 0.9444444444444444,
+            "ci95": [
+              0.7424,
+              0.9901
+            ]
+          },
+          "kolla/R:PRON -> PRON+ADP": {
+            "k": 6,
+            "n": 6,
+            "rate": 1.0,
+            "ci95": [
+              0.6097,
+              1.0
+            ]
+          },
+          "kolla/R:PRON+ADP -> PRON+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:SCONJ+ADP -> NOUN+ADP": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "kolla/R:SCONJ+ADP -> SCONJ+ADP": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "kolla/R:SPELL": {
+            "k": 136,
+            "n": 165,
+            "rate": 0.8242424242424242,
+            "ci95": [
+              0.759,
+              0.8747
+            ]
+          },
+          "kolla/R:VERB+ADP -> SCONJ+ADP": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "kolla/R:VERB+ADP -> VERB+ADP": {
+            "k": 9,
+            "n": 9,
+            "rate": 1.0,
+            "ci95": [
+              0.7008,
+              1.0
+            ]
+          },
+          "kolla/R:X -> NOUN+ADP": {
+            "k": 0,
+            "n": 1,
+            "rate": 0.0,
+            "ci95": [
+              0.0,
+              0.7935
+            ]
+          },
+          "kolla/U:ADV": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.0504696923494339,
+        "failures": [
+          {
+            "skill": "kolla/M:NOUN ADJ NOUN CCONJ NOUN VERB",
+            "correct": "하지만 재미 없는 공부를 하고 숙제를 해요 .",
+            "wrong": "하지만 .",
+            "margin": -36.9622483253479,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "제 친구가 \" Tyrone에 \" 살아요 .",
+            "wrong": "제 진구가 살아요 .",
+            "margin": -19.574486255645752,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PROPN NOUN",
+            "correct": "아침에 , 밥하고 중국 반찬을 먹어요 .",
+            "wrong": "아침에 , 밥하고 먹어요 .",
+            "margin": -13.473697662353516,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "아홉 시에 동생은 초등학교에 가요 .",
+            "wrong": "동생을 초등학교에 가요 .",
+            "margin": -13.10875129699707,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:ADV+ADP -> NOUN+ADP",
+            "correct": "온라인 쇼핑이 장점은 많아요 .",
+            "wrong": "온라인 쇼핑에 장점은 많아요 .",
+            "margin": -5.7030158042907715,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PROPN NOUN",
+            "correct": "그리고 , 중국 음식을 같이 먹을 수 있어요 .",
+            "wrong": "그리고 , 같이 먹을 수 있어요 .",
+            "margin": -9.983446598052979,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN ADJ VERB",
+            "correct": "이 분이 제 친구예요 .",
+            "wrong": ".",
+            "margin": -32.45037651062012,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB AUX",
+            "correct": "저는 심리학 교수가 되고 싶어요 .",
+            "wrong": "저는 심리학 교수가 .",
+            "margin": -1.7853479385375977,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "아이 옷에 원색이나 동색을 썼지만요 .",
+            "wrong": "원색이나 동색을 썼지만요 .",
+            "margin": -17.50984811782837,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADV VERB",
+            "correct": "잘 지냈어요 .",
+            "wrong": ".",
+            "margin": -19.23766589164734,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:PUNCT ADV PUNCT",
+            "correct": "\" Jump처럼 \" 한국에서 온 연극이에요 .",
+            "wrong": "한국에서 온 연극이에요 .",
+            "margin": -39.923173904418945,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:NOUN -> NOUN+ADP",
+            "correct": "한국어 선생님이 좋아요 .",
+            "wrong": "한국어 선생님 좋아요 .",
+            "margin": -0.19005632400512695,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB VERB",
+            "correct": "물어 보지 마세요 .",
+            "wrong": "물어 .",
+            "margin": -8.105311393737793,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "저는 영화 보기가 좋아요 .",
+            "wrong": "저는 영화 보기 좋아요 .",
+            "margin": -2.992321014404297,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "조금 재미가 없지만 돈이 많이 없어서 일해야 해요 .",
+            "wrong": "조금 돈 많이 없어서 일해야 해요 .",
+            "margin": -7.58124041557312,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN",
+            "correct": "사는 집이 아주 커요 .",
+            "wrong": "아주 커요 .",
+            "margin": -12.846185684204102,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:ADV+ADP -> ADV+ADP",
+            "correct": "한국으로 여행하실 계획이 있으십니까 ?",
+            "wrong": "한국에 여행하실 계획이 있으십니까 ?",
+            "margin": -2.2528152465820312,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN NOUN",
+            "correct": "이 년 동안 많이 배웠어요 .",
+            "wrong": "많이 배웠어요 .",
+            "margin": -14.455844163894653,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN ADV",
+            "correct": "제가 이 년 전에 대학교를 졸업했어요 .",
+            "wrong": "제가 대학교를 졸업했어요 .",
+            "margin": -15.423076629638672,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADJ NOUN",
+            "correct": "그리고 어렸을 때는 행복과 양상한 것은 사탕이다 .",
+            "wrong": "그리고 행복과 양상한 것은 사탕이다 .",
+            "margin": -12.921452045440674,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN",
+            "correct": "물이 맑아서 수영하는 것이 좋더라고요 !",
+            "wrong": "물이 맑아서 좋더라고요 !",
+            "margin": -12.029160976409912,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:NOUN -> NOUN+ADP",
+            "correct": "고등학교 친구들을 자주 만나요 ?",
+            "wrong": "고등학교 친구들 자주 만나요 ?",
+            "margin": -1.2198772430419922,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:DET NOUN",
+            "correct": "어떤 때 이런 생각을 합니다 .",
+            "wrong": "이런 생각을 합니다 .",
+            "margin": -7.620264530181885,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "삼분 동안 끓이세요 .",
+            "wrong": "끄르세요 .",
+            "margin": -13.52262020111084,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:X NOUN",
+            "correct": "Zhenya 씨 부모님은 러시아에서 살아요 .",
+            "wrong": "부모님은 러시아에서 살아요 .",
+            "margin": -26.276463508605957,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:VERB NOUN ADJ",
+            "correct": "그렇지만 공기가 매우 깨끗하니까 잘 숨쉴 수 있어요 .",
+            "wrong": "그렇지만 공기가 매우 깨끗하니까 잘 .",
+            "margin": -7.342505693435669,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADV VERB",
+            "correct": "안녕히 계세요 .",
+            "wrong": ".",
+            "margin": -15.284582138061523,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:ADJ NOUN",
+            "correct": "제가 어렸을 때는 이런 생각을 했지요 .",
+            "wrong": "제가 이런 생각을 했지요 .",
+            "margin": -7.792176008224487,
+            "ok": false
+          },
+          {
+            "skill": "kolla/R:SPELL",
+            "correct": "사람이 살면서 성숙해질 때까지 수많은 성격 변화를 경험하지요 .",
+            "wrong": "사람이 살면서 수만은 성격 변화를 경험하지요 .",
+            "margin": -11.208736181259155,
+            "ok": false
+          },
+          {
+            "skill": "kolla/M:NOUN ADV",
+            "correct": "예를 들면 미국 인디언들이 훨씬 평균보다 자살을 많이 하고 폭음과 우울증이 인디언에게 훨씬 더 심하다 .",
+            "wrong": "예를 들면 미국 인디언들이 훨씬 평균보다 자살을 많이 하고 폭음과 훨씬 더 심하다 .",
+            "margin": -8.73505163192749,
+            "ok": false
+          }
+        ]
+      },
+      "codebook": {
+        "accuracy": {
+          "k": 30,
+          "n": 32,
+          "rate": 0.9375,
+          "ci95": [
+            0.7985,
+            0.9827
+          ]
+        },
+        "mean_margin": 8.204925931990147,
+        "per_skill": {
+          "adj_relativizer": {
+            "k": 2,
+            "n": 3,
+            "rate": 0.6666666666666666,
+            "ci95": [
+              0.2077,
+              0.9385
+            ]
+          },
+          "honorific": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "irregular_conj": {
+            "k": 4,
+            "n": 4,
+            "rate": 1.0,
+            "ci95": [
+              0.5101,
+              1.0
+            ]
+          },
+          "mod_adverb": {
+            "k": 2,
+            "n": 2,
+            "rate": 1.0,
+            "ci95": [
+              0.3424,
+              1.0
+            ]
+          },
+          "noun_counter": {
+            "k": 7,
+            "n": 7,
+            "rate": 1.0,
+            "ci95": [
+              0.6457,
+              1.0
+            ]
+          },
+          "particle_loc": {
+            "k": 3,
+            "n": 3,
+            "rate": 1.0,
+            "ci95": [
+              0.4385,
+              1.0
+            ]
+          },
+          "particle_obj": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          },
+          "subj_topic": {
+            "k": 2,
+            "n": 3,
+            "rate": 0.6666666666666666,
+            "ci95": [
+              0.2077,
+              0.9385
+            ]
+          },
+          "tense_past": {
+            "k": 5,
+            "n": 5,
+            "rate": 1.0,
+            "ci95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "time_range": {
+            "k": 1,
+            "n": 1,
+            "rate": 1.0,
+            "ci95": [
+              0.2065,
+              1.0
+            ]
+          }
+        },
+        "seconds_per_pair": 0.05051231384277344,
+        "failures": [
+          {
+            "skill": "adj_relativizer",
+            "correct": "그 선생님은 친절합니다.",
+            "wrong": "그 선생님은 친절해요",
+            "margin": -0.6689267158508301,
+            "ok": false
+          },
+          {
+            "skill": "subj_topic",
+            "correct": "강아지가 공을 쫓아요.",
+            "wrong": "강아지는 공을 쫓아요.",
+            "margin": -0.2150559425354004,
+            "ok": false
+          }
+        ]
+      },
+      "peak_vram_gb": 6.163241984
+    }
+  }
+}
