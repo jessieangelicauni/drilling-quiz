@@ -1,0 +1,2171 @@
+{
+  "settings": {
+    "per_objective": "6",
+    "curriculum": "/home/jessie/AXPilot-DrillingQuiz/data/curriculum_ev_smart_factory.json",
+    "context": "",
+    "encoder": "intfloat/multilingual-e5-base",
+    "seed": "0",
+    "out": "benchmark_v2_results.json"
+  },
+  "per_objective": {
+    "particle_loc": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 3,
+        "n": 6,
+        "rate": 0.5,
+        "ci95": [
+          0.1876,
+          0.8124
+        ]
+      },
+      "objective_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "accepted": {
+        "k": 3,
+        "n": 6,
+        "rate": 0.5,
+        "ci95": [
+          0.1876,
+          0.8124
+        ]
+      }
+    },
+    "particle_obj": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 4,
+        "n": 6,
+        "rate": 0.6666666666666666,
+        "ci95": [
+          0.3,
+          0.9032
+        ]
+      },
+      "objective_ok": {
+        "k": 4,
+        "n": 6,
+        "rate": 0.6666666666666666,
+        "ci95": [
+          0.3,
+          0.9032
+        ]
+      },
+      "accepted": {
+        "k": 3,
+        "n": 6,
+        "rate": 0.5,
+        "ci95": [
+          0.1876,
+          0.8124
+        ]
+      }
+    },
+    "honorific": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 0,
+        "n": 6,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.3903
+        ]
+      },
+      "objective_ok": {
+        "k": 2,
+        "n": 6,
+        "rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
+        ]
+      },
+      "accepted": {
+        "k": 0,
+        "n": 6,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.3903
+        ]
+      }
+    },
+    "time_range": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 2,
+        "n": 6,
+        "rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
+        ]
+      },
+      "objective_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "accepted": {
+        "k": 2,
+        "n": 6,
+        "rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
+        ]
+      }
+    },
+    "tense_past": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 0,
+        "n": 6,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.3903
+        ]
+      },
+      "objective_ok": {
+        "k": 3,
+        "n": 6,
+        "rate": 0.5,
+        "ci95": [
+          0.1876,
+          0.8124
+        ]
+      },
+      "accepted": {
+        "k": 0,
+        "n": 6,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.3903
+        ]
+      }
+    },
+    "irregular_conj": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 2,
+        "n": 6,
+        "rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
+        ]
+      },
+      "objective_ok": {
+        "k": 2,
+        "n": 6,
+        "rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
+        ]
+      },
+      "accepted": {
+        "k": 0,
+        "n": 6,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.3903
+        ]
+      }
+    },
+    "adj_relativizer": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 1,
+        "n": 6,
+        "rate": 0.16666666666666666,
+        "ci95": [
+          0.0301,
+          0.5635
+        ]
+      },
+      "objective_ok": {
+        "k": 1,
+        "n": 6,
+        "rate": 0.16666666666666666,
+        "ci95": [
+          0.0301,
+          0.5635
+        ]
+      },
+      "accepted": {
+        "k": 1,
+        "n": 6,
+        "rate": 0.16666666666666666,
+        "ci95": [
+          0.0301,
+          0.5635
+        ]
+      }
+    },
+    "subj_topic": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 2,
+        "n": 6,
+        "rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
+        ]
+      },
+      "objective_ok": {
+        "k": 0,
+        "n": 6,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.3903
+        ]
+      },
+      "accepted": {
+        "k": 0,
+        "n": 6,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.3903
+        ]
+      }
+    },
+    "verb_choice": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 2,
+        "n": 6,
+        "rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
+        ]
+      },
+      "objective_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "accepted": {
+        "k": 2,
+        "n": 6,
+        "rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
+        ]
+      }
+    },
+    "noun_counter": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 3,
+        "n": 6,
+        "rate": 0.5,
+        "ci95": [
+          0.1876,
+          0.8124
+        ]
+      },
+      "objective_ok": {
+        "k": 2,
+        "n": 6,
+        "rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
+        ]
+      },
+      "accepted": {
+        "k": 1,
+        "n": 6,
+        "rate": 0.16666666666666666,
+        "ci95": [
+          0.0301,
+          0.5635
+        ]
+      }
+    },
+    "mod_adverb": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 3,
+        "n": 6,
+        "rate": 0.5,
+        "ci95": [
+          0.1876,
+          0.8124
+        ]
+      },
+      "objective_ok": {
+        "k": 2,
+        "n": 6,
+        "rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
+        ]
+      },
+      "accepted": {
+        "k": 1,
+        "n": 6,
+        "rate": 0.16666666666666666,
+        "ci95": [
+          0.0301,
+          0.5635
+        ]
+      }
+    }
+  },
+  "accepted": {
+    "k": 13,
+    "n": 66,
+    "rate": 0.19696969696969696,
+    "ci95": [
+      0.1189,
+      0.3084
+    ]
+  },
+  "embeddings": {
+    "distractors": 178,
+    "nearest_neighbour_same_mistake": {
+      "k": 15,
+      "n": 42,
+      "rate": 0.35714285714285715,
+      "ci95": [
+        0.2299,
+        0.5083
+      ]
+    },
+    "mean_cos_same": 0.9002947058788565,
+    "mean_cos_different": 0.8860342443632565
+  },
+  "items": [
+    {
+      "objective": "particle_loc",
+      "topic": "E-motor and power electronics: torque, alignment, electrical, and functional tests.",
+      "stem": "전기 모터의 토크 테스트는 주로 공장의 ___ 에서 이루어집니다.",
+      "answer": "에서",
+      "distractors": [
+        {
+          "text": "에",
+          "mistake": "Learners incorrectly used '에' to indicate the location of the action, confusing it with the marker for destination or existence."
+        },
+        {
+          "text": "으로",
+          "mistake": "Learners chose '으로' thinking it correctly conveys the place where the action occurs, but '으로' typically indicates movement into something rather than the place."
+        },
+        {
+          "text": "동안",
+          "mistake": "Learners opted for '동안' (during), mistaking it for indicating a timeframe instead of the location where the action takes place."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "particle_loc",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "particle_loc",
+      "topic": "Production planning, takt time, cycle time, throughput, OEE, scrap, and rework.",
+      "stem": "전기 자동차 부품의 조립 과정은 주로 공장의 ___ 에서 진행되며, 여기서 효율적인 생산 계획이 이루어집니다.",
+      "answer": "에서",
+      "distractors": [
+        {
+          "text": "에",
+          "mistake": "혼동하여 도착지나 존재 위치를 표현하는 데 '에'를 사용했습니다."
+        },
+        {
+          "text": "으로",
+          "mistake": "방향이나 수단을 나타내는 '으로'를 잘못 사용했습니다."
+        },
+        {
+          "text": "와",
+          "mistake": "연결어 '와'를 잘못 사용하여 문장 구조를 틀렸습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "particle_loc",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "particle_loc",
+      "topic": "SQL and Python for manufacturing data analysis.",
+      "stem": "데이터 분석 팀은 주로 공장의 ___ 에서 작업을 수행합니다.",
+      "answer": "에서",
+      "distractors": [
+        {
+          "text": "에",
+          "mistake": "Learners incorrectly used '에' to indicate the location of action, confusing it with '에' which typically marks destinations or existence."
+        },
+        {
+          "text": "으로",
+          "mistake": "Learners chose '으로' thinking it indicated movement towards a location rather than marking the place of action."
+        },
+        {
+          "text": "마다",
+          "mistake": "Learners selected '마다' believing it meant 'each time' instead of correctly identifying the location particle '에서'."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "particle_loc",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "particle_loc",
+      "topic": "Production orders, work orders, recipes, and electronic work instructions.",
+      "stem": "생산 레시피는 주로 공장의 ___ 에 저장되고 관리되며, 여기서 생산 작업이 지시대로 진행된다.",
+      "answer": "안에",
+      "distractors": [
+        {
+          "text": "위에",
+          "mistake": "Learners might incorrectly use '위에' (above) suggesting a misplaced emphasis on vertical positioning rather than indicating where something is stored or managed."
+        },
+        {
+          "text": "주변에",
+          "mistake": "Learners could mistakenly use '주변에' (around) implying the recipes are managed in the vicinity rather than specifying the exact location within the factory."
+        },
+        {
+          "text": "밖에",
+          "mistake": "Learners may incorrectly use '밖에' (outside) suggesting an external location instead of the internal storage area required by the learning objective."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "particle_loc",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "particle_loc",
+      "topic": "Predictive maintenance using sensor data.",
+      "stem": "센서 데이터를 분석하여 장비의 고장 예측을 하는 작업은 주로 공장의 ___ 에서 이루어집니다.",
+      "answer": "에서",
+      "distractors": [
+        {
+          "text": "에",
+          "mistake": "Learners incorrectly placed '에' instead of '에서', mistaking the location particle for marking existence rather than action place."
+        },
+        {
+          "text": "으로",
+          "mistake": "Learners used '으로' which typically indicates direction or purpose, confusing it with the location particle '에서'."
+        },
+        {
+          "text": "쪽",
+          "mistake": "Learners chose '쪽' which means 'side' or 'part', incorrectly applying it as a location particle instead of '에서'."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "particle_loc",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "particle_loc",
+      "topic": "Sensors, actuators, motors, drives, and machine safety.",
+      "stem": "자동화 시스템의 센서 모니터링은 주로 공장의 ___ 에서 이루어집니다.",
+      "answer": "에서",
+      "distractors": [
+        {
+          "text": "에",
+          "mistake": "혼동하여 '에'를 사용하여 모니터링의 위치를 잘못 표현했습니다."
+        },
+        {
+          "text": "으로",
+          "mistake": "방향이나 수단을 나타내는 '으로'를 사용하여 문장의 의미를 왜곡했습니다."
+        },
+        {
+          "text": "동안",
+          "mistake": "동작의 지속 시간을 나타내는 '동안'을 사용하여 위치 표시의 학습 목표를 놓쳤습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "particle_loc",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "particle_obj",
+      "topic": "Model evaluation, false positives, false negatives, and drift.",
+      "stem": "인공지능 모델을 평가할 때, 거짓 양성과 거짓 음성을 감지하고 모델의 성능 변화인 드리프트를 확인하는 것이 ___",
+      "answer": "을",
+      "distractors": [
+        {
+          "text": "를",
+          "mistake": "Learners mistakenly used '를' after a vowel, ignoring the rule for final consonants."
+        },
+        {
+          "text": "을",
+          "mistake": "Learners incorrectly placed '을' after a consonant without distinguishing between the correct usage based on the final consonant rule."
+        },
+        {
+          "text": "를도",
+          "mistake": "Learners incorrectly combined '를' with an additional particle, confusing the correct particle usage."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": false,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "particle_obj",
+      "topic": "OT (Operational Technology) versus IT (Information Technology).",
+      "stem": "스마트 팩토리에서 운영 기술을 활용할 때, 센서의 데이터를 분석하는 데 필요한 소프트웨어도 중요합니다. 이는___으로 처리될 수 있습니다.",
+      "answer": "을",
+      "distractors": [
+        {
+          "text": "를",
+          "mistake": "Learners incorrectly used '를' after a vowel, forgetting the rule for particle usage after consonants."
+        },
+        {
+          "text": "에",
+          "mistake": "Learners confused the object marker '에' with '을/를', not understanding the distinction between location markers and object markers."
+        },
+        {
+          "text": "과",
+          "mistake": "Learners mistakenly used '과' (meaning 'and') instead of the correct object marker, showing a misunderstanding of grammatical function."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "particle_obj",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "particle_obj",
+      "topic": "Quality management and end-of-line testing: root cause analysis and corrective actions.",
+      "stem": "품질 문제가 발생했을 때, 원인을 찾아내는 과정에서 어떤 분석 방법을 사용할지 결정하는 것은 중요합니다. 이___는 정확한 문제 해결을 위해 필수적입니다.",
+      "answer": "방법을",
+      "distractors": [
+        {
+          "text": "방법을을",
+          "mistake": "Learners incorrectly added an extra '을' after '방법', violating the particle rule."
+        },
+        {
+          "text": "방법를",
+          "mistake": "Learners incorrectly used '를' after '방법', even though '방법' ends with a consonant, not a vowel."
+        },
+        {
+          "text": "방법을을을",
+          "mistake": "Learners made a double error by adding '을' twice, misunderstanding both the placement and the necessity of the object particle."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "particle_obj",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "particle_obj",
+      "topic": "Dashboards using Grafana or Power BI.",
+      "stem": "데이터 분석을 통해 공장의 효율성을 개선할 때, 대시보드 도구인 그래피아나 파워비를 사용하여 결과를 시각화하___는 것이 중요합니다.",
+      "answer": "을",
+      "distractors": [
+        {
+          "text": "를",
+          "mistake": "Learners often confuse the usage rule, placing '를' even after consonants instead of correctly applying '을' after vowels or '를' after final consonants."
+        },
+        {
+          "text": "을",
+          "mistake": "While technically correct for vowels, learners sometimes incorrectly apply '을' universally instead of understanding the distinction based on initial vowels or '"
+        },
+        {
+          "text": "는",
+          "mistake": "Learners might mistakenly use '는' which indicates a topic sentence rather than the correct object particle for direct objects in transitive verbs."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": false,
+      "key_ok": false,
+      "predicted_objective": "particle_obj",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "particle_obj",
+      "topic": "IIoT gateways, edge computing, and industrial data pipelines.",
+      "stem": "스마트 팩토리에서 엣지 컴퓨팅을 통해 수집된 데이터는 을 통해 중앙 서버로 전송되고, 이 과정에서 데이터의질___이 보장되어야 합니다.",
+      "answer": "을",
+      "distractors": [
+        {
+          "text": "를",
+          "mistake": "Learners often confuse the particle '를' with '을' when the preceding verb ends in a consonant, even though the rule specifies '을' after a vowel."
+        },
+        {
+          "text": "을보",
+          "mistake": "This incorrect form combines '을' with another particle incorrectly, leading learners to mistakenly add particles unnecessarily."
+        },
+        {
+          "text": "로",
+          "mistake": "Learners may incorrectly use '로' instead of '을', mistaking it for a different grammatical function related to direction or purpose rather than serving as the ob"
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "particle_obj",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "particle_obj",
+      "topic": "Model evaluation, false positives, false negatives, and drift.",
+      "stem": "인공지능 모델을 평가할 때, 거짓 양성과 거짓 음성을 확인하고 모델의 성능 변화를 살펴봐야 하는데, 이때 을___ 사용합니다.",
+      "answer": "을",
+      "distractors": [
+        {
+          "text": "를",
+          "mistake": "Learners mistakenly use '를' instead of '을', often confusing the particle usage rule when the preceding verb ends in a consonant."
+        },
+        {
+          "text": "을들",
+          "mistake": "Learners incorrectly add an extra '들' suffix, thinking it's necessary for plural context, which is not applicable here."
+        },
+        {
+          "text": "를들",
+          "mistake": "Another common mistake is using '를들', confusing it with a plural form marker which doesn't exist in this context."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "mod_adverb",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "honorific",
+      "topic": "Computer vision for defect detection.",
+      "stem": "공장장님께서 컴퓨터 비전 기술을 이용해 제품의 결함을 찾아내시는 방법을 설명해 주셨습니다.  어떻게 하셨는지___",
+      "answer": "설명해주셨습니다",
+      "distractors": [
+        {
+          "text": "찾아냅니다",
+          "mistake": "여기서는 '-으시-' 형태의 존중 표현이 필요하지만, 단순히 동사만 사용하여 존중 표현을 놓쳤습니다."
+        },
+        {
+          "text": "설명해주시겠습니까",
+          "mistake": "존경하는 대상에 대한 '-으시-' 어미를 사용해야 하지만, 질문 형식으로 변형하여 실수했습니다."
+        },
+        {
+          "text": "공장장님께",
+          "mistake": "문장의 동사나 동작 부분에서 '-으시-'를 누락하고, 단순히 주어만 사용하여 학습 목표를 달성하지 못했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "honorific",
+      "topic": "Quality management and end-of-line testing: Statistical Process Control (SPC).",
+      "stem": "품질 관리 담당자께서 전기 자동차의 최종 검사 과정에서 통계적 공정 제어 방법을 설명해 주셨습니다. 어떻게 ___",
+      "answer": "설명해주셨습니다",
+      "distractors": [
+        {
+          "text": "설명해주시겠습니까",
+          "mistake": "여기서는 '-시-'가 동사 뒤에 붙는 것이 아니라 의문문 형태로 사용되어 학습 목표와 맞지 않습니다."
+        },
+        {
+          "text": "설명해주시고",
+          "mistake": "'-고'는 연결 어미로 사용되며, '-시-'를 사용해야 하는 문맥에서는 적절하지 않습니다."
+        },
+        {
+          "text": "설명해주셨다",
+          "mistake": "'-시-' 대신 과거 시제 '-었-'을 사용하여 존경의 표현이 누락되었습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "honorific",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "honorific",
+      "topic": "EV architecture: battery, electric motor, inverter, power electronics, thermal management, and vehicle control systems.",
+      "stem": "전기 자동차 제조 공정에서 배터리 전문가 선생님께서 배터리 관리의 중요성을 설명해 주셨습니다. 어떻게 설명해___",
+      "answer": "설명해주셨습니다",
+      "distractors": [
+        {
+          "text": "설명하셨습니다",
+          "mistake": "여기서는 '-시-' 어미가 필요하지 않아 잘못 사용했습니다."
+        },
+        {
+          "text": "설명해주시고",
+          "mistake": "문장 끝에 '-고'를 붙여 문장 구조를 잘못 이해했습니다."
+        },
+        {
+          "text": "설명해주시어요",
+          "mistake": "존댓말 '-세요'를 사용해야 하는 상황에서 '-어요'를 붙여 부적절하게 사용했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "tense_past",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "honorific",
+      "topic": "Virtual commissioning and layout planning.",
+      "stem": "디지털 트윈 기술을 활용해 스마트 팩토리의 가상 시뮬레이션을 진행하시는 방법에 대해 설명해 주셨습니다. 이는___",
+      "answer": "으시면서",
+      "distractors": [
+        {
+          "text": "으셨습니다",
+          "mistake": "이 표현은 일반적인 동사 뒤에 사용되며, '-으시면서' 형태는 문맥상 맞지 않아 존경의 표현이 부족합니다."
+        },
+        {
+          "text": "시면서",
+          "mistake": "형식이 잘못되었으며, '-시면서'는 주로 동사 뒤에 붙지만, '-으시면서'와 같은 존경의 표현으로는 적합하지 않습니다."
+        },
+        {
+          "text": "설명해주셨습니다",
+          "mistake": "존경의 표현 '-으시면서'가 누락되어 있어, 문맥에서 요구되는 존댓말과 존경의 표현이 부족합니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "honorific",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "honorific",
+      "topic": "Computer vision for defect detection.",
+      "stem": "고객님께서 컴퓨터 비전을 활용해 제조 공정에서 발생하는 결함을 감지하시는 방법을 자세히 설명해 주셨습니다.___",
+      "answer": "설명해주셨습니다",
+      "distractors": [
+        {
+          "text": "설명해주시는",
+          "mistake": "여기서는 '-시-' 대신 '-는다'를 사용하여 존경어의 올바른 활용법을 놓쳤습니다."
+        },
+        {
+          "text": "설명해주셨다",
+          "mistake": "문장의 끝 부분에서 종결 어미를 잘못 사용하여 존경어 표현이 정확하지 않았습니다."
+        },
+        {
+          "text": "알려주셨습니다",
+          "mistake": "이 경우, '-으시-'를 사용해야 하는 상황에서 다른 표현을 사용하여 존경어의 사용을 잘못 이해했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "tense_past",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "honorific",
+      "topic": "Interlocks, alarms, emergency stops, and safety systems.",
+      "stem": "자동화 시스템 관리자께서 안전 인터록과 긴급 정지 시스템의 중요성을 강조하시면서, 어떻게 안전을 최우선으로하___",
+      "answer": "하시면서",
+      "distractors": [
+        {
+          "text": "하시면서",
+          "mistake": "여기서는 '-시-'가 필요하지 않은 상황에서 사용하여 오류를 범함 (예: '관리자께서 안전을 강조하시면서 중요한 점을 말씀하셨습니다.')"
+        },
+        {
+          "text": "관리하시면서",
+          "mistake": "동사 뒤에 '-시-'를 붙이지 않고 '-시-'를 명사에 붙이는 오류 (예: '시스템 관리자께서 안전 인터록을 관리하시면서 설명하셨습니다.')"
+        },
+        {
+          "text": "설명하시면서",
+          "mistake": "동사 '-하시면서'를 사용해야 하는데 명사 '-하시면서'를 사용하여 오류를 범함 (예: '시스템 관리자께서 안전한 방법을 설명하시면서 강조하셨습니다.')"
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": false,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "time_range",
+      "topic": "Digital twin concepts and real-time synchronization.",
+      "stem": "디지털 트윈이 구축된 이후부터 실시간 동기화가 완료될 때까지의 시간은 대략 얼마나 걸릴까요?  ___",
+      "answer": "까지",
+      "distractors": [
+        {
+          "text": "부터",
+          "mistake": "Learners mistakenly used '부터' to indicate the end of the time span instead of '까지', confusing the marking of the duration's beginning and end."
+        },
+        {
+          "text": "까지",
+          "mistake": "While correct in this context, learners might choose this distractors multiple times due to familiarity, missing a nuanced understanding of temporal markers in "
+        },
+        {
+          "text": "동안",
+          "mistake": "Learners incorrectly used '동안' (during), implying a continuous action rather than marking a specific start and end time span."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": false,
+      "key_ok": false,
+      "predicted_objective": "time_range",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "time_range",
+      "topic": "Predictive maintenance using sensor data.",
+      "stem": "센서 데이터 수집부터 예측 유지보수 시스템 구현까지의 기간은 얼마나 될까요? ___",
+      "answer": "부터까지",
+      "distractors": [
+        {
+          "text": "부터만",
+          "mistake": "Learners might have forgotten to include '까지' at the end, indicating they only marked the start of the time span."
+        },
+        {
+          "text": "까지만",
+          "mistake": "Learners might have focused only on the end marker '까지', missing the crucial '부터' at the beginning."
+        },
+        {
+          "text": "부터이후까지",
+          "mistake": "Learners may have incorrectly added '이후' (meaning 'after') instead of '까지' (meaning 'until'), confusing temporal markers."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "time_range",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "time_range",
+      "topic": "Battery manufacturing and pack assembly: weld quality monitoring and inspection.",
+      "stem": "배터리 셀 용접 품질 모니터링이 시작된 부터 최종 검사가 완료된 까지의 시간은 얼마나 될까요?  ___",
+      "answer": "부터까지",
+      "distractors": [
+        {
+          "text": "부터이후까지",
+          "mistake": "학습자가 '이후까지'를 사용하여 '부터'와 '까지' 사이의 구분을 놓쳤습니다."
+        },
+        {
+          "text": "시작부터종료까지",
+          "mistake": "학습자가 더 일반적인 표현을 사용하여 '부터'와 '까지'의 구체적인 시간적 맥락을 놓쳤습니다."
+        },
+        {
+          "text": "시작때부터끝날때까지",
+          "mistake": "학습자가 시간 표현을 구어체로 잘못 사용하여 공식적인 표현법을 준수하지 못했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "time_range",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "time_range",
+      "topic": "EV architecture: battery, electric motor, inverter, power electronics, thermal management, and vehicle control systems.",
+      "stem": "전기 자동차 제작 과정에서 배터리 조립이 시작된 부터 최종 품질 검사가 완료될 때까지 걸리는 시간은 얼마나릅___니까?",
+      "answer": "부터",
+      "distractors": [
+        {
+          "text": "까지",
+          "mistake": "학습자가 '부터'와 함께 '까지'를 사용하여 시간 범위의 시작과 끝을 혼동했습니다."
+        },
+        {
+          "text": "부터만",
+          "mistake": "학습자가 시간 범위의 시작만을 표시하는 '부터만'을 사용하여 끝 부분을 빠뜨렸습니다."
+        },
+        {
+          "text": "까지만",
+          "mistake": "학습자가 시간 범위의 끝만을 표시하는 '까지만'을 사용하여 시작 부분을 누락시켰습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "time_range",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "time_range",
+      "topic": "Computer vision for defect detection.",
+      "stem": "컴퓨터 비전 기술이 결함 탐지를 시작한 부터 완료될 때까지의 시간은 얼마나 될까요?  ___",
+      "answer": "까지",
+      "distractors": [
+        {
+          "text": "부터",
+          "mistake": "학습자가 '까지'를 사용해야 하는 부분에서 '부터'를 잘못 선택하여 시작과 끝을 혼동했습니다."
+        },
+        {
+          "text": "시작부터",
+          "mistake": "'까지' 부분을 누락하여 문장의 끝 표시를 제대로 하지 못했습니다."
+        },
+        {
+          "text": "까지까지",
+          "mistake": "중복 오류로, '부터'와 '까지'를 중복 사용하여 문법적으로 잘못된 표현을 만들었습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "time_range",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "time_range",
+      "topic": "Production orders, work orders, recipes, and electronic work instructions.",
+      "stem": "생산 레시피를 작성한 부터 전자 작업 지침이 완료될 때까지의 시간은 얼마나 될까요? ___",
+      "answer": "부터까지",
+      "distractors": [
+        {
+          "text": "부터만",
+          "mistake": "학습자가 '까지' 부분을 빠뜨려 시간의 전체 범위를 표현하지 못했습니다."
+        },
+        {
+          "text": "까지부터",
+          "mistake": "문장의 시작과 끝의 순서를 잘못 이해하여 시간 순서를 혼동했습니다."
+        },
+        {
+          "text": "부터",
+          "mistake": "문장의 끝 부분을 생략하여 완전한 시간 범위를 나타내지 못했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "time_range",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "tense_past",
+      "topic": "Digital twin concepts and real-time synchronization.",
+      "stem": "디지털 트윈 기술을 통해 생산 과정을 최적화하는 방법을 배웠어요. 공장의 상태가 실시간으로 동기화되었어요.는___",
+      "answer": "동기화되었어요었어요",
+      "distractors": [
+        {
+          "text": "동기화되었어요",
+          "mistake": "과거 시제 '-았/었-'를 사용하지 않고 현재 시제로 표현했습니다."
+        },
+        {
+          "text": "동기화되었어요습니다",
+          "mistake": "존댓말 '-어요' 대신 '-습니다'를 사용하여 문법적으로 맞지 않게 표현했습니다."
+        },
+        {
+          "text": "동기화되었어요요",
+          "mistake": "불필요한 '-요'를 추가하여 문법적 오류를 범했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "subj_topic",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "tense_past",
+      "topic": "Quality management and end-of-line testing: Statistical Process Control (SPC).",
+      "stem": "품질 관리 과정에서 과거의 품질 검사 사례를 통해 배웠어요. 마지막 단계에서의 품질 테스트가 완료되었어요.는___",
+      "answer": "완료되었습니다요",
+      "distractors": [
+        {
+          "text": "완료되었어요",
+          "mistake": "과거 시제의 '-았/었-'를 사용하지 않고 '-어요'를 붙여 잘못 표현했습니다."
+        },
+        {
+          "text": "완료되었습니다",
+          "mistake": "너무 격식적인 표현을 사용하여 학습 목표인 '-어요' 스타일에 맞지 않았습니다."
+        },
+        {
+          "text": "검사되었어요",
+          "mistake": "'-았/었-'를 사용하지 않고 동사 뒤에 '-어졌어요'를 붙여 과거 시제를 잘못 표현했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "tense_past",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "tense_past",
+      "topic": "Quality management and end-of-line testing: Failure Mode and Effects Analysis (FMEA).",
+      "stem": "전기 자동차 제조 과정에서 마지막 품질 검사를 완료했어요. 이 과정은 제품의 안전성과 성능을 확인하는 데중요___했어요.",
+      "answer": "완료했어요었어요",
+      "distractors": [
+        {
+          "text": "완료했어요",
+          "mistake": "과거 시제에서 '-았/었-'을 사용하지 않아 잘못된 표현을 사용했습니다."
+        },
+        {
+          "text": "완료되었어요었다",
+          "mistake": "불필요한 중복 어미 사용으로 문법적으로 잘못되었습니다."
+        },
+        {
+          "text": "완료했습니다어요",
+          "mistake": "존댓말 '-어요'를 부적절하게 사용하여 시제 표현이 틀렸습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "tense_past",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "tense_past",
+      "topic": "Time-series data and machine telemetry.",
+      "stem": "생산 라인에서 수집된 시간 시계열 데이터를 분석하여 기계의 작동 상태를 확인했어요. 이 과정은 장비의 효율성___을 향상시키는 데 중요했어요.",
+      "answer": "향상시켰어요",
+      "distractors": [
+        {
+          "text": "유지했어요",
+          "mistake": "Learners might have used the past tense incorrectly, maintaining the state rather than focusing on improvement."
+        },
+        {
+          "text": "변경했어요",
+          "mistake": "Learners might have incorrectly used a verb indicating change rather than the intended enhancement."
+        },
+        {
+          "text": "기록했어요",
+          "mistake": "Learners could have mistakenly used a verb related to noting down data instead of focusing on the enhancement aspect."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "tense_past",
+      "topic": "Production orders, work orders, recipes, and electronic work instructions.",
+      "stem": "스마트 팩토리에서 작업 지시서를 작성하고 완료한 경험에 대해 이야기했어요. 작업 지시서는 정확하게 작성되어,___",
+      "answer": "작성되었어요었어요",
+      "distractors": [
+        {
+          "text": "작성되었습니다었어요",
+          "mistake": "과거 시제와 존댓말 '-어요'의 조합에서 '-습니다'가 잘못 사용되었습니다."
+        },
+        {
+          "text": "작성되었어요",
+          "mistake": "문장의 종결어미에서 '-었어요'만 사용하여 종결어미의 완전한 형태를 빠뜨렸습니다."
+        },
+        {
+          "text": "완성되었어요었어요",
+          "mistake": "부정확한 종결어미 사용으로, 원래 의도한 의미와 약간 벗어난 표현을 사용했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "tense_past",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "tense_past",
+      "topic": "ISA-95 and the manufacturing hierarchy.",
+      "stem": "스마트 팩토리에서 제조 계층 구조를 이해하는 데 중요한 역할을 했던 과거의 교육 세션이 완료되었어요.는 ___",
+      "answer": "완료되었어요었어요",
+      "distractors": [
+        {
+          "text": "완료되었어요",
+          "mistake": "과거 시제의 '-았/었-'를 사용하지 않고 단순히 '-어요'를 사용했습니다."
+        },
+        {
+          "text": "학습되었어요었어요",
+          "mistake": "불필요한 추가어미 '-었어요'를 붙여 문법적으로 정확하지 않은 형태를 사용했습니다."
+        },
+        {
+          "text": "진행되었어요었어요",
+          "mistake": "상황에 맞지 않는 동사 '진행되다'를 사용하여 시제와 맥락이 맞지 않았습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "subj_topic",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "irregular_conj",
+      "topic": "Battery manufacturing and pack assembly: weld quality monitoring and inspection.",
+      "stem": "배터리 팩 조립 과정에서 용접 품질을 모니터링할 때, 정밀한 검사가 필요합니다. 이 과정에서 용접 부위의 르___ 형태를 주의 깊게 살펴봐야 합니다.",
+      "answer": "르체니즈마이너트",
+      "distractors": [
+        {
+          "text": "르바인딩",
+          "mistake": "Learners might confuse '체니즈마이너트' (a made-up term for demonstration purposes) with '바인딩' (binding), incorrectly ending with 'ᄂ' instead of matching the irregular"
+        },
+        {
+          "text": "르디지스트",
+          "mistake": "Learners could mistake '디지스트' (digest) for a similar-looking adjective stem ending with 'ист' (ист), confusing the irregular verb form."
+        },
+        {
+          "text": "르센서",
+          "mistake": "Learners may incorrectly use '센서' (sensor) as a distractor, thinking it fits due to ending with 'ᄉ' but failing to apply the correct irregular verb stem ending."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "irregular_conj",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "irregular_conj",
+      "topic": "Model evaluation, false positives, false negatives, and drift.",
+      "stem": "스마트 팩토리에서 인공지능을 활용해 제조 모델을 평가할 때, 거짓 양성과 거짓 음성을 줄이기 위해 지속적인 ___ 점검이 필요합니다. 특히 모델의 성능이 시간이 지남에 따라 변화하는 드리프트 현상을 립니다.",
+      "answer": "평가",
+      "distractors": [
+        {
+          "text": "품질",
+          "mistake": "이 경우 '품질'은 모델 평가와 직접적으로 관련이 없으며, 주로 제품의 상태를 나타내는 단어로 오해할 수 있습니다."
+        },
+        {
+          "text": "변화",
+          "mistake": "'변화'는 드리프트 현상을 설명하는 데는 맞지만, 이 문맥에서는 '점검'이라는 동사와 더 자연스럽게 연결되는 '평가'라는 동사가 필요합니다."
+        },
+        {
+          "text": "적용",
+          "mistake": "'적용'은 주로 새로운 기술이나 방법을 도입하는 맥락에서 사용되므로, 평가와 점검이라는 동사의 맥락에서는 적절하지 않습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "irregular_conj",
+      "topic": "Time-series data and machine telemetry.",
+      "stem": "공장에서 생산 라인의 온도 변화를 추적할 때, 시간에 따른 온도의 변화 패턴을 분석하는 것은 매우 중요합니다___. 이 과정에서 온도 데이터의 르변화 형태를 면밀히 관찰해야 합니다.",
+      "answer": "변화르",
+      "distractors": [
+        {
+          "text": "온도르",
+          "mistake": "동사나 형용사의 변화 형태를 적용해야 하는데, 여기서는 '르'의 활용을 잘못 이해하여 동사나 형용사의 일반적인 활용 형태를 사용했습니다."
+        },
+        {
+          "text": "상승르",
+          "mistake": "특정 상황에 맞는 구체적인 변화 형태를 사용해야 하는데, '상승르'는 너무 구체적인 상황을 가정하여 일반적인 표현에 맞지 않습니다."
+        },
+        {
+          "text": "온도르변화르",
+          "mistake": "단어를 지나치게 길게 결합하여 문법적으로 자연스럽지 않은 형태를 만들었습니다. 한국어에서는 형용사 줄기와 어미의 조합이 자연스럽게 이루어져야 합니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "particle_obj",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "irregular_conj",
+      "topic": "Discrete-event simulation of production lines.",
+      "stem": "디지털 트윈을 통해 생산 라인의 효율성을 분석할 때, 이산 사건 시뮬레이션을 통해 발생하는 이벤트의 패턴을 ___ 형태로 분석합니다. 이 과정에서 이벤트의 변화를 면밀히 관찰해야 합니다.",
+      "answer": "변화하는",
+      "distractors": [
+        {
+          "text": "일정한",
+          "mistake": "학습자가 '변화하는'의 의미를 이해하지 못하고, 일정하고 변하지 않는 형태를 선택했습니다."
+        },
+        {
+          "text": "증가하는",
+          "mistake": "학습자가 동사의 변화 형태에 집중하여, 특정 방향성의 변화('증가하는')를 잘못 선택했습니다."
+        },
+        {
+          "text": "고정된",
+          "mistake": "학습자가 변화의 개념을 놓치고, 변하지 않는 상태를 나타내는 형태를 골랐습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "mod_adverb",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "irregular_conj",
+      "topic": "EV architecture: battery, electric motor, inverter, power electronics, thermal management, and vehicle control systems.",
+      "stem": "전기 모터의 효율을 최적화하기 위해, 인버터의 역할이 매우 중요합니다. 특히, 인버터의 성능을 평가할 때, ___ 형태의 데이터 분석이 필요합니다.",
+      "answer": "르변화",
+      "distractors": [
+        {
+          "text": "르개선",
+          "mistake": "Learners might incorrectly use '개선' (improvement) instead of '르변화' (change), misunderstanding the concept of analyzing changes rather than improvements."
+        },
+        {
+          "text": "르적용",
+          "mistake": "Learners might incorrectly use '르적용' (application) instead of '르변화', confusing the need for analyzing changes with practical implementation."
+        },
+        {
+          "text": "르비교",
+          "mistake": "Learners might incorrectly use '르비교' (comparison) instead of '르변화', focusing on comparing different data points rather than observing changes over time."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "irregular_conj",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "irregular_conj",
+      "topic": "Quality management and end-of-line testing: functional validation and electronic test records.",
+      "stem": "전기 자동차의 최종 검사 단계에서, 각 부품의 기능적 적합성을 확인할 때, 세밀한 테스트 기록은 필수적입니다___. 특히, 전자 부품의 성능을 평가할 때는 정확한 립니다 형태의 검증이 요구되며, 이 과정에서 발생하는 모든",
+      "answer": "기록",
+      "distractors": [
+        {
+          "text": "조립",
+          "mistake": "This answer uses '조립' (assembly) instead of focusing on the irregular verb or adjective stem required before a vowel ending, leading to a misunderstanding of '림"
+        },
+        {
+          "text": "점검",
+          "mistake": "'점검' (inspection) was chosen instead of adhering to the irregular verb/adjective stem rule, confusing the grammatical structure required."
+        },
+        {
+          "text": "변화",
+          "mistake": "'변화' (change) was selected, which doesn't follow the specific irregular verb or adjective stem pattern needed before a vowel ending, causing a grammatical error"
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "adj_relativizer",
+      "topic": "Human review and safe integration into production decisions.",
+      "stem": "인공지능 시스템은 안전하게 생산 결정에 통합되어야 하며, 이 과정에서 인간의 검토는 필수적입니다. 이 시스템___은 신뢰할 수 있어야 합니다.",
+      "answer": "신뢰할",
+      "distractors": [
+        {
+          "text": "빠르게",
+          "mistake": "The learner chose an adjective meaning 'quickly' instead of focusing on the reliability needed for AI integration."
+        },
+        {
+          "text": "안전하게",
+          "mistake": "The learner mistakenly used 'safely' instead of choosing an adjective that specifically modifies '시스템' (system) in terms of trustworthiness."
+        },
+        {
+          "text": "효율적으로",
+          "mistake": "The learner opted for 'efficiently', misunderstanding the requirement for an adjective that emphasizes reliability ('신뢰할') rather than operational efficiency."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "irregular_conj",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "adj_relativizer",
+      "topic": "Battery manufacturing and pack assembly: Battery Management System (BMS) testing.",
+      "stem": "배터리 관리 시스템 테스트는 정확하고 안전해야 합니다. 이 시스템 ___은 매우 신뢰할 수 있어야 합니다.",
+      "answer": "매우",
+      "distractors": [
+        {
+          "text": "약간",
+          "mistake": "Learners might choose '약간' (slightly) instead of '매우' (very), indicating a misunderstanding of intensifying adjectives to convey high reliability."
+        },
+        {
+          "text": "항상",
+          "mistake": "Learners might opt for '항상' (always), confusing adverbs with adjectives, suggesting they didn't grasp the use of '-(으)ᄂ' form correctly."
+        },
+        {
+          "text": "조금",
+          "mistake": "Choosing '조금' (a little) instead of '매우', learners might be applying a milder degree modifier rather than understanding the need for a stronger adjective to fit"
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "adj_relativizer",
+      "topic": "Anomaly detection for machine behavior.",
+      "stem": "스마트 팩토리에서 기계의 이상 행동을 감지하는 데 사용되는 인공지능 시스템은 항상 ___해야 합니다.",
+      "answer": "신뢰할",
+      "distractors": [
+        {
+          "text": "빠르게",
+          "mistake": "Learners might choose '빠르게' (quickly) instead of focusing on the reliability aspect required by the learning objective."
+        },
+        {
+          "text": "안전하게",
+          "mistake": "Learners might opt for '안전하게' (safely) instead of emphasizing the reliability ('신뢰할') needed for AI systems in manufacturing."
+        },
+        {
+          "text": "정확하게",
+          "mistake": "Learners could mistakenly choose '정확하게' (accurately) instead of selecting '신뢰할' (reliable), missing the focus on trustworthiness in AI systems."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "adj_relativizer",
+      "topic": "OEE analysis, downtime Pareto charts, and production trend analysis.",
+      "stem": "스마트 팩토리에서 데이터 분석을 통해 효율성을 높이는 시스템은 ___해야 합니다.",
+      "answer": "안정적인",
+      "distractors": [
+        {
+          "text": "빠르게",
+          "mistake": "The learner chose an adjective that emphasizes speed rather than reliability, focusing on efficiency through quick processing instead of system trustworthiness."
+        },
+        {
+          "text": "저렴한",
+          "mistake": "The learner selected an adjective related to cost rather than reliability, confusing economic factors with the necessary dependability of the system."
+        },
+        {
+          "text": "혁신적인",
+          "mistake": "The learner opted for an adjective highlighting innovation instead of reliability, potentially misunderstanding that modern technology doesn't automatically equ"
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "mod_adverb",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "adj_relativizer",
+      "topic": "Production planning, takt time, cycle time, throughput, OEE, scrap, and rework.",
+      "stem": "전기 자동차 생산 라인에서 효율적인 작업 흐름을 유지하기 위해, 각 공정의 사이클 타임은 ___여야 합니다.",
+      "answer": "적절한",
+      "distractors": [
+        {
+          "text": "빠른",
+          "mistake": "Learners might choose '빠른' (fast) instead of focusing on the appropriateness needed for efficiency and smoothness in production cycles, missing the nuance of '적"
+        },
+        {
+          "text": "높은",
+          "mistake": "Learners could opt for '높은' (high), implying superiority without considering the contextual appropriateness needed for operational efficiency."
+        },
+        {
+          "text": "안전한",
+          "mistake": "Learners might select '안전한' (safe), confusing the requirement for operational efficiency with safety measures, demonstrating a misunderstanding of the context."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "adj_relativizer",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "adj_relativizer",
+      "topic": "Dashboards using Grafana or Power BI.",
+      "stem": "데이터 분석을 통해 스마트 팩토리의 운영 효율성을 높이는 대시보드는 ___ 사용되어야 합니다.",
+      "answer": "효과적인",
+      "distractors": [
+        {
+          "text": "빠르게",
+          "mistake": "Learners might choose '빠르게' (quickly) instead of focusing on effectiveness, confusing efficiency with speed."
+        },
+        {
+          "text": "안전하게",
+          "mistake": "Learners might opt for '안전하게' (safely) instead of the required effectiveness, misunderstanding the context of dashboard functionality."
+        },
+        {
+          "text": "간편하게",
+          "mistake": "Learners could select '간편하게' (conveniently) instead of '효과적인', focusing on user convenience rather than the core requirement of effectiveness."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "mod_adverb",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "subj_topic",
+      "topic": "Battery manufacturing and pack assembly: Battery Management System (BMS) testing.",
+      "stem": "배터리 관리 시스템의 테스트 과정에서 중요한 역할을 하는 기능은 무엇인가요? 이 기능은 배터리의 성능을 유지___",
+      "answer": "을",
+      "distractors": [
+        {
+          "text": "는",
+          "mistake": "이 경우 '을' 대신 '는'을 사용하여 주제를 강조하려고 했지만, 문장의 구조상 목적어를 강조하는 '을'이 적절합니다."
+        },
+        {
+          "text": "가",
+          "mistake": "'가'를 사용하여 잘못된 주제 강조를 시도했습니다. 그러나 '가'는 주로 주제를 나타낼 때 사용되며, 이 문맥에서는 목적어를 지칭하는 '을'이 맞습니다."
+        },
+        {
+          "text": "이",
+          "mistake": "'이'를 사용하여 문장의 주어나 보조동사를 강조하려고 했지만, 이는 문장의 목적어를 지칭하는 데 적합하지 않은 선택입니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "particle_obj",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "subj_topic",
+      "topic": "Production planning, takt time, cycle time, throughput, OEE, scrap, and rework.",
+      "stem": "전기 자동차 제조 과정에서 생산 계획을 세울 때, 주요 요소 중 하나는 사이클 타임으로, 이는 한 대의 차량___",
+      "answer": "이에요",
+      "distractors": [
+        {
+          "text": "은요",
+          "mistake": "혼동하여 주제를 나타내는 '은/는'을 사용하여 주어와 서술어의 관계를 잘못 파악했습니다."
+        },
+        {
+          "text": "이에요",
+          "mistake": "주어를 설명하는 데 주로 사용되는 '이/가'를 주제를 강조하는 '은/는'으로 잘못 적용했습니다."
+        },
+        {
+          "text": "것이에요",
+          "mistake": "문장의 주어를 설명하는 데 필요한 추가적인 표현을 추가하여 기본적인 문법 구조를 혼동했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": false,
+      "key_ok": false,
+      "predicted_objective": "mod_adverb",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "subj_topic",
+      "topic": "Discrete-event simulation of production lines.",
+      "stem": "디지털 트윈을 통해 생산 라인의 효율을 개선하는 방법 중 하나는 이산 이벤트 시뮬레이션을 사용하는 것입니다.___",
+      "answer": "을",
+      "distractors": [
+        {
+          "text": "를",
+          "mistake": "This answer incorrectly uses '를' instead of '을', which typically marks the direct object but doesn't fit grammatically here as '을' is needed to indicate the '방법"
+        },
+        {
+          "text": "에",
+          "mistake": "This answer incorrectly uses '에' which usually indicates location or destination, not fitting the context of describing what improves efficiency."
+        },
+        {
+          "text": "과",
+          "mistake": "This answer incorrectly uses '과' which typically connects items in a list or conjunctions, not suitable for marking the topic particle in this context."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "particle_obj",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "subj_topic",
+      "topic": "Battery manufacturing and pack assembly: weld quality monitoring and inspection.",
+      "stem": "배터리 팩 조립 과정에서 용접 품질을 모니터링하고 검사하는 방법은 무엇인가요? 이 방법은 제품의 품질을 보장___, 특히 안전성을 확보하는데 중요한 역할을 합니다.",
+      "answer": "을",
+      "distractors": [
+        {
+          "text": "을",
+          "mistake": "이 경우, '을'은 주로 목적어나 목적격 조사로 사용되며, 문장의 맥락에서는 '이/가'가 더 적합한 연결 조사입니다."
+        },
+        {
+          "text": "는",
+          "mistake": "이 경우 '는'은 주제를 강조할 때 주로 사용되며, 이 문장에서는 용접 품질 모니터링 방법이 주제보다는 설명의 일부로 사용되어 '이/가'가 더 적절합니다."
+        },
+        {
+          "text": "에",
+          "mistake": "이 경우 '에'는 주로 장소나 상황을 나타내는 데 사용되므로, 이 문맥에서는 품질 보장과 직접적인 연결을 나타내는 '을'이 맞는 표현입니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": false,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "subj_topic",
+      "topic": "Time-series data and machine telemetry.",
+      "stem": "산업용 로봇의 작동 데이터는 시간에 따른 변화를 보여주는데, 이 데이터는 공장의 효율성을 향상시키는 데 중요___",
+      "answer": "이",
+      "distractors": [
+        {
+          "text": "은",
+          "mistake": "혼동하여 주제를 중심으로 설명하려고 하여 주어와 목적어의 역할을 잘못 이해했습니다."
+        },
+        {
+          "text": "가",
+          "mistake": "주어와 연결어미 사이의 관계를 잘못 파악하여 문맥상 적절하지 않은 선택을 했습니다."
+        },
+        {
+          "text": "는",
+          "mistake": "주제를 강조하려다가 주어와 목적어의 구분을 잘못하여 문장의 흐름을 방해했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "subj_topic",
+      "topic": "Battery manufacturing and pack assembly: weld quality monitoring and inspection.",
+      "stem": "배터리 팩 조립 과정에서 용접 품질을 확인할 때 주로 사용되는 방법은 무엇인가요? 이 방법은 제품의 품질을 ___",
+      "answer": "보장합니다",
+      "distractors": [
+        {
+          "text": "강화합니다",
+          "mistake": "Here, the learner might have mistakenly used '강화합니다' (strengthens) instead of '보장합니다' (ensures/guarantees), confusing the function of ensuring quality with an '"
+        },
+        {
+          "text": "검사합니다",
+          "mistake": "The learner could have chosen '검사합니다' (inspects) instead of focusing on the broader concept of ensuring quality through monitoring methods, indicating a narrow-"
+        },
+        {
+          "text": "개선합니다",
+          "mistake": "The learner might have opted for '개선합니다' (improves), misunderstanding the role of welding quality monitoring in terms of enhancing processes rather than safegu딩"
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "verb_choice",
+      "topic": "EV architecture: battery, electric motor, inverter, power electronics, thermal management, and vehicle control systems.",
+      "stem": "전기 자동차를 만드는 데 필요한 주요 부품들을 조립할 때, 가장 먼저 배터리를 연결하는 것은 무엇인가요?  ___",
+      "answer": "연결하다",
+      "distractors": [
+        {
+          "text": "설치하다",
+          "mistake": "Learners might confuse '설치하다' (install) with '연결하다', thinking that setting up components is more relevant than actually connecting them electrically."
+        },
+        {
+          "text": "조립하다",
+          "mistake": "Learners might opt for '조립하다' (assemble), focusing on the overall construction rather than the specific act of connecting the battery."
+        },
+        {
+          "text": "검사하다",
+          "mistake": "Learners could choose '검사하다' (inspect/test), imagining that verifying the connection is the primary action rather than actually making the connection."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "verb_choice",
+      "topic": "Manufacturing flow: incoming materials, component production, battery pack assembly, vehicle assembly, and end-of-line testing.",
+      "stem": "전기 자동차 제조 과정에서 부품들이 처음으로 모이는 단계는 무엇인가요? 특히, 원자재가 도착한 후 바로 어떤___이 시작되는지 궁금합니다.",
+      "answer": "조립",
+      "distractors": [
+        {
+          "text": "검사",
+          "mistake": "검사는 제품의 품질을 확인하는 단계로, 원자재 도착 직후의 초기 조립 단계와는 맞지 않습니다."
+        },
+        {
+          "text": "생산",
+          "mistake": "생산은 더 넓은 의미의 제조 과정을 가리키며, 특정 단계인 초기 조립을 정확히 표현하지 못합니다."
+        },
+        {
+          "text": "연결",
+          "mistake": "연결은 배터리 팩이나 특정 부품들 간의 연결을 의미할 수 있어, 전체적인 초기 조립 과정을 포괄하지 못합니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "verb_choice",
+      "topic": "Time-series data and machine telemetry.",
+      "stem": "스마트 팩토리에서 시간 시계열 데이터를 분석할 때, 기계의 작동 상태를 실시간으로 모니터링하기 위해 주로 ___를 사용합니다.",
+      "answer": "수집하다",
+      "distractors": [
+        {
+          "text": "적용하다",
+          "mistake": "The learner might choose '적용하다' (apply), thinking it means to implement or utilize the data collection method rather than focusing on the act of gathering data."
+        },
+        {
+          "text": "분석하다",
+          "mistake": "The learner could opt for '분석하다' (analyze), confusing the verb with the action of analyzing data after collection rather than the collection process itself."
+        },
+        {
+          "text": "보고하다",
+          "mistake": "The learner may pick '보고하다' (report), imagining it refers to reporting the data status rather than the act of collecting telemetry data."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "verb_choice",
+      "topic": "Battery manufacturing and pack assembly: battery traceability and manufacturing records.",
+      "stem": "배터리 제조 과정에서 각 배터리의 추적을 위해 어떤 기록이 필수적으로 유지되어야 하나요? ___",
+      "answer": "기록합니다",
+      "distractors": [
+        {
+          "text": "연결합니다",
+          "mistake": "The verb '연결합니다' (connect) does not appropriately collocate with '기록' (record), which is crucial for traceability in battery manufacturing."
+        },
+        {
+          "text": "검사합니다",
+          "mistake": "Using '검사합니다' (inspect) instead of '기록합니다' implies focusing on quality checks rather than maintaining manufacturing records."
+        },
+        {
+          "text": "생산합니다",
+          "mistake": "Choosing '생산합니다' (produce) suggests focusing on the act of manufacturing rather than the documentation process needed for traceability."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "verb_choice",
+      "topic": "Manufacturing data preparation and feature engineering.",
+      "stem": "스마트 팩토리에서 데이터를 준비하고 분석하기 전에, 가장 먼저 해야 할 작업은 무엇인가요? 데이터를 정제하는___ 과정이 중요합니다.",
+      "answer": "정리하다",
+      "distractors": [
+        {
+          "text": "생성하다",
+          "mistake": "학습자가 데이터 준비 과정을 데이터 생성 과정으로 오해했습니다."
+        },
+        {
+          "text": "분석하다",
+          "mistake": "학습자가 데이터 준비가 이미 분석 단계의 일부라고 잘못 이해했습니다."
+        },
+        {
+          "text": "연결하다",
+          "mistake": "학습자가 데이터 준비 과정을 물리적 연결 과정으로 혼동했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "verb_choice",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "verb_choice",
+      "topic": "Interlocks, alarms, emergency stops, and safety systems.",
+      "stem": "자동화 시스템이 안전을 유지하기 위해 인터록과 긴급 정지 버튼을 설치하는 이유는 무엇인가요? ___",
+      "answer": "설치합니다",
+      "distractors": [
+        {
+          "text": "사용합니다",
+          "mistake": "동사 '설치하다' 대신 '사용하다'를 사용하여 동사와 명사 간의 적절한 짝짓기를 놓쳤습니다."
+        },
+        {
+          "text": "설정합니다",
+          "mistake": "동사 '설치하다'의 정확한 표현 대신 '설정하다'를 사용하여 의미가 약간 달라졌습니다."
+        },
+        {
+          "text": "적용합니다",
+          "mistake": "동사 '설치하다' 대신 '적용하다'를 사용하여 문맥에 맞지 않는 표현을 선택했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "verb_choice",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "Data collection, timestamps, units, validation, and missing values.",
+      "stem": "공장에서 수집된 데이터는 시간 스탬프와 함께 기록되며, 이 데이터는 ___ 개의 주요 단위로 측정되고 검증 과정을 거칩니다. 만약 데이터 중 일부 값이 누락되었다면, 이를 어떻게처리",
+      "answer": "다섯",
+      "distractors": [
+        {
+          "text": "하나",
+          "mistake": "단일 단위만을 고려하여 여러 단위를 무시했습니다."
+        },
+        {
+          "text": "백",
+          "mistake": "잘못된 큰 단위를 선택하여 실제 상황과 맞지 않았습니다."
+        },
+        {
+          "text": "십",
+          "mistake": "십 단위만을 고집하여 정확한 개수를 파악하지 못했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "Digital twin concepts and real-time synchronization.",
+      "stem": "디지털 트윈 모델은 실시간으로 업데이트되며, 이 과정에서 수집된 정보는 총 ___ 개의 주요 단계를 거쳐 최적화 과정에 반영된다.",
+      "answer": "다섯",
+      "distractors": [
+        {
+          "text": "세",
+          "mistake": "학습자가 한국어에서 숫자를 표현할 때 일반적으로 사용되는 '개'라는 표현을 빼먹거나 잘못 사용했습니다."
+        },
+        {
+          "text": "스물다섯",
+          "mistake": "숫자를 과장되게 표현하여 실제 학습 목표와 맞지 않게 선택했습니다."
+        },
+        {
+          "text": "하나",
+          "mistake": "숫자를 과소평가하여, 최적화 과정에서 필요한 여러 단계를 간과했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "noun_counter",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "Manufacturing data preparation and feature engineering.",
+      "stem": "스마트 팩토리에서 수집된 데이터는 시간 스탬프와 함께 기록되며, 각 데이터 포인트는 ___ 개의 주요 요소로 분석되고 최적화 과정에 포함된다. 만약 데이터가 완전하지 않다면, 누락된 부분은 어떻게든",
+      "answer": "다섯",
+      "distractors": [
+        {
+          "text": "세",
+          "mistake": "세 개의 요소로 분석한다고 잘못 이해했습니다."
+        },
+        {
+          "text": "스물다섯",
+          "mistake": "숫자가 너무 크게 잘못 추정했습니다."
+        },
+        {
+          "text": "하나",
+          "mistake": "하나의 요소만으로 분석된다고 오해했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "Manufacturing flow: incoming materials, component production, battery pack assembly, vehicle assembly, and end-of-line testing.",
+      "stem": "전기 자동차 제조 과정에서는 재료 도착부터 최종 테스트까지 총 ___ 단계가 있습니다. 각 단계는 중요한 역할을 합니다.",
+      "answer": "다섯",
+      "distractors": [
+        {
+          "text": "세",
+          "mistake": "학습자가 한국어에서 숫자 '다섯'을 '세'로 잘못 세어, 정확한 제조 단계 수를 놓쳤습니다."
+        },
+        {
+          "text": "네",
+          "mistake": "학습자가 숫자를 하나 적게 이해하여, 실제로는 다섯 단계가 아닌 네 단계로 오해했습니다."
+        },
+        {
+          "text": "일곱",
+          "mistake": "학습자가 숫자를 과대평가하여, 제조 과정의 실제 단계 수보다 더 많은 단계를 잘못 인식했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "noun_counter",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "Bottleneck and capacity analysis.",
+      "stem": "디지털 트윈 모델을 통해 공장의 생산 라인에서 병목 현상을 분석할 때, 평균적으로 몇 가지 주요 요소를 고려___해야 합니까?",
+      "answer": "세",
+      "distractors": [
+        {
+          "text": "두",
+          "mistake": "학습자가 숫자를 잘못 기억하거나 이해하지 못해 두 가지 요소만 고려한다고 답했습니다."
+        },
+        {
+          "text": "네",
+          "mistake": "학습자가 숫자를 혼동하여 네 가지 요소를 언급했습니다."
+        },
+        {
+          "text": "다섯",
+          "mistake": "학습자가 추가적인 세부 요소를 잘못 포함시켜 다섯 가지 요소를 제시했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "irregular_conj",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "Data collection, timestamps, units, validation, and missing values.",
+      "stem": "데이터 수집 장치는 시간 스탬프와 함께 작동하며, 이 데이터는 처음에는 3개의 주요 단위로 측정되고, 이후에___ 개의 단위로 통합 및 검증이 이루어집니다. 누락된 데이터 값이 있을 경우, 이를 보완하기 위해 대체 방법을",
+      "answer": "다섯",
+      "distractors": [
+        {
+          "text": "두",
+          "mistake": "학습자가 한국어의 숫자 표현에서 '다섯' 대신 '두'를 선택하여, 숫자 카운터 사용에 대한 이해가 부족한 것으로 나타남."
+        },
+        {
+          "text": "일곱",
+          "mistake": "학습자가 잘못된 숫자를 선택하여, 숫자 카운터 사용에 혼동이 있거나 잘못된 정보를 기억하고 있는 것으로 보임."
+        },
+        {
+          "text": "네",
+          "mistake": "학습자가 숫자 표현에서 '네'를 선택하여, '하나' 또는 '둘'과 같은 더 작은 단위를 떠올리며 카운터 사용에 대한 오류를 범함."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "mod_adverb",
+      "topic": "Computer vision for defect detection.",
+      "stem": "컴퓨터 비전을 사용하여 제품의 결함을 찾아내는 과정은 매우 정확하게 이루어져야 합니다. 이를 위해서는 검사하___",
+      "answer": "하게",
+      "distractors": [
+        {
+          "text": "검사하지",
+          "mistake": "여기서 '-게'를 사용하지 않고 동사를 그대로 사용하여 부사의 역할을 놓쳤습니다."
+        },
+        {
+          "text": "정확하게",
+          "mistake": "이 경우 '정확하게'는 형용사로 사용되어야 하며, '-게'를 붙여 부사로 만들어야 하는 학습 목표와 맞지 않습니다."
+        },
+        {
+          "text": "검사하도록",
+          "mistake": "'-게'를 사용하여 동사를 부사로 만드는 대신, 동사 뒤에 '-도록'을 붙여 잘못 이해했습니다."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "tense_past",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "mod_adverb",
+      "topic": "Manufacturing data preparation and feature engineering.",
+      "stem": "데이터를 준비하고 특징을 공학하는 과정은 매우 신중하게 이루어져야 합니다. 이를 위해서는 데이터를 ___ 처리해야 합니다.",
+      "answer": "신중하게",
+      "distractors": [
+        {
+          "text": "빠르게",
+          "mistake": "Learners might translate '신속하게' (quickly) instead of focusing on the adverb form indicating careful handling ('신중하게') required by the learning objective."
+        },
+        {
+          "text": "정확하게",
+          "mistake": "Learners could mistakenly use '정확하게' (accurately) instead of the adverb form needed to modify the verb '처리하다' (process), focusing instead on precision rather th"
+        },
+        {
+          "text": "효율적으로",
+          "mistake": "Learners might opt for '효율적으로' (efficiently), incorrectly applying an adjective that emphasizes productivity rather than the careful modification ('게') needed."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "mod_adverb",
+      "objective_ok": true,
+      "accepted": true
+    },
+    {
+      "objective": "mod_adverb",
+      "topic": "Industrial robots, cobots, AGVs, and AMRs.",
+      "stem": "산업 로봇은 빠르고 정밀하게 작업해야 하므로, 작동 방식을 매우 정확하게 조절해야 합니다. 이를 위해 로봇의___ 동작을 매우 섬세하게 조정해야 합니다.",
+      "answer": "섬세하게",
+      "distractors": [
+        {
+          "text": "빠르게",
+          "mistake": "The learner might have translated '빠르게' (quickly) instead of focusing on the adverbial form needed to modify '조정하다' (to adjust), missing the specific structure."
+        },
+        {
+          "text": "정확하게",
+          "mistake": "The learner could have used '정확하게' (accurately) instead of the required adverb form '-게', confusing the adverb creation with direct accuracy descriptors."
+        },
+        {
+          "text": "강력하게",
+          "mistake": "Using '강력하게' (powerfully) instead of '-게' would indicate a misunderstanding of how to transform adjectives into adverbs to modify verbs in Korean."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "mod_adverb",
+      "objective_ok": true,
+      "accepted": false
+    },
+    {
+      "objective": "mod_adverb",
+      "topic": "Virtual commissioning and layout planning.",
+      "stem": "디지털 트윈을 이용한 가상 시험은 생산 과정을 매우 효율적으로 최적화해야 합니다. 이를 위해 설계 단계에서 ___해야 합니다.",
+      "answer": "정확하게",
+      "distractors": [
+        {
+          "text": "빠르게",
+          "mistake": "Learners might translate 'quickly' incorrectly, mistaking the need for precision ('정확하게') with speed ('빠르게')."
+        },
+        {
+          "text": "상세하게",
+          "mistake": "Learners could misunderstand the concept and opt for '상세하게' (in detail), forgetting the specific adverbial form needed to modify verbs regarding accuracy."
+        },
+        {
+          "text": "자동적으로",
+          "mistake": "Learners might incorrectly apply '자동적으로' (automatically) instead of focusing on the precise action required ('정확하게'), missing the nuance of modifying verbs with"
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "mod_adverb",
+      "topic": "Scenario testing before physical implementation.",
+      "stem": "디지털 트윈을 활용하여 생산 과정을 최적화할 때, 가상 시나리오 테스트는 실제 구현 전에 매우 신중하게 수행___해야 합니다.",
+      "answer": "수행하게",
+      "distractors": [
+        {
+          "text": "수행하지",
+          "mistake": "Learners might incorrectly omit the '-게' suffix, failing to transform the adjective '신중하게' into an adverb."
+        },
+        {
+          "text": "수행되게",
+          "mistake": "Learners might incorrectly add an unnecessary suffix, thinking they need to emphasize the action more than necessary."
+        },
+        {
+          "text": "진행하게",
+          "mistake": "Learners could mistakenly use '진행하다' (to proceed) instead of transforming '신중하게' into an adverb form, misunderstanding the grammatical structure required for ad"
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": true,
+      "predicted_objective": "tense_past",
+      "objective_ok": false,
+      "accepted": false
+    },
+    {
+      "objective": "mod_adverb",
+      "topic": "Battery manufacturing and pack assembly: cell, module, and pack manufacturing concepts.",
+      "stem": "배터리 셀을 제조할 때, 매우 정밀하게 작업해야 합니다. 이를 위해 제조 과정은 ___하게 이루어져야 합니다.",
+      "answer": "정밀하게",
+      "distractors": [
+        {
+          "text": "빠르게",
+          "mistake": "Learners might choose '빠르게' (quickly) instead of '정밀하게' (precisely), misunderstanding the need for careful accuracy over speed."
+        },
+        {
+          "text": "안전하게",
+          "mistake": "Learners could opt for '안전하게' (safely), confusing the concept of precision with ensuring safety measures during manufacturing."
+        },
+        {
+          "text": "비용효율적으로",
+          "mistake": "Learners may select '비용효율적으로' (cost-effectively), focusing on economic efficiency rather than the specific requirement for precision in the manufacturing verb."
+        }
+      ],
+      "format_ok": true,
+      "distinct_options": true,
+      "key_ok": false,
+      "predicted_objective": "verb_choice",
+      "objective_ok": false,
+      "accepted": false
+    }
+  ]
+}
