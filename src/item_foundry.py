@@ -262,7 +262,11 @@ def _wrong_sentence(distractor: str, before: str, target: str, after: str) -> st
     prefix = before.rsplit(" ", 1)[-1]           # start of the bracketed word
     suffix = after.split(" ", 1)[0]               # its end
     if prefix and d.startswith(prefix):
-        return before[:len(before) - len(prefix)] + d + after[len(suffix):]
+        start = before[:len(before) - len(prefix)]
+        last = sentence.split()[-1]
+        if d != last and d.endswith(last):        # the rest of the sentence from that word on
+            return start + d
+        return start + d + after[len(suffix):]
     return before + d + after
 
 

@@ -20,13 +20,16 @@ How it works:
      kiwipiepy deliberately re-analyses a malformed form like 부르어요
      exactly as 불러요, so this case is detected from the surface, not
      from the tags.
-  4. The opposite case: a malformed predicate the tagger cannot analyse
+  4. The opposite case: a malformed word the tagger cannot analyse
      at all (먹았어요 comes out as one unknown noun 먹았 + 어요), which
      step 2 can only call MULTI. When that is the only edit and it lies
-     inside one predicate word, the edit is read from the surface of that
-     word instead: what is left after the common prefix and suffix
-     (먹[었>았]어요) is an ending error, END:었>았, or a conjugation error
-     (CONJ) when the correct stem is irregular (아름다워요, tagged VA-I).
+     inside one word, the edit is read from the surface of that word
+     instead: what is left after the common prefix and suffix. In a
+     predicate (먹[었>았]어요) it is an ending error, END:었>았, or a
+     conjugation error (CONJ) when the correct stem is irregular
+     (아름다워요, tagged VA-I). After a host noun (학교[에>으로], which the
+     tagger splits into 학교 + 으 + 로) it takes the category of the
+     correct morphemes it replaces, here PART:에>으로.
 
 KAGAS's own implementation uses a different tagger; the category set and
 the align-then-classify procedure follow the paper, the tagger is
@@ -117,26 +120,35 @@ def _common_affixes(a: str, b: str) -> tuple[int, int]:
     return p, q
 
 
-def _surface_predicate_edit(correct: str, wrong: str) -> Edit | None:
+def _surface_word_edit(correct: str, wrong: str) -> Edit | None:
     """Step 4 of the module docstring: the edit read from the surface of
-    the one predicate word that differs, or None if the sentences differ in
-    more than one word or the word is not a predicate."""
+    the one word that differs, or None if the sentences differ in more than
+    one word or the word's start (its stem or host noun) differs."""
     cw, ww = correct.split(), wrong.split()
     ops = [o for o in difflib.SequenceMatcher(a=cw, b=ww, autojunk=False).get_opcodes() if o[0] != "equal"]
     if len(ops) != 1 or ops[0][0] != "replace" or ops[0][2] - ops[0][1] != 1 or ops[0][4] - ops[0][3] != 1:
         return None
     c_word, w_word = cw[ops[0][1]], ww[ops[0][3]]
-    tags = [t for _, t in _morphs(c_word)]
-    if not any(t.split("-")[0] in _PREDICATE_TAGS for t in tags):
-        return None
+    tokens = _KIWI.tokenize(c_word)
+    tags = [t.tag for t in tokens]
     p, q = _common_affixes(c_word, w_word)
     if p == 0:  # the stem itself differs: a different word, not a form of it
         return None
     c_diff, w_diff = c_word[p:len(c_word) - q], w_word[p:len(w_word) - q]
-    if any(t.endswith("-I") for t in tags):
-        return Edit("CONJ", "REP", c_word, w_word, False)
     op = "REP" if c_diff and w_diff else ("DEL" if c_diff else "INS")
-    return Edit("END", op, c_diff, w_diff, True)
+    if any(t.split("-")[0] in _PREDICATE_TAGS for t in tags):
+        if any(t.endswith("-I") for t in tags):
+            return Edit("CONJ", "REP", c_word, w_word, False)
+        return Edit("END", op, c_diff, w_diff, True)
+    # Host noun + particle (학교에 written 학교으로 / 학교이, which the
+    # tagger splits into nonsense): the category of the changed morphemes.
+    changed = [t.tag for t in tokens if t.start < len(c_word) - q and t.start + t.len > p]
+    cats = {category(t) for t in changed}
+    if len(cats) != 1 or not c_diff:
+        return None
+    cat = cats.pop()
+    return Edit(cat, op, _ALLOMORPH.get(c_diff, c_diff) if cat == "PART" else c_diff,
+                _ALLOMORPH.get(w_diff, w_diff) if cat == "PART" else w_diff, cat in FUNCTIONAL)
 
 
 def annotate(correct: str, wrong: str) -> list[Edit]:
@@ -174,7 +186,7 @@ def annotate(correct: str, wrong: str) -> list[Edit]:
         edits.append(_classify(c_side, w_side, "+".join(f for f, _ in c_side),
                                "+".join(f for f, _ in w_side), kind))
     if len(edits) == 1 and edits[0].category == "MULTI":
-        return [_surface_predicate_edit(correct, wrong) or edits[0]]
+        return [_surface_word_edit(correct, wrong) or edits[0]]
     return edits
 
 
@@ -214,6 +226,9 @@ if __name__ == "__main__":
     assert one("저는 저녁을 먹었어요.", "저는 저녁을 먹았어요.").code == "END:었>았"
     assert one("정말 좋았어요.", "정말 좋았아요.").code == "END:어>아"
     assert one("조용한 친구예요.", "조용 친구예요.").code == "END:한>"
+    # A particle the tagger misreads after its host (학교으로, 학교이).
+    assert one("학생이 학교에 가요.", "학생이 학교으로 가요.").code == "PART:에>으로"
+    assert one("학생이 학교에 가요.", "학생이 학교이 가요.").code == "PART:에>이"
     e = one("꽃이 아름다워요.", "꽃이 아름답어요.")
     assert e.category == "CONJ" and not e.functional, e
 
