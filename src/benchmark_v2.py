@@ -30,6 +30,12 @@ library; nothing is parsed, diffed or labelled by our own rules.
      and mean cosine similarity of same-mistake vs different-mistake pairs,
      within each objective.
 
+  5. Difficulty: LLM respondents of three sizes answer every accepted-format
+     item and a Rasch fit gives its difficulty prior (difficulty_llm.py,
+     PRD §9.83); reported with the respondents' accuracy, which must rise
+     with model size for the scale to mean anything, and next to the
+     morpheme heuristic it replaces.
+
 The curriculum is data: --curriculum names a JSON file
 {"context": "...", "level": "...", "objectives": {"id": "description", ...},
  "modules": {"module name": ["topic", ...], ...}} -- by default
@@ -248,6 +254,27 @@ def embedding_agreement(items: list[dict], encoder: str) -> dict:
             "mean_cos_different": float(np.mean(diff)) if diff else None}
 
 
+def difficulty_report(items: list[dict]) -> dict:
+    import numpy as np
+
+    from difficulty_heuristic import estimate_difficulty
+    from difficulty_llm import difficulty_priors
+
+    ok = [it for it in items if it.get("format_ok")]
+    out = difficulty_priors([{"stem": it["stem"], "answer": it["answer"],
+                              "distractors": [d["text"] for d in it["distractors"]]} for it in ok])
+    for it, mu, s2 in zip(ok, out["mu_hat"], out["sigma_hat2"]):
+        it["difficulty_mu"], it["difficulty_sigma2"] = mu, s2
+    heur = [estimate_difficulty(it["sentence"])[0] for it in ok]
+    by_objective = {}
+    for it in ok:
+        by_objective.setdefault(it["objective"], []).append(it["difficulty_mu"])
+    return {"respondents": out["respondents"], "respondent_accuracy": out["respondent_accuracy"],
+            "respondent_theta": out["theta"],
+            "corr_with_morpheme_heuristic": float(np.corrcoef(out["mu_hat"], heur)[0, 1]),
+            "mean_by_objective": {k: float(np.mean(v)) for k, v in by_objective.items()}}
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--per-objective", type=int, default=6)
@@ -279,6 +306,7 @@ if __name__ == "__main__":
               f"objective {r['objective_ok']['k']}  accepted {r['accepted']['k']}/{r['accepted']['n']}")
     report["accepted"] = rate(sum(it.get("accepted", False) for it in items), len(items))
     report["embeddings"] = {e: embedding_agreement(items, e) for e in args.encoders.split(",")}
+    report["difficulty"] = difficulty_report(items)
     report["items"] = items
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
@@ -287,4 +315,8 @@ if __name__ == "__main__":
     for name, e in report["embeddings"].items():
         print(f"EMBEDDINGS {name}: nearest neighbour same mistake {e['nearest_neighbour_same_mistake']}  "
               f"cos same {e['mean_cos_same']}  different {e['mean_cos_different']}")
+    d = report["difficulty"]
+    print("DIFFICULTY respondent accuracy " + ", ".join(f"{m.split('/')[-1]} {a:.0%}" for m, a in
+                                                        zip(d["respondents"], d["respondent_accuracy"]))
+          + f"  corr with morpheme heuristic {d['corr_with_morpheme_heuristic']:.2f}")
     print(f"written to {args.out}")

@@ -4478,6 +4478,30 @@ Atas persetujuan jc, file yang sudah tidak dipakai dihapus: `src/validate_novelt
 - Gate baru `unique_ok`: Qwen3-4B mode reasoning diberi stem dan 4 opsi (diacak), lalu menyebut semua opsi yang benar; item lolos hanya kalau jawabannya tepat kunci saja. Diterima = key_ok ∧ unique_ok ∧ objective_ok.
 - Embedding dibandingkan dua encoder: multilingual-e5-base vs Qwen3-Embedding-0.6B (encoder berbasis instruksi).
 
+
+### 9.83 Kelas miring (5 mahir / 500 pemula) dan difficulty dari responden LLM (2026-10-21)
+
+**Pertanyaan jc:** bagaimana kalau hanya 5 orang yang mahir dan 500 lainnya pemula?
+
+**Simulasi** (`src/simulate_skewed_population.py`, CPU): Rasch, seleksi adaptif dengan target 85%, Urnings dengan koreksi MH, 505 pelajar, 60.000 respons (sekitar 120 per pelajar), 300 item, 4 replikasi. Kelas *balanced* θ~N(0,1) dibandingkan dengan kelas *skewed*: 500 pemula θ~N(−1; 0,5) dan 5 mahir θ~N(2,5; 0,3). Ada dua pool: *wide* β~U(−3,3), dan *matched* (difficulty sesuai kebutuhan kelas, seperti generator yang menulis item untuk pelajarnya). Ada dua prior item: *flat* (n=32), dan *model* (μ̂ = β + N(0; 0,8), korelasi sekitar 0,9, urn diukur dari varians).
+
+| kelas | pool | prior | RMSE kemampuan lainnya | RMSE kemampuan mahir | RMSE item mudah | RMSE item sulit | respons/item sulit |
+|---|---|---|---|---|---|---|---|
+| balanced | wide | flat | 0,56 | 0,80 | 0,65 | 1,55 | 38,5 |
+| balanced | wide | model | 0,45 | 0,99 | 0,48 | 0,80 | 9,8 |
+| skewed | wide | flat | 1,15 | 0,94 | 1,12 | 1,62 | 18,5 |
+| skewed | wide | model | 0,91 | 0,86 | 0,84 | 0,77 | 2,7 |
+| skewed | matched | flat | 1,63 | 0,70 | 1,64 | 0,49 | 48,2 |
+| skewed | matched | model | 0,90 | 1,16 | 0,94 | 0,27 | 5,0 |
+
+**Temuan:**
+1. **5 pelajar mahir tidak dirugikan:** RMSE 0,86–0,94 di pool wide, setara kelas balanced (0,80–0,99). Angka mahir paling bising, karena hanya 5 orang × 4 replikasi.
+2. **Item sulit hanya mendapat sedikit respons** (2,7–18,5 per item, vs 38,5 di kelas balanced). Tanpa prior, difficulty-nya tetap salah (RMSE 1,62); dengan prior model turun ke 0,77. Prior paling berguna tepat di bagian ini.
+3. **Yang justru terdampak adalah 500 pemula:** RMSE 1,15 vs 0,56 di kelas balanced. Dengan pool yang cocok untuk kelas tetapi prior flat, RMSE naik ke 1,63, karena semua item mulai di β=0 sementara item sebenarnya sekitar −2,7, sehingga seluruh skala bergeser. Prior model menahan skala itu (0,90). Jadi pada kelas yang miring, prior item juga menjadi jangkar skala, bukan hanya mempercepat konvergensi.
+4. **Batasan:** prior yang disimulasikan berkorelasi sekitar 0,9 dengan difficulty sebenarnya. Korelasi prior LLM sungguhan belum diketahui sampai ada data pelajar; prior yang lemah (r=0,44) sudah diukur di §9.69 / paper Section III-B.
+
+**`src/difficulty_llm.py` (baru), pengganti `difficulty_heuristic.py`:** Qwen3-0.6B, 1.7B dan 4B dipakai sebagai responden dengan kemampuan berbeda (Liu et al., 2025, BJET, PDF ada di `docs/`). p(kunci) = softmax log-prob kalimat dari 4 opsi. Fit Rasch least-squares logit p = θ_m − β_i (mean β = 0). μ̂ = β distandarkan; σ̂² = SE² + 0,5 (`LINK_VARIANCE`, karena skala responden belum di-link ke skala pelajar). Diukur di `benchmark_v2.py` (akurasi responden harus naik dengan ukuran model; korelasi dengan heuristik morfem). Belum dipasang ke `question_bank` / `answer_processing`; itu dilakukan bersama penghapusan grup B.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
