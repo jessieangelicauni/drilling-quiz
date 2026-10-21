@@ -1,0 +1,82 @@
+{
+  "name": "Smart factory for EV manufacturing (14 weeks)",
+  "level": "beginner (TOPIK I)",
+  "context": "a smart factory course on EV manufacturing",
+  "modules": {
+    "Module 1 — EV manufacturing fundamentals": [
+      "EV architecture: battery, electric motor, inverter, power electronics, thermal management, and vehicle control systems.",
+      "Manufacturing flow: incoming materials, component production, battery pack assembly, vehicle assembly, and end-of-line testing.",
+      "Production planning, takt time, cycle time, throughput, OEE, scrap, and rework.",
+      "Introduction to Lean Manufacturing, 5S, Kaizen, and value stream mapping."
+    ],
+    "Module 2 — Industrial automation and control": [
+      "Sensors, actuators, motors, drives, and machine safety.",
+      "PLC fundamentals and ladder logic.",
+      "Industrial robots, cobots, AGVs, and AMRs.",
+      "HMI and SCADA systems.",
+      "Industrial communication: OPC UA, Modbus TCP, and PROFINET.",
+      "Interlocks, alarms, emergency stops, and safety systems."
+    ],
+    "Module 3 — Smart factory architecture": [
+      "OT (Operational Technology) versus IT (Information Technology).",
+      "ISA-95 and the manufacturing hierarchy.",
+      "MES (Manufacturing Execution System), ERP, SCADA, PLC, and CMMS.",
+      "IIoT gateways, edge computing, and industrial data pipelines.",
+      "Production orders, work orders, recipes, and electronic work instructions.",
+      "Product genealogy, serial numbers, traceability, and digital records.",
+      "OT cybersecurity, network segmentation, and access control."
+    ],
+    "Module 4 — Industrial IoT and data analytics": [
+      "Time-series data and machine telemetry.",
+      "Data collection, timestamps, units, validation, and missing values.",
+      "SQL and Python for manufacturing data analysis.",
+      "MQTT and OPC UA data integration.",
+      "Dashboards using Grafana or Power BI.",
+      "OEE analysis, downtime Pareto charts, and production trend analysis."
+    ],
+    "Module 5 — AI for smart manufacturing": [
+      "Manufacturing data preparation and feature engineering.",
+      "Predictive maintenance using sensor data.",
+      "Anomaly detection for machine behavior.",
+      "Computer vision for defect detection.",
+      "AI-assisted root cause analysis.",
+      "Model evaluation, false positives, false negatives, and drift.",
+      "Human review and safe integration into production decisions."
+    ],
+    "Module 6 — Digital twins and production optimization": [
+      "Digital twin concepts and real-time synchronization.",
+      "Discrete-event simulation of production lines.",
+      "Bottleneck and capacity analysis.",
+      "Virtual commissioning and layout planning.",
+      "Energy consumption and resource optimization.",
+      "Scenario testing before physical implementation."
+    ],
+    "Module 7 — EV-specific manufacturing and quality": [
+      "Battery manufacturing and pack assembly: cell, module, and pack manufacturing concepts.",
+      "Battery manufacturing and pack assembly: battery traceability and manufacturing records.",
+      "Battery manufacturing and pack assembly: weld quality monitoring and inspection.",
+      "Battery manufacturing and pack assembly: Battery Management System (BMS) testing.",
+      "Battery manufacturing and pack assembly: thermal, electrical, and process safety.",
+      "E-motor and power electronics: motor and inverter assembly.",
+      "E-motor and power electronics: torque, alignment, electrical, and functional tests.",
+      "E-motor and power electronics: process parameters and component genealogy.",
+      "Quality management and end-of-line testing: Statistical Process Control (SPC).",
+      "Quality management and end-of-line testing: Failure Mode and Effects Analysis (FMEA).",
+      "Quality management and end-of-line testing: root cause analysis and corrective actions.",
+      "Quality management and end-of-line testing: functional validation and electronic test records."
+    ]
+  },
+  "objectives": {
+    "particle_loc": "location particles: 에서 marks where an action takes place, 에 marks a destination or where something is or exists",
+    "particle_obj": "the object particle 을/를 on the direct object of a transitive verb (을 after a final consonant, 를 after a vowel)",
+    "honorific": "the subject honorific -(으)시- on the verb when the subject is a person owed respect",
+    "time_range": "부터 and 까지 marking the start and the end of a time span",
+    "tense_past": "the past tense -았/었- in the polite -어요 style",
+    "irregular_conj": "irregular verb and adjective stems (르, ㅂ, ㄷ, ㅅ, ㅎ irregulars) before an ending that starts with a vowel",
+    "adj_relativizer": "an adjective modifying a following noun with -(으)ㄴ",
+    "subj_topic": "the subject particle 이/가 versus the topic particle 은/는",
+    "verb_choice": "choosing the verb that collocates with its object noun",
+    "noun_counter": "native Korean counters after a number",
+    "mod_adverb": "turning an adjective into an adverb with -게 to modify a verb"
+  }
+}

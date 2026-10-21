@@ -22,13 +22,15 @@ library; nothing is parsed, diffed or labelled by our own rules.
      within each objective.
 
 The curriculum is data: --curriculum names a JSON file
-{"context": "...", "level": "...", "objectives": {"id": "description", ...}};
-without it, the 11 grammar skills of item_foundry.SKILLS are used.
---context sets the domain the sentences come from, e.g.
-"smart factory EV battery manufacturing".
+{"context": "...", "level": "...", "objectives": {"id": "description", ...},
+ "modules": {"module name": ["topic", ...], ...}} -- by default
+data/curriculum_ev_smart_factory.json, the 14-week smart factory / EV
+manufacturing course. The objectives are what the drill teaches (Korean
+grammar); each item's sentence is set in one topic of the course, drawn at
+random, so the sentences use the vocabulary learners meet in the course.
 
 Usage:
-  python3 src/benchmark_v2.py --per-objective 6 [--context "..."] [--curriculum file.json]
+  python3 src/benchmark_v2.py --per-objective 6 [--curriculum file.json]
 """
 from __future__ import annotations
 
@@ -58,10 +60,10 @@ class Item(BaseModel):
 
 
 _PROMPT = """Write one multiple-choice Korean exercise for {level} learners whose first language is Indonesian.
-Context of the course: {context}
+Course: {context}. Topic of this sentence: {topic}
 Learning objective: {objective}
 
-- "stem": one short, natural Korean sentence about the context that needs the learning objective,
+- "stem": one short, natural Korean sentence about this topic that needs the learning objective,
   with ___ where the answer goes.
 - "answer": the correct word or form for ___.
 - "distractors": three wrong fillers for ___ that learners really choose, each a DIFFERENT mistake
@@ -85,6 +87,7 @@ def load_curriculum(path: Path | None, context: str) -> dict:
     else:
         cur = {"level": "beginner (TOPIK I)", "context": "everyday life",
                "objectives": {sid: s.description for sid, s in SKILLS.items()}}
+    cur.setdefault("modules", {"": [cur["context"]]})
     if context:
         cur["context"] = context
     return cur
@@ -102,8 +105,10 @@ def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
     for oid, objective in cur["objectives"].items():
         seen: list[str] = []
         for _ in range(per_objective):
-            content = _PROMPT.format(level=cur["level"], context=cur["context"], objective=objective,
-                                     avoid="; ".join(seen[-6:]) or "(none yet)")
+            module = rng.choice(sorted(cur["modules"]))
+            topic = rng.choice(cur["modules"][module])
+            content = _PROMPT.format(level=cur["level"], context=cur["context"], topic=f"{module}: {topic}" if module else topic,
+                                     objective=objective, avoid="; ".join(seen[-6:]) or "(none yet)")
             prompt = chat.tok.apply_chat_template([{"role": "user", "content": content}],
                                                   tokenize=False, add_generation_prompt=True)
             torch.manual_seed(rng.randrange(2**31))
@@ -111,10 +116,10 @@ def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
             try:
                 item = Item.model_validate_json(raw).model_dump()
             except ValueError:  # cut off by max_new_tokens
-                items.append({"objective": oid, "raw": raw, "format_ok": False})
+                items.append({"objective": oid, "topic": topic, "raw": raw, "format_ok": False})
                 continue
             seen.append(item["stem"])
-            items.append({"objective": oid, **item, "format_ok": True})
+            items.append({"objective": oid, "topic": topic, **item, "format_ok": True})
     del generator, model, chat
     torch.cuda.empty_cache()
     return items
@@ -195,7 +200,8 @@ def embedding_agreement(items: list[dict], encoder: str) -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--per-objective", type=int, default=6)
-    parser.add_argument("--curriculum", type=Path)
+    parser.add_argument("--curriculum", type=Path,
+                        default=Path(__file__).resolve().parent.parent / "data" / "curriculum_ev_smart_factory.json")
     parser.add_argument("--context", default="")
     parser.add_argument("--encoder", default="intfloat/multilingual-e5-base")
     parser.add_argument("--seed", type=int, default=0)
