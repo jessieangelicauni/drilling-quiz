@@ -32,14 +32,30 @@ from pathlib import Path
 
 import numpy as np
 
+# Loaded one at a time, so the GPU only ever holds one of them; Qwen3-4B is
+# the key-check model, so a caller that already has it loaded passes its
+# scores in instead of loading it again (difficulty_priors(known=...)).
 RESPONDENTS = ("Qwen/Qwen3-0.6B", "Qwen/Qwen3-1.7B", "Qwen/Qwen3-4B")
 LINK_VARIANCE = 0.5  # the respondents' scale is not yet linked to the learners'
 _CLIP = 0.01
 
 
+def key_probability(items: list[dict], logprob) -> np.ndarray:
+    """Probability of picking the key of each item ({"stem", "answer",
+    "distractors": [str, ...]}) for a respondent scoring sentences with
+    `logprob`: the softmax over the four filled stems."""
+    probs = []
+    for it in items:
+        scores = np.array([logprob(it["stem"].replace("___", o, 1)) for o in [it["answer"], *it["distractors"]]])
+        e = np.exp(scores - scores.max())
+        probs.append(e[0] / e.sum())
+    return np.array(probs)
+
+
 def respond(items: list[dict], model_name: str) -> np.ndarray:
-    """Probability that `model_name` picks the key of each item
-    ({"stem", "answer", "distractors": [str, ...]})."""
+    """key_probability for `model_name`, loaded for this call and freed after."""
+    import gc
+
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -51,14 +67,11 @@ def respond(items: list[dict], model_name: str) -> np.ndarray:
         ids = tok(sentence, return_tensors="pt")["input_ids"].to("cuda")
         return -model(ids, labels=ids).loss.item() * (ids.shape[1] - 1)
 
-    probs = []
-    for it in items:
-        scores = np.array([logprob(it["stem"].replace("___", o, 1)) for o in [it["answer"], *it["distractors"]]])
-        e = np.exp(scores - scores.max())
-        probs.append(e[0] / e.sum())
-    del model
+    probs = key_probability(items, logprob)
+    del model, logprob
+    gc.collect()
     torch.cuda.empty_cache()
-    return np.array(probs)
+    return probs
 
 
 def fit_rasch(p: np.ndarray) -> dict:
@@ -71,9 +84,13 @@ def fit_rasch(p: np.ndarray) -> dict:
     return {"theta": theta, "beta": beta, "se2": se2}
 
 
-def difficulty_priors(items: list[dict], respondents: tuple[str, ...] = RESPONDENTS) -> dict:
-    """(mu_hat, sigma_hat2) per item on a standardised scale, plus the fit."""
-    p = np.stack([respond(items, m) for m in respondents])
+def difficulty_priors(items: list[dict], respondents: tuple[str, ...] = RESPONDENTS,
+                      known: dict[str, np.ndarray] | None = None) -> dict:
+    """(mu_hat, sigma_hat2) per item on a standardised scale, plus the fit.
+    `known` maps respondents already scored by the caller to their
+    key_probability, so they are not loaded again."""
+    known = known or {}
+    p = np.stack([known[m] if m in known else respond(items, m) for m in respondents])
     fit = fit_rasch(p)
     sd = fit["beta"].std() or 1.0
     mu = fit["beta"] / sd

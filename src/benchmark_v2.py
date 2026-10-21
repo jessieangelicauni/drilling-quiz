@@ -30,8 +30,9 @@ library; nothing is parsed, diffed or labelled by our own rules.
      and mean cosine similarity of same-mistake vs different-mistake pairs,
      within each objective.
 
-  5. Difficulty: LLM respondents of three sizes answer every accepted-format
-     item and a Rasch fit gives its difficulty prior (difficulty_llm.py,
+  5. Difficulty: LLM respondents of three sizes (Qwen3-4B scored while it is
+     loaded for the checks, then 0.6B and 1.7B one at a time) answer every
+     well-formed item and a Rasch fit gives its difficulty prior (difficulty_llm.py,
      PRD §9.83); reported with the respondents' accuracy, which must rise
      with model size for the scale to mean anything, and next to the
      morpheme heuristic it replaces.
@@ -130,6 +131,8 @@ def curated_examples() -> dict[str, tuple[str, str]]:
 
 
 def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
+    import gc
+
     import outlines
     import torch
 
@@ -163,11 +166,14 @@ def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
             stem = item["sentence"].replace(item["answer"], "___", 1)
             items.append({"objective": oid, "topic": topic, "stem": stem, **item, "format_ok": True})
     del generator, model, chat
+    gc.collect()  # EXAONE has to leave the GPU before Qwen3 loads
     torch.cuda.empty_cache()
     return items
 
 
-def check_items(items: list[dict], cur: dict) -> None:
+def check_items(items: list[dict], cur: dict):
+    """Gates every item; returns Qwen3-4B's key probabilities for difficulty_report."""
+    import gc
     import re
 
     import torch
@@ -212,6 +218,20 @@ def check_items(items: list[dict], cur: dict) -> None:
         it["objective_ok"] = it["predicted_objective"] == it["objective"]
         it["accepted"] = it["key_ok"] and it["unique_ok"] and it["objective_ok"]
 
+    # Qwen3-4B is also the largest difficulty respondent: score it now, while loaded.
+    from difficulty_llm import key_probability
+    ok = [it for it in items if it["format_ok"]]
+    p4b = key_probability(_difficulty_items(ok), solver.sentence_logprob)
+    del solver, model, tok
+    gc.collect()
+    torch.cuda.empty_cache()
+    return p4b
+
+
+def _difficulty_items(ok: list[dict]) -> list[dict]:
+    return [{"stem": it["stem"], "answer": it["answer"], "distractors": [d["text"] for d in it["distractors"]]}
+            for it in ok]
+
 
 # How each encoder wants its input (from the model cards).
 _ENCODER_PREFIX = {"intfloat/multilingual-e5-base": "query: ",
@@ -235,7 +255,7 @@ def embedding_agreement(items: list[dict], encoder: str) -> dict:
             edits = annotate(correct, it["stem"].replace("___", d["text"], 1))
             if len(edits) == 1:
                 rows.append({"objective": it["objective"], "mistake": d["mistake"], "code": edits[0].code})
-    enc = SentenceTransformer(encoder)
+    enc = SentenceTransformer(encoder, device="cpu")  # 278M parameters: fast enough, and leaves the GPU free
     prefix = _ENCODER_PREFIX.get(encoder, "")
     vecs = enc.encode([prefix + r["mistake"] for r in rows], normalize_embeddings=True)
     hits = n = 0
@@ -254,15 +274,14 @@ def embedding_agreement(items: list[dict], encoder: str) -> dict:
             "mean_cos_different": float(np.mean(diff)) if diff else None}
 
 
-def difficulty_report(items: list[dict]) -> dict:
+def difficulty_report(items: list[dict], p4b) -> dict:
     import numpy as np
 
     from difficulty_heuristic import estimate_difficulty
     from difficulty_llm import difficulty_priors
 
     ok = [it for it in items if it.get("format_ok")]
-    out = difficulty_priors([{"stem": it["stem"], "answer": it["answer"],
-                              "distractors": [d["text"] for d in it["distractors"]]} for it in ok])
+    out = difficulty_priors(_difficulty_items(ok), known={"Qwen/Qwen3-4B": p4b})
     for it, mu, s2 in zip(ok, out["mu_hat"], out["sigma_hat2"]):
         it["difficulty_mu"], it["difficulty_sigma2"] = mu, s2
     heur = [estimate_difficulty(it["sentence"])[0] for it in ok]
@@ -281,15 +300,15 @@ if __name__ == "__main__":
     parser.add_argument("--curriculum", type=Path,
                         default=Path(__file__).resolve().parent.parent / "data" / "curriculum_ev_smart_factory.json")
     parser.add_argument("--context", default="")
-    parser.add_argument("--encoders", default="intfloat/multilingual-e5-base,Qwen/Qwen3-Embedding-0.6B",
-                        help="comma-separated sentence encoders to compare")
+    parser.add_argument("--encoders", default="intfloat/multilingual-e5-base",
+                        help="comma-separated sentence encoders to compare, e.g. add Qwen/Qwen3-Embedding-0.6B")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--out", default="benchmark_v2_results.json")
     args = parser.parse_args()
 
     cur = load_curriculum(args.curriculum, args.context)
     items = generate_items(cur, args.per_objective, args.seed)
-    check_items(items, cur)
+    p4b = check_items(items, cur)
     report = {"settings": {k: str(v) for k, v in vars(args).items()}, "per_objective": {}}
     for oid in cur["objectives"]:
         mine = [it for it in items if it["objective"] == oid]
@@ -306,7 +325,7 @@ if __name__ == "__main__":
               f"objective {r['objective_ok']['k']}  accepted {r['accepted']['k']}/{r['accepted']['n']}")
     report["accepted"] = rate(sum(it.get("accepted", False) for it in items), len(items))
     report["embeddings"] = {e: embedding_agreement(items, e) for e in args.encoders.split(",")}
-    report["difficulty"] = difficulty_report(items)
+    report["difficulty"] = difficulty_report(items, p4b)
     report["items"] = items
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
