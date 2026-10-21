@@ -4442,6 +4442,21 @@ GEC dan classifier butuh GPU dan Hugging Face, jadi dijalankan jc.
 - Classifier mode reasoning (`--thinking`, 052155b): 43/52 (83%), bias particle_obj hilang. Sisa kesalahan ada di honorific (4/5) dan irregular_conj (dilabel verb_choice). Pada 11 item generator, hasilnya sama dengan penilaian manual: 6 dipertahankan, 5 di luar skill ditolak. Jadi bias tadi berasal dari prompt atau skor huruf, bukan hanya ukuran model.
 - Temuan: label KAGAS resmi per kata (eojeol) dengan tipe kasar (PARTICLE/ENDING). Itu tidak cukup sebagai label miskonsepsi yang muncul ulang di banyak soal (`에서>에`). Keputusan label diserahkan ke jc.
 
+### 9.80 Versi 2: pipeline tanpa heuristik (hanya model/LLM/library)
+
+jc ingin metode seperti Duolingo/Eedi: semuanya LLM, model terlatih, atau library, tanpa aturan buatan sendiri. Rancangan lengkapnya ada di Claude Doc, bagian "Versi 2". Kurikulum tidak lagi 11 skill tetap, tetapi data: konteks (misalnya smart factory / EV manufacturing) dan tujuan belajar.
+
+Pipeline:
+1. EXAONE melalui Outlines (JSON schema: stem dengan satu `___`, kunci satu kata, 3 distraktor + `mistake`).
+2. Gate log-prob Qwen3 untuk kunci.
+3. Classifier tujuan belajar oleh Qwen3 mode reasoning.
+4. Miskonsepsi = embedding kalimat `mistake` (sentence encoder multilingual), tanpa kode.
+5. Model pilihan distraktor softmax(θ·e).
+
+Yang akan dihapus setelah terbukti: annotator, blank, filter, dan parser.
+
+`src/benchmark_v2.py` mengukur empat hal: format, gate kunci, gate tujuan, dan apakah embedding mengelompokkan kesalahan yang sama. Kode KAGAS dipakai hanya sebagai kunci evaluasi.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
