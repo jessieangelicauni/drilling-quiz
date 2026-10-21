@@ -273,7 +273,7 @@ class MisconceptionItemGenerator:
         marked, distractors = reply.get("sentence"), reply.get("distractors")
         if not (isinstance(marked, str) and isinstance(distractors, list)):
             return None, ["format: needs a sentence and a list of distractors"]
-        marked = korean_only(marked)
+        marked = korean_only(marked.replace("*", ""))   # **[께]** markdown
         if marked is None:
             return None, ["format: the sentence must be Korean only, without romanisation or translation"]
         spans = re.findall(r"\[([^\[\]]*)\]", marked)
@@ -281,6 +281,8 @@ class MisconceptionItemGenerator:
             return None, ["target: put square brackets around exactly one part of the sentence"]
         target = spans[0]
         before, after = marked.split(f"[{target}]", 1)
+        if not before.strip() or before.rstrip()[-1] in ".?!":
+            return None, ["target: the brackets must be inside the sentence, not after it"]
         sentence = before + target + after
         if len(distractors) < N_DISTRACTORS:
             return None, [f"format: {N_DISTRACTORS} distractors are needed, got {len(distractors)}"]
@@ -314,6 +316,8 @@ class MisconceptionItemGenerator:
         before, after = blank
         target = sentence[len(before):len(sentence) - len(after)]
         texts = [w[len(before):len(w) - len(after)] for w in wrongs]
+        if any(" " in t.strip() for t in [target, *texts]):
+            return None, ["target: the tested part must be one word or less, not a phrase"]
         reasons = []
 
         if skill.logprob_gate and self.sentence_logprob is not None:
