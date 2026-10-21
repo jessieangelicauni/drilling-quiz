@@ -754,9 +754,8 @@ BODY = [
       "requests 20 items per skill across the 11 skills, half of them targeted at a "
       "misconception already seen in that skill's accepted items, and reports with Wilson "
       "intervals the share accepted after at most two revisions, the reasons replies were "
-      "rejected, how many distinct codes the accepted items use and how many recur, and, as a "
-      "second view that is reported but not used as a gate, whether Qwen3-4B picks the key "
-      "by letter under every rotation of the options. These runs need a GPU and have not "
+      "rejected, and how many distinct codes the accepted items use and how many recur. "
+      "These runs need a GPU and have not "
       "yet been made with the item foundry; this paragraph is the protocol, and every "
       "accepted item is saved for the instructor review below."),
 

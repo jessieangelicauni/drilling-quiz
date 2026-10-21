@@ -225,7 +225,7 @@ if __name__ == "__main__":
 
     def scripted_chat(messages, _n=iter(range(10 ** 6))):
         place = places[next(_n) % len(places)]
-        return json.dumps({"sentence": f"친구가 {place}에서 축구를 해요.", "target": "에서",
+        return json.dumps({"sentence": f"친구가 {place}[에서] 축구를 해요.",
                            "distractors": ["에", "을", "이"]}, ensure_ascii=False)
 
     bank = QuestionBank()

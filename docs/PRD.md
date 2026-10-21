@@ -4371,6 +4371,18 @@ Per jenis error KoLLA (partikel n=114 / ejaan n=131): Qwen3-4B 96 = 84,2% (CI 76
 
 **Langkah berikut (GPU):** `python3 src/validate_item_foundry.py --per-skill 20`.
 
+### 9.75 Run item foundry pertama (tanpa codebook): OOM dan acceptance rendah, diperbaiki
+
+**Hasil sebelum OOM** (5 dari 11 skill, 20 permintaan per skill): particle_loc 8/20, particle_obj 0/20, honorific 3/20, time_range 0/20, tense_past 1/20. Alasan penolakan terbanyak: `wrong-category`, `not-minimal`, dan `target`. Untuk particle_obj dan time_range, ±1 dari 3 balasan gagal di `target`. Partikel pendek seperti 을/를/까지 sering muncul lebih dari sekali di kalimat, sehingga syarat "target muncul tepat sekali" gagal walaupun kalimatnya bagus. Kolom solver (pilih huruf) 0/12, padahal kolom itu tidak dipakai sebagai gate.
+
+**Penyebab OOM:** riwayat percakapan critic terus bertambah (prompt + semua balasan + semua alasan), dengan `max_new_tokens=1500`, di GPU yang sama dengan Qwen3-4B bf16 (15,25 GB terpakai).
+
+**Diperbaiki:**
+- EXAONE sekarang menandai bagian yang diuji dengan kurung siku di dalam kalimat (`동생이 공원[에서] 축구를 해요.`). Posisinya jadi pasti, walaupun teks yang sama muncul di tempat lain. Field `target` dihapus.
+- Critic hanya mengirim balik balasan terakhir; `max_new_tokens` 400 (balasan JSON satu soal cukup pendek); `torch.cuda.empty_cache()` setelah setiap generate.
+- Pengecekan solver dengan pilih huruf dihapus dari validasi (bukan gate, judge yang lemah, dan hasilnya 0/12). Paper V-B disesuaikan.
+- `FoundryStats.rejected` menyimpan 10 balasan pertama yang ditolak beserta alasannya. File hasil ditulis ulang setelah setiap skill. Ada opsi `--skills` untuk cek cepat.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

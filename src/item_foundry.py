@@ -109,6 +109,9 @@ class FoundryStats:
     accepted: int = 0
     revisions_used: int = 0
     reasons: dict[str, int] = field(default_factory=dict)
+    # The first few rejected replies with their reasons, so a low acceptance
+    # rate can be diagnosed from the results file.
+    rejected: list[dict] = field(default_factory=list)
 
     def reject(self, reason: str) -> None:
         key = reason.split(":")[0]
@@ -188,16 +191,16 @@ def single_edit(skill: Skill, correct: str, wrong: str):
 _ITEM_PROMPT = """You write Korean grammar drill questions for {level} learners whose first language is Indonesian.
 Grammar point: {description}.
 
-Write ONE new, natural, everyday Korean sentence that uses the grammar point, in Hangul only. Then:
-- "target": the exact part of the sentence that tests the grammar point (it must appear in the
-  sentence exactly once; as short as possible, e.g. a particle or a word ending, or the one word
-  that carries it);
-- "distractors": {n} wrong replacements for "target", each a DIFFERENT mistake learners typically
-  make with this grammar point, changing nothing else, and each clearly wrong in this sentence.{target_line}
+Write ONE new, natural, everyday Korean sentence that uses the grammar point, in Hangul only, and put
+square brackets around the part that tests it -- as short as possible, e.g. a particle or a word
+ending, or the one word that carries it. Example of the format: 동생이 공원[에서] 축구를 해요.
+Then give {n} "distractors": wrong replacements for the bracketed part, each a DIFFERENT mistake
+learners typically make with this grammar point, changing nothing else, and each clearly wrong in
+this sentence.{target_line}
 Do not reuse these sentences: {avoid}
 
 Answer with JSON only:
-{{"sentence": "...", "target": "...", "distractors": ["...", "...", "..."]}}"""
+{{"sentence": "...[...]...", "distractors": ["...", "...", "..."]}}"""
 
 _REVISION_PROMPT = """That question cannot be used, for these reasons:
 {reasons}
@@ -235,15 +238,18 @@ class MisconceptionItemGenerator:
         skill = SKILLS[skill_id]
         if not isinstance(reply, dict):
             return None, ["format: the reply was not a JSON object"]
-        sentence, target = reply.get("sentence"), reply.get("target")
-        distractors = reply.get("distractors")
-        if not (isinstance(sentence, str) and isinstance(target, str) and isinstance(distractors, list)):
-            return None, ["format: needs sentence, target and a list of distractors"]
-        sentence, target = korean_only(sentence), target.strip()
-        if sentence is None:
+        marked, distractors = reply.get("sentence"), reply.get("distractors")
+        if not (isinstance(marked, str) and isinstance(distractors, list)):
+            return None, ["format: needs a sentence and a list of distractors"]
+        marked = korean_only(marked)
+        if marked is None:
             return None, ["format: the sentence must be Korean only, without romanisation or translation"]
-        if not target or sentence.count(target) != 1:
-            return None, [f"target: '{target}' must appear in the sentence exactly once"]
+        spans = re.findall(r"\[([^\[\]]*)\]", marked)
+        if len(spans) != 1 or not spans[0].strip():
+            return None, ["target: put square brackets around exactly one part of the sentence"]
+        target = spans[0]
+        before, after = marked.split(f"[{target}]", 1)
+        sentence = before + target + after
         if len(distractors) != N_DISTRACTORS:
             return None, [f"format: exactly {N_DISTRACTORS} distractors are needed, got {len(distractors)}"]
 
@@ -253,7 +259,7 @@ class MisconceptionItemGenerator:
             if not text or text == target or text in texts:
                 reasons.append(f"duplicate: distractor '{text}' repeats the target or another distractor")
                 continue
-            wrong_sentence = sentence.replace(target, text, 1)
+            wrong_sentence = before + text + after
             edit, why = single_edit(skill, sentence, wrong_sentence)
             if edit is None:
                 reasons.append(f"{why.split(':')[0]}: '{wrong_sentence}' {why}")
@@ -271,12 +277,12 @@ class MisconceptionItemGenerator:
         if skill.logprob_gate and self.sentence_logprob is not None:
             key_score = self.sentence_logprob(sentence)
             for text in texts:
-                if self.sentence_logprob(sentence.replace(target, text, 1)) >= key_score:
+                if self.sentence_logprob(before + text + after) >= key_score:
                     reasons.append(f"ambiguous: '{text}' reads at least as naturally as the key "
                                    f"'{target}'; it may also be correct")
             if reasons:
                 return None, reasons
-        return (sentence, target, texts, codes), []
+        return (before, target, after, texts, codes), []
 
     # -- generation --------------------------------------------------------
     def _prompt(self, skill_id: str, target_code: str | None) -> str:
@@ -293,7 +299,8 @@ class MisconceptionItemGenerator:
             return None
         stats = self.stats.setdefault(skill_id, FoundryStats())
         stats.attempts += 1
-        messages = [{"role": "user", "content": self._prompt(skill_id, target_code)}]
+        prompt = [{"role": "user", "content": self._prompt(skill_id, target_code)}]
+        messages = prompt
         for revision in range(MAX_REVISIONS + 1):
             reply_text = self.chat(messages)
             fields, reasons = self.verify(skill_id, extract_json(reply_text), target_code)
@@ -303,20 +310,23 @@ class MisconceptionItemGenerator:
                 return self._assemble(skill_id, *fields)
             for reason in reasons:
                 stats.reject(reason)
-            messages += [{"role": "assistant", "content": reply_text},
-                         {"role": "user", "content": _REVISION_PROMPT.format(
-                             reasons="\n".join(f"- {r}" for r in reasons))}]
+            if len(stats.rejected) < 10:
+                stats.rejected.append({"reply": reply_text[:500], "reasons": reasons})
+            # Only the latest reply is sent back, so the context stays short.
+            messages = prompt + [{"role": "assistant", "content": reply_text},
+                                 {"role": "user", "content": _REVISION_PROMPT.format(
+                                     reasons="\n".join(f"- {r}" for r in reasons))}]
         return None
 
-    def _assemble(self, skill_id, sentence, target, texts, codes) -> GeneratedItem:
+    def _assemble(self, skill_id, before, target, after, texts, codes) -> GeneratedItem:
         labels = ["A", "B", "C", "D"]
         self.rng.shuffle(labels)
         options = {labels[0]: target, **dict(zip(labels[1:], texts))}
         option_codes = {labels[0]: None, **dict(zip(labels[1:], codes))}
         options = dict(sorted(options.items()))
         option_codes = dict(sorted(option_codes.items()))
-        stem = sentence.replace(target, BLANK, 1)
-        self._recent.setdefault(skill_id, []).append(sentence)
+        stem = before + BLANK + after
+        self._recent.setdefault(skill_id, []).append(before + target + after)
         categories = sorted(SKILLS[skill_id].categories)
         return GeneratedItem(skill_id, stem, BLANK, options, labels[0], categories[0], option_codes)
 
@@ -337,7 +347,7 @@ class ExaoneChat:
 
     MODEL = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"
 
-    def __init__(self, model_name: str = MODEL, temperature: float = 0.8, max_new_tokens: int = 1500):
+    def __init__(self, model_name: str = MODEL, temperature: float = 0.8, max_new_tokens: int = 400):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
@@ -355,7 +365,10 @@ class ExaoneChat:
         with self._torch.no_grad():
             out = self.model.generate(**enc, max_new_tokens=self.max_new_tokens, do_sample=True,
                                       temperature=self.temperature, top_p=0.95)
-        return self.tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip()
+        text = self.tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).strip()
+        del enc, out
+        self._torch.cuda.empty_cache()  # shares the GPU with the checker
+        return text
 
 
 if __name__ == "__main__":
@@ -370,7 +383,7 @@ if __name__ == "__main__":
     assert describe_code("PART:에서>에") == "'에' written where '에서' is needed"
     assert describe_code("END:었>") == "'었' left out"
 
-    good = {"sentence": "동생이 공원에서 축구를 해요.", "target": "에서", "distractors": ["에", "을", "이"]}
+    good = {"sentence": "동생이 공원[에서] 축구를 해요.", "distractors": ["에", "을", "이"]}
     repeated = {**good, "distractors": ["에", "에", "이"]}
     replies = iter([json.dumps(repeated, ensure_ascii=False), json.dumps(good, ensure_ascii=False)])
     seen_prompts = []
@@ -390,7 +403,15 @@ if __name__ == "__main__":
     assert item.option_codes[item.answer] is None
     assert "MUST be this mistake: '이' written where '에서' is needed" in seen_prompts[0]
     assert "duplicate:" in seen_prompts[1], "the critic must be told exactly why the first reply failed"
+    assert gen.stats["particle_loc"].rejected and gen.stats["particle_loc"].rejected[0]["reasons"]
     assert gen.stats["particle_loc"].revisions_used == 1
+
+    # The bracket fixes the position even when the target also occurs elsewhere (에 in 에서).
+    fields, _ = MisconceptionItemGenerator(chat, None).verify(
+        "particle_loc", {"sentence": "학교에서 집[에] 가요.", "distractors": ["에서", "을", "이"]})
+    assert fields is not None and fields[0] == "학교에서 집" and fields[1] == "에", fields
+    _, reasons = gen.verify("particle_loc", {"sentence": "동생이 공원에서 축구를 해요.", "distractors": ["에", "을", "이"]})
+    assert reasons and reasons[0].startswith("target"), reasons
 
     # Two distractors that make the same mistake (allomorphs 을/를) are one misconception.
     _, reasons = gen.verify("particle_loc", {**good, "distractors": ["을", "를", "이"]})
@@ -410,7 +431,7 @@ if __name__ == "__main__":
     assert any(r.startswith("wrong-category") for r in reasons), reasons
 
     # Open-class skills get the lexical edit as their code.
-    verb = {"sentence": "저는 물을 마셔요.", "target": "마셔요", "distractors": ["먹어요", "봐요", "입어요"]}
+    verb = {"sentence": "저는 물을 [마셔요].", "distractors": ["먹어요", "봐요", "입어요"]}
     fields, reasons = MisconceptionItemGenerator(chat, None).verify("verb_choice", verb)
-    assert fields is not None and "VERB:마시>먹" in fields[3], (fields, reasons)
+    assert fields is not None and "VERB:마시>먹" in fields[4], (fields, reasons)
     print("all smoke tests passed")
