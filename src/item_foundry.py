@@ -192,15 +192,19 @@ _ITEM_PROMPT = """You write Korean grammar drill questions for {level} learners 
 Grammar point: {description}.
 
 Write ONE new, natural, everyday Korean sentence that uses the grammar point, in Hangul only, and put
-square brackets around the part that tests it -- as short as possible, e.g. a particle or a word
-ending, or the one word that carries it. Example of the format: 동생이 공원[에서] 축구를 해요.
+square brackets around the ONE part that tests this grammar point -- as short as possible, e.g. a
+particle or a word ending, or the one word that carries it.
 Then give {n} "distractors": wrong replacements for the bracketed part, each a DIFFERENT mistake
 learners typically make with this grammar point, changing nothing else, and each clearly wrong in
-this sentence. Write only the replacement text, not the whole sentence, and no comments.{target_line}
+this sentence. Write only the replacement text, not the whole sentence.{target_line}
 Do not reuse these sentences: {avoid}
 
-Answer with JSON only:
-{{"sentence": "...[...]...", "distractors": ["...", "...", "..."]}}"""
+Answer with the JSON only, no explanation. {example_note}
+{example}"""
+
+# The format example until a skill has an accepted item of its own; after
+# that, the skill's latest accepted item is the example (on-skill, not fixed).
+_FORMAT_EXAMPLE = '{"sentence": "동생이 공원[에서] 축구를 해요.", "distractors": ["에", "을", "이"]}'
 
 _REVISION_PROMPT = """That question cannot be used, for these reasons:
 {reasons}
@@ -262,6 +266,7 @@ class MisconceptionItemGenerator:
         self.items: dict[str, GeneratedItem] = {}
         self.stats: dict[str, FoundryStats] = {}
         self._recent: dict[str, list[str]] = {}
+        self._example: dict[str, str] = {}
         self._counter = 0
 
     # -- verification ------------------------------------------------------
@@ -337,8 +342,12 @@ class MisconceptionItemGenerator:
         if target_code is not None:
             target_line = f"\n  One distractor MUST be this mistake: {describe_code(target_code)}."
         avoid = "; ".join(self._recent.get(skill_id, [])[-8:]) or "(none yet)"
+        example = self._example.get(skill_id)
+        note = ("An earlier accepted answer for this grammar point:" if example else
+                "Format example (a different grammar point may be tested; follow only its shape):")
         return _ITEM_PROMPT.format(level=skill.level, description=skill.description,
-                                   n=N_DISTRACTORS, target_line=target_line, avoid=avoid)
+                                   n=N_DISTRACTORS, target_line=target_line, avoid=avoid,
+                                   example_note=note, example=example or _FORMAT_EXAMPLE)
 
     def generate(self, skill_id: str, target_code: str | None = None) -> GeneratedItem | None:
         if skill_id not in SKILLS:
@@ -373,6 +382,8 @@ class MisconceptionItemGenerator:
         option_codes = dict(sorted(option_codes.items()))
         stem = before + BLANK + after
         self._recent.setdefault(skill_id, []).append(before + target + after)
+        self._example[skill_id] = json.dumps({"sentence": f"{before}[{target}]{after}", "distractors": texts},
+                                             ensure_ascii=False)
         categories = sorted(SKILLS[skill_id].categories)
         return GeneratedItem(skill_id, stem, BLANK, options, labels[0], categories[0], option_codes)
 
@@ -395,11 +406,12 @@ class ExaoneChat:
     MODEL = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"
     GENERATORS = {"exaone-3.5-7.8b": MODEL, "gemma-3-12b": "google/gemma-3-12b-it"}
 
-    def __init__(self, model_name: str = MODEL, temperature: float = 0.8, max_new_tokens: int = 400):
+    def __init__(self, model_name: str = MODEL, temperature: float = 0.6, max_new_tokens: int = 400):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
         self._torch = torch
+        self.model_name = model_name
         self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name, trust_remote_code=True, device_map="cuda",
@@ -408,6 +420,9 @@ class ExaoneChat:
         self.max_new_tokens = max_new_tokens
 
     def __call__(self, messages: list[dict]) -> str:
+        if "exaone" in self.model_name.lower():  # EXAONE's recommended system prompt
+            messages = [{"role": "system", "content": "You are EXAONE model from LG AI Research, "
+                                                      "a helpful assistant."}] + messages
         enc = self.tok.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt",
                                            return_dict=True).to("cuda")
         with self._torch.no_grad():
