@@ -31,19 +31,22 @@ _N_MIN, _N_MAX, _REF_VAR = 8, 64, 1.0
 # Matches difficulty_heuristic.py's ACTUAL behaviour: sigma_hat2 is a fixed
 # constant (1.5), never inferred per-item -- so every encoder-seeded item
 # below gets the SAME urn size; only k0 (predicted position) varies. An
-# idealized varying-confidence encoder isn't what's shipped, so it isn't
-# what's simulated here.
+# idealized varying-confidence encoder isn't what's shipped, so it is the
+# headline here; a second set of conditions passes sigma2=noise_std**2 (an
+# encoder that reports its own error variance correctly) to measure what
+# confidence-matched urn sizing would buy.
 _FIXED_SIGMA2 = 1.5
 
 
-def seed_items_from_encoder(beta_true: np.ndarray, noise_std: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def seed_items_from_encoder(beta_true: np.ndarray, noise_std: float,
+                            sigma2: float = _FIXED_SIGMA2) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Simulates an encoder whose prediction mu_hat is the item's true beta
     plus Gaussian error -- noise_std=0 is a perfect predictor, large
     noise_std makes mu_hat uninformative. Returns (k0, n0, mu_hat) so the
     caller can report the actual realised correlation, not an assumed one.
     """
     mu_hat = beta_true + RNG.normal(0, noise_std, size=len(beta_true))
-    n = int(round(min(max(_N_MAX / (1.0 + _FIXED_SIGMA2 / _REF_VAR), _N_MIN), _N_MAX)))
+    n = int(round(min(max(_N_MAX / (1.0 + sigma2 / _REF_VAR), _N_MIN), _N_MAX)))
     pi = SIG(mu_hat)  # item urn proportion = difficulty (PRD §9.68), so a harder item gets MORE balls
     k = np.round(pi * (n + 1) - 0.5).astype(int)
     k = np.clip(k, 0, n)
@@ -107,6 +110,9 @@ if __name__ == "__main__":
             k0_n32 = np.round((k0 / n0) * (32 + 1) - 0.5).astype(int)
             k0_n32 = np.clip(k0_n32, 0, 32)
             conds[f"encoder-informed, {label}, n=32 (position only)"] = (k0_n32, np.full(I, 32), corr)
+            k0m, n0m, mu_m = seed_items_from_encoder(beta, noise_std, sigma2=noise_std ** 2)
+            conds[f"encoder-informed, {label}, sigma2 matched (n={n0m[0]})"] = (
+                k0m, n0m, np.corrcoef(mu_m, beta)[0, 1])
         return conds
 
     all_results: dict[str, list[tuple[float, float]]] = {}

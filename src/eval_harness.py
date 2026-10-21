@@ -3,7 +3,9 @@ Statistics layer for the validation scripts (review 2026-10-21, fix plan
 Prioritas 4). CPU-only, no model calls: it reads the result JSONs the GPU
 scripts already write and reports what those headline rates do not.
 
-  1. UNIQUE items. validate_novelty1.py / validate_log_likelihood.py draw
+  1. UNIQUE items. The template-era validate_novelty1.py /
+     validate_log_likelihood.py (removed with the template generator; their
+     result files are kept as the record of the curated items) drew
      "N=20/skill" with replacement from 3-7 curated slots or pairs, so the
      same stem is counted several times. Rates are recomputed per unique
      (skill, stem, correct form), each item counted once.
@@ -85,7 +87,7 @@ def _unique_rate(items_by_skill: dict[str, list[tuple[tuple, bool]]]) -> dict:
 
 
 def summarize_solver(paths: list[str]) -> dict:
-    """validate_novelty1.py output(s): check (c) key acceptance."""
+    """1_validation_results.json-style output(s): check (c) key acceptance."""
     items_by_skill = defaultdict(list)
     per_seed = []
     picks, key_pos_total, key_pos_ok = Counter(), Counter(), Counter()
@@ -114,7 +116,9 @@ def summarize_solver(paths: list[str]) -> dict:
 
 
 def summarize_loglik(paths: list[str]) -> dict:
-    """validate_log_likelihood.py / validate_lm_plausibility.py output(s)."""
+    """Log-likelihood result file(s) (log_likelihood_results.json, written by
+    the template-era validate_log_likelihood.py, removed with the template
+    generator; kept as the calibration of item_foundry's log-prob gate)."""
     items_by_skill = defaultdict(list)
     per_seed = []
     for path in paths:
@@ -162,14 +166,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--solver", nargs="+", default=["1_validation_results.json"])
     parser.add_argument("--loglik", nargs="+", default=["log_likelihood_results.json"])
-    parser.add_argument("--parse-score", nargs="+", default=["src/lm_plausibility_results.json"])
     parser.add_argument("--out", default="eval_report.json")
     args = parser.parse_args()
 
     report = {"split_salt": SPLIT_SALT, "test_fraction": TEST_FRACTION,
               "solver_key_acceptance": summarize_solver(args.solver),
-              "loglik_correct_above_distractor": summarize_loglik(args.loglik),
-              "kiwipiepy_parse_score": summarize_loglik(args.parse_score)}
+              "loglik_correct_above_distractor": summarize_loglik(args.loglik)}
 
     _print_block("check (c): solver picks the key (Qwen3-4B, letter prompt)", report["solver_key_acceptance"])
     pb = report["solver_key_acceptance"]["position_bias"]
@@ -178,7 +180,6 @@ if __name__ == "__main__":
         print(f"  key at {label}: {r['k']}/{r['n']} = {r['rate']:.1%}  95% CI [{r['ci95'][0]:.1%}, {r['ci95'][1]:.1%}]")
     _print_block("log-likelihood: correct form outscores distractor (Qwen3-4B)",
                  report["loglik_correct_above_distractor"])
-    _print_block("kiwipiepy parse score: correct form outscores distractor", report["kiwipiepy_parse_score"])
 
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)

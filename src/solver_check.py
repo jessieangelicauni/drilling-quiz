@@ -255,42 +255,7 @@ class SolverCheckProvider:
 
 
 if __name__ == "__main__":
-    from exaone_provider import ExaoneGrammarProvider
-
     solver = SolverCheckProvider()
-    provider = ExaoneGrammarProvider(seed=0)
-
-    skills = ["particle_loc", "particle_obj", "honorific", "time_range", "tense_past",
-              "irregular_conj", "adj_relativizer", "subj_topic"]
-
-    results: dict[str, list[SolverResult]] = {}
-    for skill_id in skills:
-        skill_results = []
-        for _ in range(3):
-            item_id = provider.next_new_grammar_item(skill_id)
-            if item_id is None:
-                continue
-            item = provider.items[item_id]
-            result = solver.check(item.stem, item.blank_marker, item.options, item.answer)
-            skill_results.append(result)
-            status = "OK" if result.key_accepted else "KEY-MISS"
-            print(f"[{status}] {skill_id}: {item.stem} opts={item.options} key={item.answer} "
-                  f"picked={result.picked} also_acceptable(unreliable, FYI only)={result.also_acceptable}")
-        results[skill_id] = skill_results
-
-    print("\n--- summary (check (c), the trustworthy one) ---")
-    total, key_ok = 0, 0
-    for skill_id, skill_results in results.items():
-        n = len(skill_results)
-        n_key_ok = sum(r.key_accepted for r in skill_results)
-        total += n
-        key_ok += n_key_ok
-        print(f"{skill_id:20s} key-accepted {n_key_ok}/{n}")
-    print(f"\nOVERALL: key-accepted {key_ok}/{total}")
-    print("(check (b) 'also_acceptable' printed above for reference only -- known yes-bias, see module docstring)")
-
-    assert total > 0, "the solver check must have actually run against real generated items"
-
     print("\n--- log_likelihood_check (PRD §9.35, the working replacement for check (b)) ---")
     ll_honorific = solver.log_likelihood_check("honorific", "할머니께서 ___.", "___", "쉬세요", "쉬어요")
     assert ll_honorific.valid and ll_honorific.gap is not None and ll_honorific.gap > 0, (
@@ -309,4 +274,4 @@ if __name__ == "__main__":
     rotated, agreement = solver.pick_best_rotated("저는 도서관___ 공부해요.", loc_options)
     print(f"[OK] cloze pick={cloze}; rotated letter pick={rotated} (agreement {agreement:.0%} over 4 rotations)")
 
-    print("\nall smoke tests passed (mechanism verified; see summary above for actual pass rates)")
+    print("\nall smoke tests passed")

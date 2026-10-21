@@ -152,7 +152,7 @@ def calibration_curve(k_theta_pairs: list[tuple[int, float]], quantile_table: di
 
 
 def pick_adaptive(theta_hat: float, beta_hat: np.ndarray, target: float, pool: int = 48) -> int:
-    """Same target-success-rate selection as Section IV-D Eq. 3 (target=0.85),
+    """Same target-success-rate selection as Section IV-C Eq. 4 (target=0.85),
     reused here (not reimplemented ad hoc) so the simulated practice history
     looks like what a real learner would actually be served."""
     want = theta_hat - np.log(target / (1 - target))

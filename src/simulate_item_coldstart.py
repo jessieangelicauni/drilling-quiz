@@ -7,7 +7,7 @@ real response data calibrates every item quickly regardless of its
 starting point, so the prior only matters briefly before being overwritten.
 
 That isn't the regime Novelty 1 is actually meant to help with. This
-app's real item pool is GENERATIVE and constantly growing (exaone_provider
+app's real item pool is GENERATIVE and constantly growing (item_foundry
 + question_bank.py) -- most items, most of the time, are relatively new
 and have had few responses. This simulates THAT regime instead: a pool
 that starts small and grows by one freshly-generated item every

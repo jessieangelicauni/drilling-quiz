@@ -19,7 +19,7 @@ Backs three PRD decisions (docs/PRD.md §2.1, §3.3):
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict
+from typing import Callable, Dict
 
 import numpy as np
 
@@ -92,13 +92,41 @@ def seed_item_from_encoder(mu_hat: float, sigma_hat2: float,
     return UrnState(k=k, n=n)
 
 
+SELECT_SIGMA = 0.5
+
+
+def selection_probs(theta_sel, beta_hat, target: float = 0.5, sigma: float = SELECT_SIGMA) -> np.ndarray:
+    """Probability of serving each candidate item: a Gaussian kernel on how
+    far the item's predicted success probability (on the logit scale) is
+    from `target`, normalised over the candidates (Gergely et al., 2025,
+    Eq. 17). Probabilistic rather than "closest few", because update()'s
+    adaptive-selection correction needs the actual probability that the
+    served item was selected, before and after the proposed exchange.
+    """
+    beta_hat = np.asarray(beta_hat, dtype=float)
+    d = (theta_sel - beta_hat - np.log(target / (1 - target))) / sigma
+    d2 = d * d
+    w = np.exp(-0.5 * (d2 - d2.min()))  # shifted for numerical stability; cancels in the ratio
+    return w / w.sum()
+
+
 def update(learner: UrnState, item: UrnState, correct: bool,
-           rng: np.random.Generator) -> tuple[UrnState, UrnState]:
+           rng: np.random.Generator,
+           selection_prob: Callable[[UrnState, UrnState], float] | None = None) -> tuple[UrnState, UrnState]:
     """One response event: ball-exchange proposal + MH acceptance.
 
-    Mirrors simulate_trackers.run_urnings's inner loop exactly, generalised
-    to arbitrary (not just n=32) urn sizes since item urns can now vary in
-    size (Novelty 1).
+    Mirrors simulate_trackers.urnings_step, generalised to arbitrary (not
+    just n=32) urn sizes since item urns can vary in size.
+
+    selection_prob(learner, item): the probability that this item would
+    have been served given those urn states. Pass it whenever the item was
+    chosen adaptively from the urns (BankContentProvider): the acceptance
+    ratio is then multiplied by p(item | proposed) / p(item | current),
+    without which adaptive selection inflates the rating scale exactly as it
+    does for Elo (Bolsinova et al., 2022; Gergely et al., 2025, Eq. 4;
+    simulate_trackers.py: rating SD 2.63 without, 1.00 with, true 1.04).
+    Leave it None for an item that was not selected from the urn states (a
+    freshly generated one).
     """
     n_p, n_i = learner.n, item.n
     eps = 1e-9
@@ -116,12 +144,18 @@ def update(learner: UrnState, item: UrnState, correct: bool,
     if not (0 <= kp_s <= n_p and 0 <= ki_s <= n_i):
         return learner, item
 
+    if kp_s == learner.k:
+        return learner, item  # x == y: nothing to exchange
+
+    new_learner, new_item = UrnState(k=kp_s, n=n_p), UrnState(k=ki_s, n=n_i)
     cur = learner.k * (n_i - item.k) + (n_p - learner.k) * item.k
     pro = kp_s * (n_i - ki_s) + (n_p - kp_s) * ki_s
-    if cur > 0 and rng.random() >= min(1.0, pro / cur):
+    ratio = np.inf if cur <= 0 else pro / cur
+    if selection_prob is not None:
+        ratio *= selection_prob(new_learner, new_item) / selection_prob(learner, item)
+    if rng.random() >= min(1.0, ratio):
         return learner, item
-
-    return UrnState(k=kp_s, n=n_p), UrnState(k=ki_s, n=n_i)
+    return new_learner, new_item
 
 
 def should_escalate(learner: UrnState, tau: float = 0.15) -> bool:
@@ -145,11 +179,11 @@ def should_escalate(learner: UrnState, tau: float = 0.15) -> bool:
 
 
 def should_escalate_full(learner: UrnState, consecutive_misconceptions: int, tau: float = 0.15) -> bool:
-    """Eq. 3 in full: w_k > tau  OR  consecutive(m_j) >= 2. should_escalate()
+    """Eq. 5 in full: w_k > tau  OR  consecutive(m_j) >= 2. should_escalate()
     above only ever implemented the first disjunct -- the second had
     nothing to read from anywhere in this codebase until
     LearnerSkillProfile.record_outcome() (PRD §9.38) started tracking it.
-    Use this, not should_escalate() alone, wherever Eq. 3's actual trigger
+    Use this, not should_escalate() alone, wherever Eq. 5's actual trigger
     is meant to fire -- answer_processing.py was silently only checking
     half of it before this was found and fixed.
     """
@@ -191,7 +225,7 @@ class LearnerSkillProfile:
         self.user_id = user_id
         self.n_default = n_default
         self._skills: Dict[str, UrnState] = {}
-        # Eq. 3's consecutive(m_j) >= 2 trigger (PRD §9.38): per-skill
+        # Eq. 5's consecutive(m_j) >= 2 trigger (PRD §9.38): per-skill
         # (last misconception KAGAS code, consecutive count). Found
         # entirely unimplemented -- answer_processing.py only ever
         # checked should_escalate()'s width disjunct; this half of the
@@ -282,7 +316,7 @@ if __name__ == "__main__":
     d = profile.to_dict()
     assert LearnerSkillProfile.from_dict(d).competency_percent("honorifics") == 87.5
 
-    # Eq. 3's consecutive(m_j) >= 2 trigger (PRD §9.38) -- real assertions,
+    # Eq. 5's consecutive(m_j) >= 2 trigger (PRD §9.38) -- real assertions,
     # not just "must not raise": a narrow (low-width) urn so should_escalate()
     # alone would say no, isolating this mechanism from the width disjunct.
     narrow = UrnState(k=29, n=32)  # width well under tau=0.15

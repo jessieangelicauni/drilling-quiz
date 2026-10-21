@@ -5,7 +5,7 @@ item score and examinee ability) -- the classical test theory metric for
 learners" (Crocker & Algina; conventional rule of thumb: <0.10 poor/should
 be revised, 0.10-0.19 marginal, 0.20-0.29 reasonably good, >=0.30 good).
 Missing from every validation script in this repo until now: generation
-pass rate and solver key-acceptance (validate_novelty1.py) check whether
+pass rate and solver key-acceptance (now validate_item_foundry.py) check whether
 a distractor is morphologically valid and whether a blind model can find
 the key, but neither checks the classical property that a well-constructed
 item is SUPPOSED to have -- correlating with the thing the test is for.
@@ -18,7 +18,7 @@ response probabilities with.
 
 KO-DRILL-SPECIFIC QUESTION this answers, not just a generic sanity check:
 Section IV-D (paper) states, but does not measure, that targeting 85%
-success (Eq. 3, for pedagogical reasons) "deliberately sacrifices
+success (Eq. 4, for pedagogical reasons) "deliberately sacrifices
 measurement efficiency for learning efficiency" and calls a direct
 comparison "a natural comparison for future work rather than one of the
 two claims this paper sets out to validate." This script IS that
@@ -91,7 +91,7 @@ if __name__ == "__main__":
                                       formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--n-learners", type=int, default=2000)
     parser.add_argument("--target-policy", type=float, default=0.85,
-                         help="this system's actual Eq. 3 success target")
+                         help="this system's actual Eq. 4 success target")
     parser.add_argument("--out", default="item_discrimination_results.json")
     args = parser.parse_args()
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
               f"{r['mean_discrimination']:15.3f} {quality_label(r['mean_discrimination']):>22s}")
 
     beta_50 = 0.0  # difficulty = population mean ability -> ~50% success for an average learner
-    # Eq. 2's implied beta for theta=0: sigma(0 - beta) = target, so
+    # Eq. 4's implied beta for theta=0: sigma(0 - beta) = target, so
     # beta = -logit(target) (= -1.73 for 85%, an EASY item). This used to be
     # -LOGIT(1 - target) = +1.73, i.e. a 15%-success item; the reported
     # discrimination happened to be unchanged only because theta ~ N(0, 1)
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     print(f"\n=== Section IV-D's unresolved trade-off, now measured ===")
     print(f"50%-target (max-information CAT):    beta={beta_50:+.2f}  "
           f"discrimination={d50['mean_discrimination']:.3f} ({quality_label(d50['mean_discrimination'])})")
-    print(f"{args.target_policy:.0%}-target (this system's Eq. 3 policy): beta={beta_policy:+.2f}  "
+    print(f"{args.target_policy:.0%}-target (this system's Eq. 4 policy): beta={beta_policy:+.2f}  "
           f"discrimination={dpolicy['mean_discrimination']:.3f} "
           f"({quality_label(dpolicy['mean_discrimination'])})")
     assert abs(dpolicy["avg_success_rate"] - args.target_policy) < 0.1, (
