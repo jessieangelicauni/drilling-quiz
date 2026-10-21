@@ -13,7 +13,7 @@ Reports both RMSE (tracking accuracy) and mean lag = mean(estimate - true)
 follow real improvement.
 """
 import numpy as np
-from simulate_trackers import RNG, SIG, pick_adaptive, _logit_urn
+from simulate_trackers import RNG, SIG, pick_adaptive, urnings_step, _logit_urn
 
 
 def run_elo_drift(theta0, beta, n_resp, drift_rate, K=0.3, target=0.5, parallel=False):
@@ -50,25 +50,10 @@ def run_urnings_drift(theta0, beta, n_resp, drift_rate, n_p=32, n_i=32, target=0
     ki = np.full(I, n_i // 2)
     count = np.zeros(P, dtype=int)
     track = []
-    eps = 1e-9
     for t in range(n_resp):
         p = RNG.integers(0, P)
         true_now = theta0[p] + drift_rate * count[p]
-        pi_p = np.clip(kp[p] / n_p, eps, 1 - eps)
-        theta_sel = _logit_urn(kp[p], n_p)
-        beta_hat = -_logit_urn(ki, n_i)
-        i = pick_adaptive(theta_sel, beta_hat, target)
-        x = int(RNG.random() < SIG(true_now - beta[i]))
-        pi_i = np.clip(ki[i] / n_i, eps, 1 - eps)
-        num = pi_p * (1 - pi_i)
-        q = num / (num + (1 - pi_p) * pi_i)
-        y = int(RNG.random() < q)
-        kp_s, ki_s = kp[p] + x - y, ki[i] - x + y
-        if 0 <= kp_s <= n_p and 0 <= ki_s <= n_i:
-            cur = kp[p] * (n_i - ki[i]) + (n_p - kp[p]) * ki[i]
-            pro = kp_s * (n_i - ki_s) + (n_p - kp_s) * ki_s
-            if cur <= 0 or RNG.random() < min(1.0, pro / cur):
-                kp[p], ki[i] = kp_s, ki_s
+        urnings_step(kp, ki, p, true_now, beta, n_p, n_i, target)
         count[p] += 1
         if (t + 1) % 200 == 0:
             est = _logit_urn(kp, n_p)

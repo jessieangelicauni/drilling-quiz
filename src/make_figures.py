@@ -16,7 +16,7 @@ def fig1():
     free(fig, ax, .040, .957, "ITEM FOUNDRY", 6.9, bold=True, color=MUTE)
     B(.045, .725, .195, .185, "Role 1\nGENERATOR\nEXAONE\nstem + key", F_GEN, 6.9)
     B(.265, .725, .195, .185, "Role 2\nDISTRACTORS\nEXAONE\none per $m_j$", F_GEN, 6.9)
-    B(.485, .725, .205, .185, "VERIFIER GATE\nmorph. analyser\n+ grammar\n+ round-trip", F_VER, 6.9)
+    B(.485, .725, .205, .185, "VERIFIER GATE\nKAGAS annotator\n+ log-prob\n+ critic", F_VER, 6.9)
     B(.755, .725, .220, .185, "Role 3\nDIFFICULTY PRIOR\nKLUE-RoBERTa\n$(\\hat\\mu_i,\\hat\\sigma_i^2)$", F_EST, 6.9)
     arrow(ax, (.240, .8175), (.265, .8175))
     arrow(ax, (.460, .8175), (.485, .8175))
@@ -65,41 +65,37 @@ def fig1():
 def fig2():
     fig, ax = canvas(7.15, 3.5)
     B = lambda *a, **k: box(fig, ax, *a, **k)
-    B(.015, .775, .315, .155, "KOREAN LEARNER\nCORPUS (annotated)", F_EXT, 7.0, True)
-    B(.015, .345, .315, .365,
-      "MISCONCEPTION TAXONOMY $\\mathcal{M}$\n(KAGAS, 4 of 7 relevant codes)\n"
-      "$m_1$ PART (particle)\n$m_2$ ADJ (relativizer)\n"
-      "$m_3$ END (honorific/plain)\n$m_4$ CONJ (irregular stem)", F_VER, 6.0)
-    arrow(ax, (.1725, .775), (.1725, .710))
+    B(.015, .700, .315, .230,
+      "MISCONCEPTION CODES\nKAGAS annotator, no LLM:\ncode = the edit key → $d_j$\nsame error, same code", F_EXT, 6.2, True)
+    B(.015, .345, .315, .290,
+      "LEARNER MODEL (Eqs. 2-3)\npropensity $\\eta_{p,m}$ per misconception,\nmultinomial choice among the\noffered distractors, online update\ndominant $m^*$ = argmax $\\eta$", F_PSY, 6.0)
 
-    B(.365, .630, .295, .215,
-      "CONDITIONED GENERATION\nEXAONE: one distractor per\nsampled $m_j$, tagged", F_GEN, 6.6)
-    arrow(ax, (.330, .575), (.370, .675), rad=-0.15)
+    B(.365, .680, .295, .250,
+      "GENERATION (EXAONE)\nsentence, key span, and\n3 distractors, 3 different\nerrors (one is $m^*$ when known)", F_GEN, 6.3)
+    arrow(ax, (.330, .490), (.370, .730), rad=-0.15)
 
-    B(.370, .345, .285, .215,
-      "VERIFIER GATE\n(a) $d_j$ realises $m_j$ only\n"
-      "(b) $d_j$ is not also correct\n(c) solver still picks key", F_VER, 6.4)
-    arrow(ax, (.5125, .630), (.5125, .560))
-    arrow(ax, (.655, .435), (.700, .52), rad=-0.22)
+    B(.370, .330, .285, .300,
+      "VERIFIER (no model judges)\n(a) one edit, tested category\n(b) code $m_j$ = KAGAS edit\n(c) the three codes differ\n(d) key outscores each $d_j$\n     (Qwen3 log-probability)", F_VER, 6.0)
+    arrow(ax, (.5125, .680), (.5125, .630))
 
-    B(.370, .135, .285, .175,
-      "CRITIC (LLM-as-judge)\nrejected item: diagnose\nfailure, draft a revision", F_PSY, 6.2)
-    arrow(ax, (.5125, .345), (.5125, .305))
-    ortho(ax, [(.370, .222), (.348, .222), (.348, .780), (.365, .780)])
+    B(.370, .110, .285, .170,
+      "CRITIC\nfailure reasons back to\nEXAONE, up to 2 revisions", F_POL, 6.2)
+    arrow(ax, (.5125, .330), (.5125, .280))
+    ortho(ax, [(.370, .195), (.348, .195), (.348, .760), (.365, .760)])
 
-    B(.700, .650, .29, .19,
-      "DIAGNOSTIC ITEM\nstem · key · $\\{(d_j,m_j)\\}$\nevery option labelled", F_GEN, 7.0, True)
-    B(.700, .370, .29, .215,
-      "RESPONSE → DIAGNOSIS\nchoosing $d_j$ is evidence\nagainst skill $m_j$ only", F_PSY, 7.0)
-    B(.700, .140, .29, .165,
-      "PER-SKILL UPDATE\nonly the $m_j$ dimension", F_POL, 7.0)
-    arrow(ax, (.845, .650), (.845, .585))
-    arrow(ax, (.845, .370), (.845, .305))
+    B(.700, .680, .29, .190,
+      "DIAGNOSTIC ITEM\nstem · key · $\\{(d_j,m_j)\\}$\nevery distractor coded", F_GEN, 6.8, True)
+    arrow(ax, (.655, .480), (.700, .740), rad=-0.22)
+    B(.700, .400, .29, .215,
+      "WRONG ANSWER\nchosen $d_j$ against the offered\ncodes updates the learner\nmodel: one step on $\\eta$ (Eq. 3)", F_PSY, 6.5)
+    B(.700, .140, .29, .190,
+      "NEXT ITEM\ntargets $m^*$; same $m_j$ twice\nescalates feedback (Eq. 5)", F_POL, 6.5)
+    arrow(ax, (.845, .680), (.845, .615))
+    arrow(ax, (.845, .400), (.845, .330))
 
-    ax.text(.015, .070,
-            "오늘 날씨가 ___ .      key 추워요      d: 춥어요  →  m₄\n"
-            "할아버지께서 ___ .    key 오십니다    d: 옵니다  →  m₃",
-            fontsize=7.0, fontname=KOF, va="center", ha="left", linespacing=1.75,
+    ax.text(.015, .060,
+            "동생이 공원___ 축구를 해요.    key 에서    d: 에 → PART:에서>에 · 을 → PART:에서>을 · 이 → PART:에서>이",
+            fontsize=6.6, fontname=KOF, va="center", ha="left",
             bbox=dict(fc="#f7f7f7", ec=MUTE, lw=0.7, pad=4.0))
     finish(fig, "figures/fig2_distractors.png")
 

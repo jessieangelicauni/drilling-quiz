@@ -75,8 +75,8 @@ def run_with_selection_tracking(theta: np.ndarray, n_resp: int, item_k0_fn,
         p = RNG.integers(0, P)
         pi_p = np.clip(kp[p] / n_p, eps, 1 - eps)
         theta_sel = _logit_urn(kp[p], n_p)
-        beta_hat = -_logit_urn(ki[:n_active], ni[:n_active])
-        i = pick_adaptive(theta_sel, beta_hat, target, pool=min(48, n_active))
+        beta_hat = _logit_urn(ki[:n_active], ni[:n_active])  # sign fixed, PRD §9.68
+        i = pick_adaptive(theta_sel, beta_hat, target)
         selection_count[i] += 1
 
         n_i = int(ni[i])

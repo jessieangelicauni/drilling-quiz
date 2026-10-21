@@ -8,7 +8,7 @@ Personalised Korean drill quizzes: a psychometrically grounded LLM pipeline.
 
 ## Output
 
-- `paper/KO-DRILL_IEEE.docx` — the paper, IEEE two-column format, 11 pages, 36 references
+- `paper/KO-DRILL_IEEE.docx` — the paper, IEEE two-column format
 - `paper/KO-DRILL_IEEE.pdf` — rendered for checking (LibreOffice)
 
 ## Reproduce
@@ -33,21 +33,31 @@ actual system, built directly on the decisions in `docs/PRD.md`:
 | `src/streak.py` | Daily streak counter — deliberately independent of both trackers above |
 | `src/daily_drill.py` | Assembles one day's quiz from due + new vocab and grammar items |
 
-| `src/distractor_validator.py` | KAGAS-aligned validator (`kiwipiepy` morphological analysis) — confirms a distractor option actually parses as the particle/tag it's meant to test |
-| `src/exaone_provider.py` | Real `ContentProvider` for grammar items — EXAONE-4.0-1.2B generation, gated by `distractor_validator.py`, wired and tested through `daily_drill.py` end-to-end |
+| `src/item_foundry.py` | Grammar `ContentProvider` (Novelty 1, PRD §9.74): EXAONE-3.5-7.8B-Instruct (4-bit) writes each item (sentence, key span, three distractors, each a different typical mistake). Each distractor's misconception code is its KAGAS edit from the key (`kagas_annotator.py`), e.g. `PART:에서>에`; no codebook. Verified without an LLM judge (one edit in the skill's category, three distinct codes, Qwen3-4B log-prob key-uniqueness), with up to 2 critic revisions |
+| `src/kagas_annotator.py` | KAGAS-style edit annotator: aligns kiwipiepy morphemes of the key and distractor sentences, classifies each edit by KAGAS category, and gives closed-class edits a stable code (`PART:에서>에`) |
+| `src/misconception_tracker.py` | Per-learner misconception propensities from WHICH distractor is chosen: multinomial-logit choice among the offered distractors, updated online (PRD §9.70) |
 | `src/vocab_provider.py` | Vocab `ContentProvider` — words/meanings from an admin-maintained curriculum, not generation; distractors are other curriculum meanings |
 | `src/content_provider.py` | Combines the two into the single provider `daily_drill.py` actually needs once `vocab_ratio` mixes both types |
-| `src/answer_processing.py` | The other half of the daily-drill lifecycle: processes a submitted answer — updates the Urnings skill urn, checks escalation, calls `qwen_feedback`, updates the FSRS card, records streak completion |
-| `src/question_bank.py` | Decouples generating items (slow, needs the LLM, batch) from serving them (fast, every drill assembly) — `QuestionBank.batch_generate()` + admin approve/reject/edit workflow, `BankContentProvider` serves only approved entries, no live LLM call at request time |
-| `src/qwen_feedback.py` | Fast + detailed (escalation-gated) wrong-answer feedback via Qwen3-1.7B — English-only by tested decision, not a TODO (see below) |
+| `src/answer_processing.py` | The other half of the daily-drill lifecycle: processes a submitted answer — updates the Urnings skill urn and the misconception profile, checks escalation, calls `qwen_feedback`, updates the FSRS card, records streak completion |
+| `src/question_bank.py` | Decouples generating items (slow, needs the LLM, batch) from serving them (fast, every drill assembly) — `QuestionBank.batch_generate()` + admin approve/reject/edit workflow, `BankContentProvider` serves only approved entries (sampled from the 85%-target kernel, preferring items that offer the learner's dominant misconception), no live LLM call at request time; `submit_answer` applies the Urnings selection correction |
+| `src/qwen_feedback.py` | Fast + detailed (escalation-gated) wrong-answer feedback with Qwen3-4B (bf16); the detailed path uses reasoning mode. English and Indonesian (EXAONE was dropped as explainer after it wrote wrong Indonesian explanations, PRD §9.67/§9.71) |
+| `src/solver_check.py` | Verifier checks on generated items with Qwen3-4B: blind best-answer pick (letter, rotated over option orders, or cloze log-prob scoring) and log-likelihood "is the distractor also correct" check |
+| `src/eval_harness.py` | Statistics for validation results: unique-item counts, Wilson 95% intervals, multi-seed aggregation, and a frozen dev/test split of curated items |
 | `src/difficulty_heuristic.py` | Deterministic difficulty proxy (morpheme count + grammatical complexity) standing in for the KLUE-RoBERTa regression head, which is blocked by a missing calibration dataset |
 
 Each file has runnable smoke tests in its `if __name__ == "__main__"` block
 (`.venv/bin/python src/<file>.py`). `daily_drill.py` depends on real content
 generation only through the `ContentProvider` protocol, mocked in its own
-smoke test — the generator itself (EXAONE-4.0-1.2B) was smoke-tested
-standalone (see "Content generation findings" below), not yet wired in as
-a `ContentProvider` implementation.
+smoke test.
+
+Current model per role (PRD §9.51–§9.71): item generation (`item_foundry.py`)
+uses `LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct` (4-bit); the log-prob gate
+(`solver_check.py`) and feedback (`qwen_feedback.py`) use `Qwen/Qwen3-4B`
+(bf16). The item foundry's GPU validation is
+`python3 src/validate_item_foundry.py`. The
+findings section below is the 2026-10-19 history of the template generator
+(EXAONE-4.0-1.2B, Qwen3-1.7B/4B), which was removed on 2026-10-21; it is
+kept for the record, and the files it names no longer exist.
 
 ### Content generation findings (2026-10-19)
 
@@ -153,7 +163,7 @@ which is why the failure is easy to miss in production. Urn-size sensitivity
 
 ## Citations
 
-All 36 references were verified against the Crossref API — authors, venue,
+All references were verified against the Crossref API — authors, venue,
 volume, pages, year, DOI. No arXiv or MDPI sources in the literature review;
 the two model technical reports (EXAONE, Qwen3) and the KLUE benchmark are cited
 as model/resource documentation, not as review literature.

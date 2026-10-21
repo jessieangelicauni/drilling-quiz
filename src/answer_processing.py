@@ -41,15 +41,19 @@ from datetime import datetime
 
 import numpy as np
 
+from typing import TYPE_CHECKING
+
 from daily_drill import UserDrillState
 from difficulty_heuristic import estimate_difficulty
-from exaone_provider import GeneratedItem
-from qwen_feedback import QwenFeedbackProvider
+from item_foundry import GeneratedItem
 from streak import StreakState
 from urnings_tracker import UrnState, is_mastered, seed_item_from_encoder, should_escalate_full
 from urnings_tracker import update as urnings_update
 from vocab_scheduler import new_vocab_card
 from vocab_scheduler import review as vocab_review
+
+if TYPE_CHECKING:  # loads a GPU model; only the type is needed here
+    from qwen_feedback import QwenFeedbackProvider
 
 
 @dataclass
@@ -63,7 +67,8 @@ class AnswerResult:
 def submit_grammar_answer(state: UserDrillState, item: GeneratedItem, chosen_option: str,
                            feedback_provider: QwenFeedbackProvider,
                            rng: np.random.Generator, now: datetime | None = None,
-                           item_urn: UrnState | None = None) -> AnswerResult:
+                           item_urn: UrnState | None = None,
+                           selection_prob=None) -> AnswerResult:
     correct = chosen_option == item.answer
     learner_urn = state.skill_profile.get(item.skill_id)
     was_mastered = is_mastered(learner_urn)
@@ -71,13 +76,23 @@ def submit_grammar_answer(state: UserDrillState, item: GeneratedItem, chosen_opt
     if item_urn is None:
         item_urn = seed_item_from_encoder(*estimate_difficulty(item.stem))
 
-    new_learner_urn, new_item_urn = urnings_update(learner_urn, item_urn, correct, rng)
+    # selection_prob: given when the item was served adaptively from the
+    # urn states (QuestionBank.submit_answer), see urnings_tracker.update.
+    new_learner_urn, new_item_urn = urnings_update(learner_urn, item_urn, correct, rng,
+                                                   selection_prob=selection_prob)
     state.skill_profile.set(item.skill_id, new_learner_urn)
-    # Eq. 3's OTHER disjunct (PRD §9.38): previously the whole
+    # Eq. 5's OTHER disjunct (PRD §9.38): previously the whole
     # consecutive(m_j)>=2 trigger had nothing to read from anywhere in
     # this codebase, so escalation silently only ever checked urn width.
     # Updated unconditionally (correct answers reset the streak).
-    consecutive = state.skill_profile.record_outcome(item.skill_id, correct, item.kagas_code)
+    # The misconception a wrong answer reveals is the one realised by the
+    # option actually picked (Novelty 1, PRD §9.69); items without
+    # per-option codes fall back to the item-level KAGAS code.
+    chosen_code = item.option_codes.get(chosen_option) if item.option_codes else item.kagas_code
+    consecutive = state.skill_profile.record_outcome(item.skill_id, correct, chosen_code)
+    if not correct and item.option_codes:
+        offered = [code for label, code in item.option_codes.items() if label != item.answer]
+        state.misconceptions.record_choice(item.skill_id, chosen_code, offered)
 
     feedback = None
     if not correct:
@@ -111,37 +126,47 @@ def complete_drill_session(streak: StreakState, today) -> StreakState:
 if __name__ == "__main__":
     from datetime import timezone
 
-    from exaone_provider import ExaoneGrammarProvider
-    from qwen_feedback import QwenFeedbackProvider
     from urnings_tracker import UrnState
+
+    class StubFeedback:  # stands in for QwenFeedbackProvider (GPU); records which path was taken
+        def __init__(self):
+            self.calls = []
+
+        def fast_feedback(self, stem, correct, wrong):
+            self.calls.append("fast")
+            return f"fast: {wrong} -> {correct}"
+
+        def detailed_feedback(self, stem, correct, wrong):
+            self.calls.append("detailed")
+            return f"detailed: {wrong} -> {correct}"
 
     rng = np.random.default_rng(0)
     now = datetime.now(timezone.utc)
 
     state = UserDrillState(user_id="u1", skill_ids=["particle_loc"])
     state.skill_profile.set("particle_loc", UrnState(k=10, n=32))
+    item = GeneratedItem("particle_loc", "동생이 공원___ 축구를 해요.", "___",
+                         {"A": "에", "B": "에서", "C": "을", "D": "이"}, "B", "PART",
+                         option_codes={"A": "PART:에서>에", "B": None, "C": "PART:에서>을", "D": "PART:에서>이"})
+    feedback_provider = StubFeedback()
 
-    provider = ExaoneGrammarProvider(seed=0)
-    item_id = provider.next_new_grammar_item("particle_loc")
-    assert item_id is not None
-    item = provider.items[item_id]
-
-    feedback_provider = QwenFeedbackProvider()
-
-    wrong_option = next(oid for oid, text in item.options.items() if oid != item.answer)
-    result = submit_grammar_answer(state, item, wrong_option, feedback_provider, rng, now=now)
+    result = submit_grammar_answer(state, item, "A", feedback_provider, rng, now=now)
     assert not result.correct
-    assert result.feedback, "a wrong answer must produce feedback text"
-    assert item.options[wrong_option] in result.feedback, (
-        "feedback must reference the actual wrong particle text, not its option label (A/B/C/D)")
-    print("wrong-answer feedback:", result.feedback)
-
+    assert result.feedback and "에" in result.feedback, "feedback must use the option text, not its label"
     urn_after_wrong = state.skill_profile.get("particle_loc")
     assert urn_after_wrong.k <= 10, "a wrong answer must not increase k"
+
+    # The chosen distractor's misconception is what gets recorded (Novelty 1, PRD §9.69).
+    assert state.misconceptions.dominant("particle_loc") == "PART:에서>에"
+    assert state.misconceptions.evidence("particle_loc") == 1
+    submit_grammar_answer(state, item, "A", feedback_provider, rng, now=now)
+    assert state.skill_profile.consecutive_misconceptions("particle_loc") == 2
+    assert feedback_provider.calls[-1] == "detailed", "the same misconception twice in a row must escalate"
 
     result2 = submit_grammar_answer(state, item, item.answer, feedback_provider, rng, now=now)
     assert result2.correct
     assert result2.feedback is None, "a correct answer must not produce feedback"
+    assert state.misconceptions.evidence("particle_loc") == 2, "a correct answer carries no misconception evidence"
 
     # Novelty 1 (§9.12): the ephemeral path (no item_urn given) must still
     # seed a real one, not silently skip it.
@@ -151,7 +176,6 @@ if __name__ == "__main__":
     # The persisted path: caller passes an existing item_urn (as if read
     # from a QuestionBank.BankEntry), gets back an updated one with the
     # SAME n (urn size doesn't change mid-exchange) and a valid k.
-    from urnings_tracker import seed_item_from_encoder
     persisted_item_urn = seed_item_from_encoder(mu_hat=0.0, sigma_hat2=1.5)
     result3 = submit_grammar_answer(state, item, item.answer, feedback_provider, rng, now=now,
                                      item_urn=persisted_item_urn)
@@ -164,21 +188,16 @@ if __name__ == "__main__":
     # noisy to assert on (both the ball-exchange's y and the MH acceptance
     # step are stochastic) -- averaged over many trials instead, the same
     # way urnings_tracker.py's own smoke test validates convergence over
-    # 500 draws rather than one. Direction verified empirically against
-    # simulate_trackers.run_urnings (the already-validated reference
-    # implementation this module's update() mirrors exactly) before writing
-    # this assertion, NOT assumed from intuition: a correct answer on an
-    # item seeded as easier (higher item k/n) moves the learner's urn up
-    # MORE on average than the same correct answer on an item seeded as
-    # harder (lower item k/n) -- counter to a naive "beating a hard item
-    # should earn more credit" intuition, but this is how the validated
-    # ball-exchange algorithm actually behaves per-step; its correctness is
-    # established by the RMSE/convergence results in docs/PRD.md, not by
-    # single-step intuition.
+    # 500 draws rather than one. Direction: the item urn is a difficulty
+    # (PRD §9.68), so beating an item seeded as harder (higher item k/n)
+    # moves the learner's urn up MORE on average than beating one seeded as
+    # easier. This assertion used to expect the opposite, which only held
+    # because the item urn was seeded with the mirror image of its
+    # difficulty before the 2026-10-21 fix.
     from urnings_tracker import UrnState as _UrnState
     from urnings_tracker import update as _urnings_update
-    hard_item_urn = seed_item_from_encoder(mu_hat=2.5, sigma_hat2=1.5)   # low item k/n
-    easy_item_urn = seed_item_from_encoder(mu_hat=-2.5, sigma_hat2=1.5)  # high item k/n
+    hard_item_urn = seed_item_from_encoder(mu_hat=2.5, sigma_hat2=1.5)   # high item k/n
+    easy_item_urn = seed_item_from_encoder(mu_hat=-2.5, sigma_hat2=1.5)  # low item k/n
     start = _UrnState(k=16, n=32)
     trial_rng = np.random.default_rng(7)
     n_trials = 3000
@@ -187,10 +206,10 @@ if __name__ == "__main__":
     easy_ks = [_urnings_update(start, easy_item_urn, correct=True, rng=trial_rng)[0].k
                for _ in range(n_trials)]
     avg_hard, avg_easy = np.mean(hard_ks), np.mean(easy_ks)
-    assert avg_easy > avg_hard, (
+    assert avg_hard > avg_easy, (
         "the encoder-seeded item prior must change update()'s average behaviour -- "
-        f"avg k after correct on easier-seeded item ({avg_easy:.3f}) must exceed "
-        f"harder-seeded item ({avg_hard:.3f}), confirming the prior isn't inert"
+        f"avg k after correct on harder-seeded item ({avg_hard:.3f}) must exceed "
+        f"easier-seeded item ({avg_easy:.3f}), confirming the prior isn't inert"
     )
 
     vocab_state = UserDrillState(user_id="u1", skill_ids=[])

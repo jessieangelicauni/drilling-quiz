@@ -4254,5 +4254,419 @@ dipertimbangkan revert juga.
 
 ---
 
+### 9.68 Review eksternal (2026-10-21): perbaikan cepat Q1–Q6 + harness evaluasi, dan satu temuan besar yang BELUM diperbaiki
+
+**Konteks:** review kode vs PRD dan daftar keterbatasan (`/mnt/project-files/reviews/` di project ini). User setuju mulai dari perbaikan cepat dan harness evaluasi.
+
+**Diperbaiki:**
+- **Q1 salah tanda target 85%:** `validate_item_discrimination.py` memakai `beta = -logit(0.15)` = +1.73 (item 15%-sukses, `avg_success_rate` 19%). Sekarang `beta = -logit(0.85)` = −1.73, dengan assert bahwa tingkat sukses item ≈ target. Hasil ulang: diskriminasi 0.343 (sebelumnya 0.335), drop relatif **16%** (sebelumnya 18%). Rumus di paper diperbaiki ("β=θ̂−logit(0.85)"), docx/pdf di-build ulang.
+- **Q2:** `collocation_plausibility.py` sekarang **fail-closed** secara default. Fail-open hanya kalau `KO_DRILL_ALLOW_PLAUSIBILITY_BYPASS=1`.
+- **Q3:** parser huruf dan ya/tidak di `solver_check.py` dipindah ke `llm_parsing.py` (bisa dites tanpa GPU). Sekarang hanya token pertama yang dibaca, jadi "예시" tidak lagi dianggap "ya". Ditambah `pick_by_logprob()` (skoring cloze, tanpa huruf) dan `pick_best_rotated()` (4 rotasi urutan opsi) untuk menghilangkan bias posisi.
+- **Q4:** `QuestionBank.submit_answer()` menulis balik `updated_item_urn` ke bank (sebelumnya tidak ada pemanggil yang melakukannya).
+- **Q5:** README disinkronkan dengan model yang benar-benar dipakai.
+- **Q6:** urutan kandidat filler diacak per item (sebelumnya selalu "학교"/"사과" yang sama).
+- **Harness:** `eval_harness.py` + `docs/eval-protocol.md` (draft). Hasil dari file yang sudah ada: solver key acceptance **38/55 item unik = 69.1% (CI 95% 56–80%)**; log-likelihood **51/52 = 98.1% (CI 90–99.7%)**; kiwipiepy 26/26 (CI 87–100%). Akurasi solver bergantung posisi kunci: 75% saat kunci di A vs 53% di B.
+
+**Temuan besar, BELUM diperbaiki (butuh keputusan user):** konvensi tanda kesulitan item Urnings **terbalik**. Di kernel `update()` (dan `run_urnings`), urn item berperilaku sebagai *kesulitan*: logit(k_i) berkorelasi **+0.94** dengan β sebenarnya (dicek langsung, 60.000 respons, seleksi acak). Tapi seleksi adaptif (`simulate_trackers.run_urnings`, `simulate_item_prior.py`, `simulate_item_coldstart*.py`, `validate_novelty2.py`, `BankContentProvider`) memakai `beta_hat = -logit(k_i)`, dan seeding prior (`seed_item_from_encoder`, `SIG(-mu_hat)`) juga terbalik. Akibatnya simulasi Urnings tidak benar-benar adaptif. Dengan tanda yang benar (seleksi sungguh adaptif, |P−0.5| rata-rata turun dari 0.29 ke 0.10), Urnings di setup Section III-B yang sama memberi **SD 2.87, RMSE 1.95**, lebih buruk dari Elo (2.69/1.70), bukan 1.11/0.43. Ini menyentuh klaim inti paper (Urnings stabil di bawah seleksi adaptif) dan Novelty 2 (robust terhadap prior: prior yang diinjeksikan ke Urnings selama ini selalu terbalik). Perlu dicek juga apakah kernel butuh koreksi MH untuk seleksi adaptif seperti yang dibahas di literatur Urnings.
+
+### 9.69 Urnings diperbaiki (2026-10-21): tanda urn item + koreksi seleksi adaptif, di simulasi DAN di kode produksi
+
+**Keputusan user:** "Perbaiki + tambah koreksi adaptif" (kartu keputusan, menjawab temuan besar §9.68).
+
+**Diperbaiki:**
+- **Tanda:** urn item adalah *kesulitan* (logit(k_i) ≈ +β). Semua seleksi dan seeding sekarang memakai `+logit(k_i)` dan `SIG(+mu_hat)` (`simulate_*.py`, `validate_novelty2.py`, `urnings_tracker.seed_item_from_encoder`, `question_bank`). Assert arah di smoke test `answer_processing.py` ikut dibalik: menjawab benar item yang lebih sulit sekarang menaikkan urn pelajar lebih banyak, sesuai model.
+- **Koreksi seleksi adaptif:** item dipilih dengan kernel Gaussian pada jarak logit (σ=0.5, Gergely et al. 2025 Eq. 17), dan rasio penerimaan MH dikali p(item | state usulan) / p(item | state sekarang) (Bolsinova et al. 2022; Gergely et al. 2025 Eq. 4). Di simulasi: `simulate_trackers.urnings_step`. **Di produksi** (baru): `urnings_tracker.selection_probs` + argumen `selection_prob` di `update()`; `BankContentProvider` sekarang *sampling* dari kernel dengan target 85% (bukan "salah satu dari 3 terdekat"), dan `QuestionBank.submit_answer` meneruskan probabilitas seleksi ke update. Item hasil generate langsung (tidak dipilih dari urn) tidak perlu koreksi.
+
+**Hasil ulang (Section III-B, 120.000 respons, 300 pelajar, 400 item):** Elo SD 2.32 / RMSE 1.35 (masih naik); Parallel Elo 1.55 / 0.59; **Urnings 1.00 / 0.41** (SD asli 1.04). Tanpa koreksi MH, Urnings 2.63 / 1.73, lebih buruk dari Elo. Sapuan ukuran urn (16/32/64/128): RMSE 0.59 / 0.35 / 0.32 / 0.36; urn 128 belum menyebar (SD 0.72) dalam ~400 respons per pelajar. Paper diperbarui (abstrak, III-B, Fig. 4, Diskusi).
+
+**Catatan jujur:** di simulasi statis, Glicko masih jauh lebih akurat (RMSE 0.11). Di simulasi drift (`simulate_drift.py`), RMSE@100%: Urnings 0.903, Parallel Elo 0.904, Glicko 1.027, Elo 1.227, jadi alasan menolak Glicko (§2.1) masih berlaku tapi selisihnya lebih kecil dari sebelumnya (0.86 vs 1.05).
+
+### 9.70 Novelty 2 dihapus; Novelty 1 (A1) dibangun ulang dengan metode generatif + model pilihan miskonsepsi
+
+**Novelty 2 dihapus (keputusan user, 2026-10-21):** setelah §9.69, klaim "Urnings kebal terhadap prior buruk" tidak berlaku lagi. Prior lemah tetap merugikan Urnings (RMSE 0.42 → 0.68; Elo 1.34 → 1.70; Parallel Elo 0.60 → 0.90, `simulate_item_prior.py`, `simulate_elo_item_prior.py`). Ketahanan lama ternyata artefak bug. Dibandingkan SOTA, isinya juga bukan hal baru (Urnings + koreksi seleksi sudah ada di Bolsinova 2022 dan Gergely 2025). User: "noveltynya dibandingkan dengan existing research / sota … apakah di hapus saja?" Dihapus dari paper sebagai novelty (Section IV-C dan V-C lama hilang). Hasil prior dipertahankan satu paragraf di III-B sebagai catatan desain. Ditambah kondisi baru: ukuran urn mengikuti σ² encoder yang benar (σ²=noise²) mengurangi kerugian prior lemah dari 0.68 ke 0.59, jadi encoder harus melaporkan varians yang terkalibrasi.
+
+**A1, metode baru (user: "saya mau powerful metodenya dan hasilnya bagus"; tanpa konten hardcoded):**
+- **`misconception_tracker.py`** (baru): model pilihan multinomial-logit (Luce) di antara distraktor yang ditawarkan (nested logit, Suh & Bolt 2010), di-update online dengan satu langkah SGD per jawaban salah (λ=0.4), mirip hubungan Elo dengan Bradley-Terry. Disimpan per pelajar di `UserDrillState.misconceptions`.
+- **Simulasi** (`simulate_misconceptions.py`, `misconception_results.json`; 6 miskonsepsi, 3 ditawarkan per item, ketersediaan Zipf, 300 pelajar × 20 replikasi). Akurasi top-1 setelah 10 / 40 jawaban salah:
+  - stabil: online 58.1% / 73.1%; MLE semua riwayat 59.4% / 78.0%; rate 60.0% / 77.3%; count 45.9% / 51.4%; peluang 16.7%;
+  - setelah remediasi: online **53.2% / 73.7%**; MLE 40.1% / 59.3%; rate 40.2% / 59.7%; count 34.6% / 43.3%.
+  - Online kalah ~5 poin kalau miskonsepsi tidak pernah berubah, tapi menang ~14 poin setelah remediasi. Varian urn per miskonsepsi sempat dicoba, lalu dibuang (lebih buruk saat stabil).
+- **`kagas_annotator.py`** (baru, menggantikan validator aturan kiwipiepy): menyelaraskan morfem kalimat benar vs salah (alomorf 을/를 dkk. digabung), lalu mengklasifikasi edit per kategori KAGAS. Edit kelas tertutup (partikel/akhiran/counter) menghasilkan kode stabil, mis. `PART:에서>에`. Keterbatasan: kiwipiepy kadang memotong distraktor yang ambigu secara berbeda (mis. "공원이 책을" → 이/MM), jadi distraktor seperti itu ditolak (aman, tapi bisa menurunkan tingkat lolos).
+- **`item_foundry.py`** (baru, menggantikan `exaone_provider.py`):
+  - codebook miskonsepsi per skill ditulis EXAONE dan diverifikasi annotator, lalu dibekukan di `data/misconception_codebook.json`;
+  - item ditulis EXAONE (kalimat, span kunci, 3 distraktor, masing-masing satu miskonsepsi berbeda; satu harus miskonsepsi dominan pelajar kalau sudah diketahui);
+  - verifikasi tanpa LLM-judge: satu edit di kategori skill, kode cocok dengan codebook, tiga kode berbeda, dan kunci harus punya log-prob Qwen3-4B lebih tinggi dari tiap distraktor (dilewati untuk subj_topic);
+  - critic: alasan gagal dikirim balik ke EXAONE, maksimal 2 revisi.
+- **Personalisasi:** `daily_drill` meneruskan `target_misconception` = miskonsepsi dominan ke provider. Generator mewajibkan satu distraktor merealisasikannya; `BankContentProvider` memilih item bank yang menawarkan miskonsepsi itu. Trigger eskalasi `consecutive(m_j)` sekarang memakai kode distraktor yang **dipilih**, bukan kode level item.
+- **Dihapus:** `exaone_provider.py` (slot, `verb_lookup`, pasangan tetap, filler, `primary_distractor_label`), `collocation_plausibility.py` (SBERT), `distractor_validator.py` (fungsi `correct_korean_conjugation` dipindah ke `qwen_feedback.py`), skor parse kiwipiepy (`validate_lm_plausibility.py` + hasilnya), `validate_novelty1.py`, `validate_log_likelihood.py`, `verify_exaone35_swap.py`. `1_validation_results.json` dan `log_likelihood_results.json` dipertahankan sebagai catatan item kurasi lama dan kalibrasi gerbang log-prob (51/52).
+- **Validasi GPU, BELUM dijalankan** (sandbox tanpa GPU): `python3 src/validate_item_foundry.py --per-skill 20` membangun codebook, meminta 20 item per skill (setengah ditargetkan), lalu melaporkan tingkat lolos (Wilson CI), alasan penolakan, cakupan kode, dan solver rotasi sebagai pembanding. Semua item disimpan ke `item_foundry_results.json` untuk review instruktur. Logika pipeline sudah dites di CPU dengan model pengganti (`python3 src/item_foundry.py`).
+- **Paper:** Section IV-B dan V-B ditulis ulang, Eq. 2–3 baru (model pilihan), seleksi jadi kernel (Eq. 4), eskalasi Eq. 5, Fig. 1–2 diperbarui. Referensi ditambah: KAGAS (Yoon et al. 2023; sebelumnya KAGAS salah dikutip sebagai [22], KoLLA) dan Suh & Bolt (2010).
+- **Inkonsistensi lama:** paper menyebut Qwen3 sebagai explainer, padahal `qwen_feedback.py` memakai EXAONE-3.5-7.8B. Diselesaikan di §9.71.
+
+### 9.71 Run codebook pertama (GPU), perbaikan parser + annotator, benchmark checker, explainer kembali ke Qwen3-4B
+
+**Hasil run `--codebook-only` (EXAONE-3.5-7.8B, 3 balasan × 11 skill, 6 entri per balasan):** parsing JSON sudah berhasil (32/33 balasan), tapi hanya **3 entri** lolos (honorific 1, noun_counter 2). Penyebab utama, dibaca dari `codebook_log`: EXAONE hampir selalu menambahkan romanisasi dan terjemahan Inggris di belakang kalimat Korea ("공원에서 산책했어요. (Gongwon-eseo ...) - I walked ..."). Annotator menghitung bagian Latin itu sebagai edit tambahan, jadi pasangan yang sebenarnya minimal ditolak sebagai "not-minimal". Satu balasan gagal parse karena komentar `//` di dalam JSON.
+
+**Diperbaiki:**
+- `item_foundry.korean_only()`: buang segmen romanisasi/terjemahan dalam kurung dan setelah " - "; entri yang masih berisi huruf Latin di dalam kalimatnya ditolak dengan alasan `format`, tidak diam-diam diubah. Prompt codebook sekarang meminta Hangul saja.
+- `_loads_lenient`: komentar `//` setelah nilai JSON dibuang.
+- `kagas_annotator` langkah 4: bentuk predikat yang rusak dan tidak bisa dianalisis kiwi (먹았어요 → `먹았/NNG`) dulu jadi `MULTI`. Sekarang, kalau hanya satu kata predikat yang berbeda, edit dibaca dari permukaan kata itu (먹[었>았]어요 → `END:었>았`), atau `CONJ` kalau stem benarnya irregular (tag `-I`, mis. 아름다워요). Ini kesalahan harmoni vokal 았/었 yang justru miskonsepsi nyata untuk `tense_past`.
+- `validate_item_foundry.py --from-log FILE`: verifikasi ulang balasan yang sudah tercatat tanpa memanggil EXAONE lagi (tanpa GPU bersama `--codebook-only`).
+
+**Hasil verifikasi ulang atas balasan yang sama** (`codebook_reverified_results.json`): **3 → 32 entri**, 7 dari 11 skill punya ≥3 entri (cukup untuk 3 distraktor): particle_loc 3, honorific 3, tense_past 5, irregular_conj 4, adj_relativizer 3, subj_topic 3, noun_counter 7. Masih kurang: particle_obj 1, time_range 1, mod_adverb 2, verb_choice 0.
+
+**Temuan jujur soal kualitas:** verifier memeriksa BENTUK (satu edit, kategori benar), bukan apakah bentuk salahnya miskonsepsi pelajar yang masuk akal. Sebagian entri yang lolos jelas bagus (에서>에, 었>았, 권>개, 대>개, 한> dihilangkan), sebagian sampah (말씀하시공셨습니다, 읽어요어요, 아름답께, 이것은 책을이에요), dan satu contoh "benar" sendiri salah (스무 년). Jadi rating manusia pada codebook (2 rater, kappa) wajib, dan generator EXAONE-7.8B kemungkinan terlalu lemah untuk menulis codebook. Opsi penguatan diajukan ke user (lihat thread).
+
+**Benchmark checker (`src/benchmark_checker.py`, baru, butuh GPU):** kandidat Qwen3-4B (sekarang), Qwen3-4B-Base, Qwen3-8B / 8B-Base (4-bit), Kanana-1.5-8B-base (4-bit), Gemma-3-12B-pt (4-bit, gated). Aturan sama dengan gate: log-prob kalimat benar > kalimat salah. Tiga set: 52 pasangan kurasi, kalimat pelajar KoLLA dengan tepat satu error (anotator 0) vs koreksinya, dan contoh codebook. Melaporkan akurasi + Wilson CI, margin rata-rata, VRAM puncak, detik per pasangan. `SolverCheckProvider` sekarang bisa dimuat 4-bit. EXAONE sengaja tidak jadi kandidat (generator tidak boleh menilai outputnya sendiri).
+
+**Explainer kembali ke Qwen3-4B (bf16)** atas persetujuan user: `detailed_feedback` butuh reasoning mode yang tidak ada di EXAONE-3.5; §9.67 menemukan EXAONE menulis penjelasan Indonesia yang terpotong, berisi kata tidak nyata, dan sekali membalik jawaban benar, sedangkan Qwen3 bersih di 16/16. Satu model Qwen3-4B dipakai untuk checker dan explainer. Inkonsistensi paper vs kode di §9.70 selesai.
+
+**File:** `src/item_foundry.py`, `src/kagas_annotator.py`, `src/validate_item_foundry.py`, `src/solver_check.py`, `src/qwen_feedback.py`, `src/benchmark_checker.py` (baru), `data/misconception_codebook.json`, `codebook_reverified_results.json` (baru), README.
+
+### 9.72 Hasil benchmark checker: Qwen3-4B tetap dipakai
+
+**Run pertama** (400 pasangan KoLLA): semua model ~57%. Ini bug di `benchmark_checker.py`, bukan kelemahan model: set itu memuat error "kata hilang/berlebih" (M:/U:), di mana kalimat koreksi lebih panjang, dan total log-prob selalu memenangkan kalimat yang lebih pendek. Diperbaiki: hanya penggantian satu kata (R:, 1 token), dikelompokkan partikel / ejaan / lainnya.
+
+**Run ulang** (52 kurasi, 246 KoLLA, 32 codebook; aturan gate: log-prob kalimat benar > salah):
+
+| Model | Kurasi | KoLLA (CI 95%) | Codebook | VRAM |
+|---|---|---|---|---|
+| Qwen3-4B (bf16) | 51/52 = 98,1% | 215/246 = 87,4% (82,7–91,0) | 29/32 | 8,2 GB |
+| Qwen3-4B-Base | 96,2% | 217 = 88,2% (83,6–91,7) | 30/32 | 8,2 GB |
+| Qwen3-8B (4-bit) | 98,1% | 209 = 85,0% (80,0–88,9) | 30/32 | 6,5 GB |
+| Qwen3-8B-Base (4-bit) | 94,2% | 217 = 88,2% (83,6–91,7) | 30/32 | 6,5 GB |
+| Kanana-1.5-8B-base (4-bit) | 94,2% | 211 = 85,8% (80,9–89,6) | 30/32 | 6,2 GB |
+| Gemma-3-12B-pt (4-bit) | 50/52 = 96,2% | 218 = 88,6% (84,0–92,0) | 30/32 | 8,5 GB |
+
+Per jenis error KoLLA (partikel n=114 / ejaan n=131): Qwen3-4B 96 = 84,2% (CI 76,4–89,8) / 118 = 90,1%; Qwen3-4B-Base 96 / 120; Qwen3-8B 92 / 116; Qwen3-8B-Base 96 / 120; Kanana 90 / 120; Gemma 99 = 86,8% (79,4–91,9) / 118.
+
+**Kegagalan partikel Qwen3-4B, dibaca satu per satu (17 dari 18 tercatat):** 10 adalah partikel yang *dihilangkan* pelajar (선생님 좋아요 → 선생님이 좋아요, 아버지 거실에 계세요 → 아버지는 ...). Dalam bahasa Korea lisan, penghilangan partikel sering wajar, jadi model tidak sepenuhnya salah, dan sebagian anotasi KoLLA bersifat preskriptif. Hanya 6 yang merupakan substitusi partikel (친구들이 → 친구들을, 공원은 → 공원을, 부모님이 → 부모님께서, 에 → 의), dan 1 partikel berlebih. Jenis error yang dihasilkan item foundry adalah substitusi, yang paling jarang gagal. Artinya, ~84% adalah batas bawah untuk kasus drill.
+
+**Keputusan:** semua CI tumpang tindih, jadi tidak ada model yang terbukti lebih baik. Qwen3-4B dipertahankan karena tertinggi di kurasi, dan bobot yang sama dipakai untuk explainer (dua model di GPU, bukan tiga). **Temuan untuk paper:** gate kuat pada distraktor buatan (98%) tapi melewatkan ~1 dari 8 error pelajar nyata (87%), jadi rating instruktur tetap diperlukan. Paper Section IV-B diperbarui dengan angka ini.
+
+**File:** `src/benchmark_checker.py`, `gemma_benchmark_results.json`, `src/content.py`.
+
+### 9.73 Disederhanakan: KoLLA dihapus, tanpa sampling, codebook disetujui instruktur
+
+**Instruksi user:** "saya maunya simple, namun hasilnya bagus"; KoLLA dipakai untuk semua skill atau dihapus.
+
+**Keputusan:**
+- **KoLLA dihapus.** Skema anotasinya hanya mencakup partikel dan ejaan (tidak ada error akhiran verba dalam 400 sampel benchmark), jadi paling banyak menutup 4 dari 11 skill. Dihapus: `investigate_kolla_corpus.py`, `investigate_kolla_spell.py`, `benchmark_checker.py`, dan kedua file hasil benchmark (file itu juga memuat kalimat korpus GPLv3). Hasil benchmark §9.72 tetap tercatat di sini sebagai dasar keputusan checker, tapi tidak dikutip di paper. Referensi Song et al. di tinjauan pustaka tetap ada.
+- **Self-consistency sampling dan benchmark generator dibatalkan** sebelum di-commit, karena menambah waktu run (±10 balasan × 11 skill × beberapa model) dan kompleksitas. Catatan untuk paper: replay atas 3 balasan yang tercatat menunjukkan filter itu memang membuang entri sampah. Jadi ini bisa disebut sebagai future work.
+- **Alur codebook yang dipakai (sederhana):** EXAONE mengusulkan, verifier (`korean_only` + annotator KAGAS) menyaring bentuknya, lalu **instruktur menyetujui atau menghapus** entri di `data/misconception_codebook.json` satu kali sebelum item dibuat. Codebook kecil (≤6 entri × 11 skill) dan dibekukan, jadi review ini cepat. Review ini juga validasi yang memang dibutuhkan paper (rating kode miskonsepsi, V-B). `SolverCheckProvider` kembali tanpa opsi 4-bit.
+
+**Langkah berikut (GPU):** `python3 src/validate_item_foundry.py --codebook-only` dengan prompt baru (Hangul saja), lalu review instruktur atas codebook, lalu `--per-skill 20 --reuse-codebook`.
+
+### 9.74 Codebook dihapus: label miskonsepsi = kode edit annotator KAGAS
+
+**Keputusan user** ("ok", atas rekomendasi): codebook tidak wajib. Yang dibutuhkan novelty hanyalah label yang konsisten antar soal, dan annotator sudah menghasilkannya secara otomatis.
+
+**Sekarang:**
+- EXAONE menulis kalimat, span kunci, dan 3 distraktor ("tiga kesalahan khas yang berbeda"). Formatnya `"distractors": ["...", "...", "..."]`, tanpa nomor miskonsepsi.
+- Label setiap distraktor = `kagas_annotator.annotate(kalimat kunci, kalimat distraktor)`, misalnya `PART:에서>에` atau `END:었>았`. Kesalahan yang sama selalu dapat kode yang sama di soal mana pun (alomorf 을/를 digabung). Untuk open-class (verb_choice), labelnya pasangan leksikal (`VERB:마시>먹`), yang lebih jarang berulang. Ini keterbatasan yang ditulis jujur.
+- Verifikasi: satu edit di kategori skill, tiga kode berbeda, kode target ada (kalau diminta), dan log-prob Qwen3-4B. Personalisasi: kode dominan diterjemahkan ke kalimat untuk prompt (`describe_code`: "'에' written where '에서' is needed").
+- `validate_item_foundry.py`: tanpa tahap codebook. Permintaan bertarget memakai kode yang sudah muncul di item skill itu. Laporan menambah jumlah kode berbeda dan berapa yang berulang (≥2 item).
+- Dihapus: `build_codebook`, `MisconceptionEntry`, `load/save_codebook`, `_slug`, `data/misconception_codebook.json`, `item_foundry_results.json` dan `codebook_reverified_results.json` lama.
+- Paper: IV-B "Naming the misconceptions" ditulis ulang (label dihitung, bukan ditulis). Verifier sekarang tiga cek, V-B (protokol dan rating instruktur) disesuaikan, Fig. 2 diperbarui. Rating instruktur sekarang menilai apakah kode tiap distraktor adalah kesalahan pelajar yang nyata.
+
+**Langkah berikut (GPU):** `python3 src/validate_item_foundry.py --per-skill 20`.
+
+### 9.75 Run item foundry pertama (tanpa codebook): OOM dan acceptance rendah, diperbaiki
+
+**Hasil sebelum OOM** (5 dari 11 skill, 20 permintaan per skill): particle_loc 8/20, particle_obj 0/20, honorific 3/20, time_range 0/20, tense_past 1/20. Alasan penolakan terbanyak: `wrong-category`, `not-minimal`, dan `target`. Untuk particle_obj dan time_range, ±1 dari 3 balasan gagal di `target`. Partikel pendek seperti 을/를/까지 sering muncul lebih dari sekali di kalimat, sehingga syarat "target muncul tepat sekali" gagal walaupun kalimatnya bagus. Kolom solver (pilih huruf) 0/12, padahal kolom itu tidak dipakai sebagai gate.
+
+**Penyebab OOM:** riwayat percakapan critic terus bertambah (prompt + semua balasan + semua alasan), dengan `max_new_tokens=1500`, di GPU yang sama dengan Qwen3-4B bf16 (15,25 GB terpakai).
+
+**Diperbaiki:**
+- EXAONE sekarang menandai bagian yang diuji dengan kurung siku di dalam kalimat (`동생이 공원[에서] 축구를 해요.`). Posisinya jadi pasti, walaupun teks yang sama muncul di tempat lain. Field `target` dihapus.
+- Critic hanya mengirim balik balasan terakhir; `max_new_tokens` 400 (balasan JSON satu soal cukup pendek); `torch.cuda.empty_cache()` setelah setiap generate.
+- Pengecekan solver dengan pilih huruf dihapus dari validasi (bukan gate, judge yang lemah, dan hasilnya 0/12). Paper V-B disesuaikan.
+- `FoundryStats.rejected` menyimpan 10 balasan pertama yang ditolak beserta alasannya. File hasil ditulis ulang setelah setiap skill. Ada opsi `--skills` untuk cek cepat.
+
+### 9.76 Cek cepat (--per-skill 4): 0/4 di particle_loc, penyebabnya bentuk balasan EXAONE
+
+Dari 10 balasan yang ditolak dan tersimpan, EXAONE menulis distraktor dalam tiga bentuk: (a) teks pengganti saja (yang diminta), (b) kata utuh yang memuat bagian itu (`카페에서` untuk `카페[에]`), dan (c) kalimat utuh, kadang masih dengan kurung siku. Kode lama selalu menempelkan distraktor di posisi kurung, jadi bentuk (b) dan (c) menghasilkan kalimat rusak (`친구가 카페카페에서 ...`) dan ditolak sebagai not-minimal atau wrong-category. Selain itu EXAONE kadang memberi 4 distraktor.
+
+**Diperbaiki:** `_wrong_sentence` menerima ketiga bentuk itu dan mengubahnya menjadi kalimat salah utuh. Annotator tetap yang memutuskan apakah kalimat itu satu edit dari kunci. `_shared_blank` memakai span dalam kurung kalau semua distraktor hanya berbeda di situ, dan melebar ke satu kata utuh kalau perlu. Kalau ada lebih dari 3 distraktor yang valid, yang diambil 3 (distraktor target diutamakan). Prompt menegaskan "only the replacement text, no comments".
+
+**Replay offline** atas balasan yang tercatat: bentuk (b) sekarang diterima (`카페[에]` → 에서/로/와). Sisanya ditolak karena memang buruk: mengganti kata benda (집 untuk 학교), atau menghapus subjek. Beberapa kunci yang ditulis EXAONE juga salah (카페[에] 책을 읽고 있어요; seharusnya 에서). Kunci seperti itu ditangkap oleh gate log-prob Qwen3-4B, karena kalimat dengan 에서 skornya lebih tinggi.
+
+### 9.77 Cek cepat kedua: 2/44, generator tetap EXAONE, prompt ditulis ulang
+
+Run ini masih memakai kode sebelum §9.76. Selain itu EXAONE sering keluar dari aturan: kurung siku di akhir atau di luar kalimat, lebih dari satu kurung, bagian yang salah dikurung, kunci salah (`사과[을]`), komentar bahasa Inggris, dan skill lain ikut menguji partikel. Dua item yang diterima tidak layak (opsi berupa frasa, misalnya `크게읽어요`). jc memutuskan generator tetap EXAONE-3.5-7.8B.
+
+**Diperbaiki:**
+- Verifier: kurung siku sesudah akhir kalimat ditolak, kunci dan distraktor harus satu kata atau kurang, markdown `**` dibuang.
+- Prompt ditulis ulang. Aturan tugas (7 aturan bernomor dan format output) ada di system prompt; pesan user hanya berisi grammar point, target miskonsepsi, contoh, dan kalimat yang harus dihindari. Contoh format tetap (`공원[에서]`) hanya dipakai sampai skill punya item yang diterima; sesudah itu contohnya item terakhir yang diterima di skill itu, jadi tidak menarik skill lain ke partikel.
+- Alasan penolakan untuk critic ditulis dengan kalimat biasa ("it makes a particle mistake, but this question tests a verb or adjective ending mistake"), bukan kode `MULTI`/`PART`.
+- Temperature 0.8 → 0.6.
+- `--generator gemma-3-12b` tersedia untuk perbandingan, default tetap EXAONE.
+- Annotator (langkah 4) diperluas ke kata benda + partikel. Partikel yang salah bentuk (`학교으로`, `학교이`) dipecah kiwi menjadi morfem aneh dan diberi label MULTI. Akibatnya distraktor partikel yang bagus ditolak sebagai wrong-category, dan ini penyebab penolakan terbanyak. Sekarang kategorinya diambil dari morfem benar yang diganti (`PART:에>으로`).
+- Sebaliknya, kata isi yang ditempel ke kata lain (`늦[게]` → `늦일찍`, `천천히빠르게읽어요`) tidak lagi dibaca sebagai satu kesalahan ending. Sebelumnya dua item seperti itu lolos di cek cepat.
+
+### 9.78 Generator hanya menulis kalimat; bagian kosong dihitung oleh kode
+
+Cek cepat dengan prompt §9.77: 6/44 diterima, tetapi hampir semuanya tidak layak. Contohnya: kunci di posisi aneh (`책을 [에서] 읽었습니다`); soal honorific yang menguji 습니다/어요, bukan -(으)시-; opsi rusak (`보러갔어요`). Jawaban yang ditolak menunjukkan EXAONE-7.8B tidak bisa memakai kurung siku dengan benar (`[을/를]`, kata benda dikurung untuk honorific). Selain itu, EXAONE terus menulis distraktor sebagai kalimat utuh walaupun diminta potongan saja. jc memutuskan generator tetap EXAONE.
+
+**Keputusan:** tugasnya disesuaikan dengan kemampuan EXAONE. Generator menulis `{"sentence": kalimat benar, "wrong_sentences": [3 salinan, masing-masing dengan satu kesalahan]}`, tanpa kurung siku dan tanpa potongan. Kode yang menghitung bagian kosong (`_blank`): span tempat ketiga kalimat salah berbeda dari kalimat benar, diperlebar ke morfem utuh, atau ke kata utuh kalau ada opsi yang kosong. Tanda baca akhir tidak ikut. Kalau kesalahan ada di kata yang berbeda, soal ditolak. Verifikasi lainnya tetap: annotator (satu edit, kategori skill), kode berbeda, gate log-prob, critic. `_wrong_sentence`/`_shared_blank` dihapus.
+
+### 9.79 Arah baru: pipeline berbasis model/library, langkah 1 = mengukur komponen
+
+jc ingin metode seperti Duolingo/Eedi: semuanya model, library atau prompt, tanpa heuristik buatan sendiri (rekomendasi lengkap ada di Claude Doc "KO-DRILL: metode personalisasi berbasis model"). Run 6d41db3 (format kalimat utuh, §9.78): 11/44 diterima (25%). particle_loc dan noun_counter bagus, tetapi honorific, irregular_conj, adj_relativizer dan mod_adverb menguji akhiran lain (습니다/어요).
+
+Komponen pengganti yang diusulkan:
+- KAGAS resmi menggantikan `kagas_annotator.py` dan `_blank`.
+- KoBART GEC `Soyoung97/gec_kr` dan log-prob Qwen3 mengecek kalimat benar dan salah.
+- Qwen3-4B menjadi classifier skill (pilih 1 dari 11).
+- Outlines (JSON schema) menggantikan parser.
+
+`src/benchmark_components.py` mengukur ketiganya pada 52 pasangan kurasi sebelum dipasang.
+
+**KAGAS resmi, diukur di sandbox:**
+- Satu edit: 52/52.
+- Tipe sesuai skill: 47/52. Gagalnya ada di tiga tempat:
+  - `작는` diberi label SPELL;
+  - `부르어요` diberi label SHORTEN;
+  - 3 penggantian kata kerja (verb_choice) diberi label CONJUGATION.
+
+Kesimpulan: KAGAS andal untuk "tepat satu edit" dan posisinya. Span-nya per kata (eojeol), jadi bagian kosong menjadi satu kata utuh. Cocok-tidaknya dengan skill lebih baik diputuskan oleh classifier.
+
+**Instalasi:** `cyhunspell` yang dipatok repo tidak bisa di-build lagi. Yang jalan adalah `pip install hunspell` (pyhunspell), ditambah `soylemma`, konlpy dan Java, di Python 3.11.
+
+GEC dan classifier butuh GPU dan Hugging Face, jadi dijalankan jc.
+
+**Hasil run jc (83908c3), 52 pasangan kurasi:**
+- KoBART GEC: kalimat benar dibiarkan 42/52 (81%); kalimat salah dikembalikan ke kunci 28/52 (54%). Model ini sering menulis ulang kalimat (`가르쳐요` → `가르쳐 주셨어요`, `책은` → `이 책은`) dan tidak membetulkan `부르어요`. Di bawah target 90%, jadi **tidak dipakai**.
+- Classifier skill Qwen3-4B (stem + kunci + satu distraktor): 37/52 (71%). Kesalahannya sistematis: setiap stem yang mengandung 을/를 diberi label particle_obj. Pada 11 item hasil generator, hasil classifier sama dengan penilaian manual (§9.79): 7 item sesuai skill dipertahankan, 4 item di luar skill ditolak. Prompt diubah supaya membandingkan dua kalimat utuh (benar vs salah) dan perlu diukur ulang.
+- Classifier v2 (membandingkan dua kalimat, d1f023a): 36/52 (69%), tidak lebih baik. Bias kuat ke particle_obj (opsi B), dan pada item generator hanya 5/11 cocok. Skor huruf tanpa reasoning ternyata terlalu lemah untuk model 4B. Langkah berikut: mode reasoning Qwen3 (`--thinking`).
+- Classifier mode reasoning (`--thinking`, 052155b): 43/52 (83%), bias particle_obj hilang. Sisa kesalahan ada di honorific (4/5) dan irregular_conj (dilabel verb_choice). Pada 11 item generator, hasilnya sama dengan penilaian manual: 6 dipertahankan, 5 di luar skill ditolak. Jadi bias tadi berasal dari prompt atau skor huruf, bukan hanya ukuran model.
+- Temuan: label KAGAS resmi per kata (eojeol) dengan tipe kasar (PARTICLE/ENDING). Itu tidak cukup sebagai label miskonsepsi yang muncul ulang di banyak soal (`에서>에`). Keputusan label diserahkan ke jc.
+
+### 9.80 Versi 2: pipeline tanpa heuristik (hanya model/LLM/library)
+
+jc ingin metode seperti Duolingo/Eedi: semuanya LLM, model terlatih, atau library, tanpa aturan buatan sendiri. Rancangan lengkapnya ada di Claude Doc, bagian "Versi 2". Kurikulum tidak lagi 11 skill tetap, tetapi data: konteks (misalnya smart factory / EV manufacturing) dan tujuan belajar.
+
+Pipeline:
+1. EXAONE melalui Outlines (JSON schema: stem dengan satu `___`, kunci satu kata, 3 distraktor + `mistake`).
+2. Gate log-prob Qwen3 untuk kunci.
+3. Classifier tujuan belajar oleh Qwen3 mode reasoning.
+4. Miskonsepsi = embedding kalimat `mistake` (sentence encoder multilingual), tanpa kode.
+5. Model pilihan distraktor softmax(θ·e).
+
+Yang akan dihapus setelah terbukti: annotator, blank, filter, dan parser.
+
+`src/benchmark_v2.py` mengukur empat hal: format, gate kunci, gate tujuan, dan apakah embedding mengelompokkan kesalahan yang sama. Kode KAGAS dipakai hanya sebagai kunci evaluasi.
+
+
+### 9.81 Repo cleanup (2026-10-21)
+
+Atas persetujuan jc, file yang sudah tidak dipakai dihapus: `src/validate_novelty2.py` + `2_validation_results.json` (Novelty 2 dihapus, §9.70), `src/compare_feedback_models.py` + `src/patch_exaone35_remote_code.py` (perbandingan explainer selesai, Qwen3 dipilih), `src/benchmark_components.py` + `benchmark_components_results.json` (kesimpulan di §9.79; classifier pindah ke `benchmark_v2.py`), dan `eval_report.json` (output yang dibuat ulang tiap run, sekarang di `.gitignore`). `Korean_Grammar_Curriculum.docx` dan PDF literatur di `docs/` tetap disimpan (keputusan jc). `requirements.txt` ditambah `outlines`, `pydantic`, `sentence-transformers`. Menunggu hasil v2 sebelum menghapus `kagas_annotator.py`, heuristik di `item_foundry.py`, `llm_parsing.py`, fungsi pilih-huruf di `solver_check.py`, dan `difficulty_heuristic.py` (yang terakhir juga mengubah teks paper Section III-C). Opsi `--generator gemma-3-12b` juga dihapus (EXAONE tetap generator, §9.78); model yang sudah diuji dan tidak dipakai (Qwen3-4B-Base, Qwen3-8B/-Base, Kanana-1.5-8B-base, Gemma-3-12B, EXAONE-4.0-1.2B, KoBART `gec_kr`) sudah tidak dirujuk kode, jadi boleh dihapus dari cache Hugging Face lokal. Audit lengkap: `/mnt/project-files/cleanup/audit-repo.md`.
+
+
+### 9.82 Hasil v2 pertama dan perbaikan v2.1 (2026-10-21)
+
+**Hasil run jc** (`benchmark_v2_results.json`, 6 item × 11 objective, kurikulum EV smart factory): format 66/66 (Outlines bekerja), diterima 13/66 = 19,7% (CI 11,9–30,8%). Embedding `mistake` (multilingual-e5-base): nearest neighbour sama-mistake 15/42 = 36%, cosine sama 0,900 vs beda 0,886 — hampir tidak terpisah.
+
+**Dibaca per item, hampir semua 13 item yang lolos tetap tidak layak dipakai:**
+1. **Blank di tempat yang salah.** Diminta langsung menulis stem dengan `___`, EXAONE menaruh blank di posisi acak: `공장의 ___ 에서` dengan jawaban `에서` (jadi "에서 에서"), `을___`, `동기화되었어요었어요`. Key gate log-prob menolak sebagian besar, tapi beberapa tetap lolos.
+2. **Distraktor yang sebenarnya benar.** Untuk adj_relativizer, mod_adverb, verb_choice dan noun_counter, distraktornya kata lain yang juga benar (`신중하게` vs `빠르게`, `다섯` vs `세`). Key gate hanya mengecek bahwa kunci paling mungkin, bukan bahwa distraktor salah.
+3. **Kalimat terlalu panjang dan teknis untuk TOPIK I:** sering dua kalimat, karena topik kursus dimasukkan utuh.
+
+**Perbaikan v2.1 (`src/benchmark_v2.py`), tetap tanpa heuristik:**
+- Skema: EXAONE menulis dulu satu kalimat benar (maksimal 40 karakter, satu kalimat), lalu `answer` = kata dalam kalimat itu. Stem = kalimat dengan answer diganti `___`; kalau answer tidak muncul tepat sekali di kalimat, item gagal format. Urutan ini sama dengan format kalimat-utuh §9.78 yang memang ditulis LLM dengan baik.
+- Prompt: satu contoh kurasi per objective (dari `log_likelihood_results.json`, data, bukan aturan), "maksimal 8 kata, satu kata sehari-hari dari topik", dan distraktor harus membuat kalimat salah, bukan kata lain yang benar.
+- Gate baru `unique_ok`: Qwen3-4B mode reasoning diberi stem dan 4 opsi (diacak), lalu menyebut semua opsi yang benar; item lolos hanya kalau jawabannya tepat kunci saja. Diterima = key_ok ∧ unique_ok ∧ objective_ok.
+- Embedding dibandingkan dua encoder: multilingual-e5-base vs Qwen3-Embedding-0.6B (encoder berbasis instruksi).
+
+
+### 9.83 Kelas miring (5 mahir / 500 pemula) dan difficulty dari responden LLM (2026-10-21)
+
+**Pertanyaan jc:** bagaimana kalau hanya 5 orang yang mahir dan 500 lainnya pemula?
+
+**Simulasi** (`src/simulate_skewed_population.py`, CPU): Rasch, seleksi adaptif dengan target 85%, Urnings dengan koreksi MH, 505 pelajar, 60.000 respons (sekitar 120 per pelajar), 300 item, 4 replikasi. Kelas *balanced* θ~N(0,1) dibandingkan dengan kelas *skewed*: 500 pemula θ~N(−1; 0,5) dan 5 mahir θ~N(2,5; 0,3). Ada dua pool: *wide* β~U(−3,3), dan *matched* (difficulty sesuai kebutuhan kelas, seperti generator yang menulis item untuk pelajarnya). Ada dua prior item: *flat* (n=32), dan *model* (μ̂ = β + N(0; 0,8), korelasi sekitar 0,9, urn diukur dari varians).
+
+| kelas | pool | prior | RMSE kemampuan lainnya | RMSE kemampuan mahir | RMSE item mudah | RMSE item sulit | respons/item sulit |
+|---|---|---|---|---|---|---|---|
+| balanced | wide | flat | 0,56 | 0,80 | 0,65 | 1,55 | 38,5 |
+| balanced | wide | model | 0,45 | 0,99 | 0,48 | 0,80 | 9,8 |
+| skewed | wide | flat | 1,15 | 0,94 | 1,12 | 1,62 | 18,5 |
+| skewed | wide | model | 0,91 | 0,86 | 0,84 | 0,77 | 2,7 |
+| skewed | matched | flat | 1,63 | 0,70 | 1,64 | 0,49 | 48,2 |
+| skewed | matched | model | 0,90 | 1,16 | 0,94 | 0,27 | 5,0 |
+
+**Temuan:**
+1. **5 pelajar mahir tidak dirugikan:** RMSE 0,86–0,94 di pool wide, setara kelas balanced (0,80–0,99). Angka mahir paling bising, karena hanya 5 orang × 4 replikasi.
+2. **Item sulit hanya mendapat sedikit respons** (2,7–18,5 per item, vs 38,5 di kelas balanced). Tanpa prior, difficulty-nya tetap salah (RMSE 1,62); dengan prior model turun ke 0,77. Prior paling berguna tepat di bagian ini.
+3. **Yang justru terdampak adalah 500 pemula:** RMSE 1,15 vs 0,56 di kelas balanced. Dengan pool yang cocok untuk kelas tetapi prior flat, RMSE naik ke 1,63, karena semua item mulai di β=0 sementara item sebenarnya sekitar −2,7, sehingga seluruh skala bergeser. Prior model menahan skala itu (0,90). Jadi pada kelas yang miring, prior item juga menjadi jangkar skala, bukan hanya mempercepat konvergensi.
+4. **Batasan:** prior yang disimulasikan berkorelasi sekitar 0,9 dengan difficulty sebenarnya. Korelasi prior LLM sungguhan belum diketahui sampai ada data pelajar; prior yang lemah (r=0,44) sudah diukur di §9.69 / paper Section III-B.
+
+**`src/difficulty_llm.py` (baru), pengganti `difficulty_heuristic.py`:** Qwen3-0.6B, 1.7B dan 4B dipakai sebagai responden dengan kemampuan berbeda (Liu et al., 2025, BJET, PDF ada di `docs/`). p(kunci) = softmax log-prob kalimat dari 4 opsi. Fit Rasch least-squares logit p = θ_m − β_i (mean β = 0). μ̂ = β distandarkan; σ̂² = SE² + 0,5 (`LINK_VARIANCE`, karena skala responden belum di-link ke skala pelajar). Diukur di `benchmark_v2.py` (akurasi responden harus naik dengan ukuran model; korelasi dengan heuristik morfem). Belum dipasang ke `question_bank` / `answer_processing`; itu dilakukan bersama penghapusan grup B.
+
+
+### 9.84 Kelas miring: praktik platform besar + placement test (2026-10-21)
+
+**Riset (pertanyaan jc: "biasanya Duolingo atau platform lain bagaimana?"):**
+- **Duolingo, placement test adaptif.** Pelajar baru mengerjakan tes adaptif: soal makin sulit kalau benar, lalu skill yang dianggap sudah dikuasai dibuka (blog Duolingo, "Partial credit improvements to Duolingo's placement test"). Jadi pengguna mahir tidak mulai dari nol.
+- **Duolingo English Test: prior difficulty dari model untuk item baru.** McCarthy et al. (EMNLP 2021) memakai GLM multi-task dengan fitur BERT untuk memberi difficulty awal item tanpa uji coba. Estimasi itu diperbarui cepat dari respons, dengan data sekitar 500 peserta dan ±6 paparan per item. Ini analog terdekat dengan `difficulty_llm.py` (prior dari model → Urnings memperbarui).
+- **Birdbrain (Duolingo):** difficulty soal = jumlah difficulty fitur-fiturnya (tipe soal, kosakata), diperbarui seperti Elo; V2 memakai vektor kemampuan 40 dimensi per pelajar (IEEE Spectrum).
+- **Pelánek (2016), sistem berbasis Elo:** item baru mulai di difficulty 0; butuh sekitar 100 pelajar untuk estimasi difficulty item yang baik, tapi 10 jawaban sudah cukup untuk estimasi kemampuan pelajar. Disarankan fungsi ketidakpastian yang berbeda untuk item dan pelajar.
+- **Program matematika adaptif** (studi tingkat sukses, UvA): makin tinggi tingkat sukses yang ditetapkan, makin banyak soal yang dikerjakan dan makin besar peningkatannya. Ini mendukung target 85%.
+
+**Implikasi untuk 5 mahir / 500 pemula:** item sulit hanya dijawab 5 orang, jauh di bawah ±100 jawaban yang dibutuhkan, jadi item itu hanya bisa bergantung pada prior model (seperti DET). Pelajar sendiri perlu titik awal dari placement test (seperti Duolingo).
+
+**Simulasi** (`simulate_skewed_population.py`, kondisi baru `model+placement`: urn pelajar mulai dari estimasi placement θ + N(0; 0,7)):
+
+| kelas | pool | prior | RMSE pemula/lainnya | RMSE mahir | RMSE item sulit |
+|---|---|---|---|---|---|
+| skewed | wide | flat | 1,15 | 0,97 | 1,57 |
+| skewed | wide | model | 0,91 | 0,86 | 0,78 |
+| skewed | wide | model+placement | **0,49** | **0,53** | 0,78 |
+| skewed | matched | model+placement | 0,53 | 0,86 | 0,59 |
+| balanced | wide | flat (pembanding) | 0,58 | 0,85 | 1,54 |
+
+Dengan prior model ditambah placement test, kelas miring diestimasi **lebih baik daripada kelas balanced tanpa keduanya**. Placement test belum ada di sistem; usulannya: tes adaptif pendek (sekitar 10 soal) dari bank item yang sama, hasilnya menjadi urn awal pelajar di `urnings_tracker`.
+
+Sumber: blog.duolingo.com/partial-credit-improvements-to-duolingos-placement-test; aclanthology.org/2021.emnlp-main.67; spectrum.ieee.org/duolingo; fi.muni.cz/~xpelanek/publications/CAE-elo.pdf; dare.uva.nl/id/789fc422-4935-49ca-bcba-803239522951.
+
+
+### 9.85 Urnings dengan urn pelajar yang membesar vs placement test (2026-10-21)
+
+Pertanyaan jc: apakah Urnings sendiri bisa menyelesaikan masalah kelas miring? Varian yang diuji: urn pelajar baru dimulai dengan 8 bola, menjadi 16 setelah 5 jawaban, lalu 32 setelah 10 jawaban (proporsi dipertahankan). Ini padanan "ketidakpastian awal besar" di sistem Elo (Pelánek 2016). Kode: `GROWTH` di `simulate_skewed_population.py`.
+
+| kelas | pool | kondisi | RMSE pemula/lainnya | RMSE mahir |
+|---|---|---|---|---|
+| skewed | wide | model | 0,91 | 0,93 |
+| skewed | wide | model + growing urn | 0,82 | 0,79 |
+| skewed | wide | model + placement | **0,50** | **0,62** |
+| skewed | matched | model + growing urn | 0,86 | 1,20 |
+| skewed | matched | model + placement | **0,53** | **0,77** |
+
+Urn yang membesar hanya membantu sedikit; placement test jauh lebih baik. **Rekomendasi: prior item dari model + placement test.**
+
+Catatan jujur: placement di simulasi diasumsikan menghasilkan estimasi dengan galat SD 0,7. Placement sungguhan (sekitar 10 soal adaptif, estimasi IRT EAP) hanya mencapai itu kalau difficulty soal placement-nya sudah cukup akurat. Jadi soal placement perlu diambil dari item yang paling banyak dijawab, atau item kurasi.
+
+
+### 9.86 Hasil v2.1 dan perbaikan v2.2: overgenerate-and-filter distraktor (2026-10-21)
+
+**Hasil run v2.1** (`benchmark_v2_results.json`): diterima 8/66 = 12,1% (CI 6,3–22,1%). Run ini dijalankan sebelum commit difficulty (`settings.encoders` masih default lama), jadi bagian difficulty belum ada.
+
+**Yang membaik:**
+- Kalimat sekarang pendek dan natural (`공장은 어제 디지털 트윈을 ___.`), dan blank berada di tempat yang benar.
+- Format 53/66: 13 item gagal karena `answer` tidak muncul di kalimat (misalnya `내시`).
+- Gate keunikan Qwen3 bekerja sesuai rancangan. Ia menolak distraktor yang sebenarnya juga benar (`완료했습니다` untuk `완료했어요`; `정밀하게` untuk `정확하게`).
+
+**Masalah yang tersisa: distraktor dari EXAONE.** Banyak distraktor berupa potongan kalimat (`공장에서는다섯개의센`, `기록을충전해요`), kata lain yang benar, atau bukan kesalahan pada objective-nya. Karena satu distraktor buruk menggugurkan seluruh item, tingkat penerimaan rendah walaupun kalimat dan kuncinya sudah bagus.
+
+**Embedding:** Qwen3-Embedding-0.6B memisahkan jenis kesalahan sedikit lebih baik daripada e5 (cos sama 0,901 vs beda 0,815, NN 14/30, dibanding e5 0,925 vs 0,884, NN 13/30). Keduanya masih lemah, dengan n=30.
+
+**v2.2:**
+- EXAONE menulis 6 kandidat distraktor (satu kata, maksimal 8 suku kata).
+- Qwen3 mode reasoning diberi kunci dan keenam kandidat, lalu menyebut semua opsi yang membentuk kalimat benar. Kunci harus ada di daftar itu.
+- Kandidat dipertahankan hanya kalau tidak disebut benar dan log-prob-nya di bawah kunci.
+- Tiga kandidat yang lolos dengan log-prob tertinggi (salah tapi paling meyakinkan) menjadi distraktor.
+- Diterima = kunci benar ∧ ada 3 distraktor ∧ objective cocok.
+
+Ini pola overgenerate-and-rank yang umum di literatur distractor generation. Jumlah panggilan reasoning tetap 2 per item.
+
+
+### 9.87 Difficulty prior tanpa LLM call tambahan (2026-10-21)
+
+jc: tiga model responden terlalu banyak LLM call dan tidak sepadan kalau hanya untuk prior Urnings. Versi multi-model (§9.83) diganti.
+
+**Sekarang (`src/difficulty_llm.py`):** key gate sudah menghitung log-prob Qwen3-4B untuk stem yang diisi kunci dan masing-masing distraktor. Dari situ: p = softmax(kunci | 4 opsi), μ̂ = −logit(p), di-clip ke ±3. σ̂² = 1,0 tetap (`PRIOR_VARIANCE`), karena skala ini masih skala model, bukan skala pelajar. Soal yang distraktornya hampir sama meyakinkannya dengan kunci menurut model akan mendapat difficulty tinggi.
+
+Biaya: **nol LLM call tambahan**; ini hasil sampingan dari pengecekan yang dijalani setiap item. Qwen3-0.6B dan 1.7B tidak dipakai lagi.
+
+`benchmark_v2.py` melaporkan rata-rata, SD, rata-rata per objective, dan korelasi dengan heuristik morfem. Yang perlu dicek di run berikutnya: kalau sebagian besar item mentok di −3 (model terlalu yakin), skalanya terlalu sempit dan perlu distandarkan per pool.
+
+Simulasi §9.83–§9.85 tetap berlaku: yang diuji di sana adalah prior dengan kualitas tertentu, bukan cara membuatnya.
+
+
+### 9.88 Satu panggilan Qwen3 per item (2026-10-21)
+
+jc: tetap Qwen3, tapi jangan banyak call. Gate keunikan (§9.86) dan klasifikasi objective (§9.79) sekarang digabung menjadi **satu** panggilan reasoning Qwen3-4B per item. Prompt `_JUDGE_PROMPT` menampilkan stem, kunci + 6 kandidat (huruf A–G), dan daftar objective (nomor 1–11), lalu meminta dua baris: `Correct: <huruf>` dan `Objective: <nomor>`.
+
+Objective sekarang ditanyakan untuk item secara keseluruhan ("objective mana yang diuji pilihan ini"), bukan untuk pasangan kunci vs distraktor pertama.
+
+Sisa biaya per item: 1 generasi EXAONE, 1 panggilan reasoning Qwen3, dan 7 forward pass log-prob (tanpa generasi; ini juga sumber prior difficulty, §9.87).
+
+Akurasi 43/52 di §9.79 diukur dengan prompt terpisah. Prompt gabungan perlu dicek di run berikutnya (objective_ok per objective).
+
+
+### 9.89 Keputusan: tanpa placement test; generate berdasarkan kebutuhan (2026-10-21)
+
+- **Placement test tidak dibuat** (keputusan jc). Pelajar baru mulai dari tengah urn seperti sekarang. Konsekuensinya sudah terukur di §9.84: di kelas miring, error estimasi awal sekitar dua kali lebih besar dibanding dengan placement.
+- **Celah yang ditemukan:** `batch_generate` mengisi bank per skill dengan level tetap; generator tidak melihat level pelajar. Pelajar mahir yang sedikit akan kehabisan soal di levelnya (efek plafon).
+- **Keputusan jc: soal di-generate per batch harian.** Job malam dibuat sadar level: pelajar dikelompokkan ke pita level dari estimasi Urnings, lalu untuk tiap pita × skill dihitung stok soal yang belum dikerjakan, dan generate hanya untuk pita yang stoknya kurang. Karena soal dipakai bersama dalam satu pita, kebutuhan per pita kira-kira sama dengan kebutuhan satu pelajar per hari, tidak bergantung jumlah orang. Durasi job bergantung pada tingkat penerimaan (12% di v2.1).
+- **Rencana (setelah hasil v2.2):** generate berdasarkan kebutuhan. Untuk tiap pelajar, hitung soal yang belum dikerjakan di sekitar levelnya. Kalau stoknya kurang dari batas, panggil generator dengan target level pelajar itu (mis. TOPIK II). Soal tetap melewati gate Qwen dan mendapat prior §9.87.
+
+### 9.90 Hasil v2.2 dan v2.3: 3 distraktor, perbaikan terarah (2026-10-21)
+
+**Hasil v2.2** (commit 0e9a3bb): diterima 10/66 (15%, CI 8–26%). Format 61, kunci 51, ≥3 distraktor baik 23, objective 17. Dibaca manual, hanya sekitar 3 item yang benar-benar layak (mis. tense_past `분석했어요`, `확인했어요`). 6 kandidat tidak jelas lebih baik dari 12% di v2.1, jadi kembali ke 3 distraktor (preferensi jc).
+
+Penyebab yang ditemukan:
+1. **Bug parsing judge.** Huruf dibaca dari seluruh balasan, sehingga banyak item dinilai "semua benar". Sekarang hanya baris berlabel (`Correct:`, `Objective:`, `Plausible:`) yang dibaca.
+2. **Jawaban berupa potongan kata.** Stem `공장___` dengan distraktor `공장으로` menjadi "공장공장으로". Sekarang jawaban harus satu kata utuh dari kalimat (dicek: muncul tepat sekali di antara spasi).
+3. **Distraktor sampah yang tergabung lolos** (mis. `공장에서는다섯개`), karena cukup "salah". Sekarang judge yang sama juga ditanya opsi salah mana yang mungkin dipilih pelajar nyata; yang tidak disebut ditolak.
+4. **Prior difficulty jenuh** di run itu (versi 3 responden lama). Versi −logit p (§9.87) melaporkan `at_clip`: proporsi item yang mentok di ±3. Kalau besar, standarkan per pool.
+
+**Perubahan v2.3** (`benchmark_v2.py`), tetap 1 generasi EXAONE + 1 panggilan Qwen3 per item:
+- 3 distraktor; skema meminta `mistake` lebih dulu, baru `text` (model memutuskan kesalahannya dulu).
+- Semua pasangan kurasi per objective dari log_likelihood_results.json masuk ke prompt.
+- Judge satu panggilan dengan tiga baris: Correct, Objective, Plausible.
+- **Perbaikan terarah, satu putaran:** untuk item yang kunci dan objective-nya lolos, EXAONE hanya mengganti distraktor yang ditolak, diberi alasan penolakannya; item lalu dinilai ulang. Biaya tambahan hanya untuk item yang gagal di distraktor.
+- Laporan: `accepted_before_repair`, `accepted`, dan `repaired` per objective.
+
+
+- **Prompt dirapikan** (permintaan jc): ketiga prompt dipersingkat sekitar sepertiga. Spesifikasi per field ditulis sebagai daftar pendek, tanpa pengulangan; prompt repair tidak lagi mengulang kalimat (stem + jawaban sudah cukup); prompt judge menaruh pertanyaan langsung di template tiga baris jawabannya, sehingga Qwen3 tidak perlu memetakan pertanyaan bernomor ke baris jawaban.
+
+
+### 9.91 Hasil v2.3 dan v2.4: jawaban dikunci ke kata kalimat, prior distandarkan (2026-10-21)
+
+**Hasil v2.3** (commit 82a7a9a): diterima 11/66 (17%, CI 10–27%); 9 sebelum repair, jadi repair menambah 2. Item yang lolos format sudah jauh lebih bersih (mis. `저는 어제 검사를 ___.` → 완료했어요 / 완료하고요 / 완료하니까요 / 완료하려고해요).
+
+**Hambatan utama sekarang: format, 35/66.** Ke-31 kegagalan semuanya jawaban yang bukan satu kata kalimat: EXAONE menggabungkan beberapa kata tanpa spasi (`센서를이용해`, `공장장께서품질검사를`), karena pola skema jawaban melarang spasi. honorific dan noun_counter 0/6. Distraktor gabungan yang sama (`로봇을개선해요`) juga masih lolos judge di sebagian item.
+
+**Prior difficulty jenuh:** 9 dari 11 item di −3 (`at_clip` 0.82). Qwen3 jauh lebih yakin daripada pelajar, jadi skala −logit p mentah tidak bisa dipakai.
+
+**Perubahan v2.4:**
+- **Generasi dua tahap dengan model yang sama (constrained decoding).** Tahap 1: kalimat saja. Tahap 2: skema dibuat dari kalimat itu; `answer` adalah enum kata-kata kalimat tersebut, sehingga jawaban pasti satu kata utuh (by construction), lalu 3 distraktor. Tahap 1 hanya ~20 token, jadi total token hampir sama. Qwen tetap 1 call.
+- **Prior distandarkan:** `key_logit = logprob(kunci) − logsumexp(logprob(distraktor))` tanpa clip, lalu distandarkan terhadap bank soal (di benchmark: terhadap item yang diterima di batch itu) → mean 0, SD 1 di skala Urnings. Hanya urutan dari model yang dipakai; σ̂² = 1 tetap.
+
+
+- **Cache Outlines** (pertanyaan jc): `outlines.Generator(model, schema)` di Outlines 1.3.3 mengonversi seluruh vocabulary EXAONE dan mengompilasi skema di **setiap** panggilan; tidak ada cache. `_Exaone` sekarang membuat `OutlinesCoreBackend` sekali (vocabulary sekali) dan menyimpan generator per skema, jadi skema kalimat dan distraktor dikompilasi sekali per run. Skema jawaban (enum kata kalimat) berubah tiap item, jadi dipisah menjadi decode tersendiri yang sangat kecil (beberapa token, kompilasi cepat). Total: 3 decode EXAONE per item (kalimat, jawaban, distraktor), Qwen tetap 1 call.
+
+
+**Hasil v2.4** (commit f13c4bd, sebelum perbaikan cache): diterima **18/66 (27%, CI 18–39%)**, 14 sebelum repair. Format 66/66, jadi enum jawaban menyelesaikan masalah kata gabungan. noun_counter 5/6 (dari 0), honorific format 6/6 tapi 0 diterima. Prior: `at_clip` 0.06 (dari 0.82), SD 0.94, korelasi dengan heuristik morfem 0.34. Embedding nearest-neighbour 39% (dari 9%, n=64). Sisa masalah di item yang lolos: distraktor gabungan masih ada (`조립를조립해요`, `생산은은`), beberapa kalimat tidak gramatikal (`___ 은 효율 향상에 핵심이다`), dan `확인해요` lolos padahal juga benar. Penolakan terbanyak: tidak plausible (53).
+
+
+### 9.92 Judge diganti ke Qwen3-8B (NF4) (2026-10-21)
+
+Di v2.4, judge Qwen3-4B jadi bottleneck. Ia meloloskan distraktor gabungan (`조립를조립해요`), tidak mendeteksi jawaban kedua yang juga benar (`확인해요`), dan meloloskan kalimat yang tidak gramatikal. jc: ganti langsung.
+
+- `benchmark_v2.py --judge` default `Qwen/Qwen3-8B`, dimuat 4-bit NF4 (bitsandbytes, double quant, compute bf16); bobotnya sekitar 6GB, jadi muat di 16GB. EXAONE tetap dibebaskan dulu, jadi GPU tetap memegang satu model saja.
+- Model yang sama juga dipakai untuk log-prob key gate dan prior difficulty. Validasi 51/52 pasangan kurasi (§9.68) dilakukan dengan 4B, jadi untuk 8B perlu diukur ulang.
+- Tetap 1 call reasoning per item. Lebih lambat dari 4B, dan unduhan pertama sekitar 16GB.
+- `--judge Qwen/Qwen3-4B` mengembalikan setelan lama untuk ablation.
+
+
+### 9.93 Hasil v2.5 dan v2.6: generasi kembali ke v2.4, judge melabeli tiap opsi (2026-10-21)
+
+**Hasil v2.5** (commit fbeb748, judge Qwen3-8B NF4): diterima 11/66 (17%), turun dari 27% di v2.4. Hampir semua item yang lolos punya distraktor rusak (`센서를해요`, `다섯명의센서가`, `공장은다섯명의센`), dan di noun_counter jawabannya salah pilih kata (`다섯` padahal seharusnya `개의`).
+
+Penyebabnya dua:
+1. **Regresi dari perubahan cache (§9.91), bukan dari judge.** Jawaban dan distraktor dipisah ke decode masing-masing. Prompt jawaban tanpa contoh memilih kata yang salah. Prompt distraktor yang hanya diberi stem membuat EXAONE menempelkan kata-kata sesudah blank ke distraktor.
+2. **Judge 8B tetap meloloskan opsi rusak.** Format "sebutkan huruf yang plausible" terlalu longgar: model cukup menyebut opsi apa saja, tanpa harus menilai satu per satu.
+
+v2.4 dan v2.5 berbeda di generator dan judge sekaligus, jadi pengaruh 8B vs 4B belum bisa dipisahkan dari hasil ini.
+
+**Perubahan v2.6:**
+- Generasi dikembalikan ke v2.4: satu decode untuk jawaban (enum) + distraktor. Cache tetap dipakai: vocabulary dikonversi sekali, dan skema kalimat dikompilasi sekali; skema item dikompilasi per item karena enum-nya berubah.
+- **Judge melabeli setiap opsi:** satu baris per opsi, `correct | learner error | broken`, ditambah baris `Objective`. Tidak ada opsi yang bisa terlewat. Opsi yang tidak diberi label dihitung broken.
+- **Perbandingan berpasangan 8B vs 4B:** generasi memakai seed yang sama, jadi dua run dengan `--judge` berbeda menilai item yang sama. Ini jadi ablation judge untuk paper.
+
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

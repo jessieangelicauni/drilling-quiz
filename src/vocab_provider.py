@@ -6,8 +6,8 @@ LMS admin owns.
 
 Distractors for a vocab MC question are other curriculum meanings, not
 LLM-generated -- picking plausible wrong meanings from the same bank is a
-closed, deterministic operation, same "don't let the model invent the
-options" philosophy as exaone_provider.py's particle generation.
+closed, deterministic operation: vocab distractors carry no misconception,
+unlike grammar items (item_foundry.py).
 """
 from __future__ import annotations
 
