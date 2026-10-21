@@ -4391,6 +4391,17 @@ Dari 10 balasan yang ditolak dan tersimpan, EXAONE menulis distraktor dalam tiga
 
 **Replay offline** atas balasan yang tercatat: bentuk (b) sekarang diterima (`카페[에]` → 에서/로/와). Sisanya ditolak karena memang buruk: mengganti kata benda (집 untuk 학교), atau menghapus subjek. Beberapa kunci yang ditulis EXAONE juga salah (카페[에] 책을 읽고 있어요; seharusnya 에서). Kunci seperti itu ditangkap oleh gate log-prob Qwen3-4B, karena kalimat dengan 에서 skornya lebih tinggi.
 
+### 9.77 Cek cepat kedua: 2/44, generator tetap EXAONE, prompt ditulis ulang
+
+Run ini masih memakai kode sebelum §9.76. Selain itu EXAONE sering keluar dari aturan: kurung siku di akhir atau di luar kalimat, lebih dari satu kurung, bagian yang salah dikurung, kunci salah (`사과[을]`), komentar bahasa Inggris, dan skill lain ikut menguji partikel. Dua item yang diterima tidak layak (opsi berupa frasa, misalnya `크게읽어요`). jc memutuskan generator tetap EXAONE-3.5-7.8B.
+
+**Diperbaiki:**
+- Verifier: kurung siku sesudah akhir kalimat ditolak, kunci dan distraktor harus satu kata atau kurang, markdown `**` dibuang.
+- Prompt ditulis ulang. Aturan tugas (7 aturan bernomor dan format output) ada di system prompt; pesan user hanya berisi grammar point, target miskonsepsi, contoh, dan kalimat yang harus dihindari. Contoh format tetap (`공원[에서]`) hanya dipakai sampai skill punya item yang diterima; sesudah itu contohnya item terakhir yang diterima di skill itu, jadi tidak menarik skill lain ke partikel.
+- Alasan penolakan untuk critic ditulis dengan kalimat biasa ("it makes a particle mistake, but this question tests a verb or adjective ending mistake"), bukan kode `MULTI`/`PART`.
+- Temperature 0.8 → 0.6.
+- `--generator gemma-3-12b` tersedia untuk perbandingan, default tetap EXAONE.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

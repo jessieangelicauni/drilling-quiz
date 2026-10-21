@@ -175,40 +175,63 @@ def korean_only(sentence: str) -> str | None:
     return None if not s or _LATIN.search(s) else s
 
 
+# KAGAS categories in words, for the critic's feedback.
+_CATEGORY_WORDS = {"PART": "particle", "END": "verb or adjective ending", "CONJ": "conjugation",
+                   "VERB": "verb choice", "NOUN": "noun or counter", "ADJ": "adjective choice",
+                   "SPELL": "spelling", "PUNCT": "punctuation", "MULTI": "mixed", "OTHER": "other"}
+
+
+def _category_words(category: str) -> str:
+    return _CATEGORY_WORDS.get(category, category)
+
+
 def single_edit(skill: Skill, correct: str, wrong: str):
     """The one edit turning `correct` into `wrong`, or (None, reason)."""
     edits = annotate(correct, wrong)
     if len(edits) != 1:
-        return None, f"not-minimal: {len(edits)} edits"
+        return None, (f"not-minimal: it changes {len(edits)} places in the sentence; "
+                      f"it must replace only the bracketed part")
     edit = edits[0]
     if edit.category not in skill.categories:
-        return None, f"wrong-category: {edit.category}, skill tests {sorted(skill.categories)}"
+        wanted = " or ".join(_category_words(c) for c in sorted(skill.categories))
+        return None, (f"wrong-category: it makes a {_category_words(edit.category)} mistake, "
+                      f"but this question tests a {wanted} mistake")
     return edit, ""
 
 
 # ------------------------------------------------------------------ items
 
-_ITEM_PROMPT = """You write Korean grammar drill questions for {level} learners whose first language is Indonesian.
-Grammar point: {description}.
+_SYSTEM_PROMPT = """You write multiple-choice Korean grammar questions for Indonesian learners at {level} level.
+A question is one Korean sentence with one part in square brackets. The learner sees the sentence
+with that part blanked out and picks it from four options: the correct part and three distractors.
 
-Write ONE new, natural, everyday Korean sentence that uses the grammar point, in Hangul only, and put
-square brackets around the ONE part that tests this grammar point -- as short as possible, e.g. a
-particle or a word ending, or the one word that carries it.
-Then give {n} "distractors": wrong replacements for the bracketed part, each a DIFFERENT mistake
-learners typically make with this grammar point, changing nothing else, and each clearly wrong in
-this sentence. Write only the replacement text, not the whole sentence.{target_line}
-Do not reuse these sentences: {avoid}
+Rules:
+1. The sentence is natural, everyday Korean, written in Hangul only: no romanisation, no translation.
+2. Exactly one pair of square brackets, inside the sentence, around the SHORTEST part that shows the
+   grammar point: a particle, a verb or adjective ending, or one word. Never bracket a whole phrase.
+3. Everything outside the brackets is correct and stays the same for all four options.
+4. Each distractor is only the text that replaces the bracketed part, not a whole sentence.
+5. Put a distractor in the brackets and the sentence must become wrong, and wrong ONLY because of
+   the grammar point being tested.
+6. The three distractors are three different mistakes that learners really make with this
+   grammar point.
+7. Output one JSON object and nothing else: no explanation, no comments, no markdown.
 
-Answer with the JSON only, no explanation. {example_note}
-{example}"""
+Output format:
+{{"sentence": "<Korean sentence with one [bracketed] part>", "distractors": ["<wrong 1>", "<wrong 2>", "<wrong 3>"]}}"""
 
-# The format example until a skill has an accepted item of its own; after
-# that, the skill's latest accepted item is the example (on-skill, not fixed).
+_ITEM_PROMPT = """Grammar point: {description}.{target_line}
+{example_note}
+{example}
+Write a new question.{avoid}"""
+
+# The example until a skill has an accepted item of its own; after that, the
+# skill's latest accepted item is the example (on-skill, not fixed).
 _FORMAT_EXAMPLE = '{"sentence": "동생이 공원[에서] 축구를 해요.", "distractors": ["에", "을", "이"]}'
 
-_REVISION_PROMPT = """That question cannot be used, for these reasons:
+_REVISION_PROMPT = """This question was rejected:
 {reasons}
-Write a corrected version that fixes every reason. Answer with JSON only, in the same format."""
+Write a new question that follows every rule. Output the JSON object only."""
 
 
 def describe_code(code: str) -> str:
@@ -300,7 +323,8 @@ class MisconceptionItemGenerator:
                 continue
             edit, why = single_edit(skill, sentence, wrong)
             if edit is None:
-                reasons.append(f"{why.split(':')[0]}: '{wrong}' {why}")
+                tag, _, text = why.partition(": ")
+                reasons.append(f"{tag}: distractor '{d}' -- {text}")
                 continue
             if edit.code in codes:
                 reasons.append(f"distinct: '{wrong}' makes the same mistake as another distractor "
@@ -340,21 +364,25 @@ class MisconceptionItemGenerator:
         skill = SKILLS[skill_id]
         target_line = ""
         if target_code is not None:
-            target_line = f"\n  One distractor MUST be this mistake: {describe_code(target_code)}."
-        avoid = "; ".join(self._recent.get(skill_id, [])[-8:]) or "(none yet)"
+            target_line = f"\nOne of the three distractors MUST be this mistake: {describe_code(target_code)}."
+        recent = self._recent.get(skill_id, [])[-8:]
+        avoid = f" Use a different sentence from these: {'; '.join(recent)}" if recent else ""
         example = self._example.get(skill_id)
-        note = ("An earlier accepted answer for this grammar point:" if example else
-                "Format example (a different grammar point may be tested; follow only its shape):")
-        return _ITEM_PROMPT.format(level=skill.level, description=skill.description,
-                                   n=N_DISTRACTORS, target_line=target_line, avoid=avoid,
-                                   example_note=note, example=example or _FORMAT_EXAMPLE)
+        note = ("A good question for this grammar point:" if example else
+                "Example of the output shape only (it tests a different grammar point):")
+        return _ITEM_PROMPT.format(description=skill.description, target_line=target_line,
+                                   avoid=avoid, example_note=note, example=example or _FORMAT_EXAMPLE)
+
+    def _system(self, skill_id: str) -> str:
+        return _SYSTEM_PROMPT.format(level=SKILLS[skill_id].level)
 
     def generate(self, skill_id: str, target_code: str | None = None) -> GeneratedItem | None:
         if skill_id not in SKILLS:
             return None
         stats = self.stats.setdefault(skill_id, FoundryStats())
         stats.attempts += 1
-        prompt = [{"role": "user", "content": self._prompt(skill_id, target_code)}]
+        prompt = [{"role": "system", "content": self._system(skill_id)},
+                  {"role": "user", "content": self._prompt(skill_id, target_code)}]
         messages = prompt
         for revision in range(MAX_REVISIONS + 1):
             reply_text = self.chat(messages)
@@ -411,7 +439,6 @@ class ExaoneChat:
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
         self._torch = torch
-        self.model_name = model_name
         self.tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name, trust_remote_code=True, device_map="cuda",
@@ -420,9 +447,6 @@ class ExaoneChat:
         self.max_new_tokens = max_new_tokens
 
     def __call__(self, messages: list[dict]) -> str:
-        if "exaone" in self.model_name.lower():  # EXAONE's recommended system prompt
-            messages = [{"role": "system", "content": "You are EXAONE model from LG AI Research, "
-                                                      "a helpful assistant."}] + messages
         enc = self.tok.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt",
                                            return_dict=True).to("cuda")
         with self._torch.no_grad():
