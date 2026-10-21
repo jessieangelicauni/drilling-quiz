@@ -4597,6 +4597,7 @@ Akurasi 43/52 di §9.79 diukur dengan prompt terpisah. Prompt gabungan perlu dic
 
 - **Placement test tidak dibuat** (keputusan jc). Pelajar baru mulai dari tengah urn seperti sekarang. Konsekuensinya sudah terukur di §9.84: di kelas miring, error estimasi awal sekitar dua kali lebih besar dibanding dengan placement.
 - **Celah yang ditemukan:** `batch_generate` mengisi bank per skill dengan level tetap; generator tidak melihat level pelajar. Pelajar mahir yang sedikit akan kehabisan soal di levelnya (efek plafon).
+- **Keputusan jc: soal di-generate per batch harian.** Job malam dibuat sadar level: pelajar dikelompokkan ke pita level dari estimasi Urnings, lalu untuk tiap pita × skill dihitung stok soal yang belum dikerjakan, dan generate hanya untuk pita yang stoknya kurang. Karena soal dipakai bersama dalam satu pita, kebutuhan per pita kira-kira sama dengan kebutuhan satu pelajar per hari, tidak bergantung jumlah orang. Durasi job bergantung pada tingkat penerimaan (12% di v2.1).
 - **Rencana (setelah hasil v2.2):** generate berdasarkan kebutuhan. Untuk tiap pelajar, hitung soal yang belum dikerjakan di sekitar levelnya. Kalau stoknya kurang dari batas, panggil generator dengan target level pelajar itu (mis. TOPIK II). Soal tetap melewati gate Qwen dan mendapat prior §9.87.
 
 ---
