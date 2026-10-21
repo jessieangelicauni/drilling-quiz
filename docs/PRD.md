@@ -4545,6 +4545,29 @@ Urn yang membesar hanya membantu sedikit; placement test jauh lebih baik. **Reko
 
 Catatan jujur: placement di simulasi diasumsikan menghasilkan estimasi dengan galat SD 0,7. Placement sungguhan (sekitar 10 soal adaptif, estimasi IRT EAP) hanya mencapai itu kalau difficulty soal placement-nya sudah cukup akurat. Jadi soal placement perlu diambil dari item yang paling banyak dijawab, atau item kurasi.
 
+
+### 9.86 Hasil v2.1 dan perbaikan v2.2: overgenerate-and-filter distraktor (2026-10-21)
+
+**Hasil run v2.1** (`benchmark_v2_results.json`): diterima 8/66 = 12,1% (CI 6,3–22,1%). Run ini dijalankan sebelum commit difficulty (`settings.encoders` masih default lama), jadi bagian difficulty belum ada.
+
+**Yang membaik:**
+- Kalimat sekarang pendek dan natural (`공장은 어제 디지털 트윈을 ___.`), dan blank berada di tempat yang benar.
+- Format 53/66: 13 item gagal karena `answer` tidak muncul di kalimat (misalnya `내시`).
+- Gate keunikan Qwen3 bekerja sesuai rancangan. Ia menolak distraktor yang sebenarnya juga benar (`완료했습니다` untuk `완료했어요`; `정밀하게` untuk `정확하게`).
+
+**Masalah yang tersisa: distraktor dari EXAONE.** Banyak distraktor berupa potongan kalimat (`공장에서는다섯개의센`, `기록을충전해요`), kata lain yang benar, atau bukan kesalahan pada objective-nya. Karena satu distraktor buruk menggugurkan seluruh item, tingkat penerimaan rendah walaupun kalimat dan kuncinya sudah bagus.
+
+**Embedding:** Qwen3-Embedding-0.6B memisahkan jenis kesalahan sedikit lebih baik daripada e5 (cos sama 0,901 vs beda 0,815, NN 14/30, dibanding e5 0,925 vs 0,884, NN 13/30). Keduanya masih lemah, dengan n=30.
+
+**v2.2:**
+- EXAONE menulis 6 kandidat distraktor (satu kata, maksimal 8 suku kata).
+- Qwen3 mode reasoning diberi kunci dan keenam kandidat, lalu menyebut semua opsi yang membentuk kalimat benar. Kunci harus ada di daftar itu.
+- Kandidat dipertahankan hanya kalau tidak disebut benar dan log-prob-nya di bawah kunci.
+- Tiga kandidat yang lolos dengan log-prob tertinggi (salah tapi paling meyakinkan) menjadi distraktor.
+- Diterima = kunci benar ∧ ada 3 distraktor ∧ objective cocok.
+
+Ini pola overgenerate-and-rank yang umum di literatur distractor generation. Jumlah panggilan reasoning tetap 2 per item.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

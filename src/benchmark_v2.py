@@ -13,12 +13,14 @@ library; nothing is parsed, diffed or labelled by our own rules.
      the blank in the wrong place in most items of the first run, §9.82).
      One curated example of the objective, from log_likelihood_results.json,
      is shown in the prompt when there is one.
-  2. Key check: under Qwen3-4B the stem filled with the answer must have a
-     higher log-probability than with any distractor (BLiMP-style minimal
-     pairs; 51/52 on the curated pairs, PRD §9.68), and Qwen3-4B in
-     reasoning mode, shown the four options, must find only the answer
-     correct -- a distractor that is merely a different correct word
-     (빠르게 for 신중하게) fails the item.
+  2. Distractors: overgenerate and filter (PRD §9.86). EXAONE writes six
+     candidate distractors; Qwen3-4B in reasoning mode, shown the key and
+     all six, names every option that makes a correct sentence. The key
+     must be among them; a candidate is kept only if it is NOT, and if its
+     filled stem has a lower log-probability than the key's (BLiMP-style
+     minimal pairs; 51/52 on the curated pairs, PRD §9.68). The three kept
+     candidates with the highest log-probability -- the most plausible
+     wrong answers -- become the distractors.
   3. Objective check: Qwen3-4B in reasoning mode picks which learning
      objective of the curriculum the item tests (43/52 on the curated
      pairs, PRD §9.79); the item passes when it picks the requested one.
@@ -32,7 +34,7 @@ library; nothing is parsed, diffed or labelled by our own rules.
 
   5. Difficulty: LLM respondents of three sizes (Qwen3-4B scored while it is
      loaded for the checks, then 0.6B and 1.7B one at a time) answer every
-     well-formed item and a Rasch fit gives its difficulty prior (difficulty_llm.py,
+     item with three distractors and a Rasch fit gives its difficulty prior (difficulty_llm.py,
      PRD §9.83); reported with the respondents' accuracy, which must rise
      with model size for the scale to mean anything, and next to the
      morpheme heuristic it replaces.
@@ -61,18 +63,20 @@ from eval_harness import rate
 from item_foundry import SKILLS, ExaoneChat
 
 HANGUL_WORD = r"^[가-힣]{1,10}$"
+HANGUL_OPTION = r"^[가-힣]{1,8}$"  # a distractor replaces one word, not a sentence
+N_CANDIDATES, N_DISTRACTORS = 6, 3
 HANGUL_SENTENCE = r"^[가-힣0-9 ,]{4,40}[.?!]$"
 
 
 class Distractor(BaseModel):
-    text: str = Field(pattern=HANGUL_WORD)
+    text: str = Field(pattern=HANGUL_OPTION)
     mistake: str = Field(min_length=10, max_length=160)
 
 
 class Item(BaseModel):
     sentence: str = Field(pattern=HANGUL_SENTENCE)
     answer: str = Field(pattern=HANGUL_WORD)
-    distractors: list[Distractor] = Field(min_length=3, max_length=3)
+    distractors: list[Distractor] = Field(min_length=N_CANDIDATES, max_length=N_CANDIDATES)
 
 
 _PROMPT = """Write one multiple-choice Korean exercise for {level} learners whose first language is Indonesian.
@@ -82,9 +86,10 @@ Learning objective: {objective}
 - "sentence": one short, simple, correct Korean sentence (at most 8 words) that uses the learning
   objective. Use one everyday word from the topic; keep the grammar at the learners' level.
 - "answer": the word or word ending in the sentence that the learning objective is about, copied exactly.
-- "distractors": three wrong forms that replace the answer and make the sentence ungrammatical,
-  each a DIFFERENT mistake learners really make with this learning objective (never another correct
-  word); "mistake" says in one English sentence what the learner got wrong.
+- "distractors": six wrong forms that replace the answer and make the sentence ungrammatical:
+  each changes the answer the way learners really get this learning objective wrong (a wrong
+  particle, ending or form of the same word), each a DIFFERENT mistake, never another correct word
+  and never more than one word; "mistake" says in one English sentence what the learner got wrong.
 Write a new sentence, different from: {avoid}"""
 
 _EXAMPLE = "Example of this objective: correct {correct} / learners write {wrong}\n"
@@ -96,6 +101,7 @@ _UNIQUE_PROMPT = """Fill the blank in this Korean sentence with each option.
 {options}
 
 Which options give a grammatically correct, natural Korean sentence? Answer with the letters only, separated by commas."""
+_LETTERS = "ABCDEFG"
 
 _CLASSIFY_PROMPT = """A learner wrote the wrong Korean sentence below. Which learning objective is the mistake about?
 
@@ -153,7 +159,7 @@ def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
             prompt = chat.tok.apply_chat_template([{"role": "user", "content": content}],
                                                   tokenize=False, add_generation_prompt=True)
             torch.manual_seed(rng.randrange(2**31))
-            raw = generator(prompt, max_new_tokens=600, do_sample=True, temperature=0.6, top_p=0.95)
+            raw = generator(prompt, max_new_tokens=1200, do_sample=True, temperature=0.6, top_p=0.95)
             try:
                 item = Item.model_validate_json(raw).model_dump()
             except ValueError:  # cut off by max_new_tokens
@@ -198,29 +204,34 @@ def check_items(items: list[dict], cur: dict):
                                                                                 options=options)))
         return oids[letters.index(found[-1])] if found else "none"
 
-    def correct_options(stem: str, texts: list[str]) -> list[str]:
-        shown = "\n".join(f"{'ABCD'[i]}. {t}" for i, t in enumerate(texts))
-        found = set(re.findall(r"\b([ABCD])\b", reason(_UNIQUE_PROMPT.format(stem=stem, options=shown))))
-        return [texts["ABCD".index(x)] for x in sorted(found)]
+    def correct_options(stem: str, texts: list[str]) -> set[str]:
+        letters_ = _LETTERS[:len(texts)]
+        shown = "\n".join(f"{letters_[i]}. {t}" for i, t in enumerate(texts))
+        found = set(re.findall(rf"\b([{letters_}])\b", reason(_UNIQUE_PROMPT.format(stem=stem, options=shown))))
+        return {texts[letters_.index(x)] for x in found}
 
     for it in items:
         if not it["format_ok"]:
             continue
         fill = lambda text: it["stem"].replace("___", text, 1)
-        texts = [d["text"] for d in it["distractors"]]
+        it["candidates"] = it.pop("distractors")
+        candidates = {d["text"]: d for d in it["candidates"] if d["text"] != it["answer"]}  # distinct
         key_score = solver.sentence_logprob(fill(it["answer"]))
-        it["distinct_options"] = len({it["answer"], *texts}) == 4
-        it["key_ok"] = it["distinct_options"] and all(solver.sentence_logprob(fill(t)) < key_score for t in texts)
-        shown = random.Random(it["stem"]).sample([it["answer"], *texts], 4)
-        it["judged_correct"] = correct_options(it["stem"], shown)
-        it["unique_ok"] = it["judged_correct"] == [it["answer"]]
-        it["predicted_objective"] = classify(fill(it["answer"]), fill(texts[0]))
+        shown = random.Random(it["stem"]).sample([it["answer"], *candidates], len(candidates) + 1)
+        it["judged_correct"] = sorted(correct_options(it["stem"], shown))
+        it["key_ok"] = it["answer"] in it["judged_correct"]
+        scored = [(solver.sentence_logprob(fill(t)), t) for t in candidates if t not in it["judged_correct"]]
+        kept = sorted((s, t) for s, t in scored if s < key_score)[::-1][:N_DISTRACTORS]
+        it["distractors"] = [candidates[t] for _, t in kept]
+        it["enough_distractors"] = len(it["distractors"]) == N_DISTRACTORS
+        it["predicted_objective"] = (classify(fill(it["answer"]), fill(it["distractors"][0]["text"]))
+                                     if it["distractors"] else "none")
         it["objective_ok"] = it["predicted_objective"] == it["objective"]
-        it["accepted"] = it["key_ok"] and it["unique_ok"] and it["objective_ok"]
+        it["accepted"] = it["key_ok"] and it["enough_distractors"] and it["objective_ok"]
 
     # Qwen3-4B is also the largest difficulty respondent: score it now, while loaded.
     from difficulty_llm import key_probability
-    ok = [it for it in items if it["format_ok"]]
+    ok = [it for it in items if it.get("enough_distractors")]
     p4b = key_probability(_difficulty_items(ok), solver.sentence_logprob)
     del solver, model, tok
     gc.collect()
@@ -280,7 +291,7 @@ def difficulty_report(items: list[dict], p4b) -> dict:
     from difficulty_heuristic import estimate_difficulty
     from difficulty_llm import difficulty_priors
 
-    ok = [it for it in items if it.get("format_ok")]
+    ok = [it for it in items if it.get("enough_distractors")]
     out = difficulty_priors(_difficulty_items(ok), known={"Qwen/Qwen3-4B": p4b})
     for it, mu, s2 in zip(ok, out["mu_hat"], out["sigma_hat2"]):
         it["difficulty_mu"], it["difficulty_sigma2"] = mu, s2
@@ -316,12 +327,12 @@ if __name__ == "__main__":
         report["per_objective"][oid] = {
             "format_ok": rate(len(ok), len(mine)),
             "key_ok": rate(sum(it["key_ok"] for it in ok), len(ok)),
-            "unique_ok": rate(sum(it["unique_ok"] for it in ok), len(ok)),
+            "enough_distractors": rate(sum(it["enough_distractors"] for it in ok), len(ok)),
             "objective_ok": rate(sum(it["objective_ok"] for it in ok), len(ok)),
             "accepted": rate(sum(it["accepted"] for it in ok), len(mine))}
         r = report["per_objective"][oid]
         print(f"{oid:16s} format {r['format_ok']['k']}/{r['format_ok']['n']}  key {r['key_ok']['k']}  "
-              f"unique {r['unique_ok']['k']}  "
+              f"3 distractors {r['enough_distractors']['k']}  "
               f"objective {r['objective_ok']['k']}  accepted {r['accepted']['k']}/{r['accepted']['n']}")
     report["accepted"] = rate(sum(it.get("accepted", False) for it in items), len(items))
     report["embeddings"] = {e: embedding_agreement(items, e) for e in args.encoders.split(",")}
