@@ -4634,6 +4634,9 @@ Penyebab yang ditemukan:
 - **Prior distandarkan:** `key_logit = logprob(kunci) − logsumexp(logprob(distraktor))` tanpa clip, lalu distandarkan terhadap bank soal (di benchmark: terhadap item yang diterima di batch itu) → mean 0, SD 1 di skala Urnings. Hanya urutan dari model yang dipakai; σ̂² = 1 tetap.
 
 
+- **Cache Outlines** (pertanyaan jc): `outlines.Generator(model, schema)` di Outlines 1.3.3 mengonversi seluruh vocabulary EXAONE dan mengompilasi skema di **setiap** panggilan; tidak ada cache. `_Exaone` sekarang membuat `OutlinesCoreBackend` sekali (vocabulary sekali) dan menyimpan generator per skema, jadi skema kalimat dan distraktor dikompilasi sekali per run. Skema jawaban (enum kata kalimat) berubah tiap item, jadi dipisah menjadi decode tersendiri yang sangat kecil (beberapa token, kompilasi cepat). Total: 3 decode EXAONE per item (kalimat, jawaban, distraktor), Qwen tetap 1 call.
+
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

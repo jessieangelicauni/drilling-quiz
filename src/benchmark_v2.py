@@ -3,12 +3,12 @@ Measures the model-only item pipeline (Versi 2, PRD §9.80) before it
 replaces item_foundry's verification code. Every step is a model or a
 library; nothing is parsed, diffed or labelled by our own rules.
 
-  1. Generate: EXAONE-3.5-7.8B through Outlines with JSON schemas, in two
+  1. Generate: EXAONE-3.5-7.8B through Outlines with JSON schemas, in three
      constrained decodes, so the output is valid by construction. First one
      short correct Korean sentence. Then the answer -- a schema enum of the
      sentence's own words, so it is always one whole word of it (asked for
      in one schema, it glued several words together in 31/66 items, §9.91)
-     -- and three distractors, each a whole word that replaces it. The stem
+     -- then three distractors, each a whole word that replaces it. The stem
      is the sentence with that word blanked; writing the sentence first and
      choosing the word after is the order an LLM writes well (§9.82).
      Each distractor states its learner mistake (one English sentence)
@@ -53,6 +53,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import random
 from pathlib import Path
@@ -78,13 +79,14 @@ class Sentence(BaseModel):
     sentence: str = Field(pattern=HANGUL_SENTENCE)
 
 
-def _item_schema(words: list[str]) -> type[BaseModel]:
+def _answer_schema(words: list[str]) -> type[BaseModel]:
     """The answer can only be one of the sentence's own words (v2.3 glued
-    several words into one answer in 31/66 items, PRD §9.91)."""
-    return create_model("Item", answer=(Literal[tuple(words)], ...),
-                        distractors=(list[Distractor], Field(min_length=N_DISTRACTORS, max_length=N_DISTRACTORS)))
+    several words into one answer in 31/66 items, PRD §9.91). A schema of
+    its own, so the one that changes with every sentence is tiny to compile."""
+    return create_model("Answer", answer=(Literal[tuple(words)], ...))
 
 
+@functools.cache  # the same class each time, so _Exaone compiles it once
 def _replacements(n: int) -> type[BaseModel]:
     return create_model(f"Replacements{n}", distractors=(list[Distractor], Field(min_length=n, max_length=n)))
 
@@ -95,13 +97,16 @@ Setting: {context}; {topic}. Use one word of the setting.
 {examples}
 Do not reuse these sentences: {avoid}"""
 
-_ITEM_PROMPT = """Turn this Korean sentence into a fill-in-the-blank item for {level} learners. Objective: {objective}
-Sentence: {sentence}
+_ANSWER_PROMPT = """Objective: {objective}
+Korean sentence: {sentence}
+answer: the word of the sentence the objective is about."""
+
+_DISTRACTOR_PROMPT = """Korean fill-in-the-blank item for {level} learners. Objective: {objective}
 {examples}
-- answer: the word of the sentence the objective is about.
-- distractors: 3 wrong replacements for that word, each from a different learner mistake:
-  - mistake: one English sentence naming the mistake.
-  - text: the single wrong word it produces (wrong particle, ending or form). It must make the sentence wrong."""
+Stem: {stem}   Answer: {answer}
+Write 3 wrong replacements for the answer, each from a different learner mistake:
+- mistake: one English sentence naming the mistake.
+- text: the single wrong word it produces (wrong particle, ending or form). It must make the sentence wrong."""
 
 _REPAIR_PROMPT = """Korean fill-in-the-blank item for {level} learners. Objective: {objective}
 {examples}
@@ -162,32 +167,42 @@ class _Exaone:
         import outlines
 
         self.chat = ExaoneChat()
+        from outlines.backends.outlines_core import OutlinesCoreBackend
+
         self.model = outlines.from_transformers(self.chat.model, self.chat.tok)
+        # outlines.Generator(model, schema) converts the whole vocabulary and
+        # compiles the schema on every call; Outlines 1.3 caches neither. The
+        # vocabulary is converted once here and each schema compiled once.
+        self.backend = OutlinesCoreBackend(self.model)
+        self.generators: dict[str, object] = {}
         return self
 
     def __call__(self, content: str, schema: type[BaseModel], seed: int) -> str:
         import outlines
         import torch
 
+        key = json.dumps(schema.model_json_schema(), sort_keys=True)
+        if key not in self.generators:
+            self.generators[key] = outlines.Generator(
+                self.model, processor=self.backend.get_json_schema_logits_processor(key))
         prompt = self.chat.tok.apply_chat_template([{"role": "user", "content": content}],
                                                    tokenize=False, add_generation_prompt=True)
         torch.manual_seed(seed)
-        return outlines.Generator(self.model, schema)(prompt, max_new_tokens=800, do_sample=True,
-                                                      temperature=0.6, top_p=0.95)
+        return self.generators[key](prompt, max_new_tokens=800, do_sample=True, temperature=0.6, top_p=0.95)
 
     def __exit__(self, *exc):
         import gc
 
         import torch
 
-        del self.model, self.chat
+        del self.model, self.chat, self.backend, self.generators
         gc.collect()  # EXAONE has to leave the GPU before Qwen3 loads
         torch.cuda.empty_cache()
 
 
 def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
-    """Two constrained decodes with the same model: the sentence, then the
-    answer (one of its words, by schema) and the distractors."""
+    """Three constrained decodes with the same model: the sentence, the answer
+    (one of its words, by schema; a few tokens) and the distractors."""
     rng = random.Random(seed)
     examples = curated_examples()
     items = []
@@ -211,17 +226,21 @@ def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
                 if not unique:
                     items.append({**base, "sentence": sentence, "format_ok": False})
                     continue
-                schema = _item_schema(unique)
-                raw = exaone(_ITEM_PROMPT.format(level=cur["level"], objective=objective, sentence=sentence,
-                                                 examples=examples.get(oid, "")), schema, rng.randrange(2**31))
+                answer = _answer_schema(unique).model_validate_json(exaone(
+                    _ANSWER_PROMPT.format(objective=objective, sentence=sentence), _answer_schema(unique),
+                    rng.randrange(2**31))).answer
+                stem = " ".join("___" if w == answer else w for w in sentence[:-1].split()) + sentence[-1]
+                raw = exaone(_DISTRACTOR_PROMPT.format(level=cur["level"], objective=objective, stem=stem,
+                                                       answer=answer, examples=examples.get(oid, "")),
+                             _replacements(N_DISTRACTORS), rng.randrange(2**31))
                 try:
-                    item = schema.model_validate_json(raw).model_dump()
+                    distractors = _replacements(N_DISTRACTORS).model_validate_json(raw).distractors
                 except ValueError:
-                    items.append({**base, "sentence": sentence, "raw": raw, "format_ok": False})
+                    items.append({**base, "sentence": sentence, "answer": answer, "raw": raw, "format_ok": False})
                     continue
                 seen.append(sentence)
-                stem = " ".join("___" if w == item["answer"] else w for w in sentence[:-1].split()) + sentence[-1]
-                items.append({**base, "stem": stem, "sentence": sentence, **item, "format_ok": True})
+                items.append({**base, "stem": stem, "sentence": sentence, "answer": answer,
+                              "distractors": [d.model_dump() for d in distractors], "format_ok": True})
     return items
 
 
