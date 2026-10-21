@@ -4592,6 +4592,13 @@ Sisa biaya per item: 1 generasi EXAONE, 1 panggilan reasoning Qwen3, dan 7 forwa
 
 Akurasi 43/52 di §9.79 diukur dengan prompt terpisah. Prompt gabungan perlu dicek di run berikutnya (objective_ok per objective).
 
+
+### 9.89 Keputusan: tanpa placement test; generate berdasarkan kebutuhan (2026-10-21)
+
+- **Placement test tidak dibuat** (keputusan jc). Pelajar baru mulai dari tengah urn seperti sekarang. Konsekuensinya sudah terukur di §9.84: di kelas miring, error estimasi awal sekitar dua kali lebih besar dibanding dengan placement.
+- **Celah yang ditemukan:** `batch_generate` mengisi bank per skill dengan level tetap; generator tidak melihat level pelajar. Pelajar mahir yang sedikit akan kehabisan soal di levelnya (efek plafon).
+- **Rencana (setelah hasil v2.2):** generate berdasarkan kebutuhan. Untuk tiap pelajar, hitung soal yang belum dikerjakan di sekitar levelnya. Kalau stoknya kurang dari batas, panggil generator dengan target level pelajar itu (mis. TOPIK II). Soal tetap melewati gate Qwen dan mendapat prior §9.87.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
