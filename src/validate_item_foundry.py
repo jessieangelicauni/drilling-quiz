@@ -25,13 +25,18 @@ on one 16GB GPU (7.3GB + ~8GB, PRD §9.53).
      misconception it is labelled with (the human check of the labels;
      docs/eval-protocol.md).
 
+Every codebook reply and every entry's verdict is saved in the output
+(`codebook_log`), so an empty codebook can be diagnosed from the file.
+
 Usage: python3 src/validate_item_foundry.py [--per-skill 20] [--seed 0] [--reuse-codebook]
+       python3 src/validate_item_foundry.py --codebook-only   # step 1 only, quick check
 """
 from __future__ import annotations
 
 import argparse
 import json
 import random
+from collections import Counter
 from dataclasses import asdict
 from datetime import date
 
@@ -45,21 +50,43 @@ if __name__ == "__main__":
     parser.add_argument("--per-skill", type=int, default=20)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--reuse-codebook", action="store_true")
+    parser.add_argument("--codebook-only", action="store_true",
+                        help="build and report the codebook, skip item generation and the solver")
     parser.add_argument("--out", default="item_foundry_results.json")
     args = parser.parse_args()
 
     rng = random.Random(args.seed)
     chat = ExaoneChat()
-    solver = SolverCheckProvider()
 
+    codebook_log: dict[str, list] = {}
     codebook = load_codebook() if args.reuse_codebook else {}
-    if not codebook:
-        codebook = {skill_id: build_codebook(skill_id, chat) for skill_id in SKILLS}
+    if not any(codebook.values()):
+        codebook = {}
+        for skill_id in SKILLS:
+            codebook_log[skill_id] = []
+            codebook[skill_id] = build_codebook(skill_id, chat, log=codebook_log[skill_id])
+    for skill_id, entries in codebook.items():
+        print(f"  {skill_id:16s} {len(entries)} verified misconceptions: {[e.code for e in entries]}")
+        for attempt in codebook_log.get(skill_id, []):
+            verdicts = Counter(r["verdict"].split(":")[0] for r in attempt["rows"])
+            print(f"      reply parsed={attempt['parsed']} rows={len(attempt['rows'])} {dict(verdicts)}")
+            if not attempt["parsed"]:
+                print(f"      raw reply starts: {attempt['reply'][:200]!r}")
+    if codebook_log and any(codebook.values()):
         save_codebook(codebook, {"model": ExaoneChat.MODEL, "date": date.today().isoformat(),
                                  "seed": args.seed})
         print(f"codebook written to {CODEBOOK_PATH}")
-    for skill_id, entries in codebook.items():
-        print(f"  {skill_id:16s} {len(entries)} verified misconceptions: {[e.code for e in entries]}")
+    elif codebook_log:
+        print("!! every codebook is empty -- not saved; see codebook_log in the output file")
+    if args.codebook_only or not any(codebook.values()):
+        with open(args.out, "w", encoding="utf-8") as f:
+            json.dump({"settings": vars(args), "codebook_log": codebook_log,
+                       "codebook": {s: [asdict(e) for e in es] for s, es in codebook.items()}},
+                      f, ensure_ascii=False, indent=2)
+        print(f"written to {args.out}")
+        raise SystemExit(0 if any(codebook.values()) else 1)
+
+    solver = SolverCheckProvider()
 
     gen = MisconceptionItemGenerator(chat, solver.sentence_logprob, codebook, seed=args.seed)
     report = {"settings": vars(args), "per_skill": {}}
@@ -103,6 +130,7 @@ if __name__ == "__main__":
     report["overall_acceptance"] = rate(*total)
     report["items"] = accepted_items
     report["codebook"] = {s: [asdict(e) for e in entries] for s, entries in codebook.items()}
+    report["codebook_log"] = codebook_log
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
     o = report["overall_acceptance"]

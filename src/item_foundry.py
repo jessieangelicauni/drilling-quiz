@@ -46,6 +46,7 @@ solver_check.SolverCheckProvider are the real ones.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import random
 import re
@@ -137,22 +138,42 @@ class FoundryStats:
         self.reasons[key] = self.reasons.get(key, 0) + 1
 
 
+def _loads_lenient(text: str):
+    """json.loads, then once more without trailing commas (`[1, 2,]`), which
+    LLMs write often."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return json.loads(re.sub(r",\s*([\]}])", r"\1", text))
+
+
 def extract_json(text: str):
-    """The first JSON object or array in a model reply (models often wrap it
-    in prose or a ```json fence)."""
+    """The first parseable JSON object or array in a model reply (models
+    often wrap it in prose or a ```json fence, or leave trailing commas)."""
+    text = re.sub(r"```(?:json)?", "", text)
     pairs = sorted((("{", "}"), ("[", "]")), key=lambda p: (text.find(p[0]) == -1, text.find(p[0])))
     for opener, closer in pairs:  # whichever bracket opens first
         start = text.find(opener)
         while start != -1:
-            depth = 0
+            depth, in_string, escaped = 0, False, False
             for i in range(start, len(text)):
-                if text[i] == opener:
+                ch = text[i]
+                if in_string:  # brackets inside strings do not count
+                    if escaped:
+                        escaped = False
+                    elif ch == "\\":
+                        escaped = True
+                    elif ch == '"':
+                        in_string = False
+                elif ch == '"':
+                    in_string = True
+                elif ch == opener:
                     depth += 1
-                elif text[i] == closer:
+                elif ch == closer:
                     depth -= 1
                     if depth == 0:
                         try:
-                            return json.loads(text[start:i + 1])
+                            return _loads_lenient(text[start:i + 1])
                         except json.JSONDecodeError:
                             break
             start = text.find(opener, start + 1)
@@ -160,7 +181,10 @@ def extract_json(text: str):
 
 
 def _slug(name: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:40]
+    """A stable ASCII id for a misconception name (a hash if the name has no
+    ASCII letters, e.g. one written in Korean)."""
+    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:40]
+    return slug or hashlib.sha1(name.encode("utf-8")).hexdigest()[:10]
 
 
 def single_edit(skill: Skill, correct: str, wrong: str):
@@ -188,26 +212,52 @@ Answer with JSON only:
 [{{"name": "...", "explanation": "...", "correct": "...", "wrong": "..."}}, ...]"""
 
 
-def build_codebook(skill_id: str, chat: Chat) -> list[MisconceptionEntry]:
+def _codebook_rows(raw) -> list:
+    """The list of entries in a parsed reply: the list itself, or the first
+    list value of an object ({"misconceptions": [...]})."""
+    if isinstance(raw, list):
+        return raw
+    if isinstance(raw, dict):
+        return next((v for v in raw.values() if isinstance(v, list)), [])
+    return []
+
+
+def build_codebook(skill_id: str, chat: Chat, log: list | None = None,
+                   attempts: int = 3) -> list[MisconceptionEntry]:
+    """Verified codebook for one skill. The generator is asked again (its
+    replies are sampled) until at least N_DISTRACTORS entries survive or
+    `attempts` runs out. Every reply and every entry's verdict is appended to
+    `log` when given, so an empty codebook can be diagnosed."""
     skill = SKILLS[skill_id]
-    reply = chat([{"role": "user", "content": _CODEBOOK_PROMPT.format(
-        description=skill.description, level=skill.level, k=CODEBOOK_SIZE)}])
-    raw = extract_json(reply)
     entries, seen = [], set()
-    for row in raw if isinstance(raw, list) else []:
-        if not isinstance(row, dict) or not all(isinstance(row.get(k), str) for k in
-                                                ("name", "explanation", "correct", "wrong")):
-            continue
-        edit, _ = single_edit(skill, row["correct"].strip(), row["wrong"].strip())
-        if edit is None:
-            continue
-        code = edit.code if edit.functional else f"{skill_id}/{_slug(row['name'])}"
-        if code in seen:
-            continue
-        seen.add(code)
-        entries.append(MisconceptionEntry(code, row["name"].strip(), row["explanation"].strip(),
-                                          row["correct"].strip(), row["wrong"].strip(),
-                                          edit.category, edit.functional))
+    for _ in range(attempts):
+        reply = chat([{"role": "user", "content": _CODEBOOK_PROMPT.format(
+            description=skill.description, level=skill.level, k=CODEBOOK_SIZE)}])
+        raw = extract_json(reply)
+        record = {"reply": reply, "parsed": raw is not None, "rows": []}
+        for row in _codebook_rows(raw):
+            if not isinstance(row, dict) or not all(isinstance(row.get(k), str) for k in
+                                                    ("name", "explanation", "correct", "wrong")):
+                record["rows"].append({"row": row, "verdict": "format: needs name, explanation, correct, wrong"})
+                continue
+            correct, wrong = row["correct"].strip(), row["wrong"].strip()
+            edit, why = single_edit(skill, correct, wrong)
+            if edit is None:
+                record["rows"].append({"row": row, "verdict": why,
+                                       "edits": [vars(e) for e in annotate(correct, wrong)]})
+                continue
+            code = edit.code if edit.functional else f"{skill_id}/{_slug(row['name'])}"
+            if code in seen:
+                record["rows"].append({"row": row, "verdict": f"duplicate: {code}"})
+                continue
+            seen.add(code)
+            record["rows"].append({"row": row, "verdict": f"kept: {code}"})
+            entries.append(MisconceptionEntry(code, row["name"].strip(), row["explanation"].strip(),
+                                              correct, wrong, edit.category, edit.functional))
+        if log is not None:
+            log.append(record)
+        if len(entries) >= N_DISTRACTORS:
+            break
     return entries
 
 
@@ -388,7 +438,7 @@ class ExaoneChat:
 
     MODEL = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"
 
-    def __init__(self, model_name: str = MODEL, temperature: float = 0.8, max_new_tokens: int = 600):
+    def __init__(self, model_name: str = MODEL, temperature: float = 0.8, max_new_tokens: int = 1500):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
@@ -414,6 +464,8 @@ if __name__ == "__main__":
     assert extract_json('Sure! ```json\n{"a": [1, {"b": 2}]}\n``` done') == {"a": [1, {"b": 2}]}
     assert extract_json("[1, 2] trailing") == [1, 2]
     assert extract_json("no json") is None
+    assert extract_json('```json\n[{"a": "x]y"}, {"b": 2},]\n```') == [{"a": "x]y"}, {"b": 2}]
+    assert _codebook_rows({"misconceptions": [1]}) == [1]
 
     codebook_reply = json.dumps([
         {"name": "에 for every location", "explanation": "uses 에 for the place of an action",
@@ -427,7 +479,9 @@ if __name__ == "__main__":
         {"name": "duplicate edit", "explanation": "same edit as the first, must be dropped",
          "correct": "친구가 카페에서 일해요.", "wrong": "친구가 카페에 일해요."},
     ], ensure_ascii=False)
-    book = build_codebook("particle_loc", lambda m: "Here you go:\n" + codebook_reply)
+    log = []
+    book = build_codebook("particle_loc", lambda m: "Here you go:\n" + codebook_reply, log=log)
+    assert len(log) == 1 and sum(r["verdict"].startswith("kept") for r in log[0]["rows"]) == 3
     assert [e.code for e in book] == ["PART:에서>에", "PART:에서>을", "PART:에서>이"], [e.code for e in book]
 
     good = {"sentence": "동생이 공원에서 축구를 해요.", "target": "에서",
@@ -472,4 +526,5 @@ if __name__ == "__main__":
         {"name": "eat for all consumption", "explanation": "uses 먹다 for drinks",
          "correct": "물을 마셔요.", "wrong": "물을 먹어요."}], ensure_ascii=False))
     assert verb_book and verb_book[0].code == "verb_choice/eat-for-all-consumption"
+    assert _slug("먹다 과잉 일반화") and _slug("먹다 과잉 일반화") != _slug("마시다")
     print("all smoke tests passed")
