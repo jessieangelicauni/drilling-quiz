@@ -10,11 +10,15 @@ Pair sets:
     distractor types the drill produces; Qwen3-4B already scores 51/52, so
     they mostly catch a candidate that is WORSE.
   - kolla: real learner sentences from KoLLA v2.0 (Song et al. 2026) that
-    carry exactly one annotated error, paired with their correction. Real
-    errors are harder than generated ones, so this set separates the
-    candidates. Needs kolla_corpus_download/ (investigate_kolla_corpus.py
-    downloads it). KoLLA annotates particles only, so it tests the
-    particle skills.
+    carry exactly one annotated error, a REPLACEMENT of one word (R:),
+    paired with their correction. Real errors are harder than generated
+    ones, so this set separates the candidates. Missing- and unnecessary-
+    word errors (M:, U:) are left out: the two sentences then differ in
+    length, and a total log-probability always favours the shorter one,
+    so the comparison would measure length, not grammar (the first run
+    scored ~57% for every model for exactly this reason). Reported as
+    particle (ADP), spelling and other replacements. Needs
+    kolla_corpus_download/ (investigate_kolla_corpus.py downloads it).
   - codebook: the correct / wrong examples of data/misconception_codebook.json.
 
 Candidates differ in family, size and pre-training (instruct vs base);
@@ -72,11 +76,16 @@ def kolla_pairs(limit: int, seed: int) -> list[dict]:
     pairs, tokens, edits = [], [], []
 
     def flush():
-        if tokens and len(edits) == 1:
-            start, end, etype, corr = edits[0]
-            fixed = tokens[:start] + corr.split() + tokens[end:]
-            if fixed != tokens:
-                pairs.append({"skill": f"kolla/{etype}", "correct": " ".join(fixed), "wrong": " ".join(tokens)})
+        if len(tokens) < 2 or len(edits) != 1:
+            return
+        start, end, etype, corr = edits[0]
+        if not etype.startswith("R:") or end - start != 1 or len(corr.split()) != 1:
+            return
+        fixed = tokens[:start] + corr.split() + tokens[end:]
+        if fixed != tokens:
+            kind = "particle" if "ADP" in etype else ("spelling" if etype == "R:SPELL" else "other")
+            pairs.append({"skill": f"kolla/{kind}", "etype": etype,
+                          "correct": " ".join(fixed), "wrong": " ".join(tokens)})
 
     for path in files:
         for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
