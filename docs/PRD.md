@@ -4600,6 +4600,24 @@ Akurasi 43/52 di §9.79 diukur dengan prompt terpisah. Prompt gabungan perlu dic
 - **Keputusan jc: soal di-generate per batch harian.** Job malam dibuat sadar level: pelajar dikelompokkan ke pita level dari estimasi Urnings, lalu untuk tiap pita × skill dihitung stok soal yang belum dikerjakan, dan generate hanya untuk pita yang stoknya kurang. Karena soal dipakai bersama dalam satu pita, kebutuhan per pita kira-kira sama dengan kebutuhan satu pelajar per hari, tidak bergantung jumlah orang. Durasi job bergantung pada tingkat penerimaan (12% di v2.1).
 - **Rencana (setelah hasil v2.2):** generate berdasarkan kebutuhan. Untuk tiap pelajar, hitung soal yang belum dikerjakan di sekitar levelnya. Kalau stoknya kurang dari batas, panggil generator dengan target level pelajar itu (mis. TOPIK II). Soal tetap melewati gate Qwen dan mendapat prior §9.87.
 
+### 9.90 Hasil v2.2 dan v2.3: 3 distraktor, perbaikan terarah (2026-10-21)
+
+**Hasil v2.2** (commit 0e9a3bb): diterima 10/66 (15%, CI 8–26%). Format 61, kunci 51, ≥3 distraktor baik 23, objective 17. Dibaca manual, hanya sekitar 3 item yang benar-benar layak (mis. tense_past `분석했어요`, `확인했어요`). 6 kandidat tidak jelas lebih baik dari 12% di v2.1, jadi kembali ke 3 distraktor (preferensi jc).
+
+Penyebab yang ditemukan:
+1. **Bug parsing judge.** Huruf dibaca dari seluruh balasan, sehingga banyak item dinilai "semua benar". Sekarang hanya baris berlabel (`Correct:`, `Objective:`, `Plausible:`) yang dibaca.
+2. **Jawaban berupa potongan kata.** Stem `공장___` dengan distraktor `공장으로` menjadi "공장공장으로". Sekarang jawaban harus satu kata utuh dari kalimat (dicek: muncul tepat sekali di antara spasi).
+3. **Distraktor sampah yang tergabung lolos** (mis. `공장에서는다섯개`), karena cukup "salah". Sekarang judge yang sama juga ditanya opsi salah mana yang mungkin dipilih pelajar nyata; yang tidak disebut ditolak.
+4. **Prior difficulty jenuh** di run itu (versi 3 responden lama). Versi −logit p (§9.87) melaporkan `at_clip`: proporsi item yang mentok di ±3. Kalau besar, standarkan per pool.
+
+**Perubahan v2.3** (`benchmark_v2.py`), tetap 1 generasi EXAONE + 1 panggilan Qwen3 per item:
+- 3 distraktor; skema meminta `mistake` lebih dulu, baru `text` (model memutuskan kesalahannya dulu).
+- Semua pasangan kurasi per objective dari log_likelihood_results.json masuk ke prompt.
+- Judge satu panggilan dengan tiga baris: Correct, Objective, Plausible.
+- **Perbaikan terarah, satu putaran:** untuk item yang kunci dan objective-nya lolos, EXAONE hanya mengganti distraktor yang ditolak, diberi alasan penolakannya; item lalu dinilai ulang. Biaya tambahan hanya untuk item yang gagal di distraktor.
+- Laporan: `accepted_before_repair`, `accepted`, dan `repaired` per objective.
+
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
