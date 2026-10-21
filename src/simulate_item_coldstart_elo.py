@@ -73,7 +73,7 @@ def run_elo_growing_pool(theta: np.ndarray, n_resp: int, item_bh0_fn,
             theta_sel = th[1 - c, p]
         else:
             c, theta_sel = 0, th[0, p]
-        i = pick_adaptive(theta_sel, bh[:n_active], target, pool=min(48, n_active))
+        i = pick_adaptive(theta_sel, bh[:n_active], target)
 
         x = RNG.random() < SIG(theta[p] - beta[i])
         exp = SIG(th[c, p] - bh[i])

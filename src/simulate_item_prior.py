@@ -8,7 +8,7 @@ actually in before §9.12 wired seed_item_from_encoder() in?
 Same harness and ground-truth generating model (Rasch, theta/beta ~ N(0,1),
 adaptive selection + simultaneous item calibration) as simulate_trackers.py
 -- this is a follow-up to it, same pattern as simulate_drift.py, not a
-rewrite: reuses RNG/SIG/pick_adaptive/_logit_urn directly.
+rewrite: reuses RNG/SIG/urnings_step/_logit_urn directly.
 
 difficulty_heuristic.py's own docstring is explicit that it is "not
 calibrated to any real difficulty scale" -- so rather than claim one
@@ -24,7 +24,7 @@ sensitivity, without turning into a big ablation.
 """
 import numpy as np
 
-from simulate_trackers import RNG, SIG, _logit_urn, pick_adaptive
+from simulate_trackers import RNG, SIG, _logit_urn, urnings_step
 
 # Matches urnings_tracker.seed_item_from_encoder()'s defaults exactly.
 _N_MIN, _N_MAX, _REF_VAR = 8, 64, 1.0
@@ -44,7 +44,7 @@ def seed_items_from_encoder(beta_true: np.ndarray, noise_std: float) -> tuple[np
     """
     mu_hat = beta_true + RNG.normal(0, noise_std, size=len(beta_true))
     n = int(round(min(max(_N_MAX / (1.0 + _FIXED_SIGMA2 / _REF_VAR), _N_MIN), _N_MAX)))
-    pi = SIG(-mu_hat)
+    pi = SIG(mu_hat)  # item urn proportion = difficulty (PRD §9.68), so a harder item gets MORE balls
     k = np.round(pi * (n + 1) - 0.5).astype(int)
     k = np.clip(k, 0, n)
     return k, np.full(len(beta_true), n), mu_hat
@@ -53,38 +53,19 @@ def seed_items_from_encoder(beta_true: np.ndarray, noise_std: float) -> tuple[np
 def run_urnings_item_prior(theta: np.ndarray, beta: np.ndarray, n_resp: int,
                             item_k0: np.ndarray, item_n0: np.ndarray,
                             n_p: int = 32, target: float = 0.5) -> np.ndarray:
-    """Identical ball-exchange math to simulate_trackers.run_urnings, the
-    ONLY difference being that items start from caller-supplied PER-ITEM
-    (k0, n0) instead of always starting at a flat n_i//2 -- written as a
-    separate function rather than modifying run_urnings, to leave that
-    already-validated reference implementation untouched.
+    """Same simulate_trackers.urnings_step as run_urnings (corrected sign +
+    adaptive-selection MH correction, PRD §9.68), the ONLY difference being
+    that items start from caller-supplied PER-ITEM (k0, n0) instead of
+    always starting at a flat n_i//2.
     """
     P, I = len(theta), len(beta)
     kp = np.full(P, n_p // 2)
     ki = item_k0.copy()
     ni = item_n0
     track = []
-    eps = 1e-9
     for t in range(n_resp):
         p = RNG.integers(0, P)
-        pi_p = np.clip(kp[p] / n_p, eps, 1 - eps)
-        theta_sel = _logit_urn(kp[p], n_p)
-        beta_hat = -_logit_urn(ki, ni)
-        i = pick_adaptive(theta_sel, beta_hat, target)
-
-        n_i = int(ni[i])
-        x = int(RNG.random() < SIG(theta[p] - beta[i]))
-        pi_i = np.clip(ki[i] / n_i, eps, 1 - eps)
-        num = pi_p * (1 - pi_i)
-        q = num / (num + (1 - pi_p) * pi_i)
-        y = int(RNG.random() < q)
-
-        kp_s, ki_s = kp[p] + x - y, ki[i] - x + y
-        if 0 <= kp_s <= n_p and 0 <= ki_s <= n_i:
-            cur = kp[p] * (n_i - ki[i]) + (n_p - kp[p]) * ki[i]
-            pro = kp_s * (n_i - ki_s) + (n_p - kp_s) * ki_s
-            if cur <= 0 or RNG.random() < min(1.0, pro / cur):
-                kp[p], ki[i] = kp_s, ki_s
+        urnings_step(kp, ki, p, theta[p], beta, n_p, ni, target)
 
         if (t + 1) % 200 == 0:
             est = _logit_urn(kp, n_p)

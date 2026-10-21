@@ -15,11 +15,32 @@ RNG = np.random.default_rng(20261018)
 SIG = lambda z: 1.0 / (1.0 + np.exp(-z))
 
 
-def pick_adaptive(theta_sel, beta_hat, target=0.5, pool=48):
-    """Select item whose estimated difficulty puts success prob nearest target."""
-    want = theta_sel - np.log(target / (1 - target))
-    cand = RNG.integers(0, len(beta_hat), size=pool)
-    return cand[np.argmin(np.abs(beta_hat[cand] - want))]
+# Selection kernel dispersion on the logit scale (Gergely et al., 2025,
+# J. Educ. Meas., Eq. 17 -- sigma_p = 0.5 there too).
+SELECT_SIGMA = 0.5
+
+
+def selection_probs(theta_sel, beta_hat, target=0.5, sigma=SELECT_SIGMA):
+    """Probability of serving each item: a Gaussian kernel on how far the
+    item's predicted success probability (on the logit scale) is from
+    `target`, normalised over the whole bank (Gergely et al., 2025, Eq. 17).
+
+    Probabilistic rather than "closest of a random pool of 48", for one
+    reason: Urnings' Metropolis-Hastings correction for adaptive selection
+    (run_urnings, below) needs the actual probability that this item was
+    selected, before and after the proposed update, and an argmin over a
+    random pool has no tractable selection probability. Every tracker uses
+    this same kernel so the comparison stays like-for-like.
+    """
+    d = (theta_sel - beta_hat - np.log(target / (1 - target))) / sigma
+    d2 = d * d
+    w = np.exp(-0.5 * (d2 - d2.min()))  # shifted for numerical stability; cancels in the ratio
+    return w / w.sum()
+
+
+def pick_adaptive(theta_sel, beta_hat, target=0.5):
+    """Sample one item from selection_probs()."""
+    return int(RNG.choice(len(beta_hat), p=selection_probs(theta_sel, beta_hat, target)))
 
 
 def run_elo(theta, beta, n_resp, K=0.3, target=0.5, parallel=False, update_items=True):
@@ -60,34 +81,67 @@ def _logit_urn(k, n):
     return np.log(pi / (1.0 - pi))
 
 
-def run_urnings(theta, beta, n_resp, n_p=32, n_i=32, target=0.5):
+def urnings_step(kp, ki, p, theta_p, beta, n_p, n_i, target=0.5, correct_selection=True):
+    """One Urnings-1 response event (Bolsinova et al., 2022) under adaptive
+    selection, updating kp/ki IN PLACE. Returns the served item index.
+
+    Two things here were wrong before the 2026-10-21 review (PRD §9.68):
+
+    1. Sign. The ball-exchange kernel models
+       P(correct) = pi_p (1 - pi_i) / (pi_p (1 - pi_i) + (1 - pi_p) pi_i),
+       so logit(pi_i) estimates item DIFFICULTY (+beta). Selection used
+       beta_hat = -logit(pi_i), i.e. picked items by the wrong difficulty,
+       so "adaptive" selection was close to random. Checked directly:
+       investigate_urnings_sign.py, corr(logit item urn, true beta) = +0.94.
+    2. Adaptive-selection correction. Selecting items from the current urn
+       states breaks the chain's detailed balance and inflates rating
+       variance, exactly as it does for Elo. Urnings' fix is to multiply
+       the Metropolis-Hastings acceptance ratio by
+       p(i | proposed states) / p(i | current states)
+       (Bolsinova et al., 2022; Gergely et al., 2025, Eq. 4). Set
+       correct_selection=False to see what happens without it.
+
+    n_i is an int (all items the same urn size) or an array per item.
+    """
+    eps = 1e-9
+    ni = np.broadcast_to(n_i, ki.shape)
+    theta_sel = _logit_urn(kp[p], n_p)
+    beta_hat = _logit_urn(ki, ni)
+    probs = selection_probs(theta_sel, beta_hat, target)
+    i = int(RNG.choice(len(ki), p=probs))
+
+    n_ii = int(ni[i])
+    x = int(RNG.random() < SIG(theta_p - beta[i]))
+    pi_p = np.clip(kp[p] / n_p, eps, 1 - eps)
+    pi_i = np.clip(ki[i] / n_ii, eps, 1 - eps)
+    num = pi_p * (1 - pi_i)
+    q = num / (num + (1 - pi_p) * pi_i)
+    y = int(RNG.random() < q)
+
+    kp_s, ki_s = kp[p] + x - y, ki[i] - x + y
+    if kp_s == kp[p] or not (0 <= kp_s <= n_p and 0 <= ki_s <= n_ii):
+        return i
+    cur = kp[p] * (n_ii - ki[i]) + (n_p - kp[p]) * ki[i]
+    pro = kp_s * (n_ii - ki_s) + (n_p - kp_s) * ki_s
+    ratio = np.inf if cur <= 0 else pro / cur
+    if correct_selection:
+        beta_hat_s = beta_hat.copy()
+        beta_hat_s[i] = _logit_urn(ki_s, n_ii)
+        ratio *= selection_probs(_logit_urn(kp_s, n_p), beta_hat_s, target)[i] / probs[i]
+    if RNG.random() < min(1.0, ratio):
+        kp[p], ki[i] = kp_s, ki_s
+    return i
+
+
+def run_urnings(theta, beta, n_resp, n_p=32, n_i=32, target=0.5, correct_selection=True):
     """Urnings-1 (Bolsinova et al., 2022) with adaptive selection."""
     P, I = len(theta), len(beta)
     kp = np.full(P, n_p // 2)
     ki = np.full(I, n_i // 2)
     track = []
-    eps = 1e-9
     for t in range(n_resp):
         p = RNG.integers(0, P)
-        pi_p = np.clip(kp[p] / n_p, eps, 1 - eps)
-        theta_sel = _logit_urn(kp[p], n_p)       # used only for item selection
-        beta_hat = -_logit_urn(ki, n_i)
-        i = pick_adaptive(theta_sel, beta_hat, target)
-
-        x = int(RNG.random() < SIG(theta[p] - beta[i]))
-        pi_i = np.clip(ki[i] / n_i, eps, 1 - eps)
-        # simulate a response from the CURRENT urn state
-        num = pi_p * (1 - pi_i)
-        q = num / (num + (1 - pi_p) * pi_i)
-        y = int(RNG.random() < q)
-
-        kp_s, ki_s = kp[p] + x - y, ki[i] - x + y
-        if 0 <= kp_s <= n_p and 0 <= ki_s <= n_i:
-            cur = kp[p] * (n_i - ki[i]) + (n_p - kp[p]) * ki[i]
-            pro = kp_s * (n_i - ki_s) + (n_p - kp_s) * ki_s
-            if cur <= 0 or RNG.random() < min(1.0, pro / cur):
-                kp[p], ki[i] = kp_s, ki_s
-
+        urnings_step(kp, ki, p, theta[p], beta, n_p, n_i, target, correct_selection)
         if (t + 1) % 200 == 0:
             est = _logit_urn(kp, n_p)
             track.append((t + 1, est.std(), np.corrcoef(est, theta)[0, 1],

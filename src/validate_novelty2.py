@@ -186,7 +186,7 @@ def simulate(n_learners: int, n_items: int, n_responses: int,
     for _ in range(n_responses):
         p = RNG.integers(0, n_learners)
         visits[p] += 1
-        beta_hat = np.array([-i.logit_estimate() for i in item_urns])
+        beta_hat = np.array([i.logit_estimate() for i in item_urns])  # item urn = difficulty (PRD §9.68)
         i = pick_adaptive(learner_urns[p].logit_estimate(), beta_hat, target)
 
         correct = bool(RNG.random() < 1.0 / (1.0 + np.exp(-(theta_true[p] - beta_true[i]))))

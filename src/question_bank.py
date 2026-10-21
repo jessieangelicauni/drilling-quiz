@@ -170,12 +170,15 @@ class BankContentProvider:
         # sort by raw |beta_hat - theta| with no offset at all, i.e. silently
         # implemented the 50% target the paper explicitly argues against,
         # while validate_item_discrimination.py/validate_novelty2.py (and
-        # Eq. 2 itself) all assumed 0.85. item_urn's logit, negated, is the
-        # item's implied difficulty (same sign convention as
-        # simulate_trackers.run_urnings's beta_hat = -_logit_urn(...)).
+        # Eq. 2 itself) all assumed 0.85. item_urn's logit is the item's
+        # implied difficulty, NOT negated: in urnings_tracker.update()
+        # a high item-urn proportion means a HARD item, so logit(item urn)
+        # estimates +beta. It used to be negated here (and in every
+        # simulate_*.py), which served each learner the mirror image of the
+        # intended difficulty (PRD §9.68).
         theta = learner_urn.logit_estimate()
         want = theta - _LOGIT_OFFSET
-        candidates.sort(key=lambda iid: abs(-self.bank.entries[iid].item_urn.logit_estimate() - want))
+        candidates.sort(key=lambda iid: abs(self.bank.entries[iid].item_urn.logit_estimate() - want))
         # Pick randomly among the closest few, not always the single best
         # match -- a single best-match item_urn estimate is noisy (small
         # urn, possibly just seeded), and always returning the literal
@@ -239,9 +242,9 @@ if __name__ == "__main__":
     assert urn_after_edit is not urn_before_edit, "edit() must re-seed, not keep the old item's urn object"
     # estimate_difficulty's sigma_hat2 is fixed (difficulty_heuristic.py), so
     # seed_item_from_encoder's n (driven only by sigma_hat2) stays constant;
-    # a much harder stem shows up as a LOWER k (lower implied pass-probability).
-    assert urn_after_edit.k < urn_before_edit.k, (
-        "a much longer/more complex edited stem must seed a lower (harder) item urn, "
+    # a much harder stem shows up as a HIGHER k (the item urn is a difficulty).
+    assert urn_after_edit.k > urn_before_edit.k, (
+        "a much longer/more complex edited stem must seed a higher (harder) item urn, "
         f"got {urn_after_edit} vs original {urn_before_edit}"
     )
 
@@ -252,11 +255,11 @@ if __name__ == "__main__":
     adapt_bank = QuestionBank()
     adapt_provider = BankContentProvider(adapt_bank, seed=0)
     difficulty_spread = [
-        ("easy-1", UrnState(k=28, n=32)),   # very easy item (high k/n)
-        ("easy-2", UrnState(k=24, n=32)),
+        ("easy-1", UrnState(k=4, n=32)),    # very easy item (low k/n: item urn = difficulty)
+        ("easy-2", UrnState(k=8, n=32)),
         ("medium", UrnState(k=16, n=32)),
-        ("hard-1", UrnState(k=8, n=32)),
-        ("hard-2", UrnState(k=4, n=32)),    # very hard item (low k/n)
+        ("hard-1", UrnState(k=24, n=32)),
+        ("hard-2", UrnState(k=28, n=32)),   # very hard item (high k/n)
     ]
     for label, item_urn in difficulty_spread:
         item = GeneratedItem(skill_id="adapt_test", stem=f"stem-{label}", blank_marker="___",
@@ -293,7 +296,7 @@ if __name__ == "__main__":
     # submit_answer must write the item's updated urn back to the bank, not
     # just the learner's. In urnings_tracker.update() a correct response
     # moves a ball OUT of the item urn (ki - x + y), so 30 correct answers
-    # can only lower the item's k, never raise it.
+    # can only lower the item's k (make it look easier), never raise it.
     writeback_id = bank.approved_ids("particle_loc")[0]
     writeback_entry = bank.entries[writeback_id]
     urn_before = writeback_entry.item_urn

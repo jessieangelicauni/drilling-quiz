@@ -22,7 +22,7 @@ directly rather than redefining them.
 import numpy as np
 
 from simulate_item_prior import _rmse_at
-from simulate_trackers import RNG, SIG, _logit_urn, pick_adaptive
+from simulate_trackers import RNG, SIG, _logit_urn, urnings_step
 
 
 def neutral_seed(beta_i: float) -> tuple[int, int]:
@@ -35,7 +35,7 @@ def encoder_seed_fn(noise_std: float):
     confounds the comparison)."""
     def fn(beta_i: float) -> tuple[int, int]:
         mu_hat = beta_i + RNG.normal(0, noise_std)
-        pi = SIG(-mu_hat)
+        pi = SIG(mu_hat)  # item urn proportion = difficulty (PRD §9.68)
         k = int(np.clip(round(pi * 33 - 0.5), 0, 32))
         return k, 32
     return fn
@@ -47,7 +47,7 @@ def run_urnings_growing_pool(theta: np.ndarray, n_resp: int, item_k0_fn,
     """Items are introduced one at a time (fresh true beta ~ N(0,1), seeded
     via item_k0_fn) every `intro_interval` responses, instead of all
     existing from t=0 -- the actual generative-pool regime, not a fixed
-    pool. pick_adaptive only ever sees already-introduced items.
+    pool. Selection only ever sees already-introduced items.
     """
     P = len(theta)
     I_max = I0 + n_resp // intro_interval + 1
@@ -62,7 +62,6 @@ def run_urnings_growing_pool(theta: np.ndarray, n_resp: int, item_k0_fn,
         ki[i], ni[i] = item_k0_fn(beta[i])
 
     track = []
-    eps = 1e-9
     next_intro = intro_interval
     for t in range(n_resp):
         if n_active < I_max and (t + 1) >= next_intro:
@@ -72,24 +71,7 @@ def run_urnings_growing_pool(theta: np.ndarray, n_resp: int, item_k0_fn,
             next_intro += intro_interval
 
         p = RNG.integers(0, P)
-        pi_p = np.clip(kp[p] / n_p, eps, 1 - eps)
-        theta_sel = _logit_urn(kp[p], n_p)
-        beta_hat = -_logit_urn(ki[:n_active], ni[:n_active])
-        i = pick_adaptive(theta_sel, beta_hat, target, pool=min(48, n_active))
-
-        n_i = int(ni[i])
-        x = int(RNG.random() < SIG(theta[p] - beta[i]))
-        pi_i = np.clip(ki[i] / n_i, eps, 1 - eps)
-        num = pi_p * (1 - pi_i)
-        q = num / (num + (1 - pi_p) * pi_i)
-        y = int(RNG.random() < q)
-
-        kp_s, ki_s = kp[p] + x - y, ki[i] - x + y
-        if 0 <= kp_s <= n_p and 0 <= ki_s <= n_i:
-            cur = kp[p] * (n_i - ki[i]) + (n_p - kp[p]) * ki[i]
-            pro = kp_s * (n_i - ki_s) + (n_p - kp_s) * ki_s
-            if cur <= 0 or RNG.random() < min(1.0, pro / cur):
-                kp[p], ki[i] = kp_s, ki_s
+        urnings_step(kp, ki[:n_active], p, theta[p], beta[:n_active], n_p, ni[:n_active], target)
 
         if (t + 1) % 200 == 0:
             est = _logit_urn(kp, n_p)

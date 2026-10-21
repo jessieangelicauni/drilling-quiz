@@ -82,7 +82,11 @@ def seed_item_from_encoder(mu_hat: float, sigma_hat2: float,
         raise ValueError("sigma_hat2 must be >= 0")
     n = n_max / (1.0 + sigma_hat2 / ref_var)
     n = int(round(min(max(n, n_min), n_max)))
-    pi = float(SIG(-mu_hat))
+    # The item urn's proportion is a DIFFICULTY in update()'s kernel (a high
+    # pi_i lowers P(correct)), so a harder item gets more balls. This was
+    # SIG(-mu_hat) before the 2026-10-21 review, seeding every item with the
+    # mirror image of its predicted difficulty (PRD §9.68).
+    pi = float(SIG(mu_hat))
     k = int(round(pi * (n + 1) - 0.5))
     k = min(max(k, 0), n)
     return UrnState(k=k, n=n)
