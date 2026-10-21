@@ -4528,6 +4528,23 @@ Dengan prior model ditambah placement test, kelas miring diestimasi **lebih baik
 
 Sumber: blog.duolingo.com/partial-credit-improvements-to-duolingos-placement-test; aclanthology.org/2021.emnlp-main.67; spectrum.ieee.org/duolingo; fi.muni.cz/~xpelanek/publications/CAE-elo.pdf; dare.uva.nl/id/789fc422-4935-49ca-bcba-803239522951.
 
+
+### 9.85 Urnings dengan urn pelajar yang membesar vs placement test (2026-10-21)
+
+Pertanyaan jc: apakah Urnings sendiri bisa menyelesaikan masalah kelas miring? Varian yang diuji: urn pelajar baru dimulai dengan 8 bola, menjadi 16 setelah 5 jawaban, lalu 32 setelah 10 jawaban (proporsi dipertahankan). Ini padanan "ketidakpastian awal besar" di sistem Elo (Pelánek 2016). Kode: `GROWTH` di `simulate_skewed_population.py`.
+
+| kelas | pool | kondisi | RMSE pemula/lainnya | RMSE mahir |
+|---|---|---|---|---|
+| skewed | wide | model | 0,91 | 0,93 |
+| skewed | wide | model + growing urn | 0,82 | 0,79 |
+| skewed | wide | model + placement | **0,50** | **0,62** |
+| skewed | matched | model + growing urn | 0,86 | 1,20 |
+| skewed | matched | model + placement | **0,53** | **0,77** |
+
+Urn yang membesar hanya membantu sedikit; placement test jauh lebih baik. **Rekomendasi: prior item dari model + placement test.**
+
+Catatan jujur: placement di simulasi diasumsikan menghasilkan estimasi dengan galat SD 0,7. Placement sungguhan (sekitar 10 soal adaptif, estimasi IRT EAP) hanya mencapai itu kalau difficulty soal placement-nya sudah cukup akurat. Jadi soal placement perlu diambil dari item yang paling banyak dijawab, atau item kurasi.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
