@@ -4568,6 +4568,19 @@ Catatan jujur: placement di simulasi diasumsikan menghasilkan estimasi dengan ga
 
 Ini pola overgenerate-and-rank yang umum di literatur distractor generation. Jumlah panggilan reasoning tetap 2 per item.
 
+
+### 9.87 Difficulty prior tanpa LLM call tambahan (2026-10-21)
+
+jc: tiga model responden terlalu banyak LLM call dan tidak sepadan kalau hanya untuk prior Urnings. Versi multi-model (§9.83) diganti.
+
+**Sekarang (`src/difficulty_llm.py`):** key gate sudah menghitung log-prob Qwen3-4B untuk stem yang diisi kunci dan masing-masing distraktor. Dari situ: p = softmax(kunci | 4 opsi), μ̂ = −logit(p), di-clip ke ±3. σ̂² = 1,0 tetap (`PRIOR_VARIANCE`), karena skala ini masih skala model, bukan skala pelajar. Soal yang distraktornya hampir sama meyakinkannya dengan kunci menurut model akan mendapat difficulty tinggi.
+
+Biaya: **nol LLM call tambahan**; ini hasil sampingan dari pengecekan yang dijalani setiap item. Qwen3-0.6B dan 1.7B tidak dipakai lagi.
+
+`benchmark_v2.py` melaporkan rata-rata, SD, rata-rata per objective, dan korelasi dengan heuristik morfem. Yang perlu dicek di run berikutnya: kalau sebagian besar item mentok di −3 (model terlalu yakin), skalanya terlalu sempit dan perlu distandarkan per pool.
+
+Simulasi §9.83–§9.85 tetap berlaku: yang diuji di sana adalah prior dengan kualitas tertentu, bukan cara membuatnya.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

@@ -1,115 +1,47 @@
 """
-Item difficulty from LLM respondents (PRD §9.83), to replace the morpheme
-count of difficulty_heuristic.py as the (mu_hat, sigma_hat2) prior that
-urnings_tracker.seed_item_from_encoder() takes.
+Item difficulty prior from the key check's own scores (PRD §9.87), to
+replace the morpheme count of difficulty_heuristic.py as the (mu_hat,
+sigma_hat2) that urnings_tracker.seed_item_from_encoder() takes.
 
-Language models of increasing size stand in for learners of increasing
-ability (Liu et al., 2025, "Leveraging LLM respondents for item
-evaluation", Brit. J. Educ. Tech.). Each one answers every item the way the
-key check does: the stem filled with each option is scored by its
-log-probability, and the softmax over the four options is the probability
-p that this respondent picks the key. A Rasch model,
-    logit p[m, i] = theta[m] - beta[i],
-is then fitted to the respondents x items matrix by least squares
-(identified by mean beta = 0): beta[i] is the item's difficulty and the
-spread of its residuals across respondents its standard error. An item
-only the large models answer gets a high beta.
+The key check already scores the stem filled with the key and with each
+distractor under Qwen3-4B. The softmax over those log-probabilities is the
+probability p that the model picks the key; an item whose distractors the
+model itself finds almost as plausible as the key is a hard item, so
+    mu_hat = -logit(p)
+on the logit scale of the tracker. No model call of its own: the prior is a
+by-product of a check every item passes anyway.
 
-The scale is the respondents', not the learners': until learner responses
-exist, betas are standardised and sigma_hat2 includes LINK_VARIANCE for
-that unknown link, so seed_item_from_encoder() gives the item a small urn
-that real answers overwrite quickly. Once Urnings has calibrated items from
-real learners, a linear link (or the KLUE-RoBERTa encoder of the paper,
-trained on those calibrated difficulties) replaces it.
-
-Usage (needs a GPU):
-  python3 src/difficulty_llm.py      # scores the curated items of log_likelihood_results.json
+The scale is the model's, not the learners', so sigma_hat2 is wide: the item
+gets a small urn that real answers overwrite quickly. Once Urnings has
+calibrated items from real learners, the KLUE-RoBERTa encoder of the paper,
+trained on those calibrated difficulties, replaces it.
 """
 from __future__ import annotations
 
-import json
-from pathlib import Path
+import math
 
-import numpy as np
-
-# Loaded one at a time, so the GPU only ever holds one of them; Qwen3-4B is
-# the key-check model, so a caller that already has it loaded passes its
-# scores in instead of loading it again (difficulty_priors(known=...)).
-RESPONDENTS = ("Qwen/Qwen3-0.6B", "Qwen/Qwen3-1.7B", "Qwen/Qwen3-4B")
-LINK_VARIANCE = 0.5  # the respondents' scale is not yet linked to the learners'
-_CLIP = 0.01
+PRIOR_VARIANCE = 1.0  # the model's scale is not yet linked to the learners'
+_MU_CLIP = 3.0
 
 
-def key_probability(items: list[dict], logprob) -> np.ndarray:
-    """Probability of picking the key of each item ({"stem", "answer",
-    "distractors": [str, ...]}) for a respondent scoring sentences with
-    `logprob`: the softmax over the four filled stems."""
-    probs = []
-    for it in items:
-        scores = np.array([logprob(it["stem"].replace("___", o, 1)) for o in [it["answer"], *it["distractors"]]])
-        e = np.exp(scores - scores.max())
-        probs.append(e[0] / e.sum())
-    return np.array(probs)
-
-
-def respond(items: list[dict], model_name: str) -> np.ndarray:
-    """key_probability for `model_name`, loaded for this call and freed after."""
-    import gc
-
-    import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-
-    tok = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda").eval()
-
-    @torch.no_grad()
-    def logprob(sentence: str) -> float:
-        ids = tok(sentence, return_tensors="pt")["input_ids"].to("cuda")
-        return -model(ids, labels=ids).loss.item() * (ids.shape[1] - 1)
-
-    probs = key_probability(items, logprob)
-    del model, logprob
-    gc.collect()
-    torch.cuda.empty_cache()
-    return probs
-
-
-def fit_rasch(p: np.ndarray) -> dict:
-    """Least-squares Rasch fit of logit p[m, i] = theta[m] - beta[i]."""
-    L = np.log(np.clip(p, _CLIP, 1 - _CLIP) / (1 - np.clip(p, _CLIP, 1 - _CLIP)))
-    theta = L.mean(axis=1)
-    beta = theta.mean() - L.mean(axis=0)
-    resid = L - (theta[:, None] - beta[None, :])
-    se2 = (resid ** 2).sum(axis=0) / max(len(theta) - 1, 1) / len(theta)
-    return {"theta": theta, "beta": beta, "se2": se2}
-
-
-def difficulty_priors(items: list[dict], respondents: tuple[str, ...] = RESPONDENTS,
-                      known: dict[str, np.ndarray] | None = None) -> dict:
-    """(mu_hat, sigma_hat2) per item on a standardised scale, plus the fit.
-    `known` maps respondents already scored by the caller to their
-    key_probability, so they are not loaded again."""
-    known = known or {}
-    p = np.stack([known[m] if m in known else respond(items, m) for m in respondents])
-    fit = fit_rasch(p)
-    sd = fit["beta"].std() or 1.0
-    mu = fit["beta"] / sd
-    sigma2 = fit["se2"] / sd ** 2 + LINK_VARIANCE
-    return {"respondents": list(respondents), "p_key": p.tolist(),
-            "respondent_accuracy": (p > 0.5).mean(axis=1).tolist(), "theta": fit["theta"].tolist(),
-            "mu_hat": mu.tolist(), "sigma_hat2": sigma2.tolist()}
+def difficulty_prior(key_logprob: float, distractor_logprobs: list[float]) -> tuple[float, float]:
+    """(mu_hat, sigma_hat2) from the log-probabilities of the stem filled
+    with the key and with each distractor."""
+    top = max(key_logprob, *distractor_logprobs)
+    weights = [math.exp(s - top) for s in [key_logprob, *distractor_logprobs]]
+    p = min(max(weights[0] / sum(weights), 1e-6), 1 - 1e-6)
+    mu = -math.log(p / (1 - p))
+    return max(-_MU_CLIP, min(_MU_CLIP, mu)), PRIOR_VARIANCE
 
 
 if __name__ == "__main__":
-    from difficulty_heuristic import estimate_difficulty
+    easy = difficulty_prior(-10.0, [-18.0, -19.0, -20.0])  # distractors far less likely than the key
+    hard = difficulty_prior(-10.0, [-10.5, -11.0, -14.0])  # one distractor almost as likely
+    print(f"easy: mu={easy[0]:+.2f}  hard: mu={hard[0]:+.2f}")
+    assert easy[0] < hard[0]
+    assert -_MU_CLIP <= easy[0] <= _MU_CLIP
 
-    data = json.loads((Path(__file__).resolve().parent.parent / "log_likelihood_results.json").read_text(encoding="utf-8"))
-    items = [{"skill": s, "stem": r["stem"], "answer": r["correct"], "distractors": [r["distractor"]]}
-             for s, block in data["per_skill"].items() for r in block["rows"]]
-    out = difficulty_priors(items)
-    heur = [estimate_difficulty(it["stem"].replace("___", it["answer"], 1))[0] for it in items]
-    print("respondent accuracy:", dict(zip(out["respondents"], np.round(out["respondent_accuracy"], 2))))
-    print(f"corr(LLM difficulty, morpheme heuristic) = {np.corrcoef(out['mu_hat'], heur)[0, 1]:.2f}")
-    for skill in data["per_skill"]:
-        mus = [m for it, m in zip(items, out["mu_hat"]) if it["skill"] == skill]
-        print(f"{skill:16s} mean difficulty {np.mean(mus):+.2f}")
+    from urnings_tracker import seed_item_from_encoder
+    state = seed_item_from_encoder(*hard)
+    assert 0 <= state.k <= state.n
+    print("all smoke tests passed")

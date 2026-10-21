@@ -32,12 +32,10 @@ library; nothing is parsed, diffed or labelled by our own rules.
      and mean cosine similarity of same-mistake vs different-mistake pairs,
      within each objective.
 
-  5. Difficulty: LLM respondents of three sizes (Qwen3-4B scored while it is
-     loaded for the checks, then 0.6B and 1.7B one at a time) answer every
-     item with three distractors and a Rasch fit gives its difficulty prior (difficulty_llm.py,
-     PRD §9.83); reported with the respondents' accuracy, which must rise
-     with model size for the scale to mean anything, and next to the
-     morpheme heuristic it replaces.
+  5. Difficulty: the prior for Urnings is -logit of Qwen3-4B's probability
+     of the key among the four options, from the log-probabilities the key
+     check already computed (difficulty_llm.py, PRD §9.87) -- no extra model
+     call; reported next to the morpheme heuristic it replaces.
 
 The curriculum is data: --curriculum names a JSON file
 {"context": "...", "level": "...", "objectives": {"id": "description", ...},
@@ -177,13 +175,13 @@ def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
     return items
 
 
-def check_items(items: list[dict], cur: dict):
-    """Gates every item; returns Qwen3-4B's key probabilities for difficulty_report."""
+def check_items(items: list[dict], cur: dict) -> None:
     import gc
     import re
 
     import torch
 
+    from difficulty_llm import difficulty_prior
     from solver_check import SolverCheckProvider
 
     solver = SolverCheckProvider()
@@ -223,25 +221,17 @@ def check_items(items: list[dict], cur: dict):
         scored = [(solver.sentence_logprob(fill(t)), t) for t in candidates if t not in it["judged_correct"]]
         kept = sorted((s, t) for s, t in scored if s < key_score)[::-1][:N_DISTRACTORS]
         it["distractors"] = [candidates[t] for _, t in kept]
+        if len(kept) == N_DISTRACTORS:
+            it["difficulty_mu"], it["difficulty_sigma2"] = difficulty_prior(key_score, [s for s, _ in kept])
         it["enough_distractors"] = len(it["distractors"]) == N_DISTRACTORS
         it["predicted_objective"] = (classify(fill(it["answer"]), fill(it["distractors"][0]["text"]))
                                      if it["distractors"] else "none")
         it["objective_ok"] = it["predicted_objective"] == it["objective"]
         it["accepted"] = it["key_ok"] and it["enough_distractors"] and it["objective_ok"]
 
-    # Qwen3-4B is also the largest difficulty respondent: score it now, while loaded.
-    from difficulty_llm import key_probability
-    ok = [it for it in items if it.get("enough_distractors")]
-    p4b = key_probability(_difficulty_items(ok), solver.sentence_logprob)
     del solver, model, tok
     gc.collect()
     torch.cuda.empty_cache()
-    return p4b
-
-
-def _difficulty_items(ok: list[dict]) -> list[dict]:
-    return [{"stem": it["stem"], "answer": it["answer"], "distractors": [d["text"] for d in it["distractors"]]}
-            for it in ok]
 
 
 # How each encoder wants its input (from the model cards).
@@ -285,23 +275,21 @@ def embedding_agreement(items: list[dict], encoder: str) -> dict:
             "mean_cos_different": float(np.mean(diff)) if diff else None}
 
 
-def difficulty_report(items: list[dict], p4b) -> dict:
+def difficulty_report(items: list[dict]) -> dict:
     import numpy as np
 
     from difficulty_heuristic import estimate_difficulty
-    from difficulty_llm import difficulty_priors
 
-    ok = [it for it in items if it.get("enough_distractors")]
-    out = difficulty_priors(_difficulty_items(ok), known={"Qwen/Qwen3-4B": p4b})
-    for it, mu, s2 in zip(ok, out["mu_hat"], out["sigma_hat2"]):
-        it["difficulty_mu"], it["difficulty_sigma2"] = mu, s2
+    ok = [it for it in items if "difficulty_mu" in it]
+    if len(ok) < 2:
+        return {"items": len(ok)}
+    mus = [it["difficulty_mu"] for it in ok]
     heur = [estimate_difficulty(it["sentence"])[0] for it in ok]
     by_objective = {}
     for it in ok:
         by_objective.setdefault(it["objective"], []).append(it["difficulty_mu"])
-    return {"respondents": out["respondents"], "respondent_accuracy": out["respondent_accuracy"],
-            "respondent_theta": out["theta"],
-            "corr_with_morpheme_heuristic": float(np.corrcoef(out["mu_hat"], heur)[0, 1]),
+    return {"items": len(ok), "mean": float(np.mean(mus)), "sd": float(np.std(mus)),
+            "corr_with_morpheme_heuristic": float(np.corrcoef(mus, heur)[0, 1]),
             "mean_by_objective": {k: float(np.mean(v)) for k, v in by_objective.items()}}
 
 
@@ -319,7 +307,7 @@ if __name__ == "__main__":
 
     cur = load_curriculum(args.curriculum, args.context)
     items = generate_items(cur, args.per_objective, args.seed)
-    p4b = check_items(items, cur)
+    check_items(items, cur)
     report = {"settings": {k: str(v) for k, v in vars(args).items()}, "per_objective": {}}
     for oid in cur["objectives"]:
         mine = [it for it in items if it["objective"] == oid]
@@ -336,7 +324,7 @@ if __name__ == "__main__":
               f"objective {r['objective_ok']['k']}  accepted {r['accepted']['k']}/{r['accepted']['n']}")
     report["accepted"] = rate(sum(it.get("accepted", False) for it in items), len(items))
     report["embeddings"] = {e: embedding_agreement(items, e) for e in args.encoders.split(",")}
-    report["difficulty"] = difficulty_report(items, p4b)
+    report["difficulty"] = difficulty_report(items)
     report["items"] = items
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
@@ -346,7 +334,7 @@ if __name__ == "__main__":
         print(f"EMBEDDINGS {name}: nearest neighbour same mistake {e['nearest_neighbour_same_mistake']}  "
               f"cos same {e['mean_cos_same']}  different {e['mean_cos_different']}")
     d = report["difficulty"]
-    print("DIFFICULTY respondent accuracy " + ", ".join(f"{m.split('/')[-1]} {a:.0%}" for m, a in
-                                                        zip(d["respondents"], d["respondent_accuracy"]))
-          + f"  corr with morpheme heuristic {d['corr_with_morpheme_heuristic']:.2f}")
+    if "mean" in d:
+        print(f"DIFFICULTY {d['items']} items, mean {d['mean']:+.2f} sd {d['sd']:.2f}  "
+              f"corr with morpheme heuristic {d['corr_with_morpheme_heuristic']:.2f}")
     print(f"written to {args.out}")
