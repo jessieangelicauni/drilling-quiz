@@ -40,7 +40,7 @@ actual system, built directly on the decisions in `docs/PRD.md`:
 | `src/content_provider.py` | Combines the two into the single provider `daily_drill.py` actually needs once `vocab_ratio` mixes both types |
 | `src/answer_processing.py` | The other half of the daily-drill lifecycle: processes a submitted answer — updates the Urnings skill urn and the misconception profile, checks escalation, calls `qwen_feedback`, updates the FSRS card, records streak completion |
 | `src/question_bank.py` | Decouples generating items (slow, needs the LLM, batch) from serving them (fast, every drill assembly) — `QuestionBank.batch_generate()` + admin approve/reject/edit workflow, `BankContentProvider` serves only approved entries (sampled from the 85%-target kernel, preferring items that offer the learner's dominant misconception), no live LLM call at request time; `submit_answer` applies the Urnings selection correction |
-| `src/qwen_feedback.py` | Fast + detailed (escalation-gated) wrong-answer feedback. Despite the file name it currently runs EXAONE-3.5-7.8B-Instruct (4-bit), which has no reasoning mode, so the detailed path is a longer prompt rather than reasoning. English is the active language; the Indonesian path has known quality issues (PRD §9.67) |
+| `src/qwen_feedback.py` | Fast + detailed (escalation-gated) wrong-answer feedback with Qwen3-4B (bf16); the detailed path uses reasoning mode. English and Indonesian (EXAONE was dropped as explainer after it wrote wrong Indonesian explanations, PRD §9.67/§9.71) |
 | `src/solver_check.py` | Verifier checks on generated items with Qwen3-4B: blind best-answer pick (letter, rotated over option orders, or cloze log-prob scoring) and log-likelihood "is the distractor also correct" check |
 | `src/eval_harness.py` | Statistics for validation results: unique-item counts, Wilson 95% intervals, multi-seed aggregation, and a frozen dev/test split of curated items |
 | `src/difficulty_heuristic.py` | Deterministic difficulty proxy (morpheme count + grammatical complexity) standing in for the KLUE-RoBERTa regression head, which is blocked by a missing calibration dataset |
@@ -50,10 +50,12 @@ Each file has runnable smoke tests in its `if __name__ == "__main__"` block
 generation only through the `ContentProvider` protocol, mocked in its own
 smoke test.
 
-Current model per role (PRD §9.51–§9.70): item generation (`item_foundry.py`)
-and feedback use `LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct` (4-bit);
-`solver_check.py` (log-prob gate) uses `Qwen/Qwen3-4B` (bf16). The item
-foundry's GPU validation is `python3 src/validate_item_foundry.py`. The
+Current model per role (PRD §9.51–§9.71): item generation (`item_foundry.py`)
+uses `LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct` (4-bit); the log-prob gate
+(`solver_check.py`) and feedback (`qwen_feedback.py`) use `Qwen/Qwen3-4B`
+(bf16). The item foundry's GPU validation is
+`python3 src/validate_item_foundry.py`; `python3 src/benchmark_checker.py`
+compares checker candidates on curated, KoLLA learner and codebook pairs. The
 findings section below is the 2026-10-19 history of the template generator
 (EXAONE-4.0-1.2B, Qwen3-1.7B/4B), which was removed on 2026-10-21; it is
 kept for the record, and the files it names no longer exist.

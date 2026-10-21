@@ -20,6 +20,13 @@ How it works:
      kiwipiepy deliberately re-analyses a malformed form like 부르어요
      exactly as 불러요, so this case is detected from the surface, not
      from the tags.
+  4. The opposite case: a malformed predicate the tagger cannot analyse
+     at all (먹았어요 comes out as one unknown noun 먹았 + 어요), which
+     step 2 can only call MULTI. When that is the only edit and it lies
+     inside one predicate word, the edit is read from the surface of that
+     word instead: what is left after the common prefix and suffix
+     (먹[었>았]어요) is an ending error, END:었>았, or a conjugation error
+     (CONJ) when the correct stem is irregular (아름다워요, tagged VA-I).
 
 KAGAS's own implementation uses a different tagger; the category set and
 the align-then-classify procedure follow the paper, the tagger is
@@ -56,6 +63,8 @@ FUNCTIONAL_TAGS = frozenset({"NNB", "MM"})
 
 # Phonologically conditioned allomorphs are one morpheme: picking 를 where
 # 을 belongs is an allomorph error, not a different particle.
+_PREDICATE_TAGS = ("VV", "VA", "VX", "XSV", "XSA", "VCP")
+
 _ALLOMORPH = {"를": "을", "가": "이", "는": "은", "로": "으로", "와": "과", "랑": "이랑",
               "야": "이야", "나": "이나", "며": "이며"}
 
@@ -98,6 +107,38 @@ def _classify(c_side, w_side, c_form, w_form, kind) -> Edit:
     return Edit(cat, kind, c_form, w_form, functional)
 
 
+def _common_affixes(a: str, b: str) -> tuple[int, int]:
+    p = 0
+    while p < min(len(a), len(b)) and a[p] == b[p]:
+        p += 1
+    q = 0
+    while q < min(len(a), len(b)) - p and a[-1 - q] == b[-1 - q]:
+        q += 1
+    return p, q
+
+
+def _surface_predicate_edit(correct: str, wrong: str) -> Edit | None:
+    """Step 4 of the module docstring: the edit read from the surface of
+    the one predicate word that differs, or None if the sentences differ in
+    more than one word or the word is not a predicate."""
+    cw, ww = correct.split(), wrong.split()
+    ops = [o for o in difflib.SequenceMatcher(a=cw, b=ww, autojunk=False).get_opcodes() if o[0] != "equal"]
+    if len(ops) != 1 or ops[0][0] != "replace" or ops[0][2] - ops[0][1] != 1 or ops[0][4] - ops[0][3] != 1:
+        return None
+    c_word, w_word = cw[ops[0][1]], ww[ops[0][3]]
+    tags = [t for _, t in _morphs(c_word)]
+    if not any(t.split("-")[0] in _PREDICATE_TAGS for t in tags):
+        return None
+    p, q = _common_affixes(c_word, w_word)
+    if p == 0:  # the stem itself differs: a different word, not a form of it
+        return None
+    c_diff, w_diff = c_word[p:len(c_word) - q], w_word[p:len(w_word) - q]
+    if any(t.endswith("-I") for t in tags):
+        return Edit("CONJ", "REP", c_word, w_word, False)
+    op = "REP" if c_diff and w_diff else ("DEL" if c_diff else "INS")
+    return Edit("END", op, c_diff, w_diff, True)
+
+
 def annotate(correct: str, wrong: str) -> list[Edit]:
     """All edits turning `correct` into `wrong`, in sentence order. Both
     sentences are analysed whole, so every morpheme is tagged in context
@@ -132,6 +173,8 @@ def annotate(correct: str, wrong: str) -> list[Edit]:
         kind = "REP" if c_side and w_side else ("DEL" if c_side else "INS")
         edits.append(_classify(c_side, w_side, "+".join(f for f, _ in c_side),
                                "+".join(f for f, _ in w_side), kind))
+    if len(edits) == 1 and edits[0].category == "MULTI":
+        return [_surface_predicate_edit(correct, wrong) or edits[0]]
     return edits
 
 
@@ -166,6 +209,13 @@ if __name__ == "__main__":
 
     e = one("밥을 먹어요.", "밥을 마셔요.")
     assert e.category == "VERB" and not e.functional, e
+
+    # Malformed predicates the tagger cannot analyse (step 4).
+    assert one("저는 저녁을 먹었어요.", "저는 저녁을 먹았어요.").code == "END:었>았"
+    assert one("정말 좋았어요.", "정말 좋았아요.").code == "END:어>아"
+    assert one("조용한 친구예요.", "조용 친구예요.").code == "END:한>"
+    e = one("꽃이 아름다워요.", "꽃이 아름답어요.")
+    assert e.category == "CONJ" and not e.functional, e
 
     # Not a minimal pair: two separate edits.
     assert len(annotate("저는 도서관에서 공부해요.", "저가 도서관에 공부해요.")) == 2

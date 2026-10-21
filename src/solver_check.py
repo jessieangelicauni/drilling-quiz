@@ -93,7 +93,7 @@ from collections import Counter
 from dataclasses import dataclass
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from llm_parsing import parse_answer_letter, parse_yes_no
 
@@ -147,9 +147,16 @@ class LogLikelihoodResult:
 
 
 class SolverCheckProvider:
-    def __init__(self, model_name: str = _MODEL_NAME):
+    def __init__(self, model_name: str = _MODEL_NAME, load_in_4bit: bool = False):
+        # load_in_4bit: for the larger checker candidates in benchmark_checker.py,
+        # which do not fit beside the generator on 16GB in bf16.
         self.tok = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda")
+        if load_in_4bit:
+            quant = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
+            self.model = AutoModelForCausalLM.from_pretrained(model_name, quantization_config=quant,
+                                                              device_map="cuda")
+        else:
+            self.model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda")
         self.model.eval()
 
     @torch.no_grad()

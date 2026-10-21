@@ -139,11 +139,12 @@ class FoundryStats:
 
 
 def _loads_lenient(text: str):
-    """json.loads, then once more without trailing commas (`[1, 2,]`), which
-    LLMs write often."""
+    """json.loads, then once more without trailing commas (`[1, 2,]`) and
+    `// comments` after a value, which LLMs write often."""
     try:
         return json.loads(text)
     except json.JSONDecodeError:
+        text = re.sub(r'(?m)(["\]}\d,])[ \t]*//[^\n]*$', r"\1", text)
         return json.loads(re.sub(r",\s*([\]}])", r"\1", text))
 
 
@@ -180,6 +181,20 @@ def extract_json(text: str):
     return None
 
 
+_LATIN = re.compile(r"[A-Za-z]")
+
+
+def korean_only(sentence: str) -> str | None:
+    """The Korean sentence without the romanisation or translation the
+    generator often appends -- "공원에서 산책해요. (Gongwon-eseo ...) - I walk
+    in the park." -- or None when Latin text remains inside the sentence
+    itself, which is then not a clean example."""
+    s = re.sub(r"\s*\([^()]*[A-Za-z][^()]*\)", "", sentence)   # (romanisation), (translation)
+    s = re.split(r"\s+[-\u2013\u2014:]\s+(?=.*[A-Za-z])", s, maxsplit=1)[0]  # " - I walk ..."
+    s = s.strip()
+    return None if not s or _LATIN.search(s) else s
+
+
 def _slug(name: str) -> str:
     """A stable ASCII id for a misconception name (a hash if the name has no
     ASCII letters, e.g. one written in Korean)."""
@@ -207,6 +222,7 @@ List the {k} most common misconceptions learners hold about THIS grammar point -
 rule in their head, not random slips. For each, give a short name, a one-sentence explanation,
 and one example: a short natural correct Korean sentence, and the same sentence as a learner
 holding the misconception would write it, changed ONLY where the misconception shows.
+Write "correct" and "wrong" in Hangul only: no romanisation, no translation, no notes.
 
 Answer with JSON only:
 [{{"name": "...", "explanation": "...", "correct": "...", "wrong": "..."}}, ...]"""
@@ -240,7 +256,10 @@ def build_codebook(skill_id: str, chat: Chat, log: list | None = None,
                                                     ("name", "explanation", "correct", "wrong")):
                 record["rows"].append({"row": row, "verdict": "format: needs name, explanation, correct, wrong"})
                 continue
-            correct, wrong = row["correct"].strip(), row["wrong"].strip()
+            correct, wrong = korean_only(row["correct"]), korean_only(row["wrong"])
+            if correct is None or wrong is None:
+                record["rows"].append({"row": row, "verdict": "format: Latin text inside the Korean example"})
+                continue
             edit, why = single_edit(skill, correct, wrong)
             if edit is None:
                 record["rows"].append({"row": row, "verdict": why,

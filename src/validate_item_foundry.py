@@ -28,8 +28,13 @@ on one 16GB GPU (7.3GB + ~8GB, PRD §9.53).
 Every codebook reply and every entry's verdict is saved in the output
 (`codebook_log`), so an empty codebook can be diagnosed from the file.
 
+With --from-log, step 1 re-verifies the codebook replies logged by an
+earlier run instead of asking EXAONE again, so a change to the checks can
+be measured on the same replies (no GPU needed with --codebook-only).
+
 Usage: python3 src/validate_item_foundry.py [--per-skill 20] [--seed 0] [--reuse-codebook]
        python3 src/validate_item_foundry.py --codebook-only   # step 1 only, quick check
+       python3 src/validate_item_foundry.py --codebook-only --from-log item_foundry_results.json
 """
 from __future__ import annotations
 
@@ -43,7 +48,6 @@ from datetime import date
 from eval_harness import rate
 from item_foundry import (CODEBOOK_PATH, SKILLS, ExaoneChat, MisconceptionItemGenerator, build_codebook,
                           load_codebook, save_codebook)
-from solver_check import SolverCheckProvider
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -52,11 +56,16 @@ if __name__ == "__main__":
     parser.add_argument("--reuse-codebook", action="store_true")
     parser.add_argument("--codebook-only", action="store_true",
                         help="build and report the codebook, skip item generation and the solver")
+    parser.add_argument("--from-log", help="re-verify the codebook replies logged in this results file")
     parser.add_argument("--out", default="item_foundry_results.json")
     args = parser.parse_args()
 
     rng = random.Random(args.seed)
-    chat = ExaoneChat()
+    logged = None
+    if args.from_log:
+        with open(args.from_log, encoding="utf-8") as f:
+            logged = json.load(f)["codebook_log"]
+    chat = None if logged is not None and args.codebook_only else ExaoneChat()
 
     codebook_log: dict[str, list] = {}
     codebook = load_codebook() if args.reuse_codebook else {}
@@ -64,7 +73,12 @@ if __name__ == "__main__":
         codebook = {}
         for skill_id in SKILLS:
             codebook_log[skill_id] = []
-            codebook[skill_id] = build_codebook(skill_id, chat, log=codebook_log[skill_id])
+            if logged is not None:
+                replies = iter([a["reply"] for a in logged.get(skill_id, [])])
+                codebook[skill_id] = build_codebook(skill_id, lambda _: next(replies), log=codebook_log[skill_id],
+                                                    attempts=len(logged.get(skill_id, [])))
+            else:
+                codebook[skill_id] = build_codebook(skill_id, chat, log=codebook_log[skill_id])
     for skill_id, entries in codebook.items():
         print(f"  {skill_id:16s} {len(entries)} verified misconceptions: {[e.code for e in entries]}")
         for attempt in codebook_log.get(skill_id, []):
@@ -73,8 +87,10 @@ if __name__ == "__main__":
             if not attempt["parsed"]:
                 print(f"      raw reply starts: {attempt['reply'][:200]!r}")
     if codebook_log and any(codebook.values()):
-        save_codebook(codebook, {"model": ExaoneChat.MODEL, "date": date.today().isoformat(),
-                                 "seed": args.seed})
+        provenance = {"model": ExaoneChat.MODEL, "date": date.today().isoformat(), "seed": args.seed}
+        if args.from_log:
+            provenance["reverified_from"] = args.from_log
+        save_codebook(codebook, provenance)
         print(f"codebook written to {CODEBOOK_PATH}")
     elif codebook_log:
         print("!! every codebook is empty -- not saved; see codebook_log in the output file")
@@ -85,6 +101,8 @@ if __name__ == "__main__":
                       f, ensure_ascii=False, indent=2)
         print(f"written to {args.out}")
         raise SystemExit(0 if any(codebook.values()) else 1)
+
+    from solver_check import SolverCheckProvider  # needs torch, only for item generation
 
     solver = SolverCheckProvider()
 

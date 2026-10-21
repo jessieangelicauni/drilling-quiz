@@ -4301,7 +4301,27 @@ dipertimbangkan revert juga.
 - **Dihapus:** `exaone_provider.py` (slot, `verb_lookup`, pasangan tetap, filler, `primary_distractor_label`), `collocation_plausibility.py` (SBERT), `distractor_validator.py` (fungsi `correct_korean_conjugation` dipindah ke `qwen_feedback.py`), skor parse kiwipiepy (`validate_lm_plausibility.py` + hasilnya), `validate_novelty1.py`, `validate_log_likelihood.py`, `verify_exaone35_swap.py`. `1_validation_results.json` dan `log_likelihood_results.json` dipertahankan sebagai catatan item kurasi lama dan kalibrasi gerbang log-prob (51/52).
 - **Validasi GPU, BELUM dijalankan** (sandbox tanpa GPU): `python3 src/validate_item_foundry.py --per-skill 20` membangun codebook, meminta 20 item per skill (setengah ditargetkan), lalu melaporkan tingkat lolos (Wilson CI), alasan penolakan, cakupan kode, dan solver rotasi sebagai pembanding. Semua item disimpan ke `item_foundry_results.json` untuk review instruktur. Logika pipeline sudah dites di CPU dengan model pengganti (`python3 src/item_foundry.py`).
 - **Paper:** Section IV-B dan V-B ditulis ulang, Eq. 2–3 baru (model pilihan), seleksi jadi kernel (Eq. 4), eskalasi Eq. 5, Fig. 1–2 diperbarui. Referensi ditambah: KAGAS (Yoon et al. 2023; sebelumnya KAGAS salah dikutip sebagai [22], KoLLA) dan Suh & Bolt (2010).
-- **Inkonsistensi lama yang belum disentuh:** paper menyebut Qwen3 sebagai explainer, padahal `qwen_feedback.py` sekarang memakai EXAONE-3.5-7.8B.
+- **Inkonsistensi lama:** paper menyebut Qwen3 sebagai explainer, padahal `qwen_feedback.py` memakai EXAONE-3.5-7.8B. Diselesaikan di §9.71.
+
+### 9.71 Run codebook pertama (GPU), perbaikan parser + annotator, benchmark checker, explainer kembali ke Qwen3-4B
+
+**Hasil run `--codebook-only` (EXAONE-3.5-7.8B, 3 balasan × 11 skill, 6 entri per balasan):** parsing JSON sudah berhasil (32/33 balasan), tapi hanya **3 entri** lolos (honorific 1, noun_counter 2). Penyebab utama, dibaca dari `codebook_log`: EXAONE hampir selalu menambahkan romanisasi dan terjemahan Inggris di belakang kalimat Korea ("공원에서 산책했어요. (Gongwon-eseo ...) - I walked ..."). Annotator menghitung bagian Latin itu sebagai edit tambahan, jadi pasangan yang sebenarnya minimal ditolak sebagai "not-minimal". Satu balasan gagal parse karena komentar `//` di dalam JSON.
+
+**Diperbaiki:**
+- `item_foundry.korean_only()`: buang segmen romanisasi/terjemahan dalam kurung dan setelah " - "; entri yang masih berisi huruf Latin di dalam kalimatnya ditolak dengan alasan `format`, tidak diam-diam diubah. Prompt codebook sekarang meminta Hangul saja.
+- `_loads_lenient`: komentar `//` setelah nilai JSON dibuang.
+- `kagas_annotator` langkah 4: bentuk predikat yang rusak dan tidak bisa dianalisis kiwi (먹았어요 → `먹았/NNG`) dulu jadi `MULTI`. Sekarang, kalau hanya satu kata predikat yang berbeda, edit dibaca dari permukaan kata itu (먹[었>았]어요 → `END:었>았`), atau `CONJ` kalau stem benarnya irregular (tag `-I`, mis. 아름다워요). Ini kesalahan harmoni vokal 았/었 yang justru miskonsepsi nyata untuk `tense_past`.
+- `validate_item_foundry.py --from-log FILE`: verifikasi ulang balasan yang sudah tercatat tanpa memanggil EXAONE lagi (tanpa GPU bersama `--codebook-only`).
+
+**Hasil verifikasi ulang atas balasan yang sama** (`codebook_reverified_results.json`): **3 → 32 entri**, 7 dari 11 skill punya ≥3 entri (cukup untuk 3 distraktor): particle_loc 3, honorific 3, tense_past 5, irregular_conj 4, adj_relativizer 3, subj_topic 3, noun_counter 7. Masih kurang: particle_obj 1, time_range 1, mod_adverb 2, verb_choice 0.
+
+**Temuan jujur soal kualitas:** verifier memeriksa BENTUK (satu edit, kategori benar), bukan apakah bentuk salahnya miskonsepsi pelajar yang masuk akal. Sebagian entri yang lolos jelas bagus (에서>에, 었>았, 권>개, 대>개, 한> dihilangkan), sebagian sampah (말씀하시공셨습니다, 읽어요어요, 아름답께, 이것은 책을이에요), dan satu contoh "benar" sendiri salah (스무 년). Jadi rating manusia pada codebook (2 rater, kappa) wajib, dan generator EXAONE-7.8B kemungkinan terlalu lemah untuk menulis codebook. Opsi penguatan diajukan ke user (lihat thread).
+
+**Benchmark checker (`src/benchmark_checker.py`, baru, butuh GPU):** kandidat Qwen3-4B (sekarang), Qwen3-4B-Base, Qwen3-8B / 8B-Base (4-bit), Kanana-1.5-8B-base (4-bit), Gemma-3-12B-pt (4-bit, gated). Aturan sama dengan gate: log-prob kalimat benar > kalimat salah. Tiga set: 52 pasangan kurasi, kalimat pelajar KoLLA dengan tepat satu error (anotator 0) vs koreksinya, dan contoh codebook. Melaporkan akurasi + Wilson CI, margin rata-rata, VRAM puncak, detik per pasangan. `SolverCheckProvider` sekarang bisa dimuat 4-bit. EXAONE sengaja tidak jadi kandidat (generator tidak boleh menilai outputnya sendiri).
+
+**Explainer kembali ke Qwen3-4B (bf16)** atas persetujuan user: `detailed_feedback` butuh reasoning mode yang tidak ada di EXAONE-3.5; §9.67 menemukan EXAONE menulis penjelasan Indonesia yang terpotong, berisi kata tidak nyata, dan sekali membalik jawaban benar, sedangkan Qwen3 bersih di 16/16. Satu model Qwen3-4B dipakai untuk checker dan explainer. Inkonsistensi paper vs kode di §9.70 selesai.
+
+**File:** `src/item_foundry.py`, `src/kagas_annotator.py`, `src/validate_item_foundry.py`, `src/solver_check.py`, `src/qwen_feedback.py`, `src/benchmark_checker.py` (baru), `data/misconception_codebook.json`, `codebook_reverified_results.json` (baru), README.
 
 ---
 
