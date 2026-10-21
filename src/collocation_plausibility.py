@@ -50,11 +50,18 @@ documented weakness of cosine similarity for collocation plausibility
 accepted rather than papered over.
 
 If sentence-transformers or the model is unavailable (e.g. no internet,
-not installed), this gate fails OPEN (treats every pair as plausible) --
-the same effective behavior as before this module existed, not a crash.
-A one-time warning is printed so the bypass is visible, not silent.
+not installed), this gate fails CLOSED (rejects every pair) by default.
+It used to fail open, but a validator that silently stops validating when
+the network drops is the wrong default for a gate whose whole job is to
+block bad items -- a rejected pair is cheap (the caller already has a
+retry/critic/skip path), a nonsensical item reaching a learner is not.
+Set KO_DRILL_ALLOW_PLAUSIBILITY_BYPASS=1 to opt back into fail-open, e.g.
+in a sandbox without access to huggingface.co. Either way a one-time
+warning is printed so the state is visible, not silent.
 """
 from __future__ import annotations
+
+import os
 
 import numpy as np
 
@@ -63,6 +70,10 @@ _PLAUSIBILITY_THRESHOLD = 0.43
 
 _model = None
 _load_failed = False
+
+
+def _bypass_allowed() -> bool:
+    return os.environ.get("KO_DRILL_ALLOW_PLAUSIBILITY_BYPASS") == "1"
 
 
 def _get_model():
@@ -74,9 +85,14 @@ def _get_model():
         _model = SentenceTransformer(_MODEL_NAME)
     except Exception as exc:  # noqa: BLE001 -- deliberately broad, see module docstring
         _load_failed = True
-        print(f"[collocation_plausibility] could not load {_MODEL_NAME} ({exc!r}); "
-              "plausibility gate is BYPASSED (treating every pair as plausible) "
-              "until this is fixed -- not a crash, but not a silent no-op either.")
+        if _bypass_allowed():
+            print(f"[collocation_plausibility] could not load {_MODEL_NAME} ({exc!r}); "
+                  "KO_DRILL_ALLOW_PLAUSIBILITY_BYPASS is set, so the gate is BYPASSED "
+                  "(treating every pair as plausible).")
+        else:
+            print(f"[collocation_plausibility] could not load {_MODEL_NAME} ({exc!r}); "
+                  "gate fails CLOSED (rejecting every pair) until this is fixed. "
+                  "Set KO_DRILL_ALLOW_PLAUSIBILITY_BYPASS=1 to bypass instead.")
     return _model
 
 
@@ -93,19 +109,30 @@ def collocation_similarity(noun: str, verb: str) -> float | None:
 
 def is_plausible_collocation(noun: str, verb: str) -> bool:
     """True if `verb` is a semantically plausible action/state for `noun`,
-    per the calibrated threshold -- or always True if the model is
-    unavailable (fail-open, see module docstring).
+    per the calibrated threshold. If the model is unavailable: False
+    (fail-closed), or True when KO_DRILL_ALLOW_PLAUSIBILITY_BYPASS=1 --
+    see module docstring.
     """
     sim = collocation_similarity(noun, verb)
-    return sim is None or sim >= _PLAUSIBILITY_THRESHOLD
+    if sim is None:
+        return _bypass_allowed()
+    return sim >= _PLAUSIBILITY_THRESHOLD
 
 
 if __name__ == "__main__":
     # Smoke test only -- the real calibration run's results are recorded
     # in this module's docstring (PRD §9.57), not reproduced here.
-    assert is_plausible_collocation("아무개", "아무거나") is True, (
-        "must fail OPEN (never block) when the model can't be reached, e.g. in a "
-        "sandbox without internet access to huggingface.co")
-    print("fail-open behavior confirmed in this sandbox (no internet to huggingface.co). "
-          "Real plausibility-separation behavior needs a machine with internet access -- "
-          "see this module's docstring (PRD §9.57) for the calibration results instead.")
+    if _get_model() is None:
+        os.environ.pop("KO_DRILL_ALLOW_PLAUSIBILITY_BYPASS", None)
+        assert is_plausible_collocation("아무개", "아무거나") is False, (
+            "must fail CLOSED (block) by default when the model can't be reached")
+        os.environ["KO_DRILL_ALLOW_PLAUSIBILITY_BYPASS"] = "1"
+        assert is_plausible_collocation("아무개", "아무거나") is True, (
+            "must fail OPEN only when the bypass is explicitly opted into")
+        print("model unavailable here: fail-closed default and opt-in bypass both confirmed. "
+              "Real plausibility-separation behavior needs a machine with internet access -- "
+              "see this module's docstring (PRD §9.57) for the calibration results instead.")
+    else:
+        assert is_plausible_collocation("커피", "마시다")
+        assert not is_plausible_collocation("커피", "차다"), "the documented 'kick coffee' failure"
+        print("model loaded: known-good pair accepted, documented bad pair rejected.")

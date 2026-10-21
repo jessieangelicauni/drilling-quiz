@@ -584,6 +584,12 @@ class ExaoneGrammarProvider:
         must then skip the item rather than ship one with fewer than 4 options.
         """
         fillers = []
+        # Shuffled per call: iterating `candidates` in fixed order meant
+        # the same first two (e.g. "학교"/"사과") padded every item of a
+        # skill, so a learner could learn to eliminate them on sight
+        # (review 2026-10-21). Still only ones `is_valid` rejects.
+        candidates = list(candidates)
+        self.rng.shuffle(candidates)
         for cand in candidates:
             if len(fillers) == 2:
                 break

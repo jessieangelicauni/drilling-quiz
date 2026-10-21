@@ -89,11 +89,13 @@ scoped to LOGPROB_RELIABLE_SKILLS.
 """
 from __future__ import annotations
 
-import re
+from collections import Counter
 from dataclasses import dataclass
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
+
+from llm_parsing import parse_answer_letter, parse_yes_no
 
 _MODEL_NAME = "Qwen/Qwen3-4B"
 
@@ -107,7 +109,6 @@ _ALSO_ACCEPTABLE_PROMPT = (
     '예시:\n문장: "저는 학교에서 공부해요."\n자연스러운 문장인가? 예\n\n'
     '이제 새 문장:\n문장: "{filled_sentence}"\n자연스러운 문장인가?'
 )
-_ANSWER_LETTER_RE = re.compile(r"([A-Z])")
 
 # PRD §9.34/§9.35: skills where "correct form scores higher log-prob than
 # the distractor" was empirically confirmed reliable, at N~=20/skill
@@ -194,9 +195,7 @@ class SolverCheckProvider:
         # "no answer exists", just "cut off before reaching it").
         text = self._generate(_PICK_PROMPT.format(stem=stem, options=option_lines), max_new_tokens=40)
         answer_part = text.split("정답:")[-1]  # ignore the echoed question/options when searching
-        match = _ANSWER_LETTER_RE.search(answer_part)
-        picked = match.group(1) if match else None
-        return picked if picked in options else None
+        return parse_answer_letter(answer_part, tuple(options))
 
     def _is_also_acceptable(self, stem: str, blank_marker: str, option_text: str) -> bool:
         filled = stem.replace(blank_marker, option_text, 1)
@@ -204,8 +203,43 @@ class SolverCheckProvider:
         # prompt back before answering in non-reasoning mode, so a short
         # budget cuts it off before the actual 예/아니오 ever appears.
         text = self._generate(_ALSO_ACCEPTABLE_PROMPT.format(filled_sentence=filled), max_new_tokens=30)
-        answer_part = text.split("인가?")[-1]  # ignore the echoed question when checking for 아니
-        return "예" in answer_part and "아니" not in answer_part
+        answer_part = text.split("인가?")[-1]  # ignore the echoed question
+        return parse_yes_no(answer_part) is True  # unparseable counts as "not confirmed acceptable"
+
+    def pick_by_logprob(self, stem: str, blank_marker: str, options: dict[str, str]) -> str:
+        """Cloze-style check (c): the option whose filled sentence scores the
+        highest log-probability. No letters are shown to the model, so it
+        cannot be position- or label-biased the way _pick_best can (small
+        LLMs prefer some answer positions regardless of content -- Zheng
+        et al., ICLR 2024, "Large Language Models Are Not Robust Multiple
+        Choice Selectors"; _PICK_PROMPT's one worked example is also always
+        "A"). Raw total log-prob, not length-normalised: every option fills
+        the same stem, and the options are 1-3 syllables.
+        """
+        scores = {label: self.sentence_logprob(stem.replace(blank_marker, text, 1))
+                  for label, text in options.items()}
+        return max(scores, key=scores.get)
+
+    def pick_best_rotated(self, stem: str, options: dict[str, str]) -> tuple[str | None, float]:
+        """_pick_best run under every cyclic rotation of the option texts over
+        the same labels, so each text appears once in each position. Returns
+        the majority pick (mapped back to the ORIGINAL label) and the
+        fraction of rotations that agreed with it -- a pick that changes
+        with position is a position effect, not a judgement about the item.
+        """
+        labels = list(options)
+        texts = [options[label] for label in labels]
+        label_of_text = {text: label for label, text in options.items()}
+        votes = []
+        for shift in range(len(texts)):
+            rotated = dict(zip(labels, texts[shift:] + texts[:shift]))
+            picked = self._pick_best(stem, rotated)
+            votes.append(label_of_text[rotated[picked]] if picked is not None else None)
+        counted = Counter(v for v in votes if v is not None)
+        if not counted:
+            return None, 0.0
+        best, n_best = counted.most_common(1)[0]
+        return best, n_best / len(votes)
 
     def check(self, stem: str, blank_marker: str, options: dict[str, str], answer: str) -> SolverResult:
         picked = self._pick_best(stem, options)
@@ -267,5 +301,12 @@ if __name__ == "__main__":
         "subj_topic must be valid=True via the explicit SKIP path (gap=None), not by coincidentally "
         f"scoring correctly -- got {ll_subj.reason}")
     print(f"[OK] subj_topic correctly skipped (not scored): {ll_subj.reason}")
+
+    print("\n--- position-debiased check (c): cloze log-prob and rotated letter pick ---")
+    loc_options = {"A": "에", "B": "에서", "C": "도", "D": "만"}
+    cloze = solver.pick_by_logprob("저는 도서관___ 공부해요.", "___", loc_options)
+    assert cloze == "B", f"cloze pick must find 에서 for an activity location, got {cloze}"
+    rotated, agreement = solver.pick_best_rotated("저는 도서관___ 공부해요.", loc_options)
+    print(f"[OK] cloze pick={cloze}; rotated letter pick={rotated} (agreement {agreement:.0%} over 4 rotations)")
 
     print("\nall smoke tests passed (mechanism verified; see summary above for actual pass rates)")

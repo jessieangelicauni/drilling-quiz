@@ -31,8 +31,13 @@ from enum import Enum
 _TARGET_SUCCESS = 0.85
 _LOGIT_OFFSET = math.log(_TARGET_SUCCESS / (1.0 - _TARGET_SUCCESS))
 
+import numpy as np
+
+from answer_processing import AnswerResult, submit_grammar_answer
+from daily_drill import UserDrillState
 from difficulty_heuristic import estimate_difficulty
 from exaone_provider import ExaoneGrammarProvider, GeneratedItem
+from qwen_feedback import QwenFeedbackProvider
 from urnings_tracker import UrnState, seed_item_from_encoder
 
 
@@ -106,6 +111,22 @@ class QuestionBank:
         """
         self.entries[item_id].item = item
         self.entries[item_id].item_urn = seed_item_from_encoder(*estimate_difficulty(item.stem))
+
+    def submit_answer(self, item_id: str, state: UserDrillState, chosen_option: str,
+                      feedback_provider: QwenFeedbackProvider, rng: np.random.Generator,
+                      now: datetime | None = None) -> AnswerResult:
+        """submit_grammar_answer for an item served from this bank, with the
+        item's own urn passed in AND the updated urn written back. Before
+        this existed nothing wrote AnswerResult.updated_item_urn back (review
+        2026-10-21), so every approved item kept its estimate_difficulty()
+        seed forever and BankContentProvider's adaptive selection never saw
+        real response evidence.
+        """
+        entry = self.entries[item_id]
+        result = submit_grammar_answer(state, entry.item, chosen_option, feedback_provider, rng,
+                                       now=now, item_urn=entry.item_urn)
+        entry.item_urn = result.updated_item_urn
+        return result
 
     def approved_ids(self, skill_id: str) -> list[str]:
         return [iid for iid, e in self.entries.items()
@@ -268,6 +289,23 @@ if __name__ == "__main__":
 
     assert adapt_provider.next_new_grammar_item("adapt_test") in dict(difficulty_spread), (
         "no learner_urn given must still fall back to a valid (uniform) choice")
+
+    # submit_answer must write the item's updated urn back to the bank, not
+    # just the learner's. In urnings_tracker.update() a correct response
+    # moves a ball OUT of the item urn (ki - x + y), so 30 correct answers
+    # can only lower the item's k, never raise it.
+    writeback_id = bank.approved_ids("particle_loc")[0]
+    writeback_entry = bank.entries[writeback_id]
+    urn_before = writeback_entry.item_urn
+    learner_state = UserDrillState(user_id="writeback-test", skill_ids=["particle_loc"])
+    answer_rng = np.random.default_rng(0)
+    for _ in range(30):
+        bank.submit_answer(writeback_id, learner_state, writeback_entry.item.answer,
+                           feedback_provider=None, rng=answer_rng)  # correct -> no feedback call
+    assert writeback_entry.item_urn is not urn_before, "the updated urn must be written back to the bank entry"
+    assert writeback_entry.item_urn.n == urn_before.n
+    assert writeback_entry.item_urn.k <= urn_before.k, (
+        f"correct answers must not raise the item urn's k: {urn_before} -> {writeback_entry.item_urn}")
 
     print(f"batch_generate added {added}/5 for particle_loc")
     print("all smoke tests passed")

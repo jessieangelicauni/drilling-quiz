@@ -4254,5 +4254,22 @@ dipertimbangkan revert juga.
 
 ---
 
+### 9.68 Review eksternal (2026-10-21): perbaikan cepat Q1–Q6 + harness evaluasi, dan satu temuan besar yang BELUM diperbaiki
+
+**Konteks:** review kode vs PRD dan daftar keterbatasan (`/mnt/project-files/reviews/` di project ini). User setuju mulai dari perbaikan cepat dan harness evaluasi.
+
+**Diperbaiki:**
+- **Q1 salah tanda target 85%:** `validate_item_discrimination.py` memakai `beta = -logit(0.15)` = +1.73 (item 15%-sukses, `avg_success_rate` 19%). Sekarang `beta = -logit(0.85)` = −1.73, dengan assert bahwa tingkat sukses item ≈ target. Hasil ulang: diskriminasi 0.343 (sebelumnya 0.335), drop relatif **16%** (sebelumnya 18%). Rumus di paper diperbaiki ("β=θ̂−logit(0.85)"), docx/pdf di-build ulang.
+- **Q2:** `collocation_plausibility.py` sekarang **fail-closed** secara default. Fail-open hanya kalau `KO_DRILL_ALLOW_PLAUSIBILITY_BYPASS=1`.
+- **Q3:** parser huruf dan ya/tidak di `solver_check.py` dipindah ke `llm_parsing.py` (bisa dites tanpa GPU). Sekarang hanya token pertama yang dibaca, jadi "예시" tidak lagi dianggap "ya". Ditambah `pick_by_logprob()` (skoring cloze, tanpa huruf) dan `pick_best_rotated()` (4 rotasi urutan opsi) untuk menghilangkan bias posisi.
+- **Q4:** `QuestionBank.submit_answer()` menulis balik `updated_item_urn` ke bank (sebelumnya tidak ada pemanggil yang melakukannya).
+- **Q5:** README disinkronkan dengan model yang benar-benar dipakai.
+- **Q6:** urutan kandidat filler diacak per item (sebelumnya selalu "학교"/"사과" yang sama).
+- **Harness:** `eval_harness.py` + `docs/eval-protocol.md` (draft). Hasil dari file yang sudah ada: solver key acceptance **38/55 item unik = 69.1% (CI 95% 56–80%)**; log-likelihood **51/52 = 98.1% (CI 90–99.7%)**; kiwipiepy 26/26 (CI 87–100%). Akurasi solver bergantung posisi kunci: 75% saat kunci di A vs 53% di B.
+
+**Temuan besar, BELUM diperbaiki (butuh keputusan user):** konvensi tanda kesulitan item Urnings **terbalik**. Di kernel `update()` (dan `run_urnings`), urn item berperilaku sebagai *kesulitan*: logit(k_i) berkorelasi **+0.94** dengan β sebenarnya (dicek langsung, 60.000 respons, seleksi acak). Tapi seleksi adaptif (`simulate_trackers.run_urnings`, `simulate_item_prior.py`, `simulate_item_coldstart*.py`, `validate_novelty2.py`, `BankContentProvider`) memakai `beta_hat = -logit(k_i)`, dan seeding prior (`seed_item_from_encoder`, `SIG(-mu_hat)`) juga terbalik. Akibatnya simulasi Urnings tidak benar-benar adaptif. Dengan tanda yang benar (seleksi sungguh adaptif, |P−0.5| rata-rata turun dari 0.29 ke 0.10), Urnings di setup Section III-B yang sama memberi **SD 2.87, RMSE 1.95**, lebih buruk dari Elo (2.69/1.70), bukan 1.11/0.43. Ini menyentuh klaim inti paper (Urnings stabil di bawah seleksi adaptif) dan Novelty 2 (robust terhadap prior: prior yang diinjeksikan ke Urnings selama ini selalu terbalik). Perlu dicek juga apakah kernel butuh koreksi MH untuk seleksi adaptif seperti yang dibahas di literatur Urnings.
+
+---
+
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
 yang direvisi. Jangan biarkan basi.*

@@ -105,7 +105,12 @@ if __name__ == "__main__":
               f"{r['mean_discrimination']:15.3f} {quality_label(r['mean_discrimination']):>22s}")
 
     beta_50 = 0.0  # difficulty = population mean ability -> ~50% success for an average learner
-    beta_policy = -LOGIT(1 - args.target_policy)  # Eq. 3's implied beta for theta=0
+    # Eq. 2's implied beta for theta=0: sigma(0 - beta) = target, so
+    # beta = -logit(target) (= -1.73 for 85%, an EASY item). This used to be
+    # -LOGIT(1 - target) = +1.73, i.e. a 15%-success item; the reported
+    # discrimination happened to be unchanged only because theta ~ N(0, 1)
+    # is symmetric, while avg_success_rate came out as 19% (review 2026-10-21).
+    beta_policy = -LOGIT(args.target_policy)
 
     d50 = discrimination_curve(args.n_learners, np.array([beta_50]), n_replications=200)["rows"][0]
     dpolicy = discrimination_curve(args.n_learners, np.array([beta_policy]), n_replications=200)["rows"][0]
@@ -116,6 +121,9 @@ if __name__ == "__main__":
     print(f"{args.target_policy:.0%}-target (this system's Eq. 3 policy): beta={beta_policy:+.2f}  "
           f"discrimination={dpolicy['mean_discrimination']:.3f} "
           f"({quality_label(dpolicy['mean_discrimination'])})")
+    assert abs(dpolicy["avg_success_rate"] - args.target_policy) < 0.1, (
+        f"the policy item must give an average learner roughly the target success rate, "
+        f"got {dpolicy['avg_success_rate']:.1%} for target {args.target_policy:.0%}")
     rel_drop = 1 - dpolicy["mean_discrimination"] / d50["mean_discrimination"]
     print(f"relative drop in discrimination from choosing learning over measurement: {rel_drop:.1%}")
 
