@@ -1,0 +1,49 @@
+{
+  "provenance": {
+    "model": "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct",
+    "date": "2026-10-21",
+    "seed": 0
+  },
+  "skills": {
+    "particle_loc": [],
+    "particle_obj": [],
+    "honorific": [
+      {
+        "code": "END:시>으시",
+        "name": "Misconception 3: Misunderstanding Subject Roles",
+        "explanation": "Learners might incorrectly assume that (으)시- should be added to all subjects, regardless of whether they are objects or recipients of action.",
+        "example_correct": "친구가 영화를 보러 가셨습니다.",
+        "example_wrong": "친구가 영화를 보러 가으셨습니다.",
+        "category": "END",
+        "functional": true
+      }
+    ],
+    "time_range": [],
+    "tense_past": [],
+    "irregular_conj": [],
+    "adj_relativizer": [],
+    "subj_topic": [],
+    "verb_choice": [],
+    "noun_counter": [
+      {
+        "code": "NOUN:권>개",
+        "name": "Misconception: Incorrect Counter Usage",
+        "explanation": "Learners often confuse Korean counters with those from Indonesian, especially when dealing with nouns other than people or animals.",
+        "example_correct": "책 여섯 권을 샀다. (chaek yeongrŏk-e saes-tta.) - I bought six books.",
+        "example_wrong": "책 여섯 개를 샀다. (chaek yeongrŏk-e saes-tta.) - I bought six books.",
+        "category": "NOUN",
+        "functional": true
+      },
+      {
+        "code": "NOUN:명>대",
+        "name": "Misconception: Overgeneralization",
+        "explanation": "Learners might generalize the use of counters incorrectly, thinking all countable nouns use the same counter regardless of context.",
+        "example_correct": "사람 여섯 명이 모였다. (saram yeongrŏl-e moyeotda.) - Six people gathered.",
+        "example_wrong": "사람 여섯 대가 모였다. (saram yeongrŏl-e moyeotda.) - Six people gathered.",
+        "category": "NOUN",
+        "functional": true
+      }
+    ],
+    "mod_adverb": []
+  }
+}
