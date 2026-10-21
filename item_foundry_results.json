@@ -26,86 +26,94 @@
           0.7935
         ]
       },
-      "revisions_used": 0,
+      "revisions_used": 1,
       "rejection_reasons": {
-        "not-minimal": 15,
-        "target": 2,
-        "duplicate": 1,
-        "target-misconception": 1,
-        "wrong-category": 1,
-        "distinct": 1
+        "wrong-category": 19,
+        "not-minimal": 4,
+        "target-misconception": 2,
+        "format": 1
       },
       "codes": {
-        "PART:에>에서": 1,
-        "PART:에>으로": 1,
-        "PART:>만": 1
+        "PART:서>": 1,
+        "PART:에서>을": 1,
+        "PART:에서>으로": 1
       },
       "codes_recurring": 0,
       "rejected_examples": [
         {
-          "reply": "```json\n{\"sentence\": \"친구가 학교[에] 가서 책을 읽어요.\", \"distractors\": [\"학교[에서] 가서 책을 읽어요.\", \"학교[에게] 가서 책을 읽어요.\", \"학교[와] 가서 책을 읽어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 도서관에 가서 책을 읽었어요 [에서].\", \"distractors\": [\"을\", \"가서\", \"에\"]}\n```",
           "reasons": [
-            "not-minimal: '학교에서 가서 책을 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '학교에게 가서 책을 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '학교와 가서 책을 읽어요.' not-minimal: 2 edits"
+            "wrong-category: distractor '을' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '가서' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 집[에] 가서 책을 읽어요.\", \"distractors\": [\"집[에서] 가서 책을 읽어요.\", \"집[에게] 가서 책을 읽어요.\", \"집[과] 가서 책을 읽어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구를 만나러 카페 [에] 갔어요.\", \"distractors\": [\"에서\", \"친구를\", \"갔어요\"]}\n```",
           "reasons": [
-            "not-minimal: '집에서 가서 책을 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '집에게 가서 책을 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '집과 가서 책을 읽어요.' not-minimal: 2 edits"
+            "wrong-category: distractor '친구를' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '갔어요' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 도서관[에] 가서 책을 읽어요.\", \"distractors\": [\"도서관[에서] 가서 책을 읽어요.\", \"도서관[에게] 가서 책을 읽어요.\", \"도서관[과] 가서 책을 읽어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"책을 [에] 읽었어요.\", \"distractors\": [\"에서\", \"책을 읽었어요\", \"읽고\"]}\n```",
           "reasons": [
-            "not-minimal: '도서관에서 가서 책을 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '도서관에게 가서 책을 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '도서관과 가서 책을 읽어요.' not-minimal: 2 edits"
+            "wrong-category: distractor '에서' -- it is not one particle mistake; it mixes in other words or forms",
+            "not-minimal: distractor '책을 읽었어요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '읽고' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관에 가서 책을 읽어요.[에서]\",\n  \"distractors\": [\n    \"도서관에서\",\n    \"도서관에\",\n    \"도서관에게\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 학교 [에] 가서 친구를 만납니다.\", \"distractors\": [\"에서\", \"과\", \"에게\"]}\n```",
           "reasons": [
-            "target: the brackets must be inside the sentence, not after it"
+            "wrong-category: distractor '과' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관에서 책을 읽어요.\",\n  \"distractors\": [\n    \"도서관에 책을 읽어요.\",\n    \"도서관에 가서 책을 읽어요에서\",\n    \"도서관에게 책을 읽어요.\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 학교에 [어서] 갑니다.\", \"distractors\": [\"에서\", \"는\", \"으로\"]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "wrong-category: distractor '에서' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '는' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '으로' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"나는 집[에서] 저녁을 먹어요.\",\n  \"distractors\": [\n    \"나는 집에 저녁을 먹어요.\",\n    \"집에 가서 저녁을 먹어요에서\",\n    \"집에게 저녁을 먹어요.\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"친구를 [에] 만났습니다.\", \"distractors\": [\"에서\", \"와\", \"으로\"]}\n```",
           "reasons": [
-            "not-minimal: '집에 가서 저녁을 먹어요에서' not-minimal: 3 edits",
-            "not-minimal: '집에게 저녁을 먹어요.' not-minimal: 2 edits"
+            "wrong-category: distractor '에서' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '와' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '으로' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 카페에 가는 길에[에서] 잠깐 쉬었어요.\", \"distractors\": [\"친구가 카페에 가는 길에에서 잠깐 쉬었어요.\", \"친구가 카페에 가는 길에 잠깐 쉬었는데.\", \"친구가 카페에 가는 길에 잠깐 쉬었고, [에서] 이야기를 나눴어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 공원에 [가] 갔습니다.\", \"distractors\": [\"에서\", \"을\", \"로\"]}\n```",
           "reasons": [
-            "duplicate: distractor '친구가 카페에 가는 길에에서 잠깐 쉬었어요.' is empty, the key, or a repeat",
-            "not-minimal: '친구가 카페에 가는 길에 잠깐 쉬었는데.' not-minimal: 2 edits",
-            "not-minimal: '친구가 카페에 가는 길에 잠깐 쉬었고, 에서 이야기를 나눴어요.' not-minimal: 2 edits",
-            "target-misconception: no distractor has '에서' written where '에' is needed"
+            "not-minimal: distractor '에서' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '을' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '로' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 도서관에 책을 찾는 데[에] 잠시 머물렀어요.\", \"distractors\": [\"친구가 도서관에 책을 찾는 데에서 잠시 머물렀어요.\", \"친구가 도서관에 책을 찾는 데 잠깐 머물렀고, 에서 도움을 받았어요.\", \"친구가 도서관에 책을 찾는 데[에서] 잠깐 머물렀어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 공원에 [어서] 산책을 했습니다.\", \"distractors\": [\"에서\", \"으로\", \"에게\"]}\n```",
           "reasons": [
-            "not-minimal: '친구가 도서관에 책을 찾는 데 잠깐 머물렀고, 에서 도움을 받았어요.' not-minimal: 2 edits",
-            "wrong-category: '친구가 도서관에 책을 찾는 데에서 잠깐 머물렀어요.' wrong-category: MULTI, skill tests ['PART']"
+            "wrong-category: distractor '에서' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '으로' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '에게' -- it is not one particle mistake; it mixes in other words or forms",
+            "target-misconception: no distractor has '으로' written where '에서' is needed"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 도서관에 책을 찾는 데[에] 잠시 머물렀어요.\", \"distractors\": [\"친구가 도서관에 책을 찾는 데에서 잠시 머물렀어요.\", \"\\ud55c\\ub85c 친구가 도서관에 책을 찾는 데 잠깐 머물렀어요. (여기서 '에서'는 잘못된 선택으로, 원래 문맥에서는 '에'가 필요합니다.)\", \"친구가 도서관에서 책을 찾는 데[에] 잠시 머물렀어요.\"]}\n```\n\nNote: The third distractor aims to illustrate a common mistake by placing '에서' incorrectly, while still keeping the sentence structure relevant to the grammar point. However, to strictly adhere to the instruction of providing clearly wrong replacements without altering co",
+          "reply": "```json\n{\"sentence\": \"친구를 만나러 [어서] 카페에 갔습니다.\", \"distractors\": [\"으로\", \"에\", \"에서\"]]}\n```",
           "reasons": [
-            "not-minimal: '한로 친구가 도서관에 책을 찾는 데 잠깐 머물렀어요. (여기서 '에서'는 잘못된 선택으로, 원래 문맥에서는 '에'가 필요합니다.)' not-minimal: 3 edits",
-            "distinct: '친구가 도서관에서 책을 찾는 데에 잠시 머물렀어요.' makes the same mistake as another distractor ('에서' written where '에' is needed)"
+            "format: the reply was not a JSON object"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"나는 학교에 가기 위해 [어서] 버스를 탔습니다.\", \"distractors\": [\"으로\", \"에\", \"에서\"]}\n```",
+          "reasons": [
+            "wrong-category: distractor '으로' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '에' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '에서' -- it is not one particle mistake; it mixes in other words or forms",
+            "target-misconception: no distractor has '으로' written where '에서' is needed"
           ]
         }
       ]
@@ -131,184 +139,187 @@
       },
       "revisions_used": 0,
       "rejection_reasons": {
-        "wrong-category": 6,
-        "not-minimal": 21
+        "not-minimal": 17,
+        "wrong-category": 19
       },
       "codes": {},
       "codes_recurring": 0,
       "rejected_examples": [
         {
-          "reply": "```json\n{\"sentence\": \"친구가 생일선물[을] 받았어요.\", \"distractors\": [\"친구가 생일선물를 받았어요.\", \"친구가 생일선물을 받았습니다.\", \"친구가 생일선물(을) 받았어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 책 [을/를] 읽었어요.\", \"distractors\": [\"책을 읽었어요.\", \"책을 읽었습니다.\", \"책을 읽었대요.\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 생일선물을 받았습니다.' wrong-category: END, skill tests ['PART']",
-            "wrong-category: '친구가 생일선물(을) 받았어요.' wrong-category: MULTI, skill tests ['PART']"
+            "not-minimal: distractor '책을 읽었어요.' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '책을 읽었습니다.' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '책을 읽었대요.' -- it changes 3 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 생일선물[을] 받았어요.\", \"distractors\": [\"친구가 생일선물를 받았어요.\", \"친구가 선물을 받았습니다.\", \"친구가 선물을(을) 받았어요.\"]}\n```\n\nNote: While striving for accuracy, it's important to clarify that the distractors provided still reflect common mistakes but within the context of testing the direct object particle usage correctly. Here's a refined version addressing potential confusion more precisely:\n\n```json\n{\"sentence\": \"친구가 생일선물[을] 받았어요.\", \"distractors\": [\"친구가 생일선물를 받았어요.\", \"친구가 선물을 받았어요 (잘못된 구분 없이 사용).\"",
+          "reply": "```json\n{\"sentence\": \"친구에게 선물 [을/를] 줬어요.\", \"distractors\": [\"선물을 줬어요.\", \"선물을 줬어요요.\", \"선물을 받았어요.\"]}\n```",
           "reasons": [
-            "not-minimal: '친구가 선물을 받았습니다.' not-minimal: 2 edits",
-            "not-minimal: '친구가 선물을(을) 받았어요.' not-minimal: 2 edits"
+            "not-minimal: distractor '선물을 줬어요.' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '선물을 줬어요요.' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '선물을 받았어요.' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 책[을] 읽어요.\", \"distractors\": [\"친구가 책를 읽어요.\", \"친구가 책 읽었어요.\", \"친구가 책을 읽었습니다.\"]}\n```\n\nExplanation:\n- **Sentence**: Uses a concise and natural everyday context focusing solely on the particle distinction.\n- **Distractors**:\n  1. **친구가 책를 읽어요.** - Incorrect particle usage with double '를'.\n  2. **친구가 책 읽었어요.** - Incorrect verb ending omitting the necessary particle distinction in casual speech.\n  3. **친구가 책을 읽었습니다.** - Incorrect formal verb ending instead of using the casual sp",
+          "reply": "```json\n{\"sentence\": \"나는 책 [을/를] 읽었습니다.\", \"distractors\": [\"책을 읽었습니다.\", \"읽었 책을.\", \"책 읽었습니다.\"]}\n```",
           "reasons": [
-            "not-minimal: '친구가 책 읽었어요.' not-minimal: 2 edits",
-            "wrong-category: '친구가 책을 읽었습니다.' wrong-category: END, skill tests ['PART']"
+            "not-minimal: distractor '책을 읽었습니다.' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '읽었 책을.' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '책 읽었습니다.' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 책[을] 읽어요.\",\n  \"distractors\": [\"친구가 책를 읽어요.\", \"친구가 책을 읽습니다.\", \"친구가 책[에서] 읽어요.\"]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 저녁[을/를] 맛있게 먹었어요.\", \"distractors\": [\"저녁을\", \"먹었어요을\", \"맛있게를\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 책을 읽습니다.' wrong-category: END, skill tests ['PART']"
+            "wrong-category: distractor '저녁을' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '먹었어요을' -- it is not one particle mistake; it mixes in other words or forms",
+            "not-minimal: distractor '맛있게를' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"나는 저녁[을] 먹어요.\",\n  \"distractors\": [\"나는 저녁를 먹어요.\", \"나는 저녁을 먹었습니다.\", \"나는 저녁[에서] 먹어요.\"]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"친구에게 책[을/를] 줬어요.\", \"distractors\": [\"친구에게을\", \"줬어요을\", \"주었어요를\"]}\n```",
           "reasons": [
-            "wrong-category: '나는 저녁을 먹었습니다.' wrong-category: END, skill tests ['PART']"
+            "wrong-category: distractor '친구에게을' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '줬어요을' -- it is not one particle mistake; it mixes in other words or forms",
+            "not-minimal: distractor '주었어요를' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구에게 책[을] 선물했어요.\",\n  \"distractors\": [\"친구에게 책를 선물했어요.\", \"친구에게 책을 주었습니다.\", \"친구에게 책[에게] 선물했어요.\"]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 사과[을/를] 먹었어요.\", \"distractors\": [\"나는사과을\", \"먹었어요을\", \"먹었사과를\"]}\n```",
           "reasons": [
-            "not-minimal: '친구에게 책을 주었습니다.' not-minimal: 2 edits"
+            "not-minimal: distractor '나는사과을' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '먹었어요을' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '먹었사과를' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 저녁을[을] 먹어요.\", \"distractors\": [\"저녁을먹어요.\", \"저녁을[는] 먹어요.\", \"저녁을[이] 먹어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 책[을/를] 읽었어요.\", \"distractors\": [\"책이\", \"읽었습니다\", \"을을\"]}\n```",
           "reasons": [
-            "not-minimal: '저녁을먹어요.' not-minimal: 2 edits",
-            "not-minimal: '저녁을는 먹어요.' not-minimal: 2 edits",
-            "not-minimal: '저녁을이 먹어요.' not-minimal: 2 edits"
+            "wrong-category: distractor '책이' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '읽었습니다' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '을을' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 책[을] 읽어요.\", \"distractors\": [\"책읽어요.\", \"책를[은] 읽어요.\", \"책를[이] 읽어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"그녀는 맛있는 [음식을/를] 먹었습니다.\", \"distractors\": [\"음식을먹었습니다\", \"맛있는음식이\", \"음식을을\"]}\n```",
           "reasons": [
-            "not-minimal: '친구가 책읽어요. 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '책를은 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '책를이 읽어요.' not-minimal: 2 edits"
+            "wrong-category: distractor '음식을먹었습니다' -- it is not one particle mistake; it mixes in other words or forms",
+            "not-minimal: distractor '맛있는음식이' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '음식을을' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 사과[를] 먹어요.\", \"distractors\": [\"사과먹어요.\", \"사과를는 먹어요.\", \"사과를이 먹어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 책 [을/를] 읽었습니다.\", \"distractors\": [\"책을읽었습니다\", \"을책을\", \"책을읽\"]}\n```",
           "reasons": [
-            "not-minimal: '사과먹어요.' not-minimal: 2 edits",
-            "not-minimal: '사과를는 먹어요.' not-minimal: 2 edits",
-            "not-minimal: '사과를이 먹어요.' not-minimal: 2 edits"
+            "not-minimal: distractor '책을읽었습니다' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '을책을' -- it is not one particle mistake; it mixes in other words or forms",
+            "not-minimal: distractor '책을읽' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 책[을] 읽어요.\", \"distractors\": [\"책를 읽어요.\", \"책과 읽어요.\", \"책과을 읽어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 저녁을 [---] 맛있게 먹었어요.\", \"distractors\": [\"저녁을 먹었어요\", \"저녁을 먹었습니다\", \"저녁을 먹었잖아요\"]}\n```",
           "reasons": [
-            "wrong-category: '책를 읽어요.' wrong-category: MULTI, skill tests ['PART']",
-            "not-minimal: '책과 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '책과을 읽어요.' not-minimal: 2 edits"
+            "wrong-category: distractor '저녁을 먹었어요' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '저녁을 먹었습니다' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '저녁을 먹었잖아요' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         }
       ]
     },
     "honorific": {
       "accepted_untargeted": {
-        "k": 0,
-        "n": 4,
-        "rate": 0.0,
+        "k": 1,
+        "n": 3,
+        "rate": 0.3333333333333333,
         "ci95": [
-          0.0,
-          0.4899
+          0.0615,
+          0.7923
         ]
       },
       "accepted_targeted": {
-        "k": 0,
-        "n": 0,
-        "rate": null,
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
         "ci95": [
-          0.0,
+          0.2065,
           1.0
         ]
       },
-      "revisions_used": 0,
+      "revisions_used": 2,
       "rejection_reasons": {
-        "wrong-category": 10,
-        "not-minimal": 17,
-        "target": 2
+        "wrong-category": 15,
+        "not-minimal": 3,
+        "target": 1,
+        "target-misconception": 1,
+        "ambiguous": 1
       },
-      "codes": {},
-      "codes_recurring": 0,
+      "codes": {
+        "END:습니다>어요": 2,
+        "END:습니다>읍니다": 2,
+        "END:습니다>다": 2
+      },
+      "codes_recurring": 3,
       "rejected_examples": [
         {
-          "reply": "```json\n{\n  \"sentence\": \"선생님께서 학생들[을] 위해 특별히 강의를 준비하시어요.\",\n  \"distractors\": [\n    \"선생님께서 학생들[을 위해] 강의를 준비하시어요.\",  // Misplaced use of '을 위해' instead of honorific particle\n    \"선생님께서 학생[들께] 특별히 강의를 준비하시어요.\", // Incorrect use of direct address instead of indirect honorific\n    \"선생님께서 특별히 학생들[을] 강의를 준비하시어요.\",  // Missing particle '을/를' before the direct object\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"선생님께서 학생들에게 [강의를] 해주십니다.\", \"distractors\": [\"강의를 들으세요\", \"강의를 하세요\", \"강의를 보여주세요\"]}\n```",
           "reasons": [
-            "wrong-category: '선생님께서 학생들을 위해 강의를 준비하시어요.' wrong-category: ADV, skill tests ['END']",
-            "wrong-category: '선생님께서 학생들께 특별히 강의를 준비하시어요.' wrong-category: MULTI, skill tests ['END']",
-            "not-minimal: '선생님께서 특별히 학생들을 강의를 준비하시어요.' not-minimal: 2 edits"
+            "wrong-category: distractor '강의를 들으세요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '강의를 하세요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '강의를 보여주세요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"선생님께서 학생들께 특별히 강의를 준비하시는 걸 보니[ 감탄]하십니다.\",\n  \"distractors\": [\n    \"선생님께서 학생들에게 특별히 강의를 준비하시는 걸 보니[ 놀라]십니다.\",  // Incorrect emotion expression instead of honorific particle\n    \"선생님께서 학생들께 특별히 강의 준비[를] 보시는 걸 보고[ 기쁩니다].\",  // Removal of honorific particle and addition of direct emotion expression\n    \"선생님께서 학생들께 특별히 강의 준비[를] 하시는 걸 보니[ 기뻐하]십니다.\",  // Incorrect placement of honorific particle\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"어머니께서 아이들에게 [간식을] 주십니다.\", \"distractors\": [\"간식을 먹으세요\", \"간식을 준비하세요\", \"간식을 가져다 주세요\"]}\n```",
           "reasons": [
-            "not-minimal: '선생님께서 학생들에게 특별히 강의를 준비하시는 걸 보니 놀라십니다.' not-minimal: 2 edits",
-            "not-minimal: '선생님께서 학생들께 특별히 강의 준비를 보시는 걸 보고 기쁩니다.' not-minimal: 3 edits",
-            "not-minimal: '선생님께서 학생들께 특별히 강의 준비를 하시는 걸 보니 기뻐하십니다.' not-minimal: 3 edits"
+            "wrong-category: distractor '간식을 먹으세요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '간식을 준비하세요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "not-minimal: distractor '간식을 가져다 주세요' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"어르신께서 저녁[을] 드시는 모습이 아름답게 느껴지십니다.[]\",\n  \"distractors\": [\n    \"어르신께서 저녁을 드시고 있는 모습이 아름답게 느껴지십니다[]\",  // Removal of required honorific particle\n    \"어르신께서 저녁을 드시는 모습이 아름답게 느껴지시고[],\",  // Incorrect placement and addition of comma\n    \"어르신이 저녁을 드시는 모습이 아름답게 느껴지시면서[],\"  // Incorrect use of non-honorific form and addition of unnecessary conjunction\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"선생님께서 학생들에게 [강의를] 하십니다.\", \"distractors\": [\"강의를 듣습니다\", \"강의를 읽습니다\", \"강의를 쓰십니다\" ]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "wrong-category: distractor '강의를 듣습니다' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '강의를 읽습니다' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '강의를 쓰십니다' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"선생님께서 저녁[을] 맛있게 드셨어요.\",\n  \"distractors\": [\n    \"저녁을 맛있게 드시어요.\",  // Incorrect use of personal honorific instead of verb conjugation\n    \"저녁을 맛있게 드셨습니다.\",  // Overly formal ending without need for honorific in this context\n    \"선생님 저녁을 맛있게 ...\"    // Fragmentary insertion without correct verb ending\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"선생님께서 저녁 [드시면서] 책을 읽으셨어요.\", \"distractors\": [\"드시면 책을 읽으셨어요\", \"드시면서 읽으셨어요\", \"드시면서 책을 읽으셨읍니다\"]}\n```",
           "reasons": [
-            "not-minimal: '저녁을 맛있게 드시어요.' not-minimal: 2 edits",
-            "not-minimal: '저녁을 맛있게 드셨습니다.' not-minimal: 2 edits",
-            "not-minimal: '선생님 저녁을 맛있게 ...' not-minimal: 2 edits"
+            "not-minimal: distractor '드시면 책을 읽으셨어요' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '드시면서 읽으셨어요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "not-minimal: distractor '드시면서 책을 읽으셨읍니다' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"사장님께서 회의[를] 성공적으로 마치셨습니다.\",\n  \"distractors\": [\n    \"사장님께서 회의를 성공적으로 마치어요.\",  // Incorrect use of '-시-' ending instead of formal '-셨습니다'\n    \"사장님께서 회의를 성공적으로 마쳤습니다.\",  // Overly casual ending without honoring the subject\n    \"사장님 회의를 성공적으로 ...\"            // Incomplete sentence fragment omitting correct verb ending\n  ]\n}\n```",
-          "reasons": [
-            "not-minimal: '사장님 회의를 성공적으로 ...' not-minimal: 2 edits"
-          ]
-        },
-        {
-          "reply": "```json\n{\n  \"sentence\": \"할머니께서 저녁[을] 맛있게 드셨습니다.\",\n  \"distractors\": [\n    \"할머니께서 저녁을 맛있게 드셨어요.\",  // Incorrect use of casual '-어요' instead of '-셨습니다'\n    \"할아버지께서 저녁을 맛있게 드셨습니다.\", // Incorrect subject honorific use\n    \"저녁을 맛있게 할머니께서 ...\"           // Incorrect word order and missing proper honorific ending\n  ]\n}\n```",
-          "reasons": [
-            "wrong-category: '할아버지께서 저녁을 맛있게 드셨습니다.' wrong-category: NOUN, skill tests ['END']",
-            "not-minimal: '저녁을 맛있게 할머니께서 ...' not-minimal: 2 edits"
-          ]
-        },
-        {
-          "reply": "```json\n{\"sentence\": \"선생님[께서] 책을 읽으십니다.\", \"distractors\": [\"선생님[에게] 책을 읽으십니다.\", \"선생님[이] 책을 읽으십니다.\", \"선생님[님] 책을 읽으십니다.\"]}\n```",
-          "reasons": [
-            "wrong-category: '선생님에게 책을 읽으십니다.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '선생님이 책을 읽으십니다.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '선생님님 책을 읽으십니다.' wrong-category: MULTI, skill tests ['END']"
-          ]
-        },
-        {
-          "reply": "```json\n{\"sentence\": \"손님[께서] 카페에서 차를 드십니다.\", \"distractors\": [\"손님[에게] 카페에서 차를 드십니다.\", \"손님[이] 카페에서 차를 드십니다.\", \"손님님 차를 드십니다.\"]}\n```",
-          "reasons": [
-            "wrong-category: '손님에게 카페에서 차를 드십니다.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '손님이 카페에서 차를 드십니다.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '손님님 차를 드십니다.' wrong-category: MULTI, skill tests ['END']"
-          ]
-        },
-        {
-          "reply": "```json\n{\"sentence\": \"교수님께서 강의실에서 강의를 시작하십니다.[께서].\", \"distractors\": [\"교수님에게 강의실에서 강의를 시작하십니다.\", \"교수님이 강의실에서 강의를 시작하십니다.\", \"교수님님 강의실에서 강의를 시작하십니다.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"[식사하시면서] 책을 읽으셨어요. 선생님께서는 학생들에게 좋은 조언을 해주셨습니다.\", \"distractors\": [\"식사하시면서 책을 읽으셨읍니다\", \"식사하시면서 책 읽으셨어요\", \"식사하시면서 책을 읽으셨다\"]}\n```",
           "reasons": [
             "target: the brackets must be inside the sentence, not after it"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"선생님께서[수업을] 시작하셨습니다.\", \"distractors\": [\"선생님께서[책을] 읽으셨습니다.\", \"선생님께서[점심을] 드시러 가셨습니다.\", \"선생님께서[전화를] 받으셨습니다.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"할머니께서는 [저녁을] 드시면서 이야기하셨습니다. 친구분께서는 여행 중에 맛있는 음식을 드셨어요.\", \"distractors\": [\"저녁을 드세요\", \"저녁을 드시면서 이야기하셨읍니다\", \"저녁을 드시면서 이야기하셨다\"]}\n```",
           "reasons": [
-            "not-minimal: '선생님께서책을 읽으셨습니다.' not-minimal: 2 edits",
-            "not-minimal: '선생님께서점심을 드시러 가셨습니다.' not-minimal: 2 edits",
-            "not-minimal: '선생님께서전화를 받으셨습니다.' not-minimal: 2 edits"
+            "wrong-category: distractor '저녁을 드세요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '저녁을 드시면서 이야기하셨읍니다' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '저녁을 드시면서 이야기하셨다' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"할머니께서 저녁을 [드시면서] 가족들과 이야기를 나누셨어요.\", \"distractors\": [\"드시면 이야기를 나누셨어요\", \"드시면서 이야기 나누셨다\", \"드시면서 이야기 나누셨읍니다\"]}\n```",
+          "reasons": [
+            "wrong-category: distractor '드시면 이야기를 나누셨어요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '드시면서 이야기 나누셨다' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '드시면서 이야기 나누셨읍니다' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "target-misconception: no distractor has '어요' written where '습니다' is needed"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"선생님께서 [읽으셨습니다] 책을 다 읽으셨어요.\", \"distractors\": [\"읽으셨어요\", \"읽으셨다\", \"읽으셨읍니다\"]}\n```",
+          "reasons": [
+            "ambiguous: '읽으셨어요' reads at least as naturally as the key '읽으셨습니다'; it may also be correct"
           ]
         }
       ]
@@ -334,86 +345,83 @@
       },
       "revisions_used": 0,
       "rejection_reasons": {
-        "wrong-category": 7,
-        "not-minimal": 19,
-        "target": 2
+        "wrong-category": 24,
+        "target": 3,
+        "format": 1
       },
       "codes": {},
       "codes_recurring": 0,
       "rejected_examples": [
         {
-          "reply": "```json\n{\"sentence\": \"수업은 오전 [9시부터] 시작해요.\", \"distractors\": [\"오후 9시부터\", \"9시까지\", \"부터 오후 9시\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구를 만나서 저녁을 [먹_____]고 집으로 갔어요.\", \"distractors\": [\"먹었어요\", \"먹고있어요\", \"먹었습니다\"]}\n```",
           "reasons": [
-            "wrong-category: '수업은 오전 오후 9시부터 시작해요.' wrong-category: NOUN, skill tests ['PART']",
-            "not-minimal: '수업은 오전 부터 오후 9시 시작해요.' not-minimal: 2 edits"
+            "wrong-category: distractor '먹었어요' -- it makes a verb or adjective ending mistake, but this question tests a particle mistake",
+            "wrong-category: distractor '먹고있어요' -- it makes a verb or adjective ending mistake, but this question tests a particle mistake",
+            "wrong-category: distractor '먹었습니다' -- it makes a verb or adjective ending mistake, but this question tests a particle mistake"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"수업은 [9시부터] 오후 3시까지 진행됩니다.\", \"distractors\": [\"수업은 오전 9시까지 진행됩니다.\", \"9시부터 수업은 계속됩니다.\", \"오후 3시부터 수업이 시작됩니다.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"학교에서 수업을 듣고 나서 [_____] 책을 읽었어요.\", \"distractors\": [\"듣고\", \"읽었어요\", \"읽고있어요\"]}\n```",
           "reasons": [
-            "not-minimal: '수업은 오전 9시까지 진행됩니다.' not-minimal: 2 edits",
-            "not-minimal: '9시부터 수업은 계속됩니다.' not-minimal: 2 edits",
-            "not-minimal: '오후 3시부터 수업이 시작됩니다.' not-minimal: 2 edits"
+            "wrong-category: distractor '듣고' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '읽었어요' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '읽고있어요' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구와 [점심시간부터] 오후 2시까지 공부했어요.\", \"distractors\": [\"친구와 점심시간까지 공부했어요.\", \"점심시간부터 공부를 계속했어요.\", \"오후 2시부터 공부가 시작되었어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"아침 [_____] 점심을 먹었어요.\", \"distractors\": [\"에\", \"을\", \"부터\" ]}\n```",
           "reasons": [
-            "wrong-category: '친구와 점심시간까지 공부했어요.' wrong-category: MULTI, skill tests ['PART']",
-            "not-minimal: '점심시간부터 공부를 계속했어요.' not-minimal: 3 edits",
-            "not-minimal: '오후 2시부터 공부가 시작되었어요.' not-minimal: 3 edits"
+            "wrong-category: distractor '에' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '을' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '부터' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구와 함께[부터] 점심을 먹으러 갔어요.\", \"distractors\": [\"점심을 먹[으러] 부터 갔어요.\", \"점심을 먹[으러] 까지 갔어요.\", \"점심을 먹[으러] 부터 먹었어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"점심시간은 오전 [10시부터] 오후 [2시까지]예요.\", \"distractors\": [\"10시까지\", \"오후 10시부터\", \"오후부터 2시까지\"]}\n```",
           "reasons": [
-            "not-minimal: '점심을 먹으러 부터 갔어요.' not-minimal: 2 edits",
-            "not-minimal: '점심을 먹으러 까지 갔어요.' not-minimal: 2 edits",
-            "not-minimal: '점심을 먹으러 부터 먹었어요.' not-minimal: 2 edits"
+            "target: put square brackets around exactly one part of the sentence"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"월요일[부터] 금요일까지 학교에 갔어요.\", \"distractors\": [\"월요일부터 금요일에 갔어요.\", \"월요일까지 금요일까지 학교에 있었어요.\", \"월요일부터 금요일 학교에 갔어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 회사에 [출근]해서 오후 [5시까지] 일했어요.\", \"distractors\": [\"퇴근\", \"점심\", \"퇴근해서\"]}\n```",
           "reasons": [
-            "wrong-category: '월요일부터 금요일에 갔어요.' wrong-category: MULTI, skill tests ['PART']",
-            "not-minimal: '월요일까지 금요일까지 학교에 있었어요.' not-minimal: 2 edits"
+            "target: put square brackets around exactly one part of the sentence"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"수업은 화요일[부터] 목요일까지 있었어요.\", \"distractors\": [\"수업은 화요일에 목요일까지 있었어요.\", \"화요일부터 목요일수업까지 있었어요.\", \"화요일까지 목요일까지 수업이 있었어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"오늘은 친구와 [함께] 점심을 [먹고] 나서 영화를 봤어요.\", \"distractors\": [\"혼자\", \"밥을\", \"차를\"]}\n```",
           "reasons": [
-            "not-minimal: '화요일부터 목요일수업까지 있었어요.' not-minimal: 2 edits",
-            "not-minimal: '화요일까지 목요일까지 수업이 있었어요.' not-minimal: 3 edits"
+            "target: put square brackets around exactly one part of the sentence"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"오늘 아침 8시부터 9시까지 운동을 했어요.[부터/까지]\", \"distractors\": [\"오늘 아침 8시부터 10시까지 운동을 했어요.[부터/아침]\", \"오늘 아침 8시부터 9시까지 식사를 했어요.[부터/까지]\", \"오늘 아침 9시부터 8시까지 운동을 했어요.[부터/까지]\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"아침 [____] 점심을 먹어요.\", \"distractors\": [\"아침에\", \"점심으로\", \"아침부터\"]}\n```",
           "reasons": [
-            "target: the brackets must be inside the sentence, not after it"
+            "wrong-category: distractor '아침에' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '점심으로' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '아침부터' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"운동을 오늘 아침 8시부터 9시까지 했어요 [부터까지].\", \"distractors\": [\"운동을 오늘 아침 8시부터 10시까지 했어요 [아침까지].\", \"운동을 오늘 아침 7시부터 9시까지 했어요 [부터까지].\", \"운동을 오늘 저녁 8시부터 9시까지 했어요 [부터시작]. \"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구를 [____] 집에 데리고 왔어요.\", \"distractors\": [\"친구에게\", \"친구와 함께\", \"친구로\"]}\n```",
           "reasons": [
-            "not-minimal: '운동을 오늘 아침 8시부터 10시까지 했어요 아침까지.' not-minimal: 2 edits",
-            "wrong-category: '운동을 오늘 아침 7시부터 9시까지 했어요 부터까지.' wrong-category: PUNCT, skill tests ['PART']",
-            "not-minimal: '운동을 오늘 저녁 8시부터 9시까지 했어요 부터시작.' not-minimal: 2 edits"
+            "wrong-category: distractor '친구에게' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '친구와 함께' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '친구로' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"수업은 월요일 오전 10시부터 오후 11시까지 있어요 [부터까지].\", \"distractors\": [\"수업은 월요일 오전 10시부터 밤 11시까지 있어요 [밤까지].\", \"수업은 월요일 오후 9시부터 11시까지 있어요 [오후까지].\", \"수업은 월요일 오전 10시부터 시작까지 있어요 [시작]. \"]}\n```",
+          "reply": "```json\n{\"sentence\": \"오늘 [____] 저녁을 먹었습니다.\", \"distractors\": [\"저녁에\", \"저녁과 함께\", \"저녁으로\"]]}\n```",
           "reasons": [
-            "not-minimal: '수업은 월요일 오전 10시부터 밤 11시까지 있어요 밤까지.' not-minimal: 2 edits",
-            "not-minimal: '수업은 월요일 오후 9시부터 11시까지 있어요 오후까지.' not-minimal: 3 edits",
-            "not-minimal: '수업은 월요일 오전 10시부터 시작까지 있어요 시작.' not-minimal: 2 edits"
+            "format: the reply was not a JSON object"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구와 함께[부터] 저녁 식사를 했어요.\", \"distractors\": [\"친구부터 저녁 식사를 했어요.\", \"친구와 까지 저녁 식사를 했어요.\", \"친구와 부터 저녁 식사를 했어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 학교에 가서 [ _____ ] 공부를 했어요.\", \"distractors\": [\"갔다가\", \"갔습니다\", \"갔습니다요\"]}\n```",
           "reasons": [
-            "wrong-category: '친구부터 저녁 식사를 했어요.' wrong-category: MULTI, skill tests ['PART']",
-            "wrong-category: '친구와 까지 저녁 식사를 했어요.' wrong-category: MULTI, skill tests ['PART']",
-            "wrong-category: '친구와 부터 저녁 식사를 했어요.' wrong-category: ADV, skill tests ['PART']"
+            "wrong-category: distractor '갔다가' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '갔습니다' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '갔습니다요' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         }
       ]
@@ -439,82 +447,81 @@
       },
       "revisions_used": 0,
       "rejection_reasons": {
-        "wrong-category": 21,
-        "target": 5
+        "wrong-category": 15,
+        "not-minimal": 8,
+        "duplicate": 2
       },
       "codes": {},
       "codes_recurring": 0,
       "rejected_examples": [
         {
-          "reply": "```json\n{\"sentence\": \"친구[가] 영화를 봤어요.\", \"distractors\": [\"친구[을] 영화를 봤어요.\", \"친구[에서] 영화를 봤어요.\", \"친구[이] 영화를 봤어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"어제 저녁에 [밥을] 먹었어요.\", \"distractors\": [\"밥을 먹었어요\", \"밥을 먹었습니다\", \"저녁을 먹었어요\"]}\n```",
           "reasons": [
-            "wrong-category: '친구을 영화를 봤어요.' wrong-category: MULTI, skill tests ['END']",
-            "wrong-category: '친구에서 영화를 봤어요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구이 영화를 봤어요.' wrong-category: MULTI, skill tests ['END']"
+            "wrong-category: distractor '밥을 먹었어요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "not-minimal: distractor '밥을 먹었습니다' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '저녁을 먹었어요' -- it changes 3 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구[와] 영화를 봤어요.\", \"distractors\": [\"친구[에게] 영화를 봤어요.\", \"친구[에] 영화를 봤어요.\", \"친구[와는] 영화를 봤어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구와 함께 영화를 [보았어요].\", \"distractors\": [\"보았습니다\", \"보았어요해요\", \"보았어요요\"]}\n```",
           "reasons": [
-            "wrong-category: '친구에게 영화를 봤어요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구에 영화를 봤어요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구와는 영화를 봤어요.' wrong-category: PART, skill tests ['END']"
+            "wrong-category: distractor '보았어요요' -- it makes a particle mistake, but this question tests a verb or adjective ending mistake"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구[와] 어제 영화를 봤어요.\", \"distractors\": [\"친구[에게] 어제 영화를 봤어요.\", \"친구[에] 어제 영화를 봤어요.\", \"친구[와는] 내일 영화를 봤어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"어제 저녁에 [밥을] 먹었어요.\", \"distractors\": [\"밥을을\", \"밥을했어요\", \"밥을먹었어요요\"]}\n```",
           "reasons": [
-            "wrong-category: '친구에게 어제 영화를 봤어요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구에 어제 영화를 봤어요.' wrong-category: MULTI, skill tests ['END']",
-            "wrong-category: '친구와는 내일 영화를 봤어요.' wrong-category: MULTI, skill tests ['END']"
+            "wrong-category: distractor '밥을을' -- it makes a particle mistake, but this question tests a verb or adjective ending mistake",
+            "wrong-category: distractor '밥을했어요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '밥을먹었어요요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"어머니께서 저녁[을] 맛있게 드셨어요.\", \"distractors\": [\"점심을\", \"책을\", \"길을\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"어머니께서 저녁을 [먹어요/먹었어요/먹어세요] 주셨어요.\", \"distractors\": [\"먹어요\", \"먹어세요\", \"먹었어요\"]}\n```",
           "reasons": [
-            "wrong-category: '어머니께서 저녁점심을 맛있게 드셨어요.' wrong-category: NOUN, skill tests ['END']",
-            "wrong-category: '어머니께서 저녁책을 맛있게 드셨어요.' wrong-category: NOUN, skill tests ['END']",
-            "wrong-category: '어머니께서 저녁길을 맛있게 드셨어요.' wrong-category: NOUN, skill tests ['END']"
+            "not-minimal: distractor '먹었어요' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"어머니께서 저녁[을] 맛있게 드시었어요.\", \"distractors\": [\"아침을\", \"사람을\", \"꽃을\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구와 [영화를] 봤어요.\", \"distractors\": [\"영화를 봤어요\", \"영화를 봤습니다\", \"영화를 보았어요\"]}\n```",
           "reasons": [
-            "wrong-category: '어머니께서 저녁아침을 맛있게 드시었어요.' wrong-category: NOUN, skill tests ['END']",
-            "wrong-category: '어머니께서 저녁사람을 맛있게 드시었어요.' wrong-category: NOUN, skill tests ['END']",
-            "wrong-category: '어머니께서 저녁꽃을 맛있게 드시었어요.' wrong-category: NOUN, skill tests ['END']"
+            "not-minimal: distractor '영화를 봤어요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '영화를 봤습니다' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '영화를 보았어요' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구와 함께 영화[를] 봤어요.\", \"distractors\": [\"책을\", \"길을\", \"음식을\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"어제 저녁 [밥을] 먹었어요.\", \"distractors\": [\"밥을 먹었습니다\", \"밥을 먹었어요요\", \"밥을 먹었어요.\"]}\n```",
           "reasons": [
-            "wrong-category: '친구와 함께 영화책을 봤어요.' wrong-category: NOUN, skill tests ['END']",
-            "wrong-category: '친구와 함께 영화길을 봤어요.' wrong-category: NOUN, skill tests ['END']",
-            "wrong-category: '친구와 함께 영화음식을 봤어요.' wrong-category: NOUN, skill tests ['END']"
+            "not-minimal: distractor '밥을 먹었습니다' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '밥을 먹었어요요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '밥을 먹었어요.' -- it makes a noun or counter mistake, but this question tests a verb or adjective ending mistake"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구[가] 식당[에서] 맛있는 저녁[을 먹었어요].\",\n  \"distractors\": [\n    \"친구[를] 식당[에서] 맛있는 저녁[을 먹었어요].\",\n    \"친구[가] 카페[에서] 맛있는 저녁[을 먹었어요].\",\n    \"친구[가] 식당[에서] 맛있는 점심[을 먹었어요].\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"어제 저녁에 [먹었어요] 친구들과 저녁을 했어요.\", \"distractors\": [\"먹었어요요\", \"먹었어요들\", \"먹었어요했어요\"]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "wrong-category: distractor '먹었어요요' -- it makes a MOD mistake, but this question tests a verb or adjective ending mistake",
+            "wrong-category: distractor '먹었어요들' -- it makes a noun or counter mistake, but this question tests a verb or adjective ending mistake"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"어제 친구[가] 공원[에서] 산책[을 했어요].\",\n  \"distractors\": [\n    \"어제 친구[와] 공원[에서] 산책[을 했어요].\",\n    \"어제 친구[가] 집[에서] 산책[을 했어요].\",\n    \"어제 친구[가] 공원[에서] 운동[을 했어요].\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"선생님께서 학생들에게 [가르쳤어요] 오늘의 수업 내용을 설명하셨어요.\", \"distractors\": [\"가르치었어요\", \"가르쳤어요요\", \"가르치었슴니다\"]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "wrong-category: distractor '가르치었어요' -- it makes a conjugation mistake, but this question tests a verb or adjective ending mistake",
+            "wrong-category: distractor '가르쳤어요요' -- it makes a particle mistake, but this question tests a verb or adjective ending mistake"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 어제 공원[에서] 산책[을 했어요].\",\n  \"distractors\": [\n    \"친구가 어제 공원[에서 갔어요].\",          // Incorrect use of verb without '-았/었-'\n    \"친구가 어제 집[에서] 산책[을 했어요].\",   // Incorrect location replacement\n    \"친구가 어제 공원[에서 책을 읽었어요].\",  // Changing action verb instead of tense\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"친구와 [갔어요] 영화를 봤어요. 오늘 재미있었어요.\", \"distractors\": [\"갔슴\", \"갔어요요\", \"갔었어요\"]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "wrong-category: distractor '갔어요요' -- it makes a MOD mistake, but this question tests a verb or adjective ending mistake"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구[가] 식당[에서] 저녁을 먹었어요.\", \"distractors\": [\"친구[를] 식당[에서] 저녁을 먹었어요.\", \"친구[이] 식당[으로] 저녁을 먹었어요.\", \"친구[가] 주방[에서] 저녁을 먹었어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"어머니께서 저녁을 [먹어요] 주세요.\", \"distractors\": [\"먹어요\", \"먹었어요\", \"먹는다\"]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "duplicate: distractor '먹어요' is empty, the key, or a repeat"
           ]
         }
       ]
@@ -522,111 +529,110 @@
     "irregular_conj": {
       "accepted_untargeted": {
         "k": 1,
-        "n": 3,
-        "rate": 0.3333333333333333,
+        "n": 2,
+        "rate": 0.5,
         "ci95": [
-          0.0615,
-          0.7923
+          0.0945,
+          0.9055
         ]
       },
       "accepted_targeted": {
         "k": 0,
-        "n": 1,
+        "n": 2,
         "rate": 0.0,
         "ci95": [
           0.0,
-          0.7935
+          0.6576
         ]
       },
       "revisions_used": 2,
       "rejection_reasons": {
-        "wrong-category": 26,
-        "not-minimal": 3,
-        "target-misconception": 3
+        "wrong-category": 6,
+        "format": 1,
+        "target-misconception": 6,
+        "not-minimal": 15
       },
       "codes": {
-        "END:게>일찍": 1,
-        "END:게>자주": 1,
-        "END:게>먼저": 1
+        "END:>갔어요": 1,
+        "END:>갔네": 1,
+        "END:>갔습니다": 1
       },
       "codes_recurring": 0,
       "rejected_examples": [
         {
-          "reply": "```json\n{\"sentence\": \"친구가 저녁[르] 맛있게 먹어요.\", \"distractors\": [\"저녁ᄇ\", \"저녁ᄉ\", \"저녁ᄆ\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구가 영화를 [보았어요] 싶어요.\", \"distractors\": [\"보았습니다\", \"보았어요요\", \"보았어요들\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 저녁ᄇ 맛있게 먹어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 저녁ᄉ 맛있게 먹어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 저녁ᄆ 맛있게 먹어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']"
+            "wrong-category: distractor '보았어요요' -- it makes a particle mistake, but this question tests a conjugation or verb or adjective ending mistake",
+            "wrong-category: distractor '보았어요들' -- it makes a noun or counter mistake, but this question tests a conjugation or verb or adjective ending mistake"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 저녁[르] 맛있게 즐겼어요.\", \"distractors\": [\"저녁ᄇ 맛있게 즐겼어요.\", \"저녁ᄉ 맛있게 즐겼어요.\", \"저녁ᄆ 맛있게 즐겼어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"오늘 날씨가 [맑아서] 좋네요.\", \"distractors\": [\"맑고서\", \"맑아서들\", \"맑아서는\"]]}\n```",
           "reasons": [
-            "not-minimal: '저녁ᄇ 맛있게 즐겼어요.' not-minimal: 2 edits",
-            "not-minimal: '저녁ᄉ 맛있게 즐겼어요.' not-minimal: 2 edits",
-            "not-minimal: '저녁ᄆ 맛있게 즐겼어요.' not-minimal: 2 edits"
+            "format: the reply was not a JSON object"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 저녁[르] 맛있게 먹었어요.\", \"distractors\": [\"친구가 저녁ᄇ 맛있게 먹었어요.\", \"친구가 저녁ᄉ 맛있게 먹었어요.\", \"친구가 저녁ᄆ 맛있게 먹었어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구가 저녁을 [먹]으러 갔어요.\", \"distractors\": [\"먹으러갔어요\", \"먹으러갔네\", \"먹었네\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 저녁ᄇ 맛있게 먹었어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 저녁ᄉ 맛있게 먹었어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 저녁ᄆ 맛있게 먹었어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']"
+            "target-misconception: no distractor has '갔네' added where nothing belongs"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 늦[게] 도착해서 모임이 늦어졌어요.\",\n  \"distractors\": [\n    \"일찍\",\n    \"먼저\",\n    \"빠르게\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"책을 [읽]는 것이 재미있어요.\", \"distractors\": [\"읽는것이재미있었네\", \"읽는것이재미있어요\", \"읽는것이재미있읍니다\" ]}\n```",
           "reasons": [
-            "wrong-category: '친구가 늦빠르게 도착해서 모임이 늦어졌어요.' wrong-category: ADJ, skill tests ['CONJ', 'END']"
+            "not-minimal: distractor '읽는것이재미있었네' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '읽는것이재미있어요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '읽는것이재미있읍니다' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "target-misconception: no distractor has '갔네' added where nothing belongs"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 늦[게] 집으로 돌아갔어요.\",\n  \"distractors\": [\n    \"일찍\",\n    \"먼저\",\n    \"빠르게\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"친구가 [먹]은 음식이 맛있었어요.\", \"distractors\": [\"먹은음식이맛있었네\", \"먹은음식이맛있었어요\", \"먹은음식이맛있었읍니다\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 늦빠르게 집으로 돌아갔어요.' wrong-category: ADJ, skill tests ['CONJ', 'END']"
+            "not-minimal: distractor '먹은음식이맛있었네' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '먹은음식이맛있었어요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '먹은음식이맛있었읍니다' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "target-misconception: no distractor has '갔네' added where nothing belongs"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 사랑스럽게[ᄉᄇ] 선물했어요.\", \"distractors\": [\"ᄉᄃ\", \"ᄉᄅ\", \"ᄉᄆ\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"그녀는 맛있는 [ᄉ니다] 음식을 만들었어요.\", \"distractors\": [\"맛있는 음식을 만들었어요\", \"맛있는 습니다 음식을 만들었어요\", \"맛있는 습니다를 만들었어요\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 사랑스럽게ᄉᄃ 선물했어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 사랑스럽게ᄉᄅ 선물했어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 사랑스럽게ᄉᄆ 선물했어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']"
+            "not-minimal: distractor '맛있는 음식을 만들었어요' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '맛있는 습니다 음식을 만들었어요' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '맛있는 습니다를 만들었어요' -- it changes 3 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 따뜻하게[ᄉᄇ] 차를 마셨어요.\", \"distractors\": [\"ᄉᄃ\", \"ᄉᄅ\", \"ᄉᄆ\"]}\n```\n\nExplanation:\n- The sentence uses an irregular verb stem (`마시다` becomes `마셨다`) before an ending starting with a vowel (`았어요`), focusing on the irregularity `[ᄉᄇ]`.\n- Distractors incorrectly replace `[ᄉᄇ]` with other verb endings that learners might mistakenly use, each representing a different error while keeping the rest of the sentence intact.",
+          "reply": "```json\n{\"sentence\": \"그는 친절한 [요] 선생님이에요.\", \"distractors\": [\"친절한 선생님이에요\", \"친절한데요 선생님이에요\", \"친절한요 선생님께요\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 따뜻하게ᄉᄃ 차를 마셨어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 따뜻하게ᄉᄅ 차를 마셨어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 따뜻하게ᄉᄆ 차를 마셨어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']"
+            "not-minimal: distractor '친절한 선생님이에요' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '친절한데요 선생님이에요' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '친절한요 선생님께요' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 따뜻한 날씨에[ᄉᄇ] 산책했어요.\", \"distractors\": [\"ᄉᄃ\", \"ᄉᄅ\", \"ᄉᄆ\"]}\n```\n\nExplanation:\n- The corrected sentence uses an irregular verb stem (`산책하다` becomes `산책했어요`) before an ending starting with a vowel (`했어요`), focusing on the irregular conjugation `[ᄉᄇ]`.\n- The distractors incorrectly replace `[ᄉᄇ]` with other verb endings that learners might mistakenly use, each representing a different error while keeping the context natural and relevant to the grammar point. This format avoids",
+          "reply": "```json\n{\"sentence\": \"그녀는 항상 [읽어요] 책을 즐겨요.\", \"distractors\": [\"읽는 책을 즐겨요\", \"읽어요 책을 즐겨요\", \"항상 읽어요 책을\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 따뜻한 날씨에ᄉᄃ 산책했어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 따뜻한 날씨에ᄉᄅ 산책했어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 따뜻한 날씨에ᄉᄆ 산책했어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']"
+            "not-minimal: distractor '읽는 책을 즐겨요' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '읽어요 책을 즐겨요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '항상 읽어요 책을' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 밤[게] 잠들어 있어요.\", \"distractors\": [\"밤일찍\", \"밤르게\", \"밤ᄃ게\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구가 저녁을 [먹]었어요.\", \"distractors\": [\"먹갔어요\", \"먹었네\", \"먹었습니다\" ]}\n```",
           "reasons": [
-            "wrong-category: '친구가 밤일찍 잠들어 있어요.' wrong-category: MULTI, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 밤르게 잠들어 있어요.' wrong-category: MULTI, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 밤ᄃ게 잠들어 있어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "target-misconception: no distractor has '일찍' written where '게' is needed"
+            "target-misconception: no distractor has '갔습니다' added where nothing belongs"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 밤[게] 조용히 책을 읽어요.\", \"distractors\": [\"친구가 밤일찍 조용히 책을 읽어요.\", \"친구가 밤르게 조용히 책을 읽어요.\", \"친구가 밤ᄃ게 조용히 책을 읽어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"책을 읽으면서 [읽]았어요.\", \"distractors\": [\"읽었네\", \"읽었습니다\", \"읽다가갔어요\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 밤일찍 조용히 책을 읽어요.' wrong-category: MULTI, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 밤르게 조용히 책을 읽어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
-            "wrong-category: '친구가 밤ᄃ게 조용히 책을 읽어요.' wrong-category: MULTI, skill tests ['CONJ', 'END']",
-            "target-misconception: no distractor has '일찍' written where '게' is needed"
+            "wrong-category: distractor '읽었네' -- it makes a noun or counter mistake, but this question tests a conjugation or verb or adjective ending mistake",
+            "wrong-category: distractor '읽었습니다' -- it makes a noun or counter mistake, but this question tests a conjugation or verb or adjective ending mistake",
+            "wrong-category: distractor '읽다가갔어요' -- it makes a noun or counter mistake, but this question tests a conjugation or verb or adjective ending mistake",
+            "target-misconception: no distractor has '갔습니다' added where nothing belongs"
           ]
         }
       ]
@@ -652,92 +658,88 @@
       },
       "revisions_used": 0,
       "rejection_reasons": {
-        "wrong-category": 28,
-        "not-minimal": 8,
-        "target": 1
+        "not-minimal": 14,
+        "wrong-category": 20
       },
       "codes": {},
       "codes_recurring": 0,
       "rejected_examples": [
         {
-          "reply": "```json\n{\n  \"sentence\": \"오늘 날씨[가] 참 좋네요.\",\n  \"distractors\": [\n    \"오늘 날씨[이] 참 좋네요.\",  // Incorrect use of subject marker \"이/가\"\n    \"오늘 날씨[을] 참 좋네요.\",  // Incorrect use of object marker \"을/를\"\n    \"오늘 날씨[와] 참 좋네요.\"   // Incorrect conjunction use with \"와/과\" instead of modifier particle\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 맛있는 [음식을] 먹었어요.\", \"distractors\": [\"음식을 먹었어요\", \"맛있는 음식을 먹었습니다\", \"먹은 음식을 맛있게\"]}\n```",
           "reasons": [
-            "wrong-category: '오늘 날씨이 참 좋네요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '오늘 날씨을 참 좋네요.' wrong-category: MULTI, skill tests ['END']",
-            "wrong-category: '오늘 날씨와 참 좋네요.' wrong-category: PART, skill tests ['END']"
+            "not-minimal: distractor '음식을 먹었어요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '맛있는 음식을 먹었습니다' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '먹은 음식을 맛있게' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관[에서] 공부를 해요.\",\n  \"distractors\": [\n    \"친구가 도서관이 공부를 해요.\",  // Incorrect use of subject marker \"이/가\"\n    \"친구가 도서관을 공부를 해요.\",  // Incorrect use of object marker \"을/를\"\n    \"친구가 도서관과 공부를 해요.\",  // Incorrect conjunction use with \"과/와\" instead of modifier particle\n    \"친구가 도서관에서 공부를 합니다.\",  // Incorrect verb form usage instead of focusing on -(으)ᄂ modifier\n    \"친구 도서관에서 공부를 해요.\",  // Missing subject marker \"가/이/은/는\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"그녀는 친절한 [선생님]이에요.\", \"distractors\": [\"친절한 선생님은\", \"선생님이 친절해요\", \"친절한 선생님을\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 도서관이 공부를 해요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구가 도서관을 공부를 해요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구가 도서관과 공부를 해요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구 도서관에서 공부를 해요.' wrong-category: PART, skill tests ['END']"
+            "not-minimal: distractor '친절한 선생님은' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '선생님이 친절해요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '친절한 선생님을' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 조용한 도서관[에서] 공부를 해요.\",\n  \"distractors\": [\n    \"조용한 도서관이 친구가 공부를 해요.\",  // Incorrect use of subject marker \"이/가\"\n    \"조용한 도서관을 친구가 공부를 해요.\",  // Incorrect use of object marker \"을/를\"\n    \"조용한 도서관과 친구가 공부를 해요.\",  // Incorrect conjunction use with \"과/와\" instead of modifier particle\n    \"조용한 도서관에서 친구가 공부를 합니다.\",  // Incorrect verb form usage instead of focusing on -(으)ᄂ modifier\n    \"도서관 조용한 곳에서 친구가 공부를 해요.\"  // Incorrect placement of modifier, not adhering to the specific",
+          "reply": "```json\n{\"sentence\": \"나는 맛있는 [밥]을 먹었어요.\", \"distractors\": [\"밥이 맛있어요\", \"맛있는 나를\", \"밥을 맛있게\"]}\n```",
           "reasons": [
-            "not-minimal: '조용한 도서관이 친구가 공부를 해요.' not-minimal: 2 edits",
-            "not-minimal: '조용한 도서관을 친구가 공부를 해요.' not-minimal: 2 edits",
-            "not-minimal: '조용한 도서관과 친구가 공부를 해요.' not-minimal: 2 edits",
-            "not-minimal: '조용한 도서관에서 친구가 공부를 합니다.' not-minimal: 3 edits",
-            "not-minimal: '도서관 조용한 곳에서 친구가 공부를 해요.' not-minimal: 3 edits"
+            "wrong-category: distractor '밥이 맛있어요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '맛있는 나를' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '밥을 맛있게' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구[가] 책을 읽어요.\", \"distractors\": [\"친구[를] 책을 읽어요.\", \"친구[은/는] 책을 읽어요.\", \"친구[와] 책을 읽어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"오늘 밤 [편안한] 집에서 영화를 볼 거예요.\", \"distractors\": [\"편안한집\", \"편안한을\", \"편안한에서\"]}\n```",
           "reasons": [
-            "wrong-category: '친구를 책을 읽어요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구은/는 책을 읽어요.' wrong-category: MULTI, skill tests ['END']",
-            "wrong-category: '친구와 책을 읽어요.' wrong-category: PART, skill tests ['END']"
+            "wrong-category: distractor '편안한집' -- it makes a noun or counter mistake, but this question tests a verb or adjective ending mistake",
+            "wrong-category: distractor '편안한을' -- it makes a particle mistake, but this question tests a verb or adjective ending mistake",
+            "wrong-category: distractor '편안한에서' -- it makes a particle mistake, but this question tests a verb or adjective ending mistake"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구[가] 공원[에서] 산책을 해요.\", \"distractors\": [\"친구[을] 공원[에서] 산책을 해요.\", \"친구[는/는] 공원[에서] 산책을 해요.\", \"친구[와] 공원[에서] 산책을 해요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구가 [즐거운] 여행을 했어요.\", \"distractors\": [\"즐거운여행했어요\", \"즐거운을했어요\", \"즐거운이했어요\"]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "not-minimal: distractor '즐거운여행했어요' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '즐거운을했어요' -- it makes a conjugation mistake, but this question tests a verb or adjective ending mistake",
+            "wrong-category: distractor '즐거운이했어요' -- it makes a conjugation mistake, but this question tests a verb or adjective ending mistake"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 [공원에서] 조용히 책을 읽어요.\", \"distractors\": [\"친구가 공원에서 [책을 읽어요.]\", \"친구가 [산책하면서] 공원에서 책을 읽어요.\", \"친구가 공원에서 [읽는 책]은 조용해요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 [맛있는] 음식을 먹었어요.\", \"distractors\": [\"맛있는음식을먹었어요\", \"맛있는을먹었어요\", \"맛있는이먹었어요\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 공원에서 책을 읽어요.' wrong-category: ADV, skill tests ['END']",
-            "not-minimal: '친구가 산책하면서 공원에서 책을 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '친구가 공원에서 읽는 책은 조용해요.' not-minimal: 2 edits"
+            "not-minimal: distractor '맛있는음식을먹었어요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '맛있는을먹었어요' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '맛있는이먹었어요' -- it changes 3 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 멋진[옷을] 입고 왔어요.\", \"distractors\": [\"멋진집을\", \"멋진옷을을\", \"멋진옷을로\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"오늘 날씨가 [맑아서] 산책하기 좋아요.\", \"distractors\": [\"흐려서\", \"어떨어져서\", \"조용히해서\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 멋진집을 입고 왔어요.' wrong-category: NOUN, skill tests ['END']",
-            "wrong-category: '친구가 멋진옷을을 입고 왔어요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구가 멋진옷을로 입고 왔어요.' wrong-category: PART, skill tests ['END']"
+            "wrong-category: distractor '흐려서' -- it makes a adjective choice mistake, but this question tests a verb or adjective ending mistake",
+            "wrong-category: distractor '어떨어져서' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '조용히해서' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 멋진[옷을] 입고 왔어요.\", \"distractors\": [\"친구가 멋진집을 입고 왔어요.\", \"친구가 멋진옷을을 입고 왔어요.\", \"친구가 멋진옷을로 입고 왔어요.\"]}\n```\n\nTo better adhere to the guidelines while ensuring each distractor clearly tests a different mistake related to the specific grammar point of using the particle -(으)ᄅ for adjectives modifying nouns, here's a refined version:\n\n```json\n{\"sentence\": \"친구가 예쁜[옷을] 샀습니다.\", \"distractors\": [\"친구가 예쁜집을 샀습니다.\", \"친구가 예쁜옷을을 샀습니다.\", \"친구가 예쁜옷을로 샀습니다.\"]}\n```\n\nExplanation:\n- **Sentence**: ",
+          "reply": "```json\n{\"sentence\": \"친구가 집에 [가서] 밥을 먹었어요.\", \"distractors\": [\"집으로가서\", \"갔다가\", \"가고서\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 멋진집을 입고 왔어요.' wrong-category: NOUN, skill tests ['END']",
-            "wrong-category: '친구가 멋진옷을을 입고 왔어요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구가 멋진옷을로 입고 왔어요.' wrong-category: PART, skill tests ['END']"
+            "wrong-category: distractor '집으로가서' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 예쁜[옷을] 입었습니다.\", \"distractors\": [\"친구가 멋진집을 입었습니다.\", \"친구가 예쁜옷을을 입었습니다.\", \"친구가 예쁜옷을로 입었습니다.\"]}\n```\n\nExplanation:\n- **Sentence**: \"친구가 예쁜[옷을] 입었습니다.\" (Correct usage of the particle -(으)ᄅ to modify a noun.)\n- **Distractors**:\n  - \"친구가 멋진집을 입었습니다.\" (Incorrect category mistake: '집' is not a suitable noun for clothing context.)\n  - \"친구가 예쁜옷을을 입었습니다.\" (Redundant particle usage mistake: unnecessary repetition of -(으)ᄅ.)\n  - \"친구가 예쁜옷을로 입었습니다.\" (Incorrect particle usage mistake: '-",
+          "reply": "```json\n{\"sentence\": \"나는 학교 [에서] 친구를 만났어요.\", \"distractors\": [\"학교에\", \"학교로\", \"학교와\" ]}\n```",
           "reasons": [
-            "not-minimal: '친구가 멋진집을 입었습니다.' not-minimal: 2 edits",
-            "wrong-category: '친구가 예쁜옷을을 입었습니다.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구가 예쁜옷을로 입었습니다.' wrong-category: PART, skill tests ['END']"
+            "wrong-category: distractor '학교에' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '학교로' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '학교와' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구[가] 책을 읽어요.\", \"distractors\": [\"친구[을] 책을 읽어요.\", \"친구[를] 책을 읽어요.\", \"친구[에게] 책을 읽어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구가 맛있는 [음식을] 먹어요.\", \"distractors\": [\"음식을 먹어요\", \"음식을 먹었어요\", \"음식을 먹는다\"]}\n```",
           "reasons": [
-            "wrong-category: '친구을 책을 읽어요.' wrong-category: MULTI, skill tests ['END']",
-            "wrong-category: '친구를 책을 읽어요.' wrong-category: PART, skill tests ['END']",
-            "wrong-category: '친구에게 책을 읽어요.' wrong-category: PART, skill tests ['END']"
+            "wrong-category: distractor '음식을 먹어요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "not-minimal: distractor '음식을 먹었어요' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '음식을 먹는다' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
           ]
         }
       ]
@@ -763,83 +765,87 @@
       },
       "revisions_used": 0,
       "rejection_reasons": {
-        "wrong-category": 17,
-        "not-minimal": 8,
-        "target": 3
+        "wrong-category": 20,
+        "not-minimal": 10,
+        "format": 2
       },
       "codes": {},
       "codes_recurring": 0,
       "rejected_examples": [
         {
-          "reply": "```json\n{\"sentence\": \"강아지가 집[에서] 잠을 자요.\", \"distractors\": [\"강아지은 집에서 잠을 자요.\", \"강아지가 집에 잠을 자구요.\", \"강아지가 집에서 놀아요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 학교에 [갑니다/가고 있습니다/가는 중입니다] 친구들을 만났어요.\", \"distractors\": [\"갑니다\", \"가고 있어요\", \"가는 거예요\"]}\n```",
           "reasons": [
-            "wrong-category: '강아지은 집에서 잠을 자요.' wrong-category: MULTI, skill tests ['PART']",
-            "not-minimal: '강아지가 집에 잠을 자구요.' not-minimal: 2 edits",
-            "wrong-category: '강아지가 집에서 놀아요.' wrong-category: MULTI, skill tests ['PART']"
+            "wrong-category: distractor '갑니다' -- it is not one particle mistake; it mixes in other words or forms",
+            "not-minimal: distractor '가고 있어요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '가는 거예요' -- it changes 3 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 카페[에서] 공부해요.\", \"distractors\": [\"친구은 카페에서 공부해요.\", \"친구가 카페에 공부하고 있어요.\", \"친구가 식당에서 공부해요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 [밥을/밥에] 먹었어요.\", \"distractors\": [\"돈을\", \"집을\", \"책을\"]}\n```",
           "reasons": [
-            "wrong-category: '친구은 카페에서 공부해요.' wrong-category: MULTI, skill tests ['PART']",
-            "not-minimal: '친구가 카페에 공부하고 있어요.' not-minimal: 2 edits",
-            "wrong-category: '친구가 식당에서 공부해요.' wrong-category: NOUN, skill tests ['PART']"
+            "not-minimal: distractor '돈을' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '집을' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '책을' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 도서관[에서] 책을 읽어요.\", \"distractors\": [\"친구는 도서관에서 책을 읽어요.\", \"친구가 책을 읽고 있어요, 도서관에서.\", \"친구가 교실에서 책을 읽어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"그녀는 학교 [에/에서] 가는 길을 알아요.\", \"distractors\": [\"학교로\", \"학교에서\", \"학교를\"]]}\n```",
           "reasons": [
-            "not-minimal: '친구가 책을 읽고 있어요, 도서관에서.' not-minimal: 2 edits",
-            "wrong-category: '친구가 교실에서 책을 읽어요.' wrong-category: NOUN, skill tests ['PART']"
+            "format: the reply was not a JSON object"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"나는 오늘[책]을 읽어요.[책]\", \"distractors\": [\"영화\", \"음식\", \"친구\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 [이/가] 책을 읽어요.\", \"distractors\": [\"은/는\", \"을\", \"책\"]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "not-minimal: distractor '은/는' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '을' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '책' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"나는 오늘 [책]을 읽고 있어요.\", \"distractors\": [\"나는 오늘 영화를 보고 있어요.\", \"나는 오늘 음식을 먹고 있어요.\", \"나는 오늘 친구를 만나고 있어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"그녀는 [이/가] 좋은 친구라고 생각해요.\", \"distractors\": [\"은/는\", \"좋은\", \"생각해요\"]}\n```",
           "reasons": [
-            "not-minimal: '나는 오늘 영화를 보고 있어요.' not-minimal: 2 edits",
-            "not-minimal: '나는 오늘 음식을 먹고 있어요.' not-minimal: 2 edits",
-            "not-minimal: '나는 오늘 친구를 만나고 있어요.' not-minimal: 2 edits"
+            "not-minimal: distractor '은/는' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '좋은' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '생각해요' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 카페 [에서] 이야기하고 있어요.\", \"distractors\": [\"친구가 카페에 가고 있어요.\", \"친구가 책을 읽고 있어요.\", \"친구가 음식을 주문하고 있어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"오늘 [이/가] 날씨가 참 좋네요.\", \"distractors\": [\"은/는\", \"날씨가\", \"참\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 카페에 가고 있어요.' wrong-category: MULTI, skill tests ['PART']",
-            "wrong-category: '친구가 책을 읽고 있어요.' wrong-category: MULTI, skill tests ['PART']",
-            "wrong-category: '친구가 음식을 주문하고 있어요.' wrong-category: MULTI, skill tests ['PART']"
+            "not-minimal: distractor '은/는' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '날씨가' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '참' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구[는] 맛있는 식당[을] 찾아요.\", \"distractors\": [\"친구[에서] 맛있는 식당[을] 찾아요.\", \"친구[이] 맛있는 식당[을] 찾아요.\", \"친구[는] 좋은 식당[을] 찾아요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 [이/는] 학생입니다.\", \"distractors\": [\"이\", \"는\", \"을\"}]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "format: the reply was not a JSON object"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 맛있는 식당을 찾아요.[는]\", \"distractors\": [\"친구에서 맛있는 식당을 찾아요.[는]\", \"친구이 맛있는 식당을 찾아요.[는]\", \"친구가 좋은 식당을 찾아요.[는]\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"오늘 친구 [와/과] 영화를 봤어요.\", \"distractors\": [\"와\", \"과\", \"을\"]}\n```",
           "reasons": [
-            "target: the brackets must be inside the sentence, not after it"
+            "wrong-category: distractor '와' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '과' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '을' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 맛있는 식당을 찾아요 [는] \", \"distractors\": [\"친구가 맛있는 식당을 찾아요 [을]\", \"친구가 맛있는 식당을 찾아요 [가]\", \"친구가 맛있는 식당을 찾아요 [을까요]\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 학교 [에서/에] 책을 읽어요.\", \"distractors\": [\"에서 책을\", \"에 책을 읽어요\", \"에서 읽어요\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 맛있는 식당을 찾아요 을' wrong-category: MULTI, skill tests ['PART']",
-            "wrong-category: '친구가 맛있는 식당을 찾아요 가' wrong-category: MULTI, skill tests ['PART']",
-            "wrong-category: '친구가 맛있는 식당을 찾아요 을까요' wrong-category: MULTI, skill tests ['PART']"
+            "wrong-category: distractor '에서 책을' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '에 책을 읽어요' -- it is not one particle mistake; it mixes in other words or forms",
+            "wrong-category: distractor '에서 읽어요' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구[는] 책을 읽는 것을 좋아해요.\",\n  \"distractors\": [\n    \"친구이 책을 읽는 것을 좋아해요.\",\n    \"친구가 책을 읽는 것을 좋아해요.\",\n    \"친구는 책을 읽는 것을 좋아합니다.\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 [주제/주체] 책을 읽고 있어요.\", \"distractors\": [\"주제\", \"주체는\", \"책을\"]}\n```",
           "reasons": [
-            "wrong-category: '친구이 책을 읽는 것을 좋아해요.' wrong-category: MULTI, skill tests ['PART']",
-            "wrong-category: '친구는 책을 읽는 것을 좋아합니다.' wrong-category: END, skill tests ['PART']"
+            "wrong-category: distractor '주제' -- it is not one particle mistake; it mixes in other words or forms",
+            "not-minimal: distractor '주체는' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '책을' -- it is not one particle mistake; it mixes in other words or forms"
           ]
         }
       ]
@@ -866,89 +872,89 @@
       "revisions_used": 0,
       "rejection_reasons": {
         "wrong-category": 25,
-        "not-minimal": 11
+        "target": 1,
+        "not-minimal": 5,
+        "format": 1
       },
       "codes": {},
       "codes_recurring": 0,
       "rejected_examples": [
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관[에서] 책을 읽어요.\",\n  \"distractors\": [\n    \"도서관으로\",\n    \"도서관을\",\n    \"도서관에게\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 친구[와] 영화를 봤어요.\", \"distractors\": [\"와 영화\", \"와 봤어요\", \"친구 와\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 도서관으로 책을 읽어요.' wrong-category: PART, skill tests ['VERB']",
-            "wrong-category: '친구가 도서관을 책을 읽어요.' wrong-category: PART, skill tests ['VERB']",
-            "wrong-category: '친구가 도서관에게 책을 읽어요.' wrong-category: PART, skill tests ['VERB']"
+            "wrong-category: distractor '와 영화' -- it makes a noun or counter mistake, but this question tests a verb choice mistake",
+            "wrong-category: distractor '와 봤어요' -- it is not one verb choice mistake; it mixes in other words or forms",
+            "wrong-category: distractor '친구 와' -- it makes a spelling mistake, but this question tests a verb choice mistake"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관[에서] 책을 찾고 있어요.\",\n  \"distractors\": [\n    \"도서관으로 책을\",\n    \"도서관을 책을\",\n    \"도서관에게 책을\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"그녀는 책[을] 읽는 것을 좋아해요.\", \"distractors\": [\"을 읽는 것\", \"읽는 책을\", \"좋아하는 책을\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 도서관으로 책을 책을 찾고 있어요.' wrong-category: MULTI, skill tests ['VERB']",
-            "wrong-category: '친구가 도서관을 책을 책을 찾고 있어요.' wrong-category: MULTI, skill tests ['VERB']",
-            "wrong-category: '친구가 도서관에게 책을 책을 찾고 있어요.' wrong-category: MULTI, skill tests ['VERB']"
+            "wrong-category: distractor '을 읽는 것' -- it is not one verb choice mistake; it mixes in other words or forms",
+            "wrong-category: distractor '읽는 책을' -- it is not one verb choice mistake; it mixes in other words or forms",
+            "wrong-category: distractor '좋아하는 책을' -- it is not one verb choice mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관[에서] 책을 읽고 있어요.\",\n  \"distractors\": [\n    \"친구가 도서관으로 책을 읽고 있어요.\",\n    \"친구가 도서관을 책을 읽고 있어요.\",\n    \"친구가 도서관에게 책을 읽고 있어요.\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"[읽다] 학교 책을 매일 봐요.\", \"distractors\": [\"보다\", \"읽고 있다\", \"읽어본다\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 도서관으로 책을 읽고 있어요.' wrong-category: PART, skill tests ['VERB']",
-            "wrong-category: '친구가 도서관을 책을 읽고 있어요.' wrong-category: PART, skill tests ['VERB']",
-            "wrong-category: '친구가 도서관에게 책을 읽고 있어요.' wrong-category: PART, skill tests ['VERB']"
+            "target: the brackets must be inside the sentence, not after it"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관[에서] 책을 읽어요.\",\n  \"distractors\": [\n    \"도서관에 책을 읽어요.\",\n    \"도서관을 읽어요 책.\",\n    \"도서관에서 책을 봅니다.\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 저녁에 [밥을] 먹어요.\", \"distractors\": [\"저녁을\", \"밥을 먹어요\", \"밥을 먹습니다\"]}\n```",
           "reasons": [
-            "not-minimal: '도서관에 책을 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '도서관을 읽어요 책.' not-minimal: 3 edits",
-            "not-minimal: '도서관에서 책을 봅니다.' not-minimal: 2 edits"
+            "wrong-category: distractor '저녁을' -- it makes a noun or counter mistake, but this question tests a verb choice mistake",
+            "wrong-category: distractor '밥을 먹어요' -- it is not one verb choice mistake; it mixes in other words or forms",
+            "not-minimal: distractor '밥을 먹습니다' -- it changes 2 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 학교[에서] 노트를 적어요.\",\n  \"distractors\": [\n    \"학교에 노트를 적어요.\",\n    \"학교를 적어요 노트.\",\n    \"학교에서 노트를 봐요.\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"친구가 영화를 [보러] 갑니다.\", \"distractors\": [\"보러 가다\", \"보러 갑니다\", \"영화를 보러\"]}\n```",
           "reasons": [
-            "not-minimal: '학교에 노트를 적어요.' not-minimal: 2 edits",
-            "not-minimal: '학교를 적어요 노트.' not-minimal: 3 edits",
-            "not-minimal: '학교에서 노트를 봐요.' not-minimal: 2 edits"
+            "wrong-category: distractor '보러 가다' -- it is not one verb choice mistake; it mixes in other words or forms",
+            "wrong-category: distractor '보러 갑니다' -- it is not one verb choice mistake; it mixes in other words or forms",
+            "wrong-category: distractor '영화를 보러' -- it is not one verb choice mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관[에서] 책을 읽어요.\",\n  \"distractors\": [\n    \"도서관에 책을 읽어요.\",  // Incorrect preposition usage\n    \"도서관을 읽어요 책.\",  // Incorrect word order\n    \"친구가 카페[에서] 책을 읽어요.\"  // Incorrect location noun, changing context\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 저녁 [을] 먹습니다.\", \"distractors\": [\"을 먹어요\", \"을 먹었습니다\", \"을 먹는다\"]}\n```",
           "reasons": [
-            "not-minimal: '도서관에 책을 읽어요.' not-minimal: 2 edits",
-            "not-minimal: '도서관을 읽어요 책.' not-minimal: 3 edits",
-            "wrong-category: '친구가 카페에서 책을 읽어요.' wrong-category: NOUN, skill tests ['VERB']"
+            "wrong-category: distractor '을 먹어요' -- it is not one verb choice mistake; it mixes in other words or forms",
+            "not-minimal: distractor '을 먹었습니다' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '을 먹는다' -- it is not one verb choice mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관[에서] 책을 읽어요.\",\n  \"distractors\": [\n    \"친구가 도서관으로 책을 읽어요.\",\n    \"친구가 도서관에 책을 읽어요.\",\n    \"친구가 도서관에서 책을 봐봐요.\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 저녁에 [밥을] 먹어요.\", \"distractors\": [\"밥을 먹어요\", \"밥을 먹습니다\", \"저녁을 먹어요\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 도서관으로 책을 읽어요.' wrong-category: PART, skill tests ['VERB']",
-            "wrong-category: '친구가 도서관에 책을 읽어요.' wrong-category: PART, skill tests ['VERB']",
-            "wrong-category: '친구가 도서관에서 책을 봐봐요.' wrong-category: MULTI, skill tests ['VERB']"
+            "wrong-category: distractor '밥을 먹어요' -- it is not one verb choice mistake; it mixes in other words or forms",
+            "not-minimal: distractor '밥을 먹습니다' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '저녁을 먹어요' -- it changes 3 places in the sentence; it must replace only the bracketed part"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 집[에서] 영화를 봐요.\",\n  \"distractors\": [\n    \"친구가 집으로 영화를 봐요.\",  // Incorrect particle usage\n    \"친구가 집에 영화를 봅니다.\",  // Incorrect verb form\n    \"친구가 거실에서 영화를 봐요.\" // Incorrect location specificity altering the verb collocation\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"그녀는 책을 [읽습니다] 봤어요.\", \"distractors\": [\"책을 봤어요\", \"책을 읽어요요\", \"읽습니다 책\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 집으로 영화를 봐요.' wrong-category: PART, skill tests ['VERB']",
-            "not-minimal: '친구가 집에 영화를 봅니다.' not-minimal: 2 edits",
-            "wrong-category: '친구가 거실에서 영화를 봐요.' wrong-category: NOUN, skill tests ['VERB']"
+            "wrong-category: distractor '책을 봤어요' -- it is not one verb choice mistake; it mixes in other words or forms",
+            "not-minimal: distractor '책을 읽어요요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '읽습니다 책' -- it makes a noun or counter mistake, but this question tests a verb choice mistake"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 책상[위]에서 책을 읽어요.\",\n  \"distractors\": [\n    \"친구가 책상으로 책을 읽어요.\",  // Incorrect particle usage\n    \"친구가 책상에 책을 읽습니다.\",  // Incorrect verb form\n    \"친구가 도서관 책상에서 책을 읽어요.\" // Incorrect context specificity altering verb collocation\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"친구가 영화를 [보러] 갔어요.\", \"distractors\": [\"보러 갔\", \"보러 갔어요\", \"보러 가\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 책상으로 책을 읽어요.' wrong-category: MULTI, skill tests ['VERB']",
-            "not-minimal: '친구가 책상에 책을 읽습니다.' not-minimal: 2 edits",
-            "not-minimal: '친구가 도서관 책상에서 책을 읽어요.' not-minimal: 2 edits"
+            "wrong-category: distractor '보러 갔' -- it is not one verb choice mistake; it mixes in other words or forms",
+            "wrong-category: distractor '보러 갔어요' -- it is not one verb choice mistake; it mixes in other words or forms",
+            "wrong-category: distractor '보러 가' -- it is not one verb choice mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관[에서] 책을 읽어요.\",\n  \"distractors\": [\n    \"도서관으로\",\n    \"도서관에게\",\n    \"도서관을\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"친구에게 책[을] 선물했어요.\", \"distractors\": [\"을을\", \"을드\", \"을게\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 도서관으로 책을 읽어요.' wrong-category: PART, skill tests ['VERB']",
-            "wrong-category: '친구가 도서관에게 책을 읽어요.' wrong-category: PART, skill tests ['VERB']",
-            "wrong-category: '친구가 도서관을 책을 읽어요.' wrong-category: PART, skill tests ['VERB']"
+            "wrong-category: distractor '을을' -- it makes a particle mistake, but this question tests a verb choice mistake",
+            "wrong-category: distractor '을드' -- it makes a noun or counter mistake, but this question tests a verb choice mistake",
+            "wrong-category: distractor '을게' -- it makes a noun or counter mistake, but this question tests a verb choice mistake"
           ]
         }
       ]
@@ -956,98 +962,92 @@
     "noun_counter": {
       "accepted_untargeted": {
         "k": 1,
-        "n": 4,
-        "rate": 0.25,
+        "n": 3,
+        "rate": 0.3333333333333333,
         "ci95": [
-          0.0456,
-          0.6994
+          0.0615,
+          0.7923
         ]
       },
       "accepted_targeted": {
         "k": 0,
-        "n": 0,
-        "rate": null,
+        "n": 1,
+        "rate": 0.0,
         "ci95": [
           0.0,
-          1.0
+          0.7935
         ]
       },
-      "revisions_used": 1,
+      "revisions_used": 0,
       "rejection_reasons": {
-        "not-minimal": 4,
-        "wrong-category": 5,
-        "target": 6
+        "wrong-category": 10,
+        "ambiguous": 1,
+        "format": 3
       },
       "codes": {
-        "NOUN:주>시간": 1,
-        "NOUN:주>년": 1,
-        "NOUN:주>장": 1
+        "NOUN:달>년": 1,
+        "NOUN:달>일": 1,
+        "NOUN:달>시간": 1
       },
       "codes_recurring": 0,
       "rejected_examples": [
         {
-          "reply": "```json\n{\"sentence\": \"친구 다섯[명]이 모여서 이야기를 나누고 있어요.\", \"distractors\": [\"친구 다섯[그릇]이 모여\", \"친구 다섯[시간]이 지나\", \"친구 다섯[색깔]이 다양해\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구가 집에 [하나] 책을 가져왔어요.\", \"distractors\": [\"두 개\", \"셋\", \"하나(으)로\"]}\n```",
           "reasons": [
-            "not-minimal: '친구 다섯친구 다섯그릇이 모여이 모여서 이야기를 나누고 있어요.' not-minimal: 2 edits",
-            "not-minimal: '친구 다섯친구 다섯시간이 지나이 모여서 이야기를 나누고 있어요.' not-minimal: 2 edits",
-            "not-minimal: '친구 다섯친구 다섯색깔이 다양해이 모여서 이야기를 나누고 있어요.' not-minimal: 2 edits"
+            "wrong-category: distractor '두 개' -- it is not one noun or counter mistake; it mixes in other words or forms",
+            "wrong-category: distractor '하나(으)로' -- it is not one noun or counter mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"다섯 명의 친구[들이] 함께 영화를 보러 갔어요.\", \"distractors\": [\"다섯 친구 다섯들이\", \"다섯 명의 친구 다섯시간\", \"다섯 명의 친구 다섯색깔\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 책을 [세 권] 읽었어요.\", \"distractors\": [\"하나 권\", \"두 권\", \"열 권\"]}\n```",
           "reasons": [
-            "wrong-category: '다섯 명의 친구 다섯시간' wrong-category: MULTI, skill tests ['NOUN']",
-            "wrong-category: '다섯 명의 친구 다섯색깔' wrong-category: MULTI, skill tests ['NOUN']"
+            "wrong-category: distractor '하나 권' -- it is not one noun or counter mistake; it mixes in other words or forms",
+            "wrong-category: distractor '두 권' -- it makes a MOD mistake, but this question tests a noun or counter mistake",
+            "wrong-category: distractor '열 권' -- it is not one noun or counter mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"다섯 개의 사과[들이] 책상 위에 있어요.\", \"distractors\": [\"다섯 개의 사과 다섯명이\", \"다섯 개의 사과 다섯가지 색깔\", \"다섯 개의 사과 다섯시\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"그녀는 사과를 [세 개] 먹었어요.\", \"distractors\": [\"하나 개\", \"두 개\", \"열 개\"]}\n```",
           "reasons": [
-            "not-minimal: '다섯 개의 사과 다섯명이' not-minimal: 2 edits",
-            "wrong-category: '다섯 개의 사과 다섯가지 색깔' wrong-category: MULTI, skill tests ['NOUN']",
-            "wrong-category: '다섯 개의 사과 다섯시' wrong-category: MULTI, skill tests ['NOUN']"
+            "wrong-category: distractor '하나 개' -- it is not one noun or counter mistake; it mixes in other words or forms",
+            "wrong-category: distractor '두 개' -- it makes a MOD mistake, but this question tests a noun or counter mistake",
+            "wrong-category: distractor '열 개' -- it is not one noun or counter mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구 다섯[명]이 모임에 왔어요.[]\", \"distractors\": [\"친구 다섯개[가] 모임에 왔어요.\", \"친구 다섯[번] 모임에 왔어요.\", \"친구 다섯[가지] 모임에 왔어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 이번 [시간]에 책을 읽을 거예요.\", \"distractors\": [\"일\", \"달\", \"분\"]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "wrong-category: distractor '분' -- it is not one noun or counter mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"다섯 명의 친구[들이] 모임에 왔어요.[]\", \"distractors\": [\"다섯 개의 친구들이 모임에 왔어요.\", \"다섯 번 친구들이 모임에 왔어요.\", \"다섯 가지 친구들이 모임에 왔어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"우리는 이번 [년]에 결혼할 계획이에요.\", \"distractors\": [\"달\", \"시간\", \"일\"]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "ambiguous: '달' reads at least as naturally as the key '년'; it may also be correct"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"다섯 명의 친구들이[모임에] 왔어요.[]\", \"distractors\": [\"다섯 개의 친구들이 모임에 왔어요.\", \"다섯 번 친구들이 모임에 왔어요.\", \"모임의 다섯 명의 친구들이 왔어요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 이번 [시간]에 회의에 참석할 거예요.\", \"distractors\": [\"일\", \"달\", \"분\"]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "wrong-category: distractor '분' -- it is not one noun or counter mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"오늘 밤 세 개[의] 과자를 먹었어요.[개]\", \"distractors\": [\"세 개의 과자를\", \"과자 세 개를\", \"먹은 과자 세 개\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 이번 [시간]에 시험을 볼 거예요.\", \"distractors\": [\"년\", \"달\", \"일\"]]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "format: the reply was not a JSON object"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구와 함께 여섯 번[번] 영화를 봤어요.[번]\", \"distractors\": [\"여섯 번의 영화를\", \"영화 여섯 번을\", \"봤던 여섯 번의 영화\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"우리는 이번 [년]에 다시 만나기로 했어요.\", \"distractors\": [\"달\", \"시간\", \"일\"]]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
+            "format: the reply was not a JSON object"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"여섯 명의 친구들과 일곱 번[번] 파티를 했어요.[번]\", \"distractors\": [\"일곱 번 파티를\", \"파티 일곱 번을\", \"했던 일곱 번의 파티\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"그녀는 이번 [시간]에 회의에 참석할 거예요.\", \"distractors\": [\"달\", \"년\", \"일\"]]}\n```",
           "reasons": [
-            "target: put square brackets around exactly one part of the sentence"
-          ]
-        },
-        {
-          "reply": "```json\n{\"sentence\": \"나는 이번 [달]에 두 권의 책을 읽었어요.\", \"distractors\": [\"년\", \"시간\", \"사람\"]}\n```",
-          "reasons": [
-            "wrong-category: '나는 이번 사람에 두 권의 책을 읽었어요.' wrong-category: MULTI, skill tests ['NOUN']"
+            "format: the reply was not a JSON object"
           ]
         }
       ]
@@ -1071,89 +1071,91 @@
           0.7935
         ]
       },
-      "revisions_used": 0,
+      "revisions_used": 1,
       "rejection_reasons": {
-        "not-minimal": 5,
-        "wrong-category": 19,
-        "target-misconception": 3
+        "wrong-category": 13,
+        "not-minimal": 4,
+        "target": 2,
+        "format": 1,
+        "target-misconception": 2
       },
       "codes": {
-        "END:>빠르게": 1,
-        "END:>조용하게": 1,
-        "END:>뛰어": 1
+        "END:>있다": 1,
+        "END:>있어요": 1,
+        "END:>있어요요": 1
       },
       "codes_recurring": 0,
       "rejected_examples": [
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 조용히[게] 책을 읽어요.\",\n  \"distractors\": [\n    \"친구가 조용히 책을 읽습니다.\",\n    \"친구가 조용히하게 책을 읽어요.\",\n    \"친구가 조용히 책을 읽는다요.\"\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"나는 책을 [읽게] 읽었어요.\", \"distractors\": [\"읽었어요\", \"읽는 중에\", \"읽을 거예요\"]}\n```",
           "reasons": [
-            "not-minimal: '친구가 조용히 책을 읽습니다.' not-minimal: 2 edits",
-            "not-minimal: '친구가 조용히 책을 읽는다요.' not-minimal: 2 edits"
+            "wrong-category: distractor '읽는 중에' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '읽을 거예요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 조용히[게] 이야기해요.\",\n  \"distractors\": [\n    \"친구가 조용히 이야기합니다.\",  // Incorrect use of verb ending instead of adverb marker\n    \"친구가 조용히하게 이야기해요.\",  // Incorrect insertion of '-게' mid-word\n    \"친구가 조용히 이야기하는거예요.\"  // Overly complex phrasing avoiding '-게' use correctly\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"그녀는 친절하게 [대해] 대화를 나눴어요.\", \"distractors\": [\"친절하게 대해요\", \"대해 이야기해요\", \"친절하게 대화해요\"]}\n```",
           "reasons": [
-            "not-minimal: '친구가 조용히 이야기합니다.' not-minimal: 2 edits",
-            "wrong-category: '친구가 조용히하게 이야기해요.' wrong-category: CONJ, skill tests ['END']",
-            "not-minimal: '친구가 조용히 이야기하는거예요.' not-minimal: 2 edits"
+            "not-minimal: distractor '친절하게 대해요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '대해 이야기해요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '친절하게 대화해요' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\n  \"sentence\": \"친구가 천천히[게] 걸어가요.\",\n  \"distractors\": [\n    \"친구가 천천히 걸어갑니다.\",  // Incorrect verb ending usage instead of '-게'\n    \"친구가 천천히하게 걸어가요.\",  // Incorrect insertion of '-게' mid-word\n    \"친구가 천천히 걷는거예요.\"  // Overly complex phrasing avoiding proper '-게' usage\n  ]\n}\n```",
+          "reply": "```json\n{\"sentence\": \"친구에게 [조용히] 이야기했어요.\", \"distractors\": [\"조용히 하면서\", \"조용히 했습니다\", \"조용히 이야기\"]}\n```",
           "reasons": [
-            "not-minimal: '친구가 천천히 걸어갑니다.' not-minimal: 2 edits",
-            "wrong-category: '친구가 천천히하게 걸어가요.' wrong-category: ADJ, skill tests ['END']",
-            "wrong-category: '친구가 천천히 걷는거예요.' wrong-category: MULTI, skill tests ['END']"
+            "wrong-category: distractor '조용히 하면서' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "not-minimal: distractor '조용히 했습니다' -- it changes 3 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '조용히 이야기' -- it makes a noun or counter mistake, but this question tests a verb or adjective ending mistake"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"그녀는 조용히[읽어요] 책을 봤어요.\", \"distractors\": [\"크게읽어요\", \"빨리읽어요\", \"부드럽게읽어요\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구가 [천천히] 걸어요.\", \"distractors\": [\"조용히\", \"빠르게\", \"기쁘게\"]}\n```",
           "reasons": [
-            "wrong-category: '그녀는 조용히빨리읽어요 책을 봤어요.' wrong-category: ADV, skill tests ['END']"
+            "wrong-category: distractor '조용히' -- it makes a ADV mistake, but this question tests a verb or adjective ending mistake",
+            "wrong-category: distractor '빠르게' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '기쁘게' -- it is not one verb or adjective ending mistake; it mixes in other words or forms"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"그는 천천히[걸어요] 공원을 지나갔어요.\", \"distractors\": [\"빠르게걸어요\", \"화려하게걸어요\", \"부드럽게걸어요\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"책을 [읽는다]는 [재미있게] 읽어요.\", \"distractors\": [\"읽는다로\", \"읽는다들\", \"읽는다들\"]}\n```",
           "reasons": [
-            "wrong-category: '그는 천천히빠르게걸어요 공원을 지나갔어요.' wrong-category: CONJ, skill tests ['END']",
-            "wrong-category: '그는 천천히화려하게걸어요 공원을 지나갔어요.' wrong-category: CONJ, skill tests ['END']",
-            "wrong-category: '그는 천천히부드럽게걸어요 공원을 지나갔어요.' wrong-category: CONJ, skill tests ['END']"
+            "target: put square brackets around exactly one part of the sentence"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"그는 천천히[걸었습니다] 공원을 지나갔어요.\", \"distractors\": [\"빠르게걸었습니다\", \"말했습니다\", \"뛰었습니다\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구와 함께 [놀아요]는 항상 행복합니다.\", \"distractors\": [\"놀아요요\", \"놀아요들\", \"놀아요는\"]]}\n```",
           "reasons": [
-            "wrong-category: '그는 천천히빠르게걸었습니다 공원을 지나갔어요.' wrong-category: CONJ, skill tests ['END']",
-            "wrong-category: '그는 천천히말했습니다 공원을 지나갔어요.' wrong-category: CONJ, skill tests ['END']",
-            "wrong-category: '그는 천천히뛰었습니다 공원을 지나갔어요.' wrong-category: VERB, skill tests ['END']"
+            "format: the reply was not a JSON object"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 조용히[---] 전화를 받아요.\", \"distractors\": [\"친구가 조용히뛰어 전화를 받아요.\", \"친구가 조용히먹는 전화를 받아요.\", \"친구가 조용히읽는 전화를 받아요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"친구가 책을 [읽는게] 즐겁다.\", \"distractors\": [\"읽는다\", \"읽는을\", \"읽는 것\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 조용히뛰어 전화를 받아요.' wrong-category: MULTI, skill tests ['END']",
-            "wrong-category: '친구가 조용히먹는 전화를 받아요.' wrong-category: MULTI, skill tests ['END']",
-            "wrong-category: '친구가 조용히읽는 전화를 받아요.' wrong-category: MULTI, skill tests ['END']",
-            "target-misconception: no distractor has '뛰어' added where nothing belongs"
+            "wrong-category: distractor '읽는 것' -- it makes a particle mistake, but this question tests a verb or adjective ending mistake"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 조용히[---] 이야기를 해요.\", \"distractors\": [\"친구가 조용히뛰어 이야기를 해요.\", \"친구가 조용히밥을 먹어요 이야기를 해요.\", \"친구가 조용히책을 읽어요 이야기를 해요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"책을 [읽는다]처럼 재미있게 놀아요.\", \"distractors\": [\"책을읽는것처럼\", \"책을읽는다요\", \"책을읽는다\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 조용히뛰어 이야기를 해요.' wrong-category: MULTI, skill tests ['END']",
-            "wrong-category: '친구가 조용히밥을 먹어요 이야기를 해요.' wrong-category: MULTI, skill tests ['END']",
-            "wrong-category: '친구가 조용히책을 읽어요 이야기를 해요.' wrong-category: MULTI, skill tests ['END']",
-            "target-misconception: no distractor has '뛰어' added where nothing belongs"
+            "not-minimal: distractor '책을읽는것처럼' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "not-minimal: distractor '책을읽는다요' -- it changes 2 places in the sentence; it must replace only the bracketed part",
+            "wrong-category: distractor '책을읽는다' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "target-misconception: no distractor has '있어요' added where nothing belongs"
           ]
         },
         {
-          "reply": "```json\n{\"sentence\": \"친구가 조용히[---] 산책을 해요.\", \"distractors\": [\"친구가 조용히뛰어 산책을 해요.\", \"친구가 조용히영화를 봐요 산책을 해요.\", \"친구가 조용히노래를 불러 조용히 산책을 해요.\"]}\n```",
+          "reply": "```json\n{\"sentence\": \"그는 조용히 [말합니다] 친구들에게 이야기해요.\", \"distractors\": [\"말합니다친구들에게\", \"말합니다요\", \"말한다\"]}\n```",
           "reasons": [
-            "wrong-category: '친구가 조용히뛰어 산책을 해요.' wrong-category: MULTI, skill tests ['END']",
-            "wrong-category: '친구가 조용히영화를 봐요 산책을 해요.' wrong-category: MULTI, skill tests ['END']",
-            "wrong-category: '친구가 조용히노래를 불러 조용히 산책을 해요.' wrong-category: MULTI, skill tests ['END']",
-            "target-misconception: no distractor has '뛰어' added where nothing belongs"
+            "wrong-category: distractor '말합니다친구들에게' -- it is not one verb or adjective ending mistake; it mixes in other words or forms",
+            "wrong-category: distractor '말합니다요' -- it makes a MOD mistake, but this question tests a verb or adjective ending mistake",
+            "target-misconception: no distractor has '있어요' added where nothing belongs"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"[읽어요] 책을 천천히 읽습니다.\", \"distractors\": [\"읽고 천천히 읽어요\", \"읽고 있어요요\", \"읽는다 천천히\"]}\n```",
+          "reasons": [
+            "target: the brackets must be inside the sentence, not after it"
           ]
         }
       ]
@@ -1162,92 +1164,132 @@
   "items": [
     {
       "skill_id": "particle_loc",
-      "stem": "학생이 학교___ 가는 길이 에요.",
+      "stem": "그녀는 책을 ___ 읽었습니다.",
       "blank_marker": "___",
       "options": {
-        "A": "에서",
-        "B": "으로",
-        "C": "에",
-        "D": "만에"
+        "A": "에",
+        "B": "을",
+        "C": "에서",
+        "D": "로"
       },
       "answer": "C",
       "kagas_code": "PART",
       "option_codes": {
-        "A": "PART:에>에서",
-        "B": "PART:에>으로",
+        "A": "PART:서>",
+        "B": "PART:에서>을",
         "C": null,
-        "D": "PART:>만"
+        "D": "PART:에서>으로"
       },
       "requested_misconception": null
     },
     {
-      "skill_id": "irregular_conj",
-      "stem": "친구가 늦___ 공부했어요.",
+      "skill_id": "honorific",
+      "stem": "교수님께서 ___ 학생들에게 중요한 내용을 설명하셨어요.",
       "blank_marker": "___",
       "options": {
-        "A": "게",
-        "B": "일찍",
-        "C": "자주",
-        "D": "먼저"
+        "A": "말씀하셨습니다",
+        "B": "말씀하셨어요",
+        "C": "말씀하셨읍니다",
+        "D": "말씀하셨다"
       },
       "answer": "A",
-      "kagas_code": "CONJ",
+      "kagas_code": "END",
       "option_codes": {
         "A": null,
-        "B": "END:게>일찍",
-        "C": "END:게>자주",
-        "D": "END:게>먼저"
+        "B": "END:습니다>어요",
+        "C": "END:습니다>읍니다",
+        "D": "END:습니다>다"
+      },
+      "requested_misconception": null
+    },
+    {
+      "skill_id": "honorific",
+      "stem": "할머니께서 ___ 맛있는 점심을 드셨어요.",
+      "blank_marker": "___",
+      "options": {
+        "A": "드시었습니다",
+        "B": "드시었다",
+        "C": "드시었어요",
+        "D": "드시었읍니다"
+      },
+      "answer": "A",
+      "kagas_code": "END",
+      "option_codes": {
+        "A": null,
+        "B": "END:습니다>다",
+        "C": "END:습니다>어요",
+        "D": "END:습니다>읍니다"
+      },
+      "requested_misconception": "END:습니다>어요"
+    },
+    {
+      "skill_id": "irregular_conj",
+      "stem": "친구가 영화를 ___ 갔어요.",
+      "blank_marker": "___",
+      "options": {
+        "A": "보러갔어요",
+        "B": "보러",
+        "C": "보러갔네",
+        "D": "보러갔습니다"
+      },
+      "answer": "B",
+      "kagas_code": "CONJ",
+      "option_codes": {
+        "A": "END:>갔어요",
+        "B": null,
+        "C": "END:>갔네",
+        "D": "END:>갔습니다"
       },
       "requested_misconception": null
     },
     {
       "skill_id": "noun_counter",
-      "stem": "친구가 이번 ___에 세 번 만났어요.",
+      "stem": "친구가 이번 ___에 여행을 가요.",
       "blank_marker": "___",
       "options": {
-        "A": "주",
-        "B": "시간",
-        "C": "년",
-        "D": "장"
+        "A": "년",
+        "B": "일",
+        "C": "달",
+        "D": "시간"
       },
-      "answer": "A",
+      "answer": "C",
       "kagas_code": "NOUN",
       "option_codes": {
-        "A": null,
-        "B": "NOUN:주>시간",
-        "C": "NOUN:주>년",
-        "D": "NOUN:주>장"
+        "A": "NOUN:달>년",
+        "B": "NOUN:달>일",
+        "C": null,
+        "D": "NOUN:달>시간"
       },
       "requested_misconception": null
     },
     {
       "skill_id": "mod_adverb",
-      "stem": "친구가 천천히___ 책을 즐깁니다.",
+      "stem": "그녀는 천천히 ___ 있어요.",
       "blank_marker": "___",
       "options": {
-        "A": "빠르게읽어요",
-        "B": "읽어요",
-        "C": "조용하게읽어요",
-        "D": "뛰어읽어요"
+        "A": "걸어가고있다",
+        "B": "걸어가고있어요",
+        "C": "걸어가고있어요요",
+        "D": "걸어가고"
       },
-      "answer": "B",
+      "answer": "D",
       "kagas_code": "END",
       "option_codes": {
-        "A": "END:>빠르게",
-        "B": null,
-        "C": "END:>조용하게",
-        "D": "END:>뛰어"
+        "A": "END:>있다",
+        "B": "END:>있어요",
+        "C": "END:>있어요요",
+        "D": null
       },
       "requested_misconception": null
     }
   ],
   "overall_acceptance": {
-    "k": 4,
+    "k": 6,
     "n": 44,
-    "rate": 0.09090909090909091,
+    "rate": 0.13636363636363635,
     "ci95": [
-      0.0359,
-      0.2116
+      0.064,
+      0.2671
     ]
   }
 }
