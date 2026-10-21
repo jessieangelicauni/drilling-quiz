@@ -4410,6 +4410,31 @@ Cek cepat dengan prompt §9.77: 6/44 diterima, tetapi hampir semuanya tidak laya
 
 **Keputusan:** tugasnya disesuaikan dengan kemampuan EXAONE. Generator menulis `{"sentence": kalimat benar, "wrong_sentences": [3 salinan, masing-masing dengan satu kesalahan]}`, tanpa kurung siku dan tanpa potongan. Kode yang menghitung bagian kosong (`_blank`): span tempat ketiga kalimat salah berbeda dari kalimat benar, diperlebar ke morfem utuh, atau ke kata utuh kalau ada opsi yang kosong. Tanda baca akhir tidak ikut. Kalau kesalahan ada di kata yang berbeda, soal ditolak. Verifikasi lainnya tetap: annotator (satu edit, kategori skill), kode berbeda, gate log-prob, critic. `_wrong_sentence`/`_shared_blank` dihapus.
 
+### 9.79 Arah baru: pipeline berbasis model/library, langkah 1 = mengukur komponen
+
+jc ingin metode seperti Duolingo/Eedi: semuanya model, library atau prompt, tanpa heuristik buatan sendiri (rekomendasi lengkap ada di Claude Doc "KO-DRILL: metode personalisasi berbasis model"). Run 6d41db3 (format kalimat utuh, §9.78): 11/44 diterima (25%). particle_loc dan noun_counter bagus, tetapi honorific, irregular_conj, adj_relativizer dan mod_adverb menguji akhiran lain (습니다/어요).
+
+Komponen pengganti yang diusulkan:
+- KAGAS resmi menggantikan `kagas_annotator.py` dan `_blank`.
+- KoBART GEC `Soyoung97/gec_kr` dan log-prob Qwen3 mengecek kalimat benar dan salah.
+- Qwen3-4B menjadi classifier skill (pilih 1 dari 11).
+- Outlines (JSON schema) menggantikan parser.
+
+`src/benchmark_components.py` mengukur ketiganya pada 52 pasangan kurasi sebelum dipasang.
+
+**KAGAS resmi, diukur di sandbox:**
+- Satu edit: 52/52.
+- Tipe sesuai skill: 47/52. Gagalnya ada di tiga tempat:
+  - `작는` diberi label SPELL;
+  - `부르어요` diberi label SHORTEN;
+  - 3 penggantian kata kerja (verb_choice) diberi label CONJUGATION.
+
+Kesimpulan: KAGAS andal untuk "tepat satu edit" dan posisinya. Span-nya per kata (eojeol), jadi bagian kosong menjadi satu kata utuh. Cocok-tidaknya dengan skill lebih baik diputuskan oleh classifier.
+
+**Instalasi:** `cyhunspell` yang dipatok repo tidak bisa di-build lagi. Yang jalan adalah `pip install hunspell` (pyhunspell), ditambah `soylemma`, konlpy dan Java, di Python 3.11.
+
+GEC dan classifier butuh GPU dan Hugging Face, jadi dijalankan jc.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
