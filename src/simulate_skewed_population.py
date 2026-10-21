@@ -14,7 +14,7 @@ Two populations of 505 learners, each receiving the same number of
 responses:
   - balanced: theta ~ N(0, 1)
   - skewed:   500 beginners theta ~ N(-1, 0.5), 5 advanced theta ~ N(2.5, 0.3)
-and two item priors:
+and item priors (each also with learners started from a placement test):
   - flat:  every item starts at the middle of its urn (n=32)
   - model: an LLM-respondent-style prediction mu_hat = beta + N(0, 0.8)
            (correlation ~0.9 with beta here), its urn sized from the
@@ -49,8 +49,17 @@ def population(kind: str) -> tuple[np.ndarray, np.ndarray]:
     return theta, np.arange(505) >= 500
 
 
-def run(theta: np.ndarray, beta: np.ndarray, k0: np.ndarray, n0: np.ndarray, n_resp: int):
-    kp = np.full(len(theta), N_P // 2)
+def placement(theta: np.ndarray, sd: float = 0.7) -> np.ndarray:
+    """Learner urns started from a short placement test (Duolingo's placement
+    test; ~10 answers give a usable estimate, Pelanek 2016) instead of the
+    middle: its estimate theta + N(0, sd), as urn counts."""
+    est = theta + RNG.normal(0, sd, len(theta))
+    return np.clip(np.round(1 / (1 + np.exp(-est)) * (N_P + 1) - 0.5), 0, N_P).astype(int)
+
+
+def run(theta: np.ndarray, beta: np.ndarray, k0: np.ndarray, n0: np.ndarray, n_resp: int,
+        kp0: np.ndarray | None = None):
+    kp = np.full(len(theta), N_P // 2) if kp0 is None else kp0.copy()
     ki = k0.copy()
     served = np.zeros(len(beta), dtype=int)
     for _ in range(n_resp):
@@ -81,19 +90,21 @@ if __name__ == "__main__":
                 k_m, n_m, _ = seed_items_from_encoder(beta, 0.8, sigma2=0.8 ** 2)
                 priors = {"flat": (np.full(args.items, N_FLAT // 2), np.full(args.items, N_FLAT)),
                           "model": (k_m, n_m)}
-                for prior, (k0, n0) in priors.items():
-                    th, be, served = run(theta, beta, k0, n0, args.responses)
+                runs = [(prior, k0, n0, None) for prior, (k0, n0) in priors.items()]
+                runs.append(("model+placement", k_m, n_m, placement(theta)))
+                for prior, k0, n0, kp0 in runs:
+                    th, be, served = run(theta, beta, k0, n0, args.responses, kp0)
                     rows.setdefault((pop, pool, prior), []).append([
                         rmse(th, theta, ~adv), rmse(th, theta, adv),
                         rmse(be, beta, easy), rmse(be, beta, hard),
                         served[easy].mean(), served[hard].mean(), hard.sum()])
         print(f"replication {rep + 1}/{args.reps} done")
 
-    print(f"\n{'population':10s} {'pool':8s} {'prior':6s} | {'ability RMSE':^19s} | {'item RMSE':^15s} | "
+    print(f"\n{'population':10s} {'pool':8s} {'prior':15s} | {'ability RMSE':^19s} | {'item RMSE':^15s} | "
           f"{'responses/item':^15s} | {'hard':>5s}")
-    print(f"{'':10s} {'':8s} {'':6s} | {'others':>8s} {'advanced':>9s} | {'easy':>6s} {'hard':>7s} | "
+    print(f"{'':10s} {'':8s} {'':15s} | {'others':>8s} {'advanced':>9s} | {'easy':>6s} {'hard':>7s} | "
           f"{'easy':>6s} {'hard':>7s} | {'items':>5s}")
     for (pop, pool, prior), vals in rows.items():
         m = np.nanmean(vals, axis=0)
-        print(f"{pop:10s} {pool:8s} {prior:6s} | {m[0]:8.2f} {m[1]:9.2f} | {m[2]:6.2f} {m[3]:7.2f} | "
+        print(f"{pop:10s} {pool:8s} {prior:15s} | {m[0]:8.2f} {m[1]:9.2f} | {m[2]:6.2f} {m[3]:7.2f} | "
               f"{m[4]:6.0f} {m[5]:7.1f} | {m[6]:5.0f}")

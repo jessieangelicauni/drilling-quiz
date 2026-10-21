@@ -4502,6 +4502,32 @@ Atas persetujuan jc, file yang sudah tidak dipakai dihapus: `src/validate_novelt
 
 **`src/difficulty_llm.py` (baru), pengganti `difficulty_heuristic.py`:** Qwen3-0.6B, 1.7B dan 4B dipakai sebagai responden dengan kemampuan berbeda (Liu et al., 2025, BJET, PDF ada di `docs/`). p(kunci) = softmax log-prob kalimat dari 4 opsi. Fit Rasch least-squares logit p = θ_m − β_i (mean β = 0). μ̂ = β distandarkan; σ̂² = SE² + 0,5 (`LINK_VARIANCE`, karena skala responden belum di-link ke skala pelajar). Diukur di `benchmark_v2.py` (akurasi responden harus naik dengan ukuran model; korelasi dengan heuristik morfem). Belum dipasang ke `question_bank` / `answer_processing`; itu dilakukan bersama penghapusan grup B.
 
+
+### 9.84 Kelas miring: praktik platform besar + placement test (2026-10-21)
+
+**Riset (pertanyaan jc: "biasanya Duolingo atau platform lain bagaimana?"):**
+- **Duolingo, placement test adaptif.** Pelajar baru mengerjakan tes adaptif: soal makin sulit kalau benar, lalu skill yang dianggap sudah dikuasai dibuka (blog Duolingo, "Partial credit improvements to Duolingo's placement test"). Jadi pengguna mahir tidak mulai dari nol.
+- **Duolingo English Test: prior difficulty dari model untuk item baru.** McCarthy et al. (EMNLP 2021) memakai GLM multi-task dengan fitur BERT untuk memberi difficulty awal item tanpa uji coba. Estimasi itu diperbarui cepat dari respons, dengan data sekitar 500 peserta dan ±6 paparan per item. Ini analog terdekat dengan `difficulty_llm.py` (prior dari model → Urnings memperbarui).
+- **Birdbrain (Duolingo):** difficulty soal = jumlah difficulty fitur-fiturnya (tipe soal, kosakata), diperbarui seperti Elo; V2 memakai vektor kemampuan 40 dimensi per pelajar (IEEE Spectrum).
+- **Pelánek (2016), sistem berbasis Elo:** item baru mulai di difficulty 0; butuh sekitar 100 pelajar untuk estimasi difficulty item yang baik, tapi 10 jawaban sudah cukup untuk estimasi kemampuan pelajar. Disarankan fungsi ketidakpastian yang berbeda untuk item dan pelajar.
+- **Program matematika adaptif** (studi tingkat sukses, UvA): makin tinggi tingkat sukses yang ditetapkan, makin banyak soal yang dikerjakan dan makin besar peningkatannya. Ini mendukung target 85%.
+
+**Implikasi untuk 5 mahir / 500 pemula:** item sulit hanya dijawab 5 orang, jauh di bawah ±100 jawaban yang dibutuhkan, jadi item itu hanya bisa bergantung pada prior model (seperti DET). Pelajar sendiri perlu titik awal dari placement test (seperti Duolingo).
+
+**Simulasi** (`simulate_skewed_population.py`, kondisi baru `model+placement`: urn pelajar mulai dari estimasi placement θ + N(0; 0,7)):
+
+| kelas | pool | prior | RMSE pemula/lainnya | RMSE mahir | RMSE item sulit |
+|---|---|---|---|---|---|
+| skewed | wide | flat | 1,15 | 0,97 | 1,57 |
+| skewed | wide | model | 0,91 | 0,86 | 0,78 |
+| skewed | wide | model+placement | **0,49** | **0,53** | 0,78 |
+| skewed | matched | model+placement | 0,53 | 0,86 | 0,59 |
+| balanced | wide | flat (pembanding) | 0,58 | 0,85 | 1,54 |
+
+Dengan prior model ditambah placement test, kelas miring diestimasi **lebih baik daripada kelas balanced tanpa keduanya**. Placement test belum ada di sistem; usulannya: tes adaptif pendek (sekitar 10 soal) dari bank item yang sama, hasilnya menjadi urn awal pelajar di `urnings_tracker`.
+
+Sumber: blog.duolingo.com/partial-credit-improvements-to-duolingos-placement-test; aclanthology.org/2021.emnlp-main.67; spectrum.ieee.org/duolingo; fi.muni.cz/~xpelanek/publications/CAE-elo.pdf; dare.uva.nl/id/789fc422-4935-49ca-bcba-803239522951.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
