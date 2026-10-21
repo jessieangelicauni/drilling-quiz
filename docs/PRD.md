@@ -4637,6 +4637,9 @@ Penyebab yang ditemukan:
 - **Cache Outlines** (pertanyaan jc): `outlines.Generator(model, schema)` di Outlines 1.3.3 mengonversi seluruh vocabulary EXAONE dan mengompilasi skema di **setiap** panggilan; tidak ada cache. `_Exaone` sekarang membuat `OutlinesCoreBackend` sekali (vocabulary sekali) dan menyimpan generator per skema, jadi skema kalimat dan distraktor dikompilasi sekali per run. Skema jawaban (enum kata kalimat) berubah tiap item, jadi dipisah menjadi decode tersendiri yang sangat kecil (beberapa token, kompilasi cepat). Total: 3 decode EXAONE per item (kalimat, jawaban, distraktor), Qwen tetap 1 call.
 
 
+**Hasil v2.4** (commit f13c4bd, sebelum perbaikan cache): diterima **18/66 (27%, CI 18–39%)**, 14 sebelum repair. Format 66/66, jadi enum jawaban menyelesaikan masalah kata gabungan. noun_counter 5/6 (dari 0), honorific format 6/6 tapi 0 diterima. Prior: `at_clip` 0.06 (dari 0.82), SD 0.94, korelasi dengan heuristik morfem 0.34. Embedding nearest-neighbour 39% (dari 9%, n=64). Sisa masalah di item yang lolos: distraktor gabungan masih ada (`조립를조립해요`, `생산은은`), beberapa kalimat tidak gramatikal (`___ 은 효율 향상에 핵심이다`), dan `확인해요` lolos padahal juga benar. Penolakan terbanyak: tidak plausible (53).
+
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
