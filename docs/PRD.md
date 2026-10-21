@@ -4462,6 +4462,22 @@ Yang akan dihapus setelah terbukti: annotator, blank, filter, dan parser.
 
 Atas persetujuan jc, file yang sudah tidak dipakai dihapus: `src/validate_novelty2.py` + `2_validation_results.json` (Novelty 2 dihapus, §9.70), `src/compare_feedback_models.py` + `src/patch_exaone35_remote_code.py` (perbandingan explainer selesai, Qwen3 dipilih), `src/benchmark_components.py` + `benchmark_components_results.json` (kesimpulan di §9.79; classifier pindah ke `benchmark_v2.py`), dan `eval_report.json` (output yang dibuat ulang tiap run, sekarang di `.gitignore`). `Korean_Grammar_Curriculum.docx` dan PDF literatur di `docs/` tetap disimpan (keputusan jc). `requirements.txt` ditambah `outlines`, `pydantic`, `sentence-transformers`. Menunggu hasil v2 sebelum menghapus `kagas_annotator.py`, heuristik di `item_foundry.py`, `llm_parsing.py`, fungsi pilih-huruf di `solver_check.py`, dan `difficulty_heuristic.py` (yang terakhir juga mengubah teks paper Section III-C). Opsi `--generator gemma-3-12b` juga dihapus (EXAONE tetap generator, §9.78); model yang sudah diuji dan tidak dipakai (Qwen3-4B-Base, Qwen3-8B/-Base, Kanana-1.5-8B-base, Gemma-3-12B, EXAONE-4.0-1.2B, KoBART `gec_kr`) sudah tidak dirujuk kode, jadi boleh dihapus dari cache Hugging Face lokal. Audit lengkap: `/mnt/project-files/cleanup/audit-repo.md`.
 
+
+### 9.82 Hasil v2 pertama dan perbaikan v2.1 (2026-10-21)
+
+**Hasil run jc** (`benchmark_v2_results.json`, 6 item × 11 objective, kurikulum EV smart factory): format 66/66 (Outlines bekerja), diterima 13/66 = 19,7% (CI 11,9–30,8%). Embedding `mistake` (multilingual-e5-base): nearest neighbour sama-mistake 15/42 = 36%, cosine sama 0,900 vs beda 0,886 — hampir tidak terpisah.
+
+**Dibaca per item, hampir semua 13 item yang lolos tetap tidak layak dipakai:**
+1. **Blank di tempat yang salah.** Diminta langsung menulis stem dengan `___`, EXAONE menaruh blank di posisi acak: `공장의 ___ 에서` dengan jawaban `에서` (jadi "에서 에서"), `을___`, `동기화되었어요었어요`. Key gate log-prob menolak sebagian besar, tapi beberapa tetap lolos.
+2. **Distraktor yang sebenarnya benar.** Untuk adj_relativizer, mod_adverb, verb_choice dan noun_counter, distraktornya kata lain yang juga benar (`신중하게` vs `빠르게`, `다섯` vs `세`). Key gate hanya mengecek bahwa kunci paling mungkin, bukan bahwa distraktor salah.
+3. **Kalimat terlalu panjang dan teknis untuk TOPIK I:** sering dua kalimat, karena topik kursus dimasukkan utuh.
+
+**Perbaikan v2.1 (`src/benchmark_v2.py`), tetap tanpa heuristik:**
+- Skema: EXAONE menulis dulu satu kalimat benar (maksimal 40 karakter, satu kalimat), lalu `answer` = kata dalam kalimat itu. Stem = kalimat dengan answer diganti `___`; kalau answer tidak muncul tepat sekali di kalimat, item gagal format. Urutan ini sama dengan format kalimat-utuh §9.78 yang memang ditulis LLM dengan baik.
+- Prompt: satu contoh kurasi per objective (dari `log_likelihood_results.json`, data, bukan aturan), "maksimal 8 kata, satu kata sehari-hari dari topik", dan distraktor harus membuat kalimat salah, bukan kata lain yang benar.
+- Gate baru `unique_ok`: Qwen3-4B mode reasoning diberi stem dan 4 opsi (diacak), lalu menyebut semua opsi yang benar; item lolos hanya kalau jawabannya tepat kunci saja. Diterima = key_ok ∧ unique_ok ∧ objective_ok.
+- Embedding dibandingkan dua encoder: multilingual-e5-base vs Qwen3-Embedding-0.6B (encoder berbasis instruksi).
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
