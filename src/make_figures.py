@@ -66,17 +66,16 @@ def fig2():
     fig, ax = canvas(7.15, 3.5)
     B = lambda *a, **k: box(fig, ax, *a, **k)
     B(.015, .700, .315, .230,
-      "SKILL CODEBOOK\nEXAONE names misconceptions;\nkept if one edit in the\nskill's KAGAS category", F_EXT, 6.2, True)
+      "MISCONCEPTION CODES\nKAGAS annotator, no LLM:\ncode = the edit key → $d_j$\nsame error, same code", F_EXT, 6.2, True)
     B(.015, .345, .315, .290,
       "LEARNER MODEL (Eqs. 2-3)\npropensity $\\eta_{p,m}$ per misconception,\nmultinomial choice among the\noffered distractors, online update\ndominant $m^*$ = argmax $\\eta$", F_PSY, 6.0)
 
     B(.365, .680, .295, .250,
-      "GENERATION (EXAONE)\nsentence, key span, and\n3 distractors, one per $m_j$\n(one realises $m^*$ when known)", F_GEN, 6.3)
-    arrow(ax, (.330, .815), (.365, .815))
+      "GENERATION (EXAONE)\nsentence, key span, and\n3 distractors, 3 different\nerrors (one is $m^*$ when known)", F_GEN, 6.3)
     arrow(ax, (.330, .490), (.370, .730), rad=-0.15)
 
     B(.370, .330, .285, .300,
-      "VERIFIER (no model judges)\n(a) one edit, tested category\n(b) code = edit, or codebook\n(c) the three codes differ\n(d) key outscores each $d_j$\n     (Qwen3 log-probability)", F_VER, 6.0)
+      "VERIFIER (no model judges)\n(a) one edit, tested category\n(b) code $m_j$ = KAGAS edit\n(c) the three codes differ\n(d) key outscores each $d_j$\n     (Qwen3 log-probability)", F_VER, 6.0)
     arrow(ax, (.5125, .680), (.5125, .630))
 
     B(.370, .110, .285, .170,

@@ -30,19 +30,14 @@ if __name__ == "__main__":
     import json
 
     from daily_drill import DailyDrillConfig, UserDrillState, assemble_daily_drill
-    from item_foundry import MisconceptionItemGenerator, build_codebook
+    from item_foundry import MisconceptionItemGenerator
     from vocab_provider import VocabCurriculum
 
     # CPU stand-ins for EXAONE and Qwen3-4B, as in question_bank.py's smoke test.
-    book = build_codebook("particle_loc", lambda m: json.dumps([
-        {"name": n, "explanation": n, "correct": "저는 학교에서 공부해요.", "wrong": f"저는 학교{p} 공부해요."}
-        for n, p in (("에 everywhere", "에"), ("object marking", "를"), ("subject marking", "가"))],
-        ensure_ascii=False))
     reply = json.dumps({"sentence": "친구가 공원에서 축구를 해요.", "target": "에서",
-                        "distractors": [{"text": "에", "misconception": 1}, {"text": "을", "misconception": 2},
-                                        {"text": "이", "misconception": 3}]}, ensure_ascii=False)
+                        "distractors": ["에", "을", "이"]}, ensure_ascii=False)
     grammar = MisconceptionItemGenerator(lambda m: reply, lambda s: 0.0 if "에서" in s else -5.0,
-                                         {"particle_loc": book}, seed=0)
+                                         seed=0)
 
     curriculum = VocabCurriculum()
     curriculum.add("w1", "도서관", "library", topic="places")

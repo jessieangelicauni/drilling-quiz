@@ -1,35 +1,27 @@
 """
-Item foundry for Novelty 1 (PRD §9.69): Korean grammar drill items whose
-every distractor realises one NAMED misconception, so that the option a
+Item foundry for Novelty 1 (PRD §9.69, §9.74): Korean grammar drill items
+whose every distractor realises one NAMED error, so that the option a
 learner picks says which misconception they hold (misconception_tracker.py),
 not only that they were wrong.
 
-Replaces the template generator (exaone_provider.py before 2026-10-21),
-whose items came from hand-curated slot lists, verb lookups, fixed
-correct/distractor pairs and filler options that carried no misconception
-at all. Here the LLM writes the content, and code only VERIFIES it:
+The LLM writes the content; code only VERIFIES it and LABELS it:
 
-  1. Codebook (once per skill, build_codebook): EXAONE lists the
-     misconceptions learners commonly hold about the grammar point, each
-     with a correct sentence and the learner's wrong version. Each entry is
-     kept only if kagas_annotator finds that example to be exactly one edit
-     in the grammatical category the skill tests. Saved to
-     data/misconception_codebook.json, so codes stay stable across items.
-  2. Item (MisconceptionItemGenerator.generate): EXAONE writes one natural
+  1. Item (MisconceptionItemGenerator.generate): EXAONE writes one natural
      sentence using the grammar point, marks the tested span, and writes
-     three wrong versions of that span, each realising a DIFFERENT codebook
-     misconception -- one of them, when asked, the misconception the
-     learner currently holds (personalisation).
+     three wrong versions of that span, each a different error a learner
+     typically makes -- one of them, when asked, the error the learner
+     currently makes most (personalisation).
+  2. Label: each distractor's misconception code is the KAGAS edit that
+     turns the key sentence into the distractor sentence
+     (kagas_annotator.annotate), e.g. PART:에서>에 or END:었>았. The code is
+     computed, not chosen by the model, so it is the same for the same
+     error in any item: the stable label the choice model needs, without a
+     hand-written or generated list of misconceptions.
   3. Verification, none of it by asking a model to judge (Qwen3-4B could
      not judge acceptability reliably in any of three framings, PRD
      §9.16/§9.31):
-       - each distractor is a minimal pair of the key: kagas_annotator finds
-         exactly one edit, in the skill's category;
-       - its misconception code: for a closed-class edit (particles,
-         endings, counters) the edit itself (PART:에서>에), which must agree
-         with the codebook entry the generator named when that entry has a
-         code; for an open-class edit (one verb for another) the codebook
-         entry the generator named, which must exist;
+       - each distractor is a minimal pair of the key: exactly one edit, in
+         the skill's KAGAS category;
        - the three codes differ, so every pick is informative;
        - key uniqueness by SCORING: under Qwen3-4B (a different model
          family from the generator), the sentence with the key must have a
@@ -46,12 +38,10 @@ solver_check.SolverCheckProvider are the real ones.
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import random
 import re
-from dataclasses import asdict, dataclass, field
-from pathlib import Path
+from dataclasses import dataclass, field
 from typing import Callable
 
 from kagas_annotator import annotate
@@ -59,9 +49,7 @@ from kagas_annotator import annotate
 Chat = Callable[[list[dict]], str]
 Scorer = Callable[[str], float]
 
-CODEBOOK_PATH = Path(__file__).resolve().parent.parent / "data" / "misconception_codebook.json"
 N_DISTRACTORS = 3
-CODEBOOK_SIZE = 6
 MAX_REVISIONS = 2
 BLANK = "___"
 
@@ -109,20 +97,9 @@ class GeneratedItem:
     # escalation trigger when an item has no per-option codes.
     kagas_code: str | None = None
     # Misconception realised by each option, keyed by option label: None for
-    # the key, a codebook code for each distractor (Novelty 1, PRD §9.69).
+    # the key, the KAGAS edit code for each distractor (Novelty 1, PRD §9.74).
     # What misconception_tracker learns from.
     option_codes: dict[str, str | None] | None = None
-
-
-@dataclass
-class MisconceptionEntry:
-    code: str                  # stable id: the edit (PART:에서>에) or skill_id/name
-    name: str
-    explanation: str
-    example_correct: str
-    example_wrong: str
-    category: str
-    functional: bool
 
 
 @dataclass
@@ -195,13 +172,6 @@ def korean_only(sentence: str) -> str | None:
     return None if not s or _LATIN.search(s) else s
 
 
-def _slug(name: str) -> str:
-    """A stable ASCII id for a misconception name (a hash if the name has no
-    ASCII letters, e.g. one written in Korean)."""
-    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:40]
-    return slug or hashlib.sha1(name.encode("utf-8")).hexdigest()[:10]
-
-
 def single_edit(skill: Skill, correct: str, wrong: str):
     """The one edit turning `correct` into `wrong`, or (None, reason)."""
     edits = annotate(correct, wrong)
@@ -213,121 +183,46 @@ def single_edit(skill: Skill, correct: str, wrong: str):
     return edit, ""
 
 
-# ------------------------------------------------------------------ codebook
-
-_CODEBOOK_PROMPT = """You are an expert teacher of Korean as a foreign language to Indonesian speakers.
-Grammar point: {description}. Learners: {level}.
-
-List the {k} most common misconceptions learners hold about THIS grammar point -- the mistaken
-rule in their head, not random slips. For each, give a short name, a one-sentence explanation,
-and one example: a short natural correct Korean sentence, and the same sentence as a learner
-holding the misconception would write it, changed ONLY where the misconception shows.
-Write "correct" and "wrong" in Hangul only: no romanisation, no translation, no notes.
-
-Answer with JSON only:
-[{{"name": "...", "explanation": "...", "correct": "...", "wrong": "..."}}, ...]"""
-
-
-def _codebook_rows(raw) -> list:
-    """The list of entries in a parsed reply: the list itself, or the first
-    list value of an object ({"misconceptions": [...]})."""
-    if isinstance(raw, list):
-        return raw
-    if isinstance(raw, dict):
-        return next((v for v in raw.values() if isinstance(v, list)), [])
-    return []
-
-
-def build_codebook(skill_id: str, chat: Chat, log: list | None = None,
-                   attempts: int = 3) -> list[MisconceptionEntry]:
-    """Verified codebook for one skill. The generator is asked again (its
-    replies are sampled) until at least N_DISTRACTORS entries survive or
-    `attempts` runs out. Every reply and every entry's verdict is appended to
-    `log` when given, so an empty codebook can be diagnosed."""
-    skill = SKILLS[skill_id]
-    entries, seen = [], set()
-    for _ in range(attempts):
-        reply = chat([{"role": "user", "content": _CODEBOOK_PROMPT.format(
-            description=skill.description, level=skill.level, k=CODEBOOK_SIZE)}])
-        raw = extract_json(reply)
-        record = {"reply": reply, "parsed": raw is not None, "rows": []}
-        for row in _codebook_rows(raw):
-            if not isinstance(row, dict) or not all(isinstance(row.get(k), str) for k in
-                                                    ("name", "explanation", "correct", "wrong")):
-                record["rows"].append({"row": row, "verdict": "format: needs name, explanation, correct, wrong"})
-                continue
-            correct, wrong = korean_only(row["correct"]), korean_only(row["wrong"])
-            if correct is None or wrong is None:
-                record["rows"].append({"row": row, "verdict": "format: Latin text inside the Korean example"})
-                continue
-            edit, why = single_edit(skill, correct, wrong)
-            if edit is None:
-                record["rows"].append({"row": row, "verdict": why,
-                                       "edits": [vars(e) for e in annotate(correct, wrong)]})
-                continue
-            code = edit.code if edit.functional else f"{skill_id}/{_slug(row['name'])}"
-            if code in seen:
-                record["rows"].append({"row": row, "verdict": f"duplicate: {code}"})
-                continue
-            seen.add(code)
-            record["rows"].append({"row": row, "verdict": f"kept: {code}"})
-            entries.append(MisconceptionEntry(code, row["name"].strip(), row["explanation"].strip(),
-                                              correct, wrong, edit.category, edit.functional))
-        if log is not None:
-            log.append(record)
-        if len(entries) >= N_DISTRACTORS:
-            break
-    return entries
-
-
-def load_codebook(path: Path = CODEBOOK_PATH) -> dict[str, list[MisconceptionEntry]]:
-    if not path.exists():
-        return {}
-    data = json.loads(path.read_text(encoding="utf-8"))
-    return {s: [MisconceptionEntry(**e) for e in entries] for s, entries in data["skills"].items()}
-
-
-def save_codebook(codebook: dict[str, list[MisconceptionEntry]], provenance: dict,
-                  path: Path = CODEBOOK_PATH) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    data = {"provenance": provenance,
-            "skills": {s: [asdict(e) for e in entries] for s, entries in codebook.items()}}
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-
-
 # ------------------------------------------------------------------ items
 
 _ITEM_PROMPT = """You write Korean grammar drill questions for {level} learners whose first language is Indonesian.
 Grammar point: {description}.
 
-Misconceptions learners hold about it:
-{codebook}
-
-Write ONE new, natural, everyday Korean sentence that uses the grammar point. Then:
+Write ONE new, natural, everyday Korean sentence that uses the grammar point, in Hangul only. Then:
 - "target": the exact part of the sentence that tests the grammar point (it must appear in the
   sentence exactly once; as short as possible, e.g. a particle or a word ending, or the one word
   that carries it);
-- "distractors": {n} wrong replacements for "target", each what a learner holding a DIFFERENT
-  misconception above would write, changing nothing else, and each clearly wrong in this sentence.
-  Give the misconception's number for each.{target_line}
+- "distractors": {n} wrong replacements for "target", each a DIFFERENT mistake learners typically
+  make with this grammar point, changing nothing else, and each clearly wrong in this sentence.{target_line}
 Do not reuse these sentences: {avoid}
 
 Answer with JSON only:
-{{"sentence": "...", "target": "...", "distractors": [{{"text": "...", "misconception": 1}}, ...]}}"""
+{{"sentence": "...", "target": "...", "distractors": ["...", "...", "..."]}}"""
 
 _REVISION_PROMPT = """That question cannot be used, for these reasons:
 {reasons}
 Write a corrected version that fixes every reason. Answer with JSON only, in the same format."""
 
 
+def describe_code(code: str) -> str:
+    """A misconception code in words, for the prompt: "PART:에서>에" ->
+    "'에' written where '에서' is needed"."""
+    _, _, change = code.partition(":")
+    correct, _, wrong = change.partition(">")
+    correct, wrong = correct.replace("+", ""), wrong.replace("+", "")
+    if not wrong:
+        return f"'{correct}' left out"
+    if not correct:
+        return f"'{wrong}' added where nothing belongs"
+    return f"'{wrong}' written where '{correct}' is needed"
+
+
 class MisconceptionItemGenerator:
     """Implements daily_drill.ContentProvider's grammar half."""
 
-    def __init__(self, chat: Chat, sentence_logprob: Scorer | None,
-                 codebook: dict[str, list[MisconceptionEntry]], seed: int | None = None):
+    def __init__(self, chat: Chat, sentence_logprob: Scorer | None, seed: int | None = None):
         self.chat = chat
         self.sentence_logprob = sentence_logprob
-        self.codebook = codebook
         self.rng = random.Random(seed)
         self.items: dict[str, GeneratedItem] = {}
         self.stats: dict[str, FoundryStats] = {}
@@ -337,14 +232,16 @@ class MisconceptionItemGenerator:
     # -- verification ------------------------------------------------------
     def verify(self, skill_id: str, reply: dict, target_code: str | None = None):
         """(item fields, []) if the reply passes every check, else (None, reasons)."""
-        skill, entries = SKILLS[skill_id], self.codebook.get(skill_id, [])
+        skill = SKILLS[skill_id]
         if not isinstance(reply, dict):
             return None, ["format: the reply was not a JSON object"]
         sentence, target = reply.get("sentence"), reply.get("target")
         distractors = reply.get("distractors")
         if not (isinstance(sentence, str) and isinstance(target, str) and isinstance(distractors, list)):
             return None, ["format: needs sentence, target and a list of distractors"]
-        sentence, target = sentence.strip(), target.strip()
+        sentence, target = korean_only(sentence), target.strip()
+        if sentence is None:
+            return None, ["format: the sentence must be Korean only, without romanisation or translation"]
         if not target or sentence.count(target) != 1:
             return None, [f"target: '{target}' must appear in the sentence exactly once"]
         if len(distractors) != N_DISTRACTORS:
@@ -352,8 +249,7 @@ class MisconceptionItemGenerator:
 
         reasons, texts, codes = [], [], []
         for d in distractors:
-            text = d.get("text", "").strip() if isinstance(d, dict) else ""
-            number = d.get("misconception") if isinstance(d, dict) else None
+            text = d.strip() if isinstance(d, str) else ""
             if not text or text == target or text in texts:
                 reasons.append(f"duplicate: distractor '{text}' repeats the target or another distractor")
                 continue
@@ -362,25 +258,13 @@ class MisconceptionItemGenerator:
             if edit is None:
                 reasons.append(f"{why.split(':')[0]}: '{wrong_sentence}' {why}")
                 continue
-            entry = entries[number - 1] if isinstance(number, int) and 1 <= number <= len(entries) else None
-            if edit.functional:
-                code = edit.code
-                if entry is not None and entry.functional and entry.code != code:
-                    reasons.append(f"label: '{text}' realises {code}, not misconception {number} "
-                                   f"({entry.name}, {entry.code})")
-                    continue
-            elif entry is None:
-                reasons.append(f"label: '{text}' must name one of the listed misconceptions")
-                continue
-            else:
-                code = entry.code
             texts.append(text)
-            codes.append(code)
+            codes.append(edit.code)
         if len(set(codes)) != len(codes):
-            reasons.append("distinct: two distractors realise the same misconception")
+            reasons.append("distinct: two distractors make the same mistake "
+                           f"({', '.join(describe_code(c) for c in codes if codes.count(c) > 1)})")
         if target_code is not None and target_code not in codes:
-            name = next((e.name for e in entries if e.code == target_code), target_code)
-            reasons.append(f"target-misconception: no distractor realises '{name}'")
+            reasons.append(f"target-misconception: no distractor has {describe_code(target_code)}")
         if reasons:
             return None, reasons
 
@@ -396,20 +280,16 @@ class MisconceptionItemGenerator:
 
     # -- generation --------------------------------------------------------
     def _prompt(self, skill_id: str, target_code: str | None) -> str:
-        skill, entries = SKILLS[skill_id], self.codebook.get(skill_id, [])
-        listed = "\n".join(f"{i}. {e.name}: {e.explanation} (e.g. {e.example_correct} -> {e.example_wrong})"
-                           for i, e in enumerate(entries, 1))
+        skill = SKILLS[skill_id]
         target_line = ""
         if target_code is not None:
-            number = next((i for i, e in enumerate(entries, 1) if e.code == target_code), None)
-            if number is not None:
-                target_line = f"\n  One distractor MUST realise misconception {number}."
+            target_line = f"\n  One distractor MUST be this mistake: {describe_code(target_code)}."
         avoid = "; ".join(self._recent.get(skill_id, [])[-8:]) or "(none yet)"
-        return _ITEM_PROMPT.format(level=skill.level, description=skill.description, codebook=listed,
+        return _ITEM_PROMPT.format(level=skill.level, description=skill.description,
                                    n=N_DISTRACTORS, target_line=target_line, avoid=avoid)
 
     def generate(self, skill_id: str, target_code: str | None = None) -> GeneratedItem | None:
-        if skill_id not in SKILLS or not self.codebook.get(skill_id):
+        if skill_id not in SKILLS:
             return None
         stats = self.stats.setdefault(skill_id, FoundryStats())
         stats.attempts += 1
@@ -484,31 +364,15 @@ if __name__ == "__main__":
     assert extract_json("[1, 2] trailing") == [1, 2]
     assert extract_json("no json") is None
     assert extract_json('```json\n[{"a": "x]y"}, {"b": 2},]\n```') == [{"a": "x]y"}, {"b": 2}]
-    assert _codebook_rows({"misconceptions": [1]}) == [1]
+    assert extract_json('{"a": "x", // note\n"b": 1}') == {"a": "x", "b": 1}
+    assert korean_only("공원에서 산책했어요. (Gongwon-eseo ...) - I walked.") == "공원에서 산책했어요."
+    assert korean_only("저는 저녁을 먹었어요, ate.") is None
+    assert describe_code("PART:에서>에") == "'에' written where '에서' is needed"
+    assert describe_code("END:었>") == "'었' left out"
 
-    codebook_reply = json.dumps([
-        {"name": "에 for every location", "explanation": "uses 에 for the place of an action",
-         "correct": "저는 학교에서 공부해요.", "wrong": "저는 학교에 공부해요."},
-        {"name": "object particle on places", "explanation": "marks the place like an object",
-         "correct": "저는 학교에서 공부해요.", "wrong": "저는 학교를 공부해요."},
-        {"name": "subject particle on places", "explanation": "marks the place as the subject",
-         "correct": "저는 학교에서 공부해요.", "wrong": "저는 학교가 공부해요."},
-        {"name": "not minimal", "explanation": "two changes, must be dropped",
-         "correct": "저는 학교에서 공부해요.", "wrong": "제가 학교에 공부해요."},
-        {"name": "duplicate edit", "explanation": "same edit as the first, must be dropped",
-         "correct": "친구가 카페에서 일해요.", "wrong": "친구가 카페에 일해요."},
-    ], ensure_ascii=False)
-    log = []
-    book = build_codebook("particle_loc", lambda m: "Here you go:\n" + codebook_reply, log=log)
-    assert len(log) == 1 and sum(r["verdict"].startswith("kept") for r in log[0]["rows"]) == 3
-    assert [e.code for e in book] == ["PART:에서>에", "PART:에서>을", "PART:에서>이"], [e.code for e in book]
-
-    good = {"sentence": "동생이 공원에서 축구를 해요.", "target": "에서",
-            "distractors": [{"text": "에", "misconception": 1}, {"text": "을", "misconception": 2},
-                            {"text": "이", "misconception": 3}]}
-    mislabelled = {**good, "distractors": [{"text": "에", "misconception": 2}, {"text": "을", "misconception": 1},
-                                           {"text": "이", "misconception": 3}]}
-    replies = iter([json.dumps(mislabelled, ensure_ascii=False), json.dumps(good, ensure_ascii=False)])
+    good = {"sentence": "동생이 공원에서 축구를 해요.", "target": "에서", "distractors": ["에", "을", "이"]}
+    repeated = {**good, "distractors": ["에", "에", "이"]}
+    replies = iter([json.dumps(repeated, ensure_ascii=False), json.dumps(good, ensure_ascii=False)])
     seen_prompts = []
 
     def chat(messages):
@@ -516,34 +380,37 @@ if __name__ == "__main__":
         return next(replies)
 
     # A scorer that prefers the key sentence: stands in for Qwen3-4B log-probs.
-    gen = MisconceptionItemGenerator(chat, lambda s: 0.0 if "공원에서" in s else -5.0,
-                                     {"particle_loc": book}, seed=0)
+    gen = MisconceptionItemGenerator(chat, lambda s: 0.0 if "공원에서" in s else -5.0, seed=0)
     item_id = gen.next_new_grammar_item("particle_loc", target_misconception="PART:에서>이")
     assert item_id is not None, gen.stats
     item = gen.items[item_id]
     assert item.stem == "동생이 공원___ 축구를 해요." and item.options[item.answer] == "에서"
+    # Codes come from the annotator, so the same error gets the same code in any item.
     assert sorted(c for c in item.option_codes.values() if c) == ["PART:에서>에", "PART:에서>을", "PART:에서>이"]
     assert item.option_codes[item.answer] is None
-    assert "MUST realise misconception 3" in seen_prompts[0]
-    assert "label:" in seen_prompts[1], "the critic must be told exactly why the first reply failed"
+    assert "MUST be this mistake: '이' written where '에서' is needed" in seen_prompts[0]
+    assert "duplicate:" in seen_prompts[1], "the critic must be told exactly why the first reply failed"
     assert gen.stats["particle_loc"].revisions_used == 1
 
+    # Two distractors that make the same mistake (allomorphs 을/를) are one misconception.
+    _, reasons = gen.verify("particle_loc", {**good, "distractors": ["을", "를", "이"]})
+    assert any(r.startswith("distinct") for r in reasons), reasons
+
+    # The requested misconception must be among the distractors.
+    _, reasons = gen.verify("particle_loc", good, target_code="PART:에서>도")
+    assert any(r.startswith("target-misconception") for r in reasons), reasons
+
     # Ambiguity is caught by scoring: a distractor that reads as naturally as the key.
-    flat = MisconceptionItemGenerator(lambda m: json.dumps(good, ensure_ascii=False), lambda s: 0.0,
-                                      {"particle_loc": book}, seed=0)
+    flat = MisconceptionItemGenerator(lambda m: json.dumps(good, ensure_ascii=False), lambda s: 0.0, seed=0)
     assert flat.generate("particle_loc") is None
     assert flat.stats["particle_loc"].reasons.get("ambiguous", 0) > 0
 
     # A distractor that edits something other than the tested category is rejected.
-    _, reasons = gen.verify("particle_loc", {**good, "distractors": [
-        {"text": "에", "misconception": 1}, {"text": "을", "misconception": 2},
-        {"text": "에서 축구", "misconception": 3}]})
+    _, reasons = gen.verify("particle_loc", {**good, "distractors": ["에", "을", "에서 축구"]})
     assert any(r.startswith("wrong-category") for r in reasons), reasons
 
-    # Open-class skills take their code from the named codebook entry.
-    verb_book = build_codebook("verb_choice", lambda m: json.dumps([
-        {"name": "eat for all consumption", "explanation": "uses 먹다 for drinks",
-         "correct": "물을 마셔요.", "wrong": "물을 먹어요."}], ensure_ascii=False))
-    assert verb_book and verb_book[0].code == "verb_choice/eat-for-all-consumption"
-    assert _slug("먹다 과잉 일반화") and _slug("먹다 과잉 일반화") != _slug("마시다")
+    # Open-class skills get the lexical edit as their code.
+    verb = {"sentence": "저는 물을 마셔요.", "target": "마셔요", "distractors": ["먹어요", "봐요", "입어요"]}
+    fields, reasons = MisconceptionItemGenerator(chat, None).verify("verb_choice", verb)
+    assert fields is not None and "VERB:마시>먹" in fields[3], (fields, reasons)
     print("all smoke tests passed")

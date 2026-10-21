@@ -219,25 +219,18 @@ class BankContentProvider:
 if __name__ == "__main__":
     import json
 
-    from item_foundry import build_codebook
-
     # CPU stand-ins for EXAONE (scripted replies) and Qwen3-4B (a scorer that
     # prefers the key); item_foundry.py's own smoke test covers verification.
-    book = build_codebook("particle_loc", lambda m: json.dumps([
-        {"name": n, "explanation": n, "correct": "저는 학교에서 공부해요.", "wrong": f"저는 학교{p} 공부해요."}
-        for n, p in (("에 everywhere", "에"), ("object marking", "를"), ("subject marking", "가"))],
-        ensure_ascii=False))
     places = ["공원", "도서관", "회사", "카페", "식당"]
 
     def scripted_chat(messages, _n=iter(range(10 ** 6))):
         place = places[next(_n) % len(places)]
         return json.dumps({"sentence": f"친구가 {place}에서 축구를 해요.", "target": "에서",
-                           "distractors": [{"text": "에", "misconception": 1}, {"text": "을", "misconception": 2},
-                                           {"text": "이", "misconception": 3}]}, ensure_ascii=False)
+                           "distractors": ["에", "을", "이"]}, ensure_ascii=False)
 
     bank = QuestionBank()
     provider = MisconceptionItemGenerator(scripted_chat, lambda s: 0.0 if "에서" in s else -5.0,
-                                          {"particle_loc": book}, seed=0)
+                                          seed=0)
 
     added = bank.batch_generate(provider, "particle_loc", n_target=5)
     assert added == 5, f"every scripted item passes verification, got {added}/5"

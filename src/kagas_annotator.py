@@ -8,8 +8,8 @@ Used by item_foundry.py to verify, without asking another LLM, that a
 generated distractor is a genuine minimal pair of the key (exactly one
 edit), that the edit sits in the grammatical category the skill tests
 (a particle item must differ in a particle, PART), and, for functional
-morphemes, WHAT the edit is (에서 -> 에), which is how a distractor is
-matched to a misconception in the skill's codebook.
+morphemes, WHAT the edit is (에서 -> 에): the edit's code (PART:에서>에) is
+the distractor's misconception label.
 
 How it works:
   1. Analyse both sentences with kiwipiepy and align their morpheme
@@ -56,8 +56,8 @@ _CATEGORY = (
 )
 # Categories whose forms are a closed class, so the edit itself (에서 -> 에)
 # names the misconception and generalises across items. Open-class edits
-# (one noun or verb for another) do not, and are matched to a misconception
-# by meaning instead (item_foundry.py).
+# (one verb for another) are labelled by their lexical pair (VERB:마시>먹),
+# which recurs less often across items.
 FUNCTIONAL = frozenset({"PART", "END"})
 FUNCTIONAL_TAGS = frozenset({"NNB", "MM"})
 

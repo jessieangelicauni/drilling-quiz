@@ -33,7 +33,7 @@ actual system, built directly on the decisions in `docs/PRD.md`:
 | `src/streak.py` | Daily streak counter — deliberately independent of both trackers above |
 | `src/daily_drill.py` | Assembles one day's quiz from due + new vocab and grammar items |
 
-| `src/item_foundry.py` | Grammar `ContentProvider` (Novelty 1, PRD §9.70): EXAONE-3.5-7.8B-Instruct (4-bit) writes a per-skill misconception codebook and each item (sentence, key span, three distractors, each realising a different codebook misconception, optionally the learner's dominant one); verified by `kagas_annotator.py` and Qwen3-4B log-prob scoring, with critic revisions. No hand-written slots, lookups or fillers |
+| `src/item_foundry.py` | Grammar `ContentProvider` (Novelty 1, PRD §9.74): EXAONE-3.5-7.8B-Instruct (4-bit) writes each item (sentence, key span, three distractors, each a different typical mistake). Each distractor's misconception code is its KAGAS edit from the key (`kagas_annotator.py`), e.g. `PART:에서>에`; no codebook. Verified without an LLM judge (one edit in the skill's category, three distinct codes, Qwen3-4B log-prob key-uniqueness), with up to 2 critic revisions |
 | `src/kagas_annotator.py` | KAGAS-style edit annotator: aligns kiwipiepy morphemes of the key and distractor sentences, classifies each edit by KAGAS category, and gives closed-class edits a stable code (`PART:에서>에`) |
 | `src/misconception_tracker.py` | Per-learner misconception propensities from WHICH distractor is chosen: multinomial-logit choice among the offered distractors, updated online (PRD §9.70) |
 | `src/vocab_provider.py` | Vocab `ContentProvider` — words/meanings from an admin-maintained curriculum, not generation; distractors are other curriculum meanings |

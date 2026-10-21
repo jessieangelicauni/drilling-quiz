@@ -4357,6 +4357,20 @@ Per jenis error KoLLA (partikel n=114 / ejaan n=131): Qwen3-4B 96 = 84,2% (CI 76
 
 **Langkah berikut (GPU):** `python3 src/validate_item_foundry.py --codebook-only` dengan prompt baru (Hangul saja), lalu review instruktur atas codebook, lalu `--per-skill 20 --reuse-codebook`.
 
+### 9.74 Codebook dihapus: label miskonsepsi = kode edit annotator KAGAS
+
+**Keputusan user** ("ok", atas rekomendasi): codebook tidak wajib. Yang dibutuhkan novelty hanyalah label yang konsisten antar soal, dan annotator sudah menghasilkannya secara otomatis.
+
+**Sekarang:**
+- EXAONE menulis kalimat, span kunci, dan 3 distraktor ("tiga kesalahan khas yang berbeda"). Formatnya `"distractors": ["...", "...", "..."]`, tanpa nomor miskonsepsi.
+- Label setiap distraktor = `kagas_annotator.annotate(kalimat kunci, kalimat distraktor)`, misalnya `PART:에서>에` atau `END:었>았`. Kesalahan yang sama selalu dapat kode yang sama di soal mana pun (alomorf 을/를 digabung). Untuk open-class (verb_choice), labelnya pasangan leksikal (`VERB:마시>먹`), yang lebih jarang berulang. Ini keterbatasan yang ditulis jujur.
+- Verifikasi: satu edit di kategori skill, tiga kode berbeda, kode target ada (kalau diminta), dan log-prob Qwen3-4B. Personalisasi: kode dominan diterjemahkan ke kalimat untuk prompt (`describe_code`: "'에' written where '에서' is needed").
+- `validate_item_foundry.py`: tanpa tahap codebook. Permintaan bertarget memakai kode yang sudah muncul di item skill itu. Laporan menambah jumlah kode berbeda dan berapa yang berulang (≥2 item).
+- Dihapus: `build_codebook`, `MisconceptionEntry`, `load/save_codebook`, `_slug`, `data/misconception_codebook.json`, `item_foundry_results.json` dan `codebook_reverified_results.json` lama.
+- Paper: IV-B "Naming the misconceptions" ditulis ulang (label dihitung, bukan ditulis). Verifier sekarang tiga cek, V-B (protokol dan rating instruktur) disesuaikan, Fig. 2 diperbarui. Rating instruktur sekarang menilai apakah kode tiap distraktor adalah kesalahan pelajar yang nyata.
+
+**Langkah berikut (GPU):** `python3 src/validate_item_foundry.py --per-skill 20`.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
