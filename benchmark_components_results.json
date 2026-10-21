@@ -1,212 +1,13 @@
 {
   "n_pairs": 52,
-  "gec": {
-    "key_kept": {
-      "k": 42,
-      "n": 52,
-      "rate": 0.8076923076923077,
-      "ci95": [
-        0.681,
-        0.892
-      ]
-    },
-    "wrong_fixed": {
-      "k": 28,
-      "n": 52,
-      "rate": 0.5384615384615384,
-      "ci95": [
-        0.405,
-        0.6666
-      ]
-    },
-    "both": {
-      "k": 28,
-      "n": 52,
-      "rate": 0.5384615384615384,
-      "ci95": [
-        0.405,
-        0.6666
-      ]
-    },
-    "failures": [
-      {
-        "skill": "adj_relativizer",
-        "correct": "저는 큰 집을 좋아해요.",
-        "wrong": "저는 크는 집을 좋아해요.",
-        "gec_correct": "저는 큰 집을 좋아해요.",
-        "gec_wrong": "저는 작은 집을 좋아해요."
-      },
-      {
-        "skill": "honorific",
-        "correct": "선생님께서 가르치세요.",
-        "wrong": "선생님께서 가르쳐요.",
-        "gec_correct": "선생님께서 가르치세요.",
-        "gec_wrong": "선생님께서 가르쳐 주셨어요."
-      },
-      {
-        "skill": "honorific",
-        "correct": "사장님께서 일하세요.",
-        "wrong": "사장님께서 일해요.",
-        "gec_correct": "\" 사장님께서 일하세요.",
-        "gec_wrong": "사장님께서 일하시네요."
-      },
-      {
-        "skill": "honorific",
-        "correct": "할머니께서 쉬세요.",
-        "wrong": "할머니께서 쉬어요.",
-        "gec_correct": "할머니께서 쉬세요.",
-        "gec_wrong": "할머니께서 쉬셨어요."
-      },
-      {
-        "skill": "honorific",
-        "correct": "의사선생님께서 진료하세요.",
-        "wrong": "의사선생님께서 진료해요.",
-        "gec_correct": "의사선생님께서 진료하세요.",
-        "gec_wrong": "의사선생님께서 진료해 주세요."
-      },
-      {
-        "skill": "irregular_conj",
-        "correct": "저는 노래를 불러요.",
-        "wrong": "저는 노래를 부르어요.",
-        "gec_correct": "저는 노래를 불러요.",
-        "gec_wrong": "저는 노래를 부르어요."
-      },
-      {
-        "skill": "irregular_conj",
-        "correct": "저는 머리를 잘라요.",
-        "wrong": "저는 머리를 자르어요.",
-        "gec_correct": "저는 머리를 잘라요.",
-        "gec_wrong": "저는 머리를 자르어요."
-      },
-      {
-        "skill": "irregular_conj",
-        "correct": "저는 답을 몰라요.",
-        "wrong": "저는 답을 모르어요.",
-        "gec_correct": "저는 답을 몰라요.",
-        "gec_wrong": "저는 답을 모르았어요."
-      },
-      {
-        "skill": "mod_adverb",
-        "correct": "저는 빠르게 달려요",
-        "wrong": "저는 빠른 달려요",
-        "gec_correct": "저는 빠르게 달려요",
-        "gec_wrong": "저는 빠른 속도로 달려요"
-      },
-      {
-        "skill": "mod_adverb",
-        "correct": "저는 많게 먹어요",
-        "wrong": "저는 많은 먹어요",
-        "gec_correct": "저는 많이 먹어요",
-        "gec_wrong": "저는 많이 먹어요"
-      },
-      {
-        "skill": "noun_counter",
-        "correct": "학생은 다섯 명 있어요.",
-        "wrong": "학생은 다섯 개 있어요.",
-        "gec_correct": "고등학생이 다섯 명 있어요.",
-        "gec_wrong": "고등학생이 다섯 개 있어요."
-      },
-      {
-        "skill": "noun_counter",
-        "correct": "컵은 다섯 개 있어요.",
-        "wrong": "컵은 다섯 명 있어요.",
-        "gec_correct": "컵이 다섯 개 있어요.",
-        "gec_wrong": "컵은 다섯 개가 있어요."
-      },
-      {
-        "skill": "noun_counter",
-        "correct": "책은 다섯 권 있어요.",
-        "wrong": "책은 다섯 장 있어요.",
-        "gec_correct": "이 책은 다섯 권 있어요.",
-        "gec_wrong": "책은 다섯 장 있어요."
-      },
-      {
-        "skill": "noun_counter",
-        "correct": "선생님은 다섯 분 있어요.",
-        "wrong": "선생님은 다섯 명 있어요.",
-        "gec_correct": "선생님은 다섯 분이 계세요.",
-        "gec_wrong": "선생님은 다섯 분이 계세요."
-      },
-      {
-        "skill": "noun_counter",
-        "correct": "사과는 다섯 개 있어요.",
-        "wrong": "사과는 다섯 명 있어요.",
-        "gec_correct": "사과가 다섯 개 있어요.",
-        "gec_wrong": "사과가 다섯 개 있어요."
-      },
-      {
-        "skill": "time_range",
-        "correct": "3월부터 5월까지 여행해요.",
-        "wrong": "3월까지 5월까지 여행해요.",
-        "gec_correct": "저는 3월부터 5월까지 여행을 해요.",
-        "gec_wrong": "3월까지 5월까지 여행해요."
-      },
-      {
-        "skill": "time_range",
-        "correct": "두 시부터 네 시까지 회의해요.",
-        "wrong": "두 시까지 네 시까지 회의해요.",
-        "gec_correct": "오후 두 시부터 네 시까지 회의해요.",
-        "gec_wrong": "오후 두 시까지 네 시까지 회의해요."
-      },
-      {
-        "skill": "time_range",
-        "correct": "아침부터 저녁까지 운동해요.",
-        "wrong": "아침까지 저녁까지 운동해요.",
-        "gec_correct": "저는 아침부터 저녁까지 운동해요.",
-        "gec_wrong": "저는 아침부터 저녁까지 운동해요."
-      },
-      {
-        "skill": "time_range",
-        "correct": "아홉 시부터 열 시까지 공부해요.",
-        "wrong": "아홉 시까지 열 시까지 공부해요.",
-        "gec_correct": "아홉 시부터 열 시까지 공부해요.",
-        "gec_wrong": "아홉 시까지 열 시까지 공부해요."
-      },
-      {
-        "skill": "verb_choice",
-        "correct": "저는 숙제를 해요.",
-        "wrong": "저는 숙제를 봐요.",
-        "gec_correct": "저는 숙제를 해요.",
-        "gec_wrong": "저는 숙제를 봐요."
-      },
-      {
-        "skill": "verb_choice",
-        "correct": "저는 음악을 들어요.",
-        "wrong": "저는 음악을 봐요.",
-        "gec_correct": "저는 음악을 들어요.",
-        "gec_wrong": "저는 음악을 봐요."
-      },
-      {
-        "skill": "verb_choice",
-        "correct": "저는 영화를 봐요.",
-        "wrong": "저는 영화를 먹어요.",
-        "gec_correct": "저는 영화를 봐요.",
-        "gec_wrong": "저는 영화를 먹어요."
-      },
-      {
-        "skill": "verb_choice",
-        "correct": "저는 사진을 찍어요.",
-        "wrong": "저는 사진을 먹어요.",
-        "gec_correct": "저는 사진을 찍어요.",
-        "gec_wrong": "저는 사진을 먹어요."
-      },
-      {
-        "skill": "verb_choice",
-        "correct": "저는 밥을 먹어요.",
-        "wrong": "저는 밥을 마셔요.",
-        "gec_correct": "저는 밥을 먹어요.",
-        "gec_wrong": "저는 밥을 마셔요."
-      }
-    ]
-  },
   "classifier": {
     "curated_accuracy": {
-      "k": 37,
+      "k": 36,
       "n": 52,
-      "rate": 0.7115384615384616,
+      "rate": 0.6923076923076923,
       "ci95": [
-        0.5773,
-        0.8167
+        0.5573,
+        0.8009
       ]
     },
     "curated_failures": [
@@ -217,18 +18,13 @@
       },
       {
         "skill": "adj_relativizer",
-        "stem": "저는 ___ 옷을 좋아해요.",
-        "predicted": "particle_obj"
-      },
-      {
-        "skill": "adj_relativizer",
         "stem": "저는 ___ 음식을 좋아해요.",
         "predicted": "particle_obj"
       },
       {
         "skill": "adj_relativizer",
         "stem": "저는 ___ 집을 좋아해요.",
-        "predicted": "irregular_conj"
+        "predicted": "particle_obj"
       },
       {
         "skill": "adj_relativizer",
@@ -239,6 +35,11 @@
         "skill": "adj_relativizer",
         "stem": "저는 ___ 가방을 좋아해요.",
         "predicted": "particle_obj"
+      },
+      {
+        "skill": "honorific",
+        "stem": "할머니께서 ___.",
+        "predicted": "tense_past"
       },
       {
         "skill": "irregular_conj",
@@ -253,17 +54,32 @@
       {
         "skill": "irregular_conj",
         "stem": "저는 답을 ___.",
-        "predicted": "tense_past"
+        "predicted": "particle_obj"
+      },
+      {
+        "skill": "mod_adverb",
+        "stem": "저는 ___ 달려요",
+        "predicted": "irregular_conj"
+      },
+      {
+        "skill": "mod_adverb",
+        "stem": "저는 ___ 걸어요",
+        "predicted": "particle_obj"
       },
       {
         "skill": "mod_adverb",
         "stem": "저는 ___ 가요",
-        "predicted": "subj_topic"
+        "predicted": "particle_obj"
       },
       {
         "skill": "mod_adverb",
         "stem": "저는 ___ 말해요",
-        "predicted": "adj_relativizer"
+        "predicted": "particle_obj"
+      },
+      {
+        "skill": "mod_adverb",
+        "stem": "저는 ___ 먹어요",
+        "predicted": "particle_obj"
       },
       {
         "skill": "verb_choice",
@@ -272,17 +88,7 @@
       },
       {
         "skill": "verb_choice",
-        "stem": "저는 영화를 ___.",
-        "predicted": "particle_obj"
-      },
-      {
-        "skill": "verb_choice",
         "stem": "저는 사진을 ___.",
-        "predicted": "particle_obj"
-      },
-      {
-        "skill": "verb_choice",
-        "stem": "저는 밥을 ___.",
         "predicted": "particle_obj"
       }
     ],
@@ -303,7 +109,7 @@
         "skill": "particle_loc",
         "stem": "친구가 집___ 왔습니다.",
         "key": "에",
-        "predicted": "particle_loc"
+        "predicted": "particle_obj"
       },
       {
         "skill": "particle_loc",
@@ -321,7 +127,7 @@
         "skill": "time_range",
         "stem": "친구와 함께 저녁 7시부터 자정___ 영화를 봤어요.",
         "key": "까지",
-        "predicted": "time_range"
+        "predicted": "particle_obj"
       },
       {
         "skill": "irregular_conj",
@@ -333,7 +139,7 @@
         "skill": "irregular_conj",
         "stem": "친구에게 편지를 쓰는 것이 설레___",
         "key": "네요.",
-        "predicted": "tense_past"
+        "predicted": "honorific"
       },
       {
         "skill": "adj_relativizer",
@@ -355,12 +161,12 @@
       }
     ],
     "generated_kept": {
-      "k": 7,
+      "k": 5,
       "n": 11,
-      "rate": 0.6363636363636364,
+      "rate": 0.45454545454545453,
       "ci95": [
-        0.3538,
-        0.8483
+        0.2127,
+        0.7199
       ]
     }
   }
