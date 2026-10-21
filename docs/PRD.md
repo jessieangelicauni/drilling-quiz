@@ -4581,6 +4581,17 @@ Biaya: **nol LLM call tambahan**; ini hasil sampingan dari pengecekan yang dijal
 
 Simulasi §9.83–§9.85 tetap berlaku: yang diuji di sana adalah prior dengan kualitas tertentu, bukan cara membuatnya.
 
+
+### 9.88 Satu panggilan Qwen3 per item (2026-10-21)
+
+jc: tetap Qwen3, tapi jangan banyak call. Gate keunikan (§9.86) dan klasifikasi objective (§9.79) sekarang digabung menjadi **satu** panggilan reasoning Qwen3-4B per item. Prompt `_JUDGE_PROMPT` menampilkan stem, kunci + 6 kandidat (huruf A–G), dan daftar objective (nomor 1–11), lalu meminta dua baris: `Correct: <huruf>` dan `Objective: <nomor>`.
+
+Objective sekarang ditanyakan untuk item secara keseluruhan ("objective mana yang diuji pilihan ini"), bukan untuk pasangan kunci vs distraktor pertama.
+
+Sisa biaya per item: 1 generasi EXAONE, 1 panggilan reasoning Qwen3, dan 7 forward pass log-prob (tanpa generasi; ini juga sumber prior difficulty, §9.87).
+
+Akurasi 43/52 di §9.79 diukur dengan prompt terpisah. Prompt gabungan perlu dicek di run berikutnya (objective_ok per objective).
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

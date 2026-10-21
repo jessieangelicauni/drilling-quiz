@@ -21,9 +21,10 @@ library; nothing is parsed, diffed or labelled by our own rules.
      minimal pairs; 51/52 on the curated pairs, PRD §9.68). The three kept
      candidates with the highest log-probability -- the most plausible
      wrong answers -- become the distractors.
-  3. Objective check: Qwen3-4B in reasoning mode picks which learning
-     objective of the curriculum the item tests (43/52 on the curated
-     pairs, PRD §9.79); the item passes when it picks the requested one.
+  3. Objective check: in the same reasoning call as step 2 (one call per
+     item, PRD §9.88), Qwen3-4B also picks which learning objective of the
+     curriculum the item tests (43/52 on the curated pairs as a call of its
+     own, PRD §9.79); the item passes when it picks the requested one.
   4. Misconception embeddings: every distractor's mistake sentence is
      embedded with a multilingual sentence encoder. A useful embedding puts
      the same mistake in different items close together. Measured against
@@ -92,24 +93,22 @@ Write a new sentence, different from: {avoid}"""
 
 _EXAMPLE = "Example of this objective: correct {correct} / learners write {wrong}\n"
 
-_UNIQUE_PROMPT = """Fill the blank in this Korean sentence with each option.
+_JUDGE_PROMPT = """A Korean multiple-choice exercise. Fill the blank with each option.
 
 {stem}
 
 {options}
 
-Which options give a grammatically correct, natural Korean sentence? Answer with the letters only, separated by commas."""
-_LETTERS = "ABCDEFG"
-
-_CLASSIFY_PROMPT = """A learner wrote the wrong Korean sentence below. Which learning objective is the mistake about?
-
-Correct: {correct}
-Wrong:   {wrong}
-
 Learning objectives:
-{options}
+{objectives}
 
-Answer with one letter only."""
+1. Which options give a grammatically correct, natural Korean sentence?
+2. Which learning objective does choosing among these options test?
+
+Answer in exactly two lines:
+Correct: <letters, separated by commas>
+Objective: <number>"""
+_LETTERS = "ABCDEFG"
 
 
 def load_curriculum(path: Path | None, context: str) -> dict:
@@ -187,8 +186,7 @@ def check_items(items: list[dict], cur: dict) -> None:
     solver = SolverCheckProvider()
     tok, model = solver.tok, solver.model
     oids = list(cur["objectives"])
-    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:len(oids)]
-    options = "\n".join(f"{letters[i]}. {cur['objectives'][o]}" for i, o in enumerate(oids))
+    objectives = "\n".join(f"{i + 1}. {cur['objectives'][o]}" for i, o in enumerate(oids))
 
     @torch.no_grad()
     def reason(content: str) -> str:  # Qwen3 thinks first; the reply after </think>
@@ -197,16 +195,16 @@ def check_items(items: list[dict], cur: dict) -> None:
         out = model.generate(**enc, max_new_tokens=2048, do_sample=False)
         return tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True).split("</think>")[-1]
 
-    def classify(correct: str, wrong: str) -> str:
-        found = re.findall(rf"\b([{letters}])\b", reason(_CLASSIFY_PROMPT.format(correct=correct, wrong=wrong,
-                                                                                options=options)))
-        return oids[letters.index(found[-1])] if found else "none"
-
-    def correct_options(stem: str, texts: list[str]) -> set[str]:
-        letters_ = _LETTERS[:len(texts)]
-        shown = "\n".join(f"{letters_[i]}. {t}" for i, t in enumerate(texts))
-        found = set(re.findall(rf"\b([{letters_}])\b", reason(_UNIQUE_PROMPT.format(stem=stem, options=shown))))
-        return {texts[letters_.index(x)] for x in found}
+    def judge(stem: str, texts: list[str]) -> tuple[set[str], str]:
+        """One reasoning call: the options that are correct, and the objective tested."""
+        letters = _LETTERS[:len(texts)]
+        shown = "\n".join(f"{letters[i]}. {t}" for i, t in enumerate(texts))
+        reply = reason(_JUDGE_PROMPT.format(stem=stem, options=shown, objectives=objectives))
+        correct_line = re.search(r"Correct:(.*)", reply)
+        objective_line = re.search(r"Objective:\D*(\d+)", reply)
+        correct = set(re.findall(rf"\b([{letters}])\b", correct_line.group(1))) if correct_line else set()
+        number = int(objective_line.group(1)) if objective_line else 0
+        return {texts[letters.index(x)] for x in correct}, oids[number - 1] if 1 <= number <= len(oids) else "none"
 
     for it in items:
         if not it["format_ok"]:
@@ -216,7 +214,8 @@ def check_items(items: list[dict], cur: dict) -> None:
         candidates = {d["text"]: d for d in it["candidates"] if d["text"] != it["answer"]}  # distinct
         key_score = solver.sentence_logprob(fill(it["answer"]))
         shown = random.Random(it["stem"]).sample([it["answer"], *candidates], len(candidates) + 1)
-        it["judged_correct"] = sorted(correct_options(it["stem"], shown))
+        judged, it["predicted_objective"] = judge(it["stem"], shown)
+        it["judged_correct"] = sorted(judged)
         it["key_ok"] = it["answer"] in it["judged_correct"]
         scored = [(solver.sentence_logprob(fill(t)), t) for t in candidates if t not in it["judged_correct"]]
         kept = sorted((s, t) for s, t in scored if s < key_score)[::-1][:N_DISTRACTORS]
@@ -224,8 +223,6 @@ def check_items(items: list[dict], cur: dict) -> None:
         if len(kept) == N_DISTRACTORS:
             it["difficulty_mu"], it["difficulty_sigma2"] = difficulty_prior(key_score, [s for s, _ in kept])
         it["enough_distractors"] = len(it["distractors"]) == N_DISTRACTORS
-        it["predicted_objective"] = (classify(fill(it["answer"]), fill(it["distractors"][0]["text"]))
-                                     if it["distractors"] else "none")
         it["objective_ok"] = it["predicted_objective"] == it["objective"]
         it["accepted"] = it["key_ok"] and it["enough_distractors"] and it["objective_ok"]
 
