@@ -416,12 +416,10 @@ class MisconceptionItemGenerator:
 
 
 class ExaoneChat:
-    """An instruct model, 4-bit (PRD §9.53), as a Chat callable: by default
-    EXAONE-3.5-7.8B-Instruct, or any GENERATORS entry. Sampled, not greedy,
-    so repeated calls give different sentences."""
+    """EXAONE-3.5-7.8B-Instruct, 4-bit (PRD §9.53), as a Chat callable.
+    Sampled, not greedy, so repeated calls give different sentences."""
 
     MODEL = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"
-    GENERATORS = {"exaone-3.5-7.8b": MODEL, "gemma-3-12b": "google/gemma-3-12b-it"}
 
     def __init__(self, model_name: str = MODEL, temperature: float = 0.6, max_new_tokens: int = 400):
         import torch

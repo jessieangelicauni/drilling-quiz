@@ -43,12 +43,11 @@ if __name__ == "__main__":
     parser.add_argument("--per-skill", type=int, default=20)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--skills", default="all", help="comma-separated skill ids, for a quick check")
-    parser.add_argument("--generator", default="exaone-3.5-7.8b", choices=sorted(ExaoneChat.GENERATORS))
     parser.add_argument("--out", default="item_foundry_results.json")
     args = parser.parse_args()
 
     rng = random.Random(args.seed)
-    chat = ExaoneChat(ExaoneChat.GENERATORS[args.generator])
+    chat = ExaoneChat()
     solver = SolverCheckProvider()
     gen = MisconceptionItemGenerator(chat, solver.sentence_logprob, seed=args.seed)
 
