@@ -26,7 +26,7 @@ from enum import Enum
 # Section IV-C Eq. 4's actual target (85% success, not maximum-information
 # 50%) -- the logit offset such that sigma(theta - (theta - _LOGIT_OFFSET))
 # = 0.85. Shared constant so the offset used here can never silently drift
-# from the one validate_item_discrimination.py/validate_novelty2.py assume
+# from the one validate_item_discrimination.py assumes
 # when they report this policy's measured cost.
 _TARGET_SUCCESS = 0.85
 _LOGIT_OFFSET = math.log(_TARGET_SUCCESS / (1.0 - _TARGET_SUCCESS))

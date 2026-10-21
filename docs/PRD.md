@@ -4457,6 +4457,11 @@ Yang akan dihapus setelah terbukti: annotator, blank, filter, dan parser.
 
 `src/benchmark_v2.py` mengukur empat hal: format, gate kunci, gate tujuan, dan apakah embedding mengelompokkan kesalahan yang sama. Kode KAGAS dipakai hanya sebagai kunci evaluasi.
 
+
+### 9.81 Repo cleanup (2026-10-21)
+
+Atas persetujuan jc, file yang sudah tidak dipakai dihapus: `src/validate_novelty2.py` + `2_validation_results.json` (Novelty 2 dihapus, §9.70), `src/compare_feedback_models.py` + `src/patch_exaone35_remote_code.py` (perbandingan explainer selesai, Qwen3 dipilih), `src/benchmark_components.py` + `benchmark_components_results.json` (kesimpulan di §9.79; classifier pindah ke `benchmark_v2.py`), dan `eval_report.json` (output yang dibuat ulang tiap run, sekarang di `.gitignore`). `Korean_Grammar_Curriculum.docx` dan PDF literatur di `docs/` tetap disimpan (keputusan jc). `requirements.txt` ditambah `outlines`, `pydantic`, `sentence-transformers`. Menunggu hasil v2 sebelum menghapus `kagas_annotator.py`, heuristik di `item_foundry.py`, `llm_parsing.py`, fungsi pilih-huruf di `solver_check.py`, dan `difficulty_heuristic.py` (yang terakhir juga mengubah teks paper Section III-C). Audit lengkap: `/mnt/project-files/cleanup/audit-repo.md`.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

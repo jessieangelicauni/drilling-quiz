@@ -102,8 +102,7 @@ def correct_korean_conjugation(text: str) -> str:
 #   - it is a different family from the item generator (EXAONE), and the
 #     same weights as the key-uniqueness checker (solver_check.py), so the
 #     drill holds two models on the GPU, not three.
-# bf16 (~8GB), as validated; no trust_remote_code. compare_feedback_models.py
-# is the side-by-side reading pack against EXAONE.
+# bf16 (~8GB), as validated; no trust_remote_code.
 _MODEL_NAME = "Qwen/Qwen3-4B"
 _DETAILED_MIN_TOKENS = 1200  # empirically the minimum that reliably finishes; see qwen_feedback history
 

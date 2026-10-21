@@ -12,3 +12,8 @@ safetensors==0.8.0
 bitsandbytes==0.50.2
 kiwipiepy==0.24.0
 kiwipiepy_model==0.24.0
+
+# model-only item pipeline (benchmark_v2.py, PRD §9.80)
+outlines==1.3.3
+pydantic==2.13.5
+sentence-transformers
