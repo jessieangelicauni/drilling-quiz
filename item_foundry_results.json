@@ -1,0 +1,643 @@
+{
+  "settings": {
+    "per_skill": 4,
+    "seed": 0,
+    "skills": "all",
+    "out": "item_foundry_results.json"
+  },
+  "per_skill": {
+    "particle_loc": {
+      "accepted_untargeted": {
+        "k": 0,
+        "n": 4,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.4899
+        ]
+      },
+      "accepted_targeted": {
+        "k": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": [
+          0.0,
+          1.0
+        ]
+      },
+      "revisions_used": 0,
+      "rejection_reasons": {
+        "not-minimal": 17,
+        "wrong-category": 16,
+        "format": 1
+      },
+      "codes": {},
+      "codes_recurring": 0,
+      "rejected_examples": [
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 학교[에] 책을 두고 갔어요.\",\n  \"distractors\": [\n    \"학교[에서] 책을 두고 갔어요.\",  // Uses 에서 incorrectly instead of 에\n    \"친구가 집[에] 책을 두고 갔어요.\", // Incorrect location, changes the context\n    \"친구가 학교[에서] 공부를 했어요.\"  // Uses 에서 incorrectly for a different action context\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 학교학교[에서] 책을 두고 갔어요. 책을 두고 갔어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 학교친구가 집[에] 책을 두고 갔어요. 책을 두고 갔어요.' not-minimal: 2 edits",
+            "wrong-category: '친구가 학교친구가 학교[에서] 공부를 했어요. 책을 두고 갔어요.' wrong-category: MULTI, skill tests ['PART']"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 버스[에] 책을 두고 내렸어요.\",\n  \"distractors\": [\n    \"친구가 버스[에서] 책을 두고 내렸어요.\",  // Incorrect use of 에서 instead of 에\n    \"친구가 집[에] 책을 두고 내렸어요.\",       // Incorrect location context\n    \"친구가 버스[위에] 책을 두고 내렸어요.\"    // Incorrect particle 사용 (위에 instead of 에)\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 버스친구가 버스[에서] 책을 두고 내렸어요. 책을 두고 내렸어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 버스친구가 집[에] 책을 두고 내렸어요. 책을 두고 내렸어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 버스친구가 버스[위에] 책을 두고 내렸어요. 책을 두고 내렸어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 카페[에] 노트북을 가져왔어요.\",\n  \"distractors\": [\n    \"친구가 카페[에서] 노트북을 가져왔어요.\",      // Incorrect use of 에서 instead of 에\n    \"친구가 집[에] 노트북을 가져왔어요.\",          // Incorrect context changing location\n    \"친구가 카페[위에] 노트북을 가져왔어요.\"      // Incorrect particle 사용 (위에 instead of 에)\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 카페친구가 카페[에서] 노트북을 가져왔어요. 노트북을 가져왔어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 카페친구가 집[에] 노트북을 가져왔어요. 노트북을 가져왔어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 카페친구가 카페[위에] 노트북을 가져왔어요. 노트북을 가져왔어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"친구가 카페[에] 책을 읽고 있어요.\", \"distractors\": [\"카페[에서] 책을 읽고 있어요.\", \"카페[와] 책을 읽고 있어요.\", \"카페[으로] 책을 읽고 있어요.\"]}\n```",
+          "reasons": [
+            "not-minimal: '친구가 카페카페[에서] 책을 읽고 있어요. 책을 읽고 있어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 카페카페[와] 책을 읽고 있어요. 책을 읽고 있어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 카페카페[으로] 책을 읽고 있어요. 책을 읽고 있어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"친구가 도서관[에] 책을 읽고 있어요.\", \"distractors\": [\"친구가 도서관[에서] 책을 읽고 있어요.\", \"친구가 책[에] 도서관을 읽고 있어요.\", \"친구가 책[으로] 도서관에 가 있어요.\"]}\n```",
+          "reasons": [
+            "not-minimal: '친구가 도서관친구가 도서관[에서] 책을 읽고 있어요. 책을 읽고 있어요.' not-minimal: 2 edits",
+            "wrong-category: '친구가 도서관친구가 책[에] 도서관을 읽고 있어요. 책을 읽고 있어요.' wrong-category: MULTI, skill tests ['PART']",
+            "not-minimal: '친구가 도서관친구가 책[으로] 도서관에 가 있어요. 책을 읽고 있어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"친구가 집[에] 책을 읽고 있어요.\", \"distractors\": [\"친구가 집[에서] 책을 읽고 있어요.\", \"친구가 책[에] 집을 읽고 있어요.\", \"친구가 책[으로] 집에 가 있어요.\"]}\n```",
+          "reasons": [
+            "not-minimal: '친구가 집친구가 집[에서] 책을 읽고 있어요. 책을 읽고 있어요.' not-minimal: 2 edits",
+            "wrong-category: '친구가 집친구가 책[에] 집을 읽고 있어요. 책을 읽고 있어요.' wrong-category: MULTI, skill tests ['PART']",
+            "not-minimal: '친구가 집친구가 책[으로] 집에 가 있어요. 책을 읽고 있어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 서점[에] 책을 읽고 있어요.\",\n  \"distractors\": [\n    \"서점에서\",  // Incorrect use of 에서 (from 에서 to 에)\n    \"서점으로\",  // Incorrect use of 로 (direction particle) instead of 에\n    \"책을 서점에\"  // Incorrect word order placement altering the grammatical structure\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '친구가 서점서점에서 책을 읽고 있어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '친구가 서점서점으로 책을 읽고 있어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '친구가 서점책을 서점에 책을 읽고 있어요.' wrong-category: MULTI, skill tests ['PART']"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 집[에] 책을 읽고 있어요.\",\n  \"distractors\": [\n    \"친구가 집에서 책을 읽고 있어요.\",  // Incorrect use of 에서 instead of 에\n    \"집으로 친구가 책을 읽고 있어요.\",  // Incorrect use of 로 instead of 에, and disrupts subject-verb order\n    \"친구가 책을 집에 읽고 있어요.\",    // Incorrect placement of 에, disrupting grammatical structure\n    \"친구가 책을 읽고 있는 곳은 집에요.\" // Overly complex construction avoiding direct particle use\n  ]\n}\n```",
+          "reasons": [
+            "format: exactly 3 distractors are needed, got 4"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"학생이 교실[에] 공부하고 있어요.\",\n  \"distractors\": [\n    \"학생이 교실에서 공부하고 있어요.\",    // Incorrect use of 에서 instead of 에\n    \"교실로 학생이 공부하고 있어요.\",    // Incorrect use of 로 instead of 에, disrupting natural order\n    \"학생이 공부하고 있는 곳은 교실이에요.\" // Overly complex sentence avoiding direct particle use\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '학생이 교실학생이 교실에서 공부하고 있어요. 공부하고 있어요.' not-minimal: 2 edits",
+            "not-minimal: '학생이 교실교실로 학생이 공부하고 있어요. 공부하고 있어요.' not-minimal: 2 edits",
+            "wrong-category: '학생이 교실학생이 공부하고 있는 곳은 교실이에요. 공부하고 있어요.' wrong-category: MULTI, skill tests ['PART']"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 카페[에] 책을 읽고 있어요.\",\n  \"distractors\": [\n    \"카페에서\",  // Incorrect use of 에/에서 mix-up (destination vs. location)\n    \"카페로\",    // Incorrect use of 로 (direction) instead of 에\n    \"카페와\"     // Incorrect use of 과 (with) instead of 에\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '친구가 카페카페에서 책을 읽고 있어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '친구가 카페카페로 책을 읽고 있어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '친구가 카페카페와 책을 읽고 있어요.' wrong-category: MULTI, skill tests ['PART']"
+          ]
+        }
+      ]
+    },
+    "particle_obj": {
+      "accepted_untargeted": {
+        "k": 0,
+        "n": 4,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.4899
+        ]
+      },
+      "accepted_targeted": {
+        "k": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": [
+          0.0,
+          1.0
+        ]
+      },
+      "revisions_used": 0,
+      "rejection_reasons": {
+        "not-minimal": 25,
+        "format": 1,
+        "wrong-category": 8
+      },
+      "codes": {},
+      "codes_recurring": 0,
+      "rejected_examples": [
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 생일 선물[을] 주었어요.\",\n  \"distractors\": [\n    \"선물를 주었어요.\",  // Incorrect particle usage (vowel ending without '을')\n    \"선물을 주었읍니다.\",  // Incorrect particle '을' with outdated polite form\n    \"선물을 주었어요들.\"  // Incorrect pluralization marker '들' instead of correct object particle '을'\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 생일 선물선물를 주었어요. 주었어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 생일 선물선물을 주었읍니다. 주었어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 생일 선물선물을 주었어요들. 주었어요.' not-minimal: 3 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 생일 선물[을] 받았어요.\",\n  \"distractors\": [\n    \"선물를 받았어요.\",  // Incorrect particle usage (vowel ending without '을')\n    \"선물을 받었읍니다.\",  // Incorrect particle '을' with outdated polite form\n    \"선물을 받았어요들.\"  // Incorrect pluralization marker '들' instead of correct object particle '을'\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 생일 선물선물를 받았어요. 받았어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 생일 선물선물을 받었읍니다. 받았어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 생일 선물선물을 받았어요들. 받았어요.' not-minimal: 3 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 생일 선물[을] 받았어요.\",\n  \"distractors\": [\n    \"선물 받았어요.\",  // Omitting the object particle entirely (mistake: missing particle)\n    \"선물를 받았어요.\",  // Incorrect particle usage after a presumed vowel ending (mistake: wrong particle)\n    \"선물을 받았읍니다.\",  // Using outdated polite form instead of standard form (mistake: archaic form)\n    \"선물을 받았어요들.\",  // Incorrect use of plural marker instead of object particle (mistake: wrong particle usage)\n  ]\n}\n```",
+          "reasons": [
+            "format: exactly 3 distractors are needed, got 4"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"친구가 서점[에서] 책을 읽어요.\", \"distractors\": [\"친구가 서점[에서] 돈을 넣어요.\", \"친구가 서점[에서] 커피를 마셔요.\", \"친구가 서점[들에서] 책을 빌려요.\"]}\n```",
+          "reasons": [
+            "not-minimal: '친구가 서점친구가 서점[에서] 돈을 넣어요. 책을 읽어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 서점친구가 서점[에서] 커피를 마셔요. 책을 읽어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 서점친구가 서점[들에서] 책을 빌려요. 책을 읽어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"친구가 도서관[에서] 책을 읽어요.\", \"distractors\": [\"친구가 도서관[에서] 노트를 적어요.\", \"친구가 도서관[에서] 의자를 앉아요.\", \"친구가 도서관[들에서] 책을 찾습니다.\"]}\n```",
+          "reasons": [
+            "not-minimal: '친구가 도서관친구가 도서관[에서] 노트를 적어요. 책을 읽어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 도서관친구가 도서관[에서] 의자를 앉아요. 책을 읽어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 도서관친구가 도서관[들에서] 책을 찾습니다. 책을 읽어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"친구가 도서관[에서] 책을 읽어요.\", \"distractors\": [\"친구가 도서관[에] 책을 읽어요.\", \"친구가 도서관[에서] 사람을 만나요.\", \"[에서] 책을 읽어요 친구가 도서관.\"]}\n```",
+          "reasons": [
+            "not-minimal: '친구가 도서관친구가 도서관[에] 책을 읽어요. 책을 읽어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 도서관친구가 도서관[에서] 사람을 만나요. 책을 읽어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 도서관[에서] 책을 읽어요 친구가 도서관. 책을 읽어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 책[을] 읽어요.\",\n  \"distractors\": [\n    \"책에\",  // Mistaken use of particle before a noun\n    \"읽는을\",  // Incorrect formation attempting to combine verb and object particle incorrectly\n    \"을읽어요\"  // Missing particle before the object directly\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '친구가 책책에 읽어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '친구가 책읽는을 읽어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '친구가 책을읽어요 읽어요.' wrong-category: MULTI, skill tests ['PART']"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 과일[을] 먹어요.\",\n  \"distractors\": [\n    \"과일에\",  // Incorrect use of particle before the noun\n    \"먹는을\",  // Incorrect combination of verb and object particle\n    \"과일먹어요\"  // Incorrect omission of particle before the object\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '친구가 과일과일에 먹어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '친구가 과일먹는을 먹어요.' wrong-category: NOUN, skill tests ['PART']",
+            "wrong-category: '친구가 과일과일먹어요 먹어요.' wrong-category: MULTI, skill tests ['PART']"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 밥[을] 먹어요.\",\n  \"distractors\": [\n    \"친구가 밥에 먹어요.\",  // Incorrect use of particle before the noun\n    \"친구가 밥먹는을 먹어요.\",  // Incorrect combination of verb and object particle\n    \"친구가 밥먹어요.\"  // Incorrect omission of particle before the object\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 밥친구가 밥에 먹어요. 먹어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 밥친구가 밥먹는을 먹어요. 먹어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 밥친구가 밥먹어요. 먹어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 가게[에서] 사과를 샀어요.\",\n  \"distractors\": [\n    \"친구가 가게[에서] 사과를 찾았어요.\",  // Incorrect use of 찾다 (to find) instead of 사오다 (to buy)\n    \"친구가 가게[으로] 사과를 가져왔어요.\", // Incorrect preposition instead of using the object particle\n    \"친구가 가게[에서] 배를 샀어요.\"       // Incorrect object noun change without altering the grammar rule context\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 가게친구가 가게[에서] 사과를 찾았어요. 사과를 샀어요.' not-minimal: 2 edits",
+            "wrong-category: '친구가 가게친구가 가게[으로] 사과를 가져왔어요. 사과를 샀어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '친구가 가게친구가 가게[에서] 배를 샀어요. 사과를 샀어요.' wrong-category: MULTI, skill tests ['PART']"
+          ]
+        }
+      ]
+    },
+    "honorific": {
+      "accepted_untargeted": {
+        "k": 0,
+        "n": 4,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.4899
+        ]
+      },
+      "accepted_targeted": {
+        "k": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": [
+          0.0,
+          1.0
+        ]
+      },
+      "revisions_used": 0,
+      "rejection_reasons": {
+        "format": 1,
+        "not-minimal": 20,
+        "wrong-category": 4,
+        "target": 3
+      },
+      "codes": {},
+      "codes_recurring": 0,
+      "rejected_examples": [
+        {
+          "reply": "```json\n{\n  \"sentence\": \"선생님[께서] 학생들에게 영어를 가르치세요.\",\n  \"distractors\": [\n    \"선생님에게서\",  // Incorrect use of preposition instead of honorific suffix\n    \"선생님이\",     // Incorrect omission of honorific suffix\n    \"영어께서\"     // Incorrect application of honorific suffix to an object (verb) instead of subject\"\n  ]\n}\n```",
+          "reasons": [
+            "format: the reply was not a JSON object"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"[선생님께서] 학생들에게 영어를 가르치세요.\",\n  \"distractors\": [\n    \"[선생님에게서] 학생들에게 영어를 가르치세요.\",  // Incorrect use of preposition instead of honorific suffix\n    \"선생님이 학생들에게 영어를 가르치세요.\",         // Incorrect omission of honorific suffix\n    \"학생들에게 영어를 [선생님께서] 가르치세요.\"      // Incorrect placement of honorific suffix\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '[선생님에게서] 학생들에게 영어를 가르치세요. 학생들에게 영어를 가르치세요.' not-minimal: 3 edits",
+            "not-minimal: '선생님이 학생들에게 영어를 가르치세요. 학생들에게 영어를 가르치세요.' not-minimal: 2 edits",
+            "not-minimal: '학생들에게 영어를 [선생님께서] 가르치세요. 학생들에게 영어를 가르치세요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"[선생님께] 학생들에게 영어를 가르치세요.\",\n  \"distractors\": [\n    \"선생님께 학생들에게 영어를 가르치세요.\",          // Incorrect omission of particle\n    \"[선생님] 학생들에게 영어를 가르치세요.\",           // Incorrect placement without required particle\n    \"선생님께서 학생들에게 영어를 [가르치세요]. \"      // Incorrect placement and separation of verb suffix\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '선생님께 학생들에게 영어를 가르치세요. 학생들에게 영어를 가르치세요.' wrong-category: MULTI, skill tests ['END']",
+            "not-minimal: '[선생님] 학생들에게 영어를 가르치세요. 학생들에게 영어를 가르치세요.' not-minimal: 3 edits",
+            "wrong-category: '선생님께서 학생들에게 영어를 [가르치세요]. 학생들에게 영어를 가르치세요.' wrong-category: MULTI, skill tests ['END']"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"선생님께서는 저녁[으)시-께 식사를 하셨습니다.\",\n  \"distractors\": [\n    \"선생님께서는 저녁에 식사를 하셨습니다.\",  // Incorrect: Omitting the honorific suffix (-으)시-\n    \"선생님께서 저녁으시 식사를 하셨습니다.\",  // Incorrect: Incorrect spacing around (-으)시-\n    \"선생님께서는 저녁드시 식사를 하셨습니다.\"   // Incorrect: Misuse of '-시' without proper honorific form (-으)시-\n  ]\n}\n```",
+          "reasons": [
+            "target: put square brackets around exactly one part of the sentence"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"할머니께서 저녁[으)시-께 맛있는 국을 드셔서 기쁩니다.\",\n  \"distractors\": [\n    \"할머니께서 저녁에 맛있는 국을 드셔서 기쁩니다.\",  // Incorrect: Omitting the honorific suffix (-으)시-\n    \"할머니께서 저녁으시 맛있는 국을 드셔서 기쁩니다.\",  // Incorrect: Incorrect spacing around (-으)시-\n    \"할머니께서 저녁드시 맛있는 국을 드셔서 기쁩니다.\"   // Incorrect: Misuse of '-시' without proper honorific form (-으)시-\n  ]\n}\n```",
+          "reasons": [
+            "target: put square brackets around exactly one part of the sentence"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"할아버지께서 저녁[을 드시]셔서 행복합니다.\",\n  \"distractors\": [\n    \"할아버지께서 저녁을 드셔서 행복합니다.\",  // Incorrect: Omitting the honorific suffix (-으)시-\n    \"할아버지께서 저녁을드시셔서 행복합니다.\",  // Incorrect: Incorrect spacing around the honorific suffix\n    \"할아버지께서 저녁을드시셔서 행복했어요.\"   // Incorrect: Incorrect verb ending form after the honorific suffix\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '할아버지께서 저녁할아버지께서 저녁을 드셔서 행복합니다.셔서 행복합니다.' not-minimal: 2 edits",
+            "not-minimal: '할아버지께서 저녁할아버지께서 저녁을드시셔서 행복합니다.셔서 행복합니다.' not-minimal: 2 edits",
+            "not-minimal: '할아버지께서 저녁할아버지께서 저녁을드시셔서 행복했어요.셔서 행복합니다.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"선생님[께서] 책을 읽으시는 것을 보았습니다.\",\n  \"distractors\": [\n    \"선생님이 책을 읽으시는 것을 보았습니다.\",  // Incorrect: Omitting the honorific marker\n    \"선생님께서 책을 읽으시는 것을 봤습니다.\",  // Incorrect: Incorrect verb ending usage (봤다 instead of 보았습니다)\n    \"선생님께 책을 읽으시는 것을 보았습니다.\"   // Incorrect: Missing the verb marker '으' in the honorific construction\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '선생님선생님이 책을 읽으시는 것을 보았습니다. 책을 읽으시는 것을 보았습니다.' not-minimal: 2 edits",
+            "not-minimal: '선생님선생님께서 책을 읽으시는 것을 봤습니다. 책을 읽으시는 것을 보았습니다.' not-minimal: 2 edits",
+            "not-minimal: '선생님선생님께 책을 읽으시는 것을 보았습니다. 책을 읽으시는 것을 보았습니다.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"할아버지[께서] 정원[에서] 산책하시는 모습을 보았습니다.\",\n  \"distractors\": [\n    \"할아버지 정원에서 산책하시는 모습을 보았습니다.\",  // Incorrect: Omitting the honorific marker\n    \"할아버지께서 정원에서 산책하시는 모습을 봤습니다.\",  // Incorrect: Incorrect verb ending usage (봤다 instead of 보았습니다)\n    \"할아버지께 정원에서 산책하시는 모습을 보았습니다.\"   // Incorrect: Missing the appropriate verb marker '으' in the context, though structurally it's slightly adjusted for clarity and correctness\n  ]\n}\n```",
+          "reasons": [
+            "target: put square brackets around exactly one part of the sentence"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"할아버지[께서] 조용히 책을 읽으시는 모습이 아름다웠습니다.\",\n  \"distractors\": [\n    \"할아버지 조용히 책을 읽는 모습이 아름다웠습니다.\",    // Incorrect: Omitting the honorific marker '-시-'\n    \"할아버지께서 조용히 책을 읽으셨습니다. 모습이 아름다웠습니다.\",  // Incorrect: Misplaced use of '-으시-' removing contextual clarity around '읽으시는'\n    \"할아버지께서 조용히 책을 읽으시는 모습이 아름다웠습니다.\",  // Incorrect: Slightly awkward but technically correct; distracting due to implied but unnecessary punctuation or structure change\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '할아버지할아버지 조용히 책을 읽는 모습이 아름다웠습니다. 조용히 책을 읽으시는 모습이 아름다웠습니다.' wrong-category: MULTI, skill tests ['END']",
+            "not-minimal: '할아버지할아버지께서 조용히 책을 읽으셨습니다. 모습이 아름다웠습니다. 조용히 책을 읽으시는 모습이 아름다웠습니다.' not-minimal: 2 edits",
+            "not-minimal: '할아버지할아버지께서 조용히 책을 읽으시는 모습이 아름다웠습니다. 조용히 책을 읽으시는 모습이 아름다웠습니다.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"선생님[께서] 책을 읽으십니다.\",\n  \"distractors\": [\n    \"선생님에게서 책을 읽으십니다.\",  // Incorrect use of '에게서' instead of '-시-'\n    \"선생님읽으십니다 책을.\",        // Incorrect placement of '-시-', missing particle\n    \"'께서'읽으십니다 선생님 책을.\"  // Incorrect attachment of '-시-', disrupts grammatical structure\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '선생님선생님에게서 책을 읽으십니다. 책을 읽으십니다.' not-minimal: 2 edits",
+            "wrong-category: '선생님선생님읽으십니다 책을. 책을 읽으십니다.' wrong-category: MULTI, skill tests ['END']",
+            "not-minimal: '선생님'께서'읽으십니다 선생님 책을. 책을 읽으십니다.' not-minimal: 2 edits"
+          ]
+        }
+      ]
+    },
+    "time_range": {
+      "accepted_untargeted": {
+        "k": 0,
+        "n": 4,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.4899
+        ]
+      },
+      "accepted_targeted": {
+        "k": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": [
+          0.0,
+          1.0
+        ]
+      },
+      "revisions_used": 0,
+      "rejection_reasons": {
+        "wrong-category": 11,
+        "not-minimal": 5,
+        "target": 6
+      },
+      "codes": {},
+      "codes_recurring": 0,
+      "rejected_examples": [
+        {
+          "reply": "```json\n{\"sentence\": \"나는 수업[부터] 시작될 때까지 기다렸어요.\", \"distractors\": [\"수업[동안]\", \"수업[에서]\", \"수업[부터] 끝나기\"]}\n```",
+          "reasons": [
+            "wrong-category: '나는 수업수업[동안] 시작될 때까지 기다렸어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '나는 수업수업[에서] 시작될 때까지 기다렸어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '나는 수업수업[부터] 끝나기 시작될 때까지 기다렸어요.' wrong-category: MULTI, skill tests ['PART']"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"친구를 만난 [부터] 함께 산책했어요.\", \"distractors\": [\"친구를 만난 [동안]\", \"친구를 만난 [때]\", \"친구를 만난 [부터] 카페까지\"]}\n```",
+          "reasons": [
+            "wrong-category: '친구를 만난 친구를 만난 [동안] 함께 산책했어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '친구를 만난 친구를 만난 [때] 함께 산책했어요.' wrong-category: MULTI, skill tests ['PART']",
+            "wrong-category: '친구를 만난 친구를 만난 [부터] 카페까지 함께 산책했어요.' wrong-category: MULTI, skill tests ['PART']"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"수업이 시작된 [부터] 집중해서 공부했어요.\", \"distractors\": [\"수업이 시작된 [동안] 집중해서 공부했어요.\", \"수업이 시작된 [때] 집중해서 공부했어요.\", \"수업이 끝난 [부터] 집중해서 공부했어요.\"]}\n```",
+          "reasons": [
+            "not-minimal: '수업이 시작된 수업이 시작된 [동안] 집중해서 공부했어요. 집중해서 공부했어요.' not-minimal: 2 edits",
+            "not-minimal: '수업이 시작된 수업이 시작된 [때] 집중해서 공부했어요. 집중해서 공부했어요.' not-minimal: 2 edits",
+            "not-minimal: '수업이 시작된 수업이 끝난 [부터] 집중해서 공부했어요. 집중해서 공부했어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"나는 학교 [부터] [까지] 매일 공부해요.\",\n  \"distractors\": [\n    \"학교만\",  // Incorrect: Missing the temporal marker \"부터\"\n    \"동안\",    // Incorrect: Uses a different time expression without \"부터\" and \"까지\"\n    \"까지만\"   // Incorrect: Incorrect placement, missing \"부터\"\n  ]\n}\n```",
+          "reasons": [
+            "target: put square brackets around exactly one part of the sentence"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구와 함께 도서관 [부터] [까지] 책을 읽었어요.\",\n  \"distractors\": [\n    \"친구와 함께\",  // Incorrect: Replaces the temporal marker part with a phrase\n    \"[도서관동안]\",   // Incorrect: Incorrect format combining '부터' and '까지' incorrectly\n    \"까지만\"        // Incorrect: Incorrect placement and omission of '부터'\n  ]\n}\n```",
+          "reasons": [
+            "target: put square brackets around exactly one part of the sentence"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"나는 수업 [부터] [까지] 집중해서 공부했어요.\",\n  \"distractors\": [\n    \"수업 열심히\",    // Incorrect: Replaces the temporal marker part with an adverbial phrase\n    \"[수업 시작부터]\", // Incorrect: Incorrect grammatical structure omitting '까지'\n    \"까지만 집중\"     // Incorrect: Misplaces the markers and omits '부터' entirely\n  ]\n}\n```",
+          "reasons": [
+            "target: put square brackets around exactly one part of the sentence"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"친구와 함께[부터] 저녁 식사를 시작[까지] 했어요.\", \"distractors\": [\"친구와 함께부터 저녁 식사를 끝냈[까지] 했어요.\", \"친구와 함께 저녁 식사[부터] 시작까지 했어요.\", \"친구와 함께 식사[부터]부터 끝났[까지] 했어요.\"]}\n```",
+          "reasons": [
+            "target: put square brackets around exactly one part of the sentence"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"어제 [부터] 아침 [까지] 일어나지 못했어요.\", \"distractors\": [\"어제 [부터] 밤 [까지] 일어나지 못했어요.\", \"어제 아침 [부터] 못했[까지] 일어나지 못했어요.\", \"어제 [부터] 일어났[까지] 못하고 있었어요.\"]}\n```",
+          "reasons": [
+            "target: put square brackets around exactly one part of the sentence"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"수업은 [월요일] [부터] [금요일]까지 진행됩니다.\", \"distractors\": [\"수업은 [화요일] [부터] [수요일]까지 진행됩니다.\", \"수업은 [월요일] [부터] [주말]까지 진행됩니다.\", \"수업은 [주말] [부터] [금요일]까지 진행됩니다.\"]}\n```",
+          "reasons": [
+            "target: put square brackets around exactly one part of the sentence"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"수업은 오전 [9시부터] 시작해요.\",\n  \"distractors\": [\n    \"9시까지\",       // Mistakenly uses '까지' instead of '부터' indicating end instead of start.\n    \"오후 9시부터\",  // Incorrectly specifies time period with '오후' (afternoon), mismatching context expecting AM time.\n    \"10시부터\"       // Incorrect starting time given, does not match the intended '9시부터'.\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '수업은 오전 오후 9시부터 시작해요.' wrong-category: NOUN, skill tests ['PART']",
+            "wrong-category: '수업은 오전 10시부터 시작해요.' wrong-category: PUNCT, skill tests ['PART']"
+          ]
+        }
+      ]
+    },
+    "tense_past": {
+      "accepted_untargeted": {
+        "k": 0,
+        "n": 4,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.4899
+        ]
+      },
+      "accepted_targeted": {
+        "k": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": [
+          0.0,
+          1.0
+        ]
+      },
+      "revisions_used": 0,
+      "rejection_reasons": {
+        "wrong-category": 5,
+        "not-minimal": 24,
+        "target": 2
+      },
+      "codes": {},
+      "codes_recurring": 0,
+      "rejected_examples": [
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 [과거했어요] 저녁을 같이 먹으러 왔습니다.\",\n  \"distractors\": [\n    \"과거해요\",       // Incorrect use of '해요' instead of '았어요'\n    \"과거했어요요\",   // Overuse and incorrect form extension\n    \"과거했어요으\",   // Incorrect addition of an unrelated particle '으'\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '친구가 과거했어요요 저녁을 같이 먹으러 왔습니다.' wrong-category: MOD, skill tests ['END']",
+            "wrong-category: '친구가 과거했어요으 저녁을 같이 먹으러 왔습니다.' wrong-category: PART, skill tests ['END']"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"어제 친구가 [과거했어요] 저녁을 같이 먹으러 왔습니다.\",\n  \"distractors\": [\n    \"과거해요 저녁을 같이 먹으러 왔습니다.\",  // Incorrect use of '해요' instead of '았어요'\n    \"과거했어요 저녁을 같이 먹으러 왔어요.\",  // Incorrect verb ending, should be past tense but with wrong verb ending\n    \"과거했어요요 저녁을 같이 먹으러 왔습니다.\", // Overuse of '요' which is incorrect in this context\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '어제 친구가 과거해요 저녁을 같이 먹으러 왔습니다. 저녁을 같이 먹으러 왔습니다.' not-minimal: 2 edits",
+            "wrong-category: '어제 친구가 과거했어요 저녁을 같이 먹으러 왔어요. 저녁을 같이 먹으러 왔습니다.' wrong-category: MULTI, skill tests ['END']",
+            "not-minimal: '어제 친구가 과거했어요요 저녁을 같이 먹으러 왔습니다. 저녁을 같이 먹으러 왔습니다.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 어제 저녁을 [함께 먹었어요] 와서 정말 기뻤습니다.\",\n  \"distractors\": [\n    \"친구가 어제 저녁을 함께 먹어요 와서 정말 기뻤습니다.\",  // Incorrect use of '해요' instead of '었어요'\n    \"친구가 어제 저녁을 먹었어요요 와서 정말 기뻤습니다.\",  // Incorrect overuse or misuse of '요'\n    \"친구가 어제 저녁을 함께 먹었습니다 와서 정말 기뻤습니다.\"  // Incorrect verb tense or structure, missing past tense marker\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 어제 저녁을 친구가 어제 저녁을 함께 먹어요 와서 정말 기뻤습니다. 와서 정말 기뻤습니다.' not-minimal: 3 edits",
+            "not-minimal: '친구가 어제 저녁을 친구가 어제 저녁을 먹었어요요 와서 정말 기뻤습니다. 와서 정말 기뻤습니다.' not-minimal: 3 edits",
+            "not-minimal: '친구가 어제 저녁을 친구가 어제 저녁을 함께 먹었습니다 와서 정말 기뻤습니다. 와서 정말 기뻤습니다.' not-minimal: 3 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"어제 친구와 함께 영화[를 봤어요]\", \"distractors\": [\"영화[를 봤다]\", \"영화[를 봤어요요]\", \"영화[를 본어요]\"]}\n```",
+          "reasons": [
+            "not-minimal: '어제 친구와 함께 영화영화[를 봤다]' not-minimal: 2 edits",
+            "not-minimal: '어제 친구와 함께 영화영화[를 봤어요요]' not-minimal: 2 edits",
+            "not-minimal: '어제 친구와 함께 영화영화[를 본어요]' not-minimal: 3 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"친구와 어제 영화[를 봤어요]\", \"distractors\": [\"친구와 어제 영화[를 봤다]\", \"친구와 어제 영화[를 봤어요요]\", \"친구와 어제 영화[를 본어요]\"]}\n```",
+          "reasons": [
+            "not-minimal: '친구와 어제 영화친구와 어제 영화[를 봤다]' not-minimal: 2 edits",
+            "not-minimal: '친구와 어제 영화친구와 어제 영화[를 봤어요요]' not-minimal: 2 edits",
+            "not-minimal: '친구와 어제 영화친구와 어제 영화[를 본어요]' not-minimal: 3 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\"sentence\": \"어제 친구와 영화[를 봤어요]를 봤어요.\", \"distractors\": [\"어제 친구와 영화[를 봤다]를 봤어요.\", \"어제 친구와 영화[보았어요요]를 봤어요.\", \"[어제 친구와 영화를] 봤어요요.\"]}\n```\n\nNote: The distractors are crafted to illustrate typical mistakes while ensuring each deviation is distinct and clearly incorrect within the context provided. However, for absolute clarity and minimal edits, let's refine them further:\n\n```json\n{\"sentence\": \"어제 친구와 영화[를 봤어요]를 봤어요.\", \"distractors\": [\"어제 친구와 영화[를 봤다]를 봤어요.\", \"어제 친구와 영화[보았어요요]를 봤어요.\", \"[어제 친구와 ",
+          "reasons": [
+            "not-minimal: '어제 친구와 영화어제 친구와 영화[를 봤다]를 봤어요.를 봤어요.' not-minimal: 3 edits",
+            "not-minimal: '어제 친구와 영화어제 친구와 영화[보았어요요]를 봤어요.를 봤어요.' not-minimal: 3 edits",
+            "not-minimal: '어제 친구와 영화[어제 친구와 영화를] 봤어요요.를 봤어요.' not-minimal: 3 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"[학생] 선생님께 선물[을 줬어요]\",\n  \"distractors\": [\n    \"[학생] 선생님께 선물[을 가졌어요]\",  // Incorrect use of possession verb instead of past tense\n    \"[학생] 선생님께 선물[을 사요]\",      // Incorrect use of present tense polite form\n    \"[학생] 선생님께 선물[을 했습니다]\"    // Incorrect use of formal past tense without '-었어요' style\n  ]\n}\n```",
+          "reasons": [
+            "target: put square brackets around exactly one part of the sentence"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관[에서 책을 읽었어요]\",\n  \"distractors\": [\n    \"친구가 도서관[에서 책을 읽고 있어요]\",  // Incorrect use of present continuous tense\n    \"친구가 도서관[에서 책을 읽어요]\",      // Incorrect use of present tense instead of past tense\n    \"친구가 도서관[에서 책을 봤어요]\",      // Incorrect choice of verb form, '봤어요' instead of '읽었어요'\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 도서관친구가 도서관[에서 책을 읽고 있어요]' not-minimal: 3 edits",
+            "not-minimal: '친구가 도서관친구가 도서관[에서 책을 읽어요]' not-minimal: 3 edits",
+            "not-minimal: '친구가 도서관친구가 도서관[에서 책을 봤어요]' not-minimal: 3 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 어제 도서관[에서 책을 읽었어요]\",\n  \"distractors\": [\n    \"친구가 오늘 도서관[에서 책을 읽었어요]\",  // Incorrect temporal indicator ('오늘' instead of '어제')\n    \"친구가 도서관[에서 책을 읽고 있어요]\",      // Incorrect tense, present continuous instead of past ('읽고 있어요')\n    \"친구가 도서관[에서 잡지를 읽었어요]\",      // Incorrect object, changes '책' to '잡지' (different noun mistake)\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 어제 도서관친구가 오늘 도서관[에서 책을 읽었어요]' not-minimal: 2 edits",
+            "not-minimal: '친구가 어제 도서관친구가 도서관[에서 책을 읽고 있어요]' not-minimal: 3 edits",
+            "not-minimal: '친구가 어제 도서관친구가 도서관[에서 잡지를 읽었어요]' not-minimal: 3 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 어제 저녁[을/에/에서] 맛있는 김치찌개를 즐겼어요.\",\n  \"distractors\": [\n    \"을먹어요\",  // Incorrect use of verb ending instead of past tense marker\n    \"에서먹었어요\",  // Incorrect combination of location particle and past tense\n    \"을 즐겼어요\"  // Redundant use of '을' before the past tense marker\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '친구가 어제 저녁을먹어요 맛있는 김치찌개를 즐겼어요.' wrong-category: MULTI, skill tests ['END']",
+            "not-minimal: '친구가 어제 저녁에서먹었어요 맛있는 김치찌개를 즐겼어요.' not-minimal: 2 edits",
+            "wrong-category: '친구가 어제 저녁을 즐겼어요 맛있는 김치찌개를 즐겼어요.' wrong-category: MULTI, skill tests ['END']"
+          ]
+        }
+      ]
+    },
+    "irregular_conj": {
+      "accepted_untargeted": {
+        "k": 0,
+        "n": 4,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.4899
+        ]
+      },
+      "accepted_targeted": {
+        "k": 0,
+        "n": 0,
+        "rate": null,
+        "ci95": [
+          0.0,
+          1.0
+        ]
+      },
+      "revisions_used": 0,
+      "rejection_reasons": {
+        "target": 1,
+        "not-minimal": 19,
+        "wrong-category": 8,
+        "format": 2
+      },
+      "codes": {},
+      "codes_recurring": 0,
+      "rejected_examples": [
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구[가] 아름다움[을] 발견해요.\",\n  \"distractors\": [\n    \"친구[을] 아름다움[을] 발견해요.\",  // Incorrect: Reusing '아름다움' incorrectly in place of verb stem.\n    \"친구[에] 아름다움[이] 있어요.\",      // Incorrect: Using different verb structure without adhering to irregular verb stem rule before vowel ending.\n    \"친구[가] 아름다움[가] 있어요.\"       // Incorrect: Incorrectly adding '-가' to both parts instead of correctly applying irregular stem rule.\n  ]\n}\n```",
+          "reasons": [
+            "target: put square brackets around exactly one part of the sentence"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"그녀는 편안함[을] 찾기 위해 일찍 자요.\",\n  \"distractors\": [\n    \"그녀는 편안함[가] 찾기 위해 일찍 자요.\",  // Incorrect: Incorrect use of verb stem ending before vowel.\n    \"그녀는 편안함[에서] 찾기 위해 일찍 자요.\",  // Incorrect: Misuse of particle before vowel ending.\n    \"그녀는 편안함[으]로 찾기 위해 일찍 자요.\",  // Incorrect: Incorrect insertion of 받침 '으' instead of proper irregular stem rule application.\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '그녀는 편안함그녀는 편안함[가] 찾기 위해 일찍 자요. 찾기 위해 일찍 자요.' not-minimal: 3 edits",
+            "not-minimal: '그녀는 편안함그녀는 편안함[에서] 찾기 위해 일찍 자요. 찾기 위해 일찍 자요.' not-minimal: 3 edits",
+            "not-minimal: '그녀는 편안함그녀는 편안함[으]로 찾기 위해 일찍 자요. 찾기 위해 일찍 자요.' not-minimal: 3 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 행복함[을] 나누려고 모임에 가요.\",\n  \"distractors\": [\n    \"친구가 행복함[가] 나누려고 모임에 가요.\",  // Incorrect: Misuse of verb stem ending before vowel.\n    \"친구가 행복함[에] 나누려고 모임에 가요.\",  // Incorrect: Misuse of particle '에' instead of focusing on irregular stem rule.\n    \"친구가 행복함[으로] 나누려고 모임에 가요.\",  // Incorrect: Incorrect use of '으로' instead of proper handling of irregular stems before vowels.\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 행복함친구가 행복함[가] 나누려고 모임에 가요. 나누려고 모임에 가요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 행복함친구가 행복함[에] 나누려고 모임에 가요. 나누려고 모임에 가요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 행복함친구가 행복함[으로] 나누려고 모임에 가요. 나누려고 모임에 가요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 저녁[르] 맛있게 먹어요.\",\n  \"distractors\": [\n    \"친구가 저녁ᄇ 맛있게 먹어요.\",\n    \"친구가 저녁ᄃ 맛있게 먹어요.\",\n    \"친구가 저녁ᄉ 맛있게 먹어요.\"\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 저녁친구가 저녁ᄇ 맛있게 먹어요. 맛있게 먹어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 저녁친구가 저녁ᄃ 맛있게 먹어요. 맛있게 먹어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 저녁친구가 저녁ᄉ 맛있게 먹어요. 맛있게 먹어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 저녁[르] 맛있게 먹어요.\",\n  \"distractors\": [\n    \"친구가 저녁ᄇ 맛있게 먹어요.\",  // Incorrect ending consonant\n    \"친구가 저녁ᄑ 맛있게 먹어요.\",  // Incorrect verb stem application (wrong vowel rule application)\n    \"친구가 저녁ᄆ 맛있게 먹어요.\",  // Incorrect use of different ending form not related to irregular stem rule\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 저녁친구가 저녁ᄇ 맛있게 먹어요. 맛있게 먹어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 저녁친구가 저녁ᄑ 맛있게 먹어요. 맛있게 먹어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 저녁친구가 저녁ᄆ 맛있게 먹어요. 맛있게 먹어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 저녁[르] 맛있게 먹어요.\",\n  \"distractors\": [\n    \"친구가 저녁ᄇ 먹어요.\",          // Incorrect application of irregular ending without '르'\n    \"친구가 저녁ᄉ 맛있게 먹어요.\",    // Incorrect verb stem application (wrong vowel rule application)\n    \"친구가 저녁ᄆ 먹어요.\"           // Incorrect ending particle used instead of '르'\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '친구가 저녁친구가 저녁ᄇ 먹어요. 맛있게 먹어요.' wrong-category: MULTI, skill tests ['CONJ', 'END']",
+            "not-minimal: '친구가 저녁친구가 저녁ᄉ 맛있게 먹어요. 맛있게 먹어요.' not-minimal: 2 edits",
+            "wrong-category: '친구가 저녁친구가 저녁ᄆ 먹어요. 맛있게 먹어요.' wrong-category: MULTI, skill tests ['CONJ', 'END']"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 카페[에서] 이야기르 해요.\",\n  \"distractors\": [\n    \"카페로\",  // Incorrect use of locative particle '로' instead of '에서'\n    \"카페를\",  // Incorrect use of object marker '를' instead of '에서'\n    \"카페와\"  // Incorrect use of conjunction '와' instead of '에서'\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '친구가 카페카페로 이야기르 해요.' wrong-category: MULTI, skill tests ['CONJ', 'END']",
+            "wrong-category: '친구가 카페카페를 이야기르 해요.' wrong-category: MULTI, skill tests ['CONJ', 'END']",
+            "wrong-category: '친구가 카페카페와 이야기르 해요.' wrong-category: MULTI, skill tests ['CONJ', 'END']"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관르 [에서] 책을 읽어요.\",\n  \"distractors\": [\n    \"도서관로 책을 읽어요.\",  // Incorrect use of locative particle '로' instead of '에서'\n    \"도서관을 책을 읽어요.\",  // Incorrect use of object marker '를' instead of '에서'\n    \"도서관과 책을 읽어요.\"  // Incorrect use of conjunction '과' instead of '에서'\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 도서관르 도서관로 책을 읽어요. 책을 읽어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 도서관르 도서관을 책을 읽어요. 책을 읽어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 도서관르 도서관과 책을 읽어요. 책을 읽어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 도서관[에서] 책을 읽어요.\",\n  \"distractors\": [\n    \"친구가 도서관르 책을 읽어요.\",  // Incorrect '르' instead of '에서'\n    \"친구가 도서관만 책을 읽어요.\",  // Incorrect use of '만' instead of '에서'\n    \"친구가 도서관과 책을 읽어요.\"  // Incorrect use of '과' instead of '에서'\n  ]\n}\n```",
+          "reasons": [
+            "not-minimal: '친구가 도서관친구가 도서관르 책을 읽어요. 책을 읽어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 도서관친구가 도서관만 책을 읽어요. 책을 읽어요.' not-minimal: 2 edits",
+            "not-minimal: '친구가 도서관친구가 도서관과 책을 읽어요. 책을 읽어요.' not-minimal: 2 edits"
+          ]
+        },
+        {
+          "reply": "```json\n{\n  \"sentence\": \"친구가 오래된 책[을] 찾고 있어요.\",\n  \"distractors\": [\n    \"책들을\",  // Incorrect use of plural form instead of singular stem with vowel ending rule.\n    \"을에게\",  // Incorrect particle usage; \"에게\" is not applicable here and changes meaning.\n    \"을로써\"  // Incorrect suffix usage; \"로써\" doesn't fit the context and alters the verb form incorrectly.\n  ]\n}\n```",
+          "reasons": [
+            "wrong-category: '친구가 오래된 책책들을 찾고 있어요.' wrong-category: NOUN, skill tests ['CONJ', 'END']",
+            "wrong-category: '친구가 오래된 책을에게 찾고 있어요.' wrong-category: PART, skill tests ['CONJ', 'END']",
+            "wrong-category: '친구가 오래된 책을로써 찾고 있어요.' wrong-category: PART, skill tests ['CONJ', 'END']"
+          ]
+        }
+      ]
+    }
+  },
+  "items": []
+}
