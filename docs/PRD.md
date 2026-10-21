@@ -4621,6 +4621,19 @@ Penyebab yang ditemukan:
 - **Prompt dirapikan** (permintaan jc): ketiga prompt dipersingkat sekitar sepertiga. Spesifikasi per field ditulis sebagai daftar pendek, tanpa pengulangan; prompt repair tidak lagi mengulang kalimat (stem + jawaban sudah cukup); prompt judge menaruh pertanyaan langsung di template tiga baris jawabannya, sehingga Qwen3 tidak perlu memetakan pertanyaan bernomor ke baris jawaban.
 
 
+### 9.91 Hasil v2.3 dan v2.4: jawaban dikunci ke kata kalimat, prior distandarkan (2026-10-21)
+
+**Hasil v2.3** (commit 82a7a9a): diterima 11/66 (17%, CI 10–27%); 9 sebelum repair, jadi repair menambah 2. Item yang lolos format sudah jauh lebih bersih (mis. `저는 어제 검사를 ___.` → 완료했어요 / 완료하고요 / 완료하니까요 / 완료하려고해요).
+
+**Hambatan utama sekarang: format, 35/66.** Ke-31 kegagalan semuanya jawaban yang bukan satu kata kalimat: EXAONE menggabungkan beberapa kata tanpa spasi (`센서를이용해`, `공장장께서품질검사를`), karena pola skema jawaban melarang spasi. honorific dan noun_counter 0/6. Distraktor gabungan yang sama (`로봇을개선해요`) juga masih lolos judge di sebagian item.
+
+**Prior difficulty jenuh:** 9 dari 11 item di −3 (`at_clip` 0.82). Qwen3 jauh lebih yakin daripada pelajar, jadi skala −logit p mentah tidak bisa dipakai.
+
+**Perubahan v2.4:**
+- **Generasi dua tahap dengan model yang sama (constrained decoding).** Tahap 1: kalimat saja. Tahap 2: skema dibuat dari kalimat itu; `answer` adalah enum kata-kata kalimat tersebut, sehingga jawaban pasti satu kata utuh (by construction), lalu 3 distraktor. Tahap 1 hanya ~20 token, jadi total token hampir sama. Qwen tetap 1 call.
+- **Prior distandarkan:** `key_logit = logprob(kunci) − logsumexp(logprob(distraktor))` tanpa clip, lalu distandarkan terhadap bank soal (di benchmark: terhadap item yang diterima di batch itu) → mean 0, SD 1 di skala Urnings. Hanya urutan dari model yang dipakai; σ̂² = 1 tetap.
+
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

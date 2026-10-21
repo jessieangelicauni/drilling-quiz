@@ -3,19 +3,19 @@ Measures the model-only item pipeline (Versi 2, PRD §9.80) before it
 replaces item_foundry's verification code. Every step is a model or a
 library; nothing is parsed, diffed or labelled by our own rules.
 
-  1. Generate: EXAONE-3.5-7.8B through Outlines with a JSON schema, so the
-     output is valid by construction: one short correct Korean sentence,
-     the whole word in it that the objective is about (the answer, with its
-     particle or ending attached), and three distractors, each a whole word
-     that replaces it. The stem is the sentence with that word blanked;
-     writing the whole sentence first and choosing the word after is the
-     order an LLM writes well (asking it for a stem with ___ directly put
-     the blank in the wrong place in most items of the first run, §9.82).
+  1. Generate: EXAONE-3.5-7.8B through Outlines with JSON schemas, in two
+     constrained decodes, so the output is valid by construction. First one
+     short correct Korean sentence. Then the answer -- a schema enum of the
+     sentence's own words, so it is always one whole word of it (asked for
+     in one schema, it glued several words together in 31/66 items, §9.91)
+     -- and three distractors, each a whole word that replaces it. The stem
+     is the sentence with that word blanked; writing the sentence first and
+     choosing the word after is the order an LLM writes well (§9.82).
      Each distractor states its learner mistake (one English sentence)
      BEFORE its wrong form, so the model decides on a mistake and then
      writes it, instead of writing a word and explaining it after (§9.90).
      All curated examples of the objective, from log_likelihood_results.json,
-     are shown in the prompt.
+     are shown in both prompts.
   2. Judge: one Qwen3-4B reasoning call per item (§9.88) names the options
      that make a correct sentence, the learning objective the item tests, and
      the wrong options a real learner could choose. A distractor fails when
@@ -33,10 +33,11 @@ library; nothing is parsed, diffed or labelled by our own rules.
      of this evaluation, not in the pipeline: nearest-neighbour agreement
      and mean cosine similarity of same-mistake vs different-mistake pairs,
      within each objective.
-  5. Difficulty: the prior for Urnings is -logit of Qwen3-4B's probability
-     of the key among the four options, from the log-probabilities the key
-     check already computed (difficulty_llm.py, PRD §9.87) -- no extra model
-     call; reported next to the morpheme heuristic it replaces.
+  5. Difficulty: the prior for Urnings is the log-odds of Qwen3-4B choosing
+     the key over the distractors, from the log-probabilities the key check
+     already computed, standardised across the accepted items (difficulty_llm.py,
+     PRD §9.91) -- no extra model call; reported next to the morpheme
+     heuristic it replaces.
 
 The curriculum is data: --curriculum names a JSON file
 {"context": "...", "level": "...", "objectives": {"id": "description", ...},
@@ -56,12 +57,13 @@ import json
 import random
 from pathlib import Path
 
+from typing import Literal
+
 from pydantic import BaseModel, Field, create_model
 
 from eval_harness import rate
 from item_foundry import SKILLS, ExaoneChat
 
-HANGUL_WORD = r"^[가-힣]{1,10}$"
 HANGUL_OPTION = r"^[가-힣]{1,8}$"  # a distractor replaces one word, not a sentence
 HANGUL_SENTENCE = r"^[가-힣0-9 ,]{4,40}[.?!]$"
 N_DISTRACTORS = 3
@@ -72,26 +74,34 @@ class Distractor(BaseModel):
     text: str = Field(pattern=HANGUL_OPTION)
 
 
-class Item(BaseModel):
+class Sentence(BaseModel):
     sentence: str = Field(pattern=HANGUL_SENTENCE)
-    answer: str = Field(pattern=HANGUL_WORD)
-    distractors: list[Distractor] = Field(min_length=N_DISTRACTORS, max_length=N_DISTRACTORS)
+
+
+def _item_schema(words: list[str]) -> type[BaseModel]:
+    """The answer can only be one of the sentence's own words (v2.3 glued
+    several words into one answer in 31/66 items, PRD §9.91)."""
+    return create_model("Item", answer=(Literal[tuple(words)], ...),
+                        distractors=(list[Distractor], Field(min_length=N_DISTRACTORS, max_length=N_DISTRACTORS)))
 
 
 def _replacements(n: int) -> type[BaseModel]:
     return create_model(f"Replacements{n}", distractors=(list[Distractor], Field(min_length=n, max_length=n)))
 
 
-_PROMPT = """Create one Korean fill-in-the-blank item for {level} learners (first language: Indonesian).
-Objective: {objective}
-Setting: {context}; {topic}
+_SENTENCE_PROMPT = """Write one short, correct Korean sentence (at most 8 words) for {level} learners
+(first language: Indonesian) that uses this grammar: {objective}
+Setting: {context}; {topic}. Use one word of the setting.
 {examples}
-- sentence: a short, correct Korean sentence (at most 8 words) that uses the objective and one word of the setting.
-- answer: the one word of the sentence the objective is about, copied exactly, with its particle or ending.
+Do not reuse these sentences: {avoid}"""
+
+_ITEM_PROMPT = """Turn this Korean sentence into a fill-in-the-blank item for {level} learners. Objective: {objective}
+Sentence: {sentence}
+{examples}
+- answer: the word of the sentence the objective is about.
 - distractors: 3 wrong replacements for that word, each from a different learner mistake:
   - mistake: one English sentence naming the mistake.
-  - text: the single wrong word it produces (wrong particle, ending or form). It must make the sentence wrong.
-Do not reuse these sentences: {avoid}"""
+  - text: the single wrong word it produces (wrong particle, ending or form). It must make the sentence wrong."""
 
 _REPAIR_PROMPT = """Korean fill-in-the-blank item for {level} learners. Objective: {objective}
 {examples}
@@ -176,6 +186,8 @@ class _Exaone:
 
 
 def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
+    """Two constrained decodes with the same model: the sentence, then the
+    answer (one of its words, by schema) and the distractors."""
     rng = random.Random(seed)
     examples = curated_examples()
     items = []
@@ -185,21 +197,31 @@ def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
             for _ in range(per_objective):
                 module = rng.choice(sorted(cur["modules"]))
                 topic = rng.choice(cur["modules"][module])
-                content = _PROMPT.format(level=cur["level"], context=cur["context"],
-                                         topic=f"{module}: {topic}" if module else topic, objective=objective,
-                                         examples=examples.get(oid, ""), avoid="; ".join(seen[-6:]) or "(none yet)")
-                raw = exaone(content, Item, rng.randrange(2**31))
+                base = {"objective": oid, "topic": topic}
                 try:
-                    item = Item.model_validate_json(raw).model_dump()
+                    sentence = Sentence.model_validate_json(exaone(_SENTENCE_PROMPT.format(
+                        level=cur["level"], context=cur["context"], topic=f"{module}: {topic}" if module else topic,
+                        objective=objective, examples=examples.get(oid, ""),
+                        avoid="; ".join(seen[-6:]) or "(none yet)"), Sentence, rng.randrange(2**31))).sentence
                 except ValueError:  # cut off by max_new_tokens
-                    items.append({"objective": oid, "topic": topic, "raw": raw, "format_ok": False})
+                    items.append({**base, "format_ok": False})
                     continue
-                if item["sentence"].rstrip(".?!").split().count(item["answer"]) != 1:  # one whole word of it
-                    items.append({"objective": oid, "topic": topic, **item, "format_ok": False})
+                words = sentence.rstrip(".?!").split()
+                unique = [w for w in dict.fromkeys(words) if words.count(w) == 1]
+                if not unique:
+                    items.append({**base, "sentence": sentence, "format_ok": False})
                     continue
-                seen.append(item["sentence"])
-                stem = item["sentence"].replace(item["answer"], "___", 1)
-                items.append({"objective": oid, "topic": topic, "stem": stem, **item, "format_ok": True})
+                schema = _item_schema(unique)
+                raw = exaone(_ITEM_PROMPT.format(level=cur["level"], objective=objective, sentence=sentence,
+                                                 examples=examples.get(oid, "")), schema, rng.randrange(2**31))
+                try:
+                    item = schema.model_validate_json(raw).model_dump()
+                except ValueError:
+                    items.append({**base, "sentence": sentence, "raw": raw, "format_ok": False})
+                    continue
+                seen.append(sentence)
+                stem = " ".join("___" if w == item["answer"] else w for w in sentence[:-1].split()) + sentence[-1]
+                items.append({**base, "stem": stem, "sentence": sentence, **item, "format_ok": True})
     return items
 
 
@@ -210,7 +232,7 @@ def check_items(items: list[dict], cur: dict) -> None:
 
     import torch
 
-    from difficulty_llm import difficulty_prior
+    from difficulty_llm import key_logit
     from solver_check import SolverCheckProvider
 
     solver = SolverCheckProvider()
@@ -265,8 +287,7 @@ def check_items(items: list[dict], cur: dict) -> None:
                 it["rejected"][t] = "it is not a mistake a real learner would make"
         it["distractors_ok"] = not it["rejected"]
         it["accepted"] = it["key_ok"] and it["objective_ok"] and it["distractors_ok"]
-        if it["accepted"]:
-            it["difficulty_mu"], it["difficulty_sigma2"] = difficulty_prior(key_score, scores)
+        it["key_logit"] = key_logit(key_score, scores)
 
     del solver, model, tok
     gc.collect()
@@ -342,20 +363,26 @@ def embedding_agreement(items: list[dict], encoder: str) -> dict:
 
 
 def difficulty_report(items: list[dict]) -> dict:
+    """Sets the Urnings prior of the accepted items (difficulty_llm.py, standardised
+    within this batch, as the bank is empty) and reports it."""
     import numpy as np
 
     from difficulty_heuristic import estimate_difficulty
+    from difficulty_llm import difficulty_priors
 
-    ok = [it for it in items if "difficulty_mu" in it]
+    ok = [it for it in items if it.get("accepted")]
     if len(ok) < 2:
         return {"items": len(ok)}
+    for it, (mu, s2) in zip(ok, difficulty_priors([it["key_logit"] for it in ok])):
+        it["difficulty_mu"], it["difficulty_sigma2"] = mu, s2
     mus = [it["difficulty_mu"] for it in ok]
     heur = [estimate_difficulty(it["sentence"])[0] for it in ok]
     by_objective = {}
     for it in ok:
         by_objective.setdefault(it["objective"], []).append(it["difficulty_mu"])
     return {"items": len(ok), "mean": float(np.mean(mus)), "sd": float(np.std(mus)),
-            "at_clip": sum(abs(m) >= 3.0 for m in mus) / len(mus),  # many here: the scale needs standardising
+            "at_clip": sum(abs(m) >= 3.0 for m in mus) / len(mus),
+            "key_logit_range": [float(min(it["key_logit"] for it in ok)), float(max(it["key_logit"] for it in ok))],
             "corr_with_morpheme_heuristic": float(np.corrcoef(mus, heur)[0, 1]),
             "mean_by_objective": {k: float(np.mean(v)) for k, v in by_objective.items()}}
 
