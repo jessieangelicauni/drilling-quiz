@@ -66,6 +66,7 @@ FUNCTIONAL_TAGS = frozenset({"NNB", "MM"})
 
 # Phonologically conditioned allomorphs are one morpheme: picking 를 where
 # 을 belongs is an allomorph error, not a different particle.
+_CONTENT = frozenset({"NOUN", "VERB", "ADJ", "ADV", "MOD"})
 _PREDICATE_TAGS = ("VV", "VA", "VX", "XSV", "XSA", "VCP")
 
 _ALLOMORPH = {"를": "을", "가": "이", "는": "은", "로": "으로", "와": "과", "랑": "이랑",
@@ -135,6 +136,12 @@ def _surface_word_edit(correct: str, wrong: str) -> Edit | None:
     if p == 0:  # the stem itself differs: a different word, not a form of it
         return None
     c_diff, w_diff = c_word[p:len(c_word) - q], w_word[p:len(w_word) - q]
+    # A whole word pasted into another (늦[게] -> 늦일찍) is not a slip in
+    # the word's form: the inserted piece is a content word of its own.
+    inserted = [t for t in _KIWI.tokenize(w_word)
+                if t.start >= p and t.start + t.len <= len(w_word) - q and t.len >= 2]
+    if any(category(t.tag) in _CONTENT for t in inserted):
+        return None
     op = "REP" if c_diff and w_diff else ("DEL" if c_diff else "INS")
     if any(t.split("-")[0] in _PREDICATE_TAGS for t in tags):
         if any(t.endswith("-I") for t in tags):
@@ -229,6 +236,8 @@ if __name__ == "__main__":
     # A particle the tagger misreads after its host (학교으로, 학교이).
     assert one("학생이 학교에 가요.", "학생이 학교으로 가요.").code == "PART:에>으로"
     assert one("학생이 학교에 가요.", "학생이 학교이 가요.").code == "PART:에>이"
+    # ...but a content word pasted into another word is not read as one edit.
+    assert annotate("친구가 늦게 왔어요.", "친구가 늦일찍 왔어요.")[0].category == "MULTI"
     e = one("꽃이 아름다워요.", "꽃이 아름답어요.")
     assert e.category == "CONJ" and not e.functional, e
 

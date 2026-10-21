@@ -4401,6 +4401,8 @@ Run ini masih memakai kode sebelum §9.76. Selain itu EXAONE sering keluar dari 
 - Alasan penolakan untuk critic ditulis dengan kalimat biasa ("it makes a particle mistake, but this question tests a verb or adjective ending mistake"), bukan kode `MULTI`/`PART`.
 - Temperature 0.8 → 0.6.
 - `--generator gemma-3-12b` tersedia untuk perbandingan, default tetap EXAONE.
+- Annotator (langkah 4) diperluas ke kata benda + partikel. Partikel yang salah bentuk (`학교으로`, `학교이`) dipecah kiwi menjadi morfem aneh dan diberi label MULTI. Akibatnya distraktor partikel yang bagus ditolak sebagai wrong-category, dan ini penyebab penolakan terbanyak. Sekarang kategorinya diambil dari morfem benar yang diganti (`PART:에>으로`).
+- Sebaliknya, kata isi yang ditempel ke kata lain (`늦[게]` → `늦일찍`, `천천히빠르게읽어요`) tidak lagi dibaca sebagai satu kesalahan ending. Sebelumnya dua item seperti itu lolos di cek cepat.
 
 ---
 

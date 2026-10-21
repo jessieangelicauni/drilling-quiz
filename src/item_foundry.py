@@ -194,6 +194,9 @@ def single_edit(skill: Skill, correct: str, wrong: str):
     edit = edits[0]
     if edit.category not in skill.categories:
         wanted = " or ".join(_category_words(c) for c in sorted(skill.categories))
+        if edit.category == "MULTI":
+            return None, (f"wrong-category: it is not one {wanted} mistake; it mixes in other "
+                          f"words or forms")
         return None, (f"wrong-category: it makes a {_category_words(edit.category)} mistake, "
                       f"but this question tests a {wanted} mistake")
     return edit, ""
