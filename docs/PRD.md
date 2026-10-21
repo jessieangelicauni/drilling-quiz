@@ -4383,6 +4383,14 @@ Per jenis error KoLLA (partikel n=114 / ejaan n=131): Qwen3-4B 96 = 84,2% (CI 76
 - Pengecekan solver dengan pilih huruf dihapus dari validasi (bukan gate, judge yang lemah, dan hasilnya 0/12). Paper V-B disesuaikan.
 - `FoundryStats.rejected` menyimpan 10 balasan pertama yang ditolak beserta alasannya. File hasil ditulis ulang setelah setiap skill. Ada opsi `--skills` untuk cek cepat.
 
+### 9.76 Cek cepat (--per-skill 4): 0/4 di particle_loc, penyebabnya bentuk balasan EXAONE
+
+Dari 10 balasan yang ditolak dan tersimpan, EXAONE menulis distraktor dalam tiga bentuk: (a) teks pengganti saja (yang diminta), (b) kata utuh yang memuat bagian itu (`카페에서` untuk `카페[에]`), dan (c) kalimat utuh, kadang masih dengan kurung siku. Kode lama selalu menempelkan distraktor di posisi kurung, jadi bentuk (b) dan (c) menghasilkan kalimat rusak (`친구가 카페카페에서 ...`) dan ditolak sebagai not-minimal atau wrong-category. Selain itu EXAONE kadang memberi 4 distraktor.
+
+**Diperbaiki:** `_wrong_sentence` menerima ketiga bentuk itu dan mengubahnya menjadi kalimat salah utuh. Annotator tetap yang memutuskan apakah kalimat itu satu edit dari kunci. `_shared_blank` memakai span dalam kurung kalau semua distraktor hanya berbeda di situ, dan melebar ke satu kata utuh kalau perlu. Kalau ada lebih dari 3 distraktor yang valid, yang diambil 3 (distraktor target diutamakan). Prompt menegaskan "only the replacement text, no comments".
+
+**Replay offline** atas balasan yang tercatat: bentuk (b) sekarang diterima (`카페[에]` → 에서/로/와). Sisanya ditolak karena memang buruk: mengganti kata benda (집 untuk 학교), atau menghapus subjek. Beberapa kunci yang ditulis EXAONE juga salah (카페[에] 책을 읽고 있어요; seharusnya 에서). Kunci seperti itu ditangkap oleh gate log-prob Qwen3-4B, karena kalimat dengan 에서 skornya lebih tinggi.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama
