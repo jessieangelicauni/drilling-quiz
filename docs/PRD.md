@@ -4338,7 +4338,9 @@ dipertimbangkan revert juga.
 | Kanana-1.5-8B-base (4-bit) | 94,2% | 211 = 85,8% (80,9–89,6) | 30/32 | 6,2 GB |
 | Gemma-3-12B-pt (4-bit) | 50/52 = 96,2% | 218 = 88,6% (84,0–92,0) | 30/32 | 8,5 GB |
 
-Gemma per jenis: partikel 99/114 = 86,8%, ejaan 118/131 = 90,1%. (Rincian per jenis untuk 5 model lain menunggu `checker_benchmark_results.json` run ulang di-push; file yang ada di repo masih run pertama.)
+Per jenis error KoLLA (partikel n=114 / ejaan n=131): Qwen3-4B 96 = 84,2% (CI 76,4–89,8) / 118 = 90,1%; Qwen3-4B-Base 96 / 120; Qwen3-8B 92 / 116; Qwen3-8B-Base 96 / 120; Kanana 90 / 120; Gemma 99 = 86,8% (79,4–91,9) / 118.
+
+**Kegagalan partikel Qwen3-4B, dibaca satu per satu (17 dari 18 tercatat):** 10 adalah partikel yang *dihilangkan* pelajar (선생님 좋아요 → 선생님이 좋아요, 아버지 거실에 계세요 → 아버지는 ...). Dalam bahasa Korea lisan, penghilangan partikel sering wajar, jadi model tidak sepenuhnya salah, dan sebagian anotasi KoLLA bersifat preskriptif. Hanya 6 yang merupakan substitusi partikel (친구들이 → 친구들을, 공원은 → 공원을, 부모님이 → 부모님께서, 에 → 의), dan 1 partikel berlebih. Jenis error yang dihasilkan item foundry adalah substitusi, yang paling jarang gagal. Artinya, ~84% adalah batas bawah untuk kasus drill.
 
 **Keputusan:** semua CI tumpang tindih, jadi tidak ada model yang terbukti lebih baik. Qwen3-4B dipertahankan karena tertinggi di kurasi, dan bobot yang sama dipakai untuk explainer (dua model di GPU, bukan tiga). **Temuan untuk paper:** gate kuat pada distraktor buatan (98%) tapi melewatkan ~1 dari 8 error pelajar nyata (87%), jadi rating instruktur tetap diperlukan. Paper Section IV-B diperbarui dengan angka ini.
 
