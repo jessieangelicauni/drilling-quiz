@@ -16,7 +16,7 @@ library; nothing is parsed, diffed or labelled by our own rules.
      writes it, instead of writing a word and explaining it after (§9.90).
      All curated examples of the objective, from log_likelihood_results.json,
      are shown in both prompts.
-  2. Judge: one Qwen3-4B reasoning call per item (§9.88) names the options
+  2. Judge: one Qwen3-8B (NF4) reasoning call per item (§9.88, §9.92) names the options
      that make a correct sentence, the learning objective the item tests, and
      the wrong options a real learner could choose. A distractor fails when
      it is named correct, when it is not named plausible (v2.2 kept glued
@@ -33,7 +33,7 @@ library; nothing is parsed, diffed or labelled by our own rules.
      of this evaluation, not in the pipeline: nearest-neighbour agreement
      and mean cosine similarity of same-mistake vs different-mistake pairs,
      within each objective.
-  5. Difficulty: the prior for Urnings is the log-odds of Qwen3-4B choosing
+  5. Difficulty: the prior for Urnings is the log-odds of the judge model choosing
      the key over the distractors, from the log-probabilities the key check
      already computed, standardised across the accepted items (difficulty_llm.py,
      PRD §9.91) -- no extra model call; reported next to the morpheme
@@ -244,7 +244,7 @@ def generate_items(cur: dict, per_objective: int, seed: int) -> list[dict]:
     return items
 
 
-def check_items(items: list[dict], cur: dict) -> None:
+def check_items(items: list[dict], cur: dict, judge_model: str = "Qwen/Qwen3-8B") -> None:
     """Judges every given item: one Qwen3 reasoning call plus four log-probabilities."""
     import gc
     import re
@@ -254,7 +254,7 @@ def check_items(items: list[dict], cur: dict) -> None:
     from difficulty_llm import key_logit
     from solver_check import SolverCheckProvider
 
-    solver = SolverCheckProvider()
+    solver = SolverCheckProvider(judge_model, four_bit="8B" in judge_model)
     tok, model = solver.tok, solver.model
     oids = list(cur["objectives"])
     objectives = "\n".join(f"{i + 1}. {cur['objectives'][o]}" for i, o in enumerate(oids))
@@ -414,15 +414,17 @@ if __name__ == "__main__":
     parser.add_argument("--context", default="")
     parser.add_argument("--encoders", default="intfloat/multilingual-e5-base",
                         help="comma-separated sentence encoders to compare, e.g. add Qwen/Qwen3-Embedding-0.6B")
+    parser.add_argument("--judge", default="Qwen/Qwen3-8B",
+                        help="judge and key-gate model; Qwen/Qwen3-4B was used up to v2.4 (PRD §9.92)")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--out", default="benchmark_v2_results.json")
     args = parser.parse_args()
 
     cur = load_curriculum(args.curriculum, args.context)
     items = generate_items(cur, args.per_objective, args.seed)
-    check_items([it for it in items if it["format_ok"]], cur)
+    check_items([it for it in items if it["format_ok"]], cur, args.judge)
     first_pass = sum(it.get("accepted", False) for it in items)
-    check_items(repair_items([it for it in items if it["format_ok"]], cur, args.seed), cur)
+    check_items(repair_items([it for it in items if it["format_ok"]], cur, args.seed), cur, args.judge)
     report = {"settings": {k: str(v) for k, v in vars(args).items()}, "per_objective": {}}
     for oid in cur["objectives"]:
         mine = [it for it in items if it["objective"] == oid]

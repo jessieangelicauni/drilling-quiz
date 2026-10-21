@@ -4640,6 +4640,16 @@ Penyebab yang ditemukan:
 **Hasil v2.4** (commit f13c4bd, sebelum perbaikan cache): diterima **18/66 (27%, CI 18–39%)**, 14 sebelum repair. Format 66/66, jadi enum jawaban menyelesaikan masalah kata gabungan. noun_counter 5/6 (dari 0), honorific format 6/6 tapi 0 diterima. Prior: `at_clip` 0.06 (dari 0.82), SD 0.94, korelasi dengan heuristik morfem 0.34. Embedding nearest-neighbour 39% (dari 9%, n=64). Sisa masalah di item yang lolos: distraktor gabungan masih ada (`조립를조립해요`, `생산은은`), beberapa kalimat tidak gramatikal (`___ 은 효율 향상에 핵심이다`), dan `확인해요` lolos padahal juga benar. Penolakan terbanyak: tidak plausible (53).
 
 
+### 9.92 Judge diganti ke Qwen3-8B (NF4) (2026-10-21)
+
+Di v2.4, judge Qwen3-4B jadi bottleneck. Ia meloloskan distraktor gabungan (`조립를조립해요`), tidak mendeteksi jawaban kedua yang juga benar (`확인해요`), dan meloloskan kalimat yang tidak gramatikal. jc: ganti langsung.
+
+- `benchmark_v2.py --judge` default `Qwen/Qwen3-8B`, dimuat 4-bit NF4 (bitsandbytes, double quant, compute bf16); bobotnya sekitar 6GB, jadi muat di 16GB. EXAONE tetap dibebaskan dulu, jadi GPU tetap memegang satu model saja.
+- Model yang sama juga dipakai untuk log-prob key gate dan prior difficulty. Validasi 51/52 pasangan kurasi (§9.68) dilakukan dengan 4B, jadi untuk 8B perlu diukur ulang.
+- Tetap 1 call reasoning per item. Lebih lambat dari 4B, dan unduhan pertama sekitar 16GB.
+- `--judge Qwen/Qwen3-4B` mengembalikan setelan lama untuk ablation.
+
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

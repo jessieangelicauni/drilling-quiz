@@ -147,9 +147,19 @@ class LogLikelihoodResult:
 
 
 class SolverCheckProvider:
-    def __init__(self, model_name: str = _MODEL_NAME):
+    def __init__(self, model_name: str = _MODEL_NAME, four_bit: bool = False):
+        """four_bit: NF4 weights (bitsandbytes), so Qwen3-8B (~6GB) fits a
+        16GB GPU that cannot hold it in bf16."""
         self.tok = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda")
+        if four_bit:
+            from transformers import BitsAndBytesConfig
+
+            quant = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4",
+                                       bnb_4bit_compute_dtype=torch.bfloat16, bnb_4bit_use_double_quant=True)
+            self.model = AutoModelForCausalLM.from_pretrained(model_name, quantization_config=quant,
+                                                              device_map="cuda")
+        else:
+            self.model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16).to("cuda")
         self.model.eval()
 
     @torch.no_grad()
