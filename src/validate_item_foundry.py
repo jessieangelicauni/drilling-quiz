@@ -24,7 +24,6 @@ on one 16GB GPU (7.3GB + ~8GB, PRD §9.53).
      real learner mistake (docs/eval-protocol.md).
 
 Usage: python3 src/validate_item_foundry.py [--per-skill 20] [--seed 0] [--skills particle_loc,tense_past]
-                                         [--generator gemma-3-12b]
 """
 from __future__ import annotations
 
