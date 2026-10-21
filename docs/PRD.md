@@ -4346,6 +4346,17 @@ Per jenis error KoLLA (partikel n=114 / ejaan n=131): Qwen3-4B 96 = 84,2% (CI 76
 
 **File:** `src/benchmark_checker.py`, `gemma_benchmark_results.json`, `src/content.py`.
 
+### 9.73 Disederhanakan: KoLLA dihapus, tanpa sampling, codebook disetujui instruktur
+
+**Instruksi user:** "saya maunya simple, namun hasilnya bagus"; KoLLA dipakai untuk semua skill atau dihapus.
+
+**Keputusan:**
+- **KoLLA dihapus.** Skema anotasinya hanya mencakup partikel dan ejaan (tidak ada error akhiran verba dalam 400 sampel benchmark), jadi paling banyak menutup 4 dari 11 skill. Dihapus: `investigate_kolla_corpus.py`, `investigate_kolla_spell.py`, `benchmark_checker.py`, dan kedua file hasil benchmark (file itu juga memuat kalimat korpus GPLv3). Hasil benchmark §9.72 tetap tercatat di sini sebagai dasar keputusan checker, tapi tidak dikutip di paper. Referensi Song et al. di tinjauan pustaka tetap ada.
+- **Self-consistency sampling dan benchmark generator dibatalkan** sebelum di-commit, karena menambah waktu run (±10 balasan × 11 skill × beberapa model) dan kompleksitas. Catatan untuk paper: replay atas 3 balasan yang tercatat menunjukkan filter itu memang membuang entri sampah. Jadi ini bisa disebut sebagai future work.
+- **Alur codebook yang dipakai (sederhana):** EXAONE mengusulkan, verifier (`korean_only` + annotator KAGAS) menyaring bentuknya, lalu **instruktur menyetujui atau menghapus** entri di `data/misconception_codebook.json` satu kali sebelum item dibuat. Codebook kecil (≤6 entri × 11 skill) dan dibekukan, jadi review ini cepat. Review ini juga validasi yang memang dibutuhkan paper (rating kode miskonsepsi, V-B). `SolverCheckProvider` kembali tanpa opsi 4-bit.
+
+**Langkah berikut (GPU):** `python3 src/validate_item_foundry.py --codebook-only` dengan prompt baru (Hangul saja), lalu review instruktur atas codebook, lalu `--per-skill 20 --reuse-codebook`.
+
 ---
 
 *Dokumen ini hidup — update setiap ada keputusan baru atau keputusan lama

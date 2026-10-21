@@ -54,8 +54,7 @@ Current model per role (PRD §9.51–§9.71): item generation (`item_foundry.py`
 uses `LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct` (4-bit); the log-prob gate
 (`solver_check.py`) and feedback (`qwen_feedback.py`) use `Qwen/Qwen3-4B`
 (bf16). The item foundry's GPU validation is
-`python3 src/validate_item_foundry.py`; `python3 src/benchmark_checker.py`
-compares checker candidates on curated, KoLLA learner and codebook pairs. The
+`python3 src/validate_item_foundry.py`. The
 findings section below is the 2026-10-19 history of the template generator
 (EXAONE-4.0-1.2B, Qwen3-1.7B/4B), which was removed on 2026-10-21; it is
 kept for the record, and the files it names no longer exist.
