@@ -4,6 +4,7 @@
     "curriculum": "/home/jessie/AXPilot-DrillingQuiz/data/curriculum_ev_smart_factory.json",
     "context": "",
     "encoders": "intfloat/multilingual-e5-base",
+    "judge": "Qwen/Qwen3-8B",
     "seed": "0",
     "out": "benchmark_v2_results.json"
   },
@@ -19,12 +20,12 @@
         ]
       },
       "key_ok": {
-        "k": 4,
+        "k": 3,
         "n": 6,
-        "rate": 0.6666666666666666,
+        "rate": 0.5,
         "ci95": [
-          0.3,
-          0.9032
+          0.1876,
+          0.8124
         ]
       },
       "distractors_ok": {
@@ -36,14 +37,14 @@
           0.3903
         ]
       },
-      "repaired": 4,
+      "repaired": 1,
       "objective_ok": {
-        "k": 5,
+        "k": 2,
         "n": 6,
-        "rate": 0.8333333333333334,
+        "rate": 0.3333333333333333,
         "ci95": [
-          0.4365,
-          0.9699
+          0.0968,
+          0.7
         ]
       },
       "accepted": {
@@ -67,40 +68,40 @@
         ]
       },
       "key_ok": {
-        "k": 5,
-        "n": 6,
-        "rate": 0.8333333333333334,
-        "ci95": [
-          0.4365,
-          0.9699
-        ]
-      },
-      "distractors_ok": {
         "k": 3,
         "n": 6,
         "rate": 0.5,
         "ci95": [
           0.1876,
           0.8124
+        ]
+      },
+      "distractors_ok": {
+        "k": 2,
+        "n": 6,
+        "rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
         ]
       },
       "repaired": 2,
       "objective_ok": {
-        "k": 5,
+        "k": 6,
         "n": 6,
-        "rate": 0.8333333333333334,
+        "rate": 1.0,
         "ci95": [
-          0.4365,
-          0.9699
+          0.6097,
+          1.0
         ]
       },
       "accepted": {
-        "k": 3,
+        "k": 2,
         "n": 6,
-        "rate": 0.5,
+        "rate": 0.3333333333333333,
         "ci95": [
-          0.1876,
-          0.8124
+          0.0968,
+          0.7
         ]
       }
     },
@@ -115,40 +116,40 @@
         ]
       },
       "key_ok": {
-        "k": 3,
+        "k": 5,
         "n": 6,
-        "rate": 0.5,
+        "rate": 0.8333333333333334,
         "ci95": [
-          0.1876,
-          0.8124
+          0.4365,
+          0.9699
         ]
       },
       "distractors_ok": {
-        "k": 1,
+        "k": 2,
         "n": 6,
-        "rate": 0.16666666666666666,
+        "rate": 0.3333333333333333,
         "ci95": [
-          0.0301,
-          0.5635
+          0.0968,
+          0.7
         ]
       },
-      "repaired": 2,
+      "repaired": 4,
       "objective_ok": {
-        "k": 4,
+        "k": 5,
         "n": 6,
-        "rate": 0.6666666666666666,
+        "rate": 0.8333333333333334,
         "ci95": [
-          0.3,
-          0.9032
+          0.4365,
+          0.9699
         ]
       },
       "accepted": {
-        "k": 0,
+        "k": 2,
         "n": 6,
-        "rate": 0.0,
+        "rate": 0.3333333333333333,
         "ci95": [
-          0.0,
-          0.3903
+          0.0968,
+          0.7
         ]
       }
     },
@@ -180,7 +181,7 @@
           0.5635
         ]
       },
-      "repaired": 1,
+      "repaired": 2,
       "objective_ok": {
         "k": 3,
         "n": 6,
@@ -211,40 +212,40 @@
         ]
       },
       "key_ok": {
-        "k": 6,
+        "k": 3,
         "n": 6,
-        "rate": 1.0,
+        "rate": 0.5,
         "ci95": [
-          0.6097,
-          1.0
+          0.1876,
+          0.8124
         ]
       },
       "distractors_ok": {
+        "k": 1,
+        "n": 6,
+        "rate": 0.16666666666666666,
+        "ci95": [
+          0.0301,
+          0.5635
+        ]
+      },
+      "repaired": 3,
+      "objective_ok": {
         "k": 3,
         "n": 6,
         "rate": 0.5,
         "ci95": [
           0.1876,
           0.8124
-        ]
-      },
-      "repaired": 5,
-      "objective_ok": {
-        "k": 6,
-        "n": 6,
-        "rate": 1.0,
-        "ci95": [
-          0.6097,
-          1.0
         ]
       },
       "accepted": {
-        "k": 3,
+        "k": 1,
         "n": 6,
-        "rate": 0.5,
+        "rate": 0.16666666666666666,
         "ci95": [
-          0.1876,
-          0.8124
+          0.0301,
+          0.5635
         ]
       }
     },
@@ -259,15 +260,6 @@
         ]
       },
       "key_ok": {
-        "k": 4,
-        "n": 6,
-        "rate": 0.6666666666666666,
-        "ci95": [
-          0.3,
-          0.9032
-        ]
-      },
-      "distractors_ok": {
         "k": 1,
         "n": 6,
         "rate": 0.16666666666666666,
@@ -276,14 +268,23 @@
           0.5635
         ]
       },
-      "repaired": 0,
-      "objective_ok": {
+      "distractors_ok": {
         "k": 0,
         "n": 6,
         "rate": 0.0,
         "ci95": [
           0.0,
           0.3903
+        ]
+      },
+      "repaired": 0,
+      "objective_ok": {
+        "k": 1,
+        "n": 6,
+        "rate": 0.16666666666666666,
+        "ci95": [
+          0.0301,
+          0.5635
         ]
       },
       "accepted": {
@@ -307,12 +308,12 @@
         ]
       },
       "key_ok": {
-        "k": 2,
+        "k": 4,
         "n": 6,
-        "rate": 0.3333333333333333,
+        "rate": 0.6666666666666666,
         "ci95": [
-          0.0968,
-          0.7
+          0.3,
+          0.9032
         ]
       },
       "distractors_ok": {
@@ -324,23 +325,23 @@
           0.5635
         ]
       },
-      "repaired": 2,
+      "repaired": 3,
       "objective_ok": {
-        "k": 2,
+        "k": 4,
         "n": 6,
-        "rate": 0.3333333333333333,
+        "rate": 0.6666666666666666,
         "ci95": [
-          0.0968,
-          0.7
+          0.3,
+          0.9032
         ]
       },
       "accepted": {
-        "k": 0,
+        "k": 1,
         "n": 6,
-        "rate": 0.0,
+        "rate": 0.16666666666666666,
         "ci95": [
-          0.0,
-          0.3903
+          0.0301,
+          0.5635
         ]
       }
     },
@@ -355,44 +356,92 @@
         ]
       },
       "key_ok": {
-        "k": 4,
+        "k": 1,
         "n": 6,
-        "rate": 0.6666666666666666,
+        "rate": 0.16666666666666666,
         "ci95": [
-          0.3,
-          0.9032
+          0.0301,
+          0.5635
         ]
       },
       "distractors_ok": {
-        "k": 2,
+        "k": 0,
         "n": 6,
-        "rate": 0.3333333333333333,
+        "rate": 0.0,
         "ci95": [
-          0.0968,
-          0.7
+          0.0,
+          0.3903
         ]
       },
-      "repaired": 2,
+      "repaired": 1,
       "objective_ok": {
-        "k": 2,
+        "k": 1,
         "n": 6,
-        "rate": 0.3333333333333333,
+        "rate": 0.16666666666666666,
         "ci95": [
-          0.0968,
-          0.7
+          0.0301,
+          0.5635
         ]
       },
       "accepted": {
-        "k": 2,
+        "k": 0,
         "n": 6,
-        "rate": 0.3333333333333333,
+        "rate": 0.0,
         "ci95": [
-          0.0968,
-          0.7
+          0.0,
+          0.3903
         ]
       }
     },
     "verb_choice": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 1,
+        "n": 6,
+        "rate": 0.16666666666666666,
+        "ci95": [
+          0.0301,
+          0.5635
+        ]
+      },
+      "distractors_ok": {
+        "k": 0,
+        "n": 6,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.3903
+        ]
+      },
+      "repaired": 1,
+      "objective_ok": {
+        "k": 1,
+        "n": 6,
+        "rate": 0.16666666666666666,
+        "ci95": [
+          0.0301,
+          0.5635
+        ]
+      },
+      "accepted": {
+        "k": 0,
+        "n": 6,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.3903
+        ]
+      }
+    },
+    "noun_counter": {
       "format_ok": {
         "k": 6,
         "n": 6,
@@ -412,15 +461,63 @@
         ]
       },
       "distractors_ok": {
-        "k": 2,
+        "k": 3,
         "n": 6,
-        "rate": 0.3333333333333333,
+        "rate": 0.5,
         "ci95": [
-          0.0968,
-          0.7
+          0.1876,
+          0.8124
         ]
       },
-      "repaired": 3,
+      "repaired": 0,
+      "objective_ok": {
+        "k": 3,
+        "n": 6,
+        "rate": 0.5,
+        "ci95": [
+          0.1876,
+          0.8124
+        ]
+      },
+      "accepted": {
+        "k": 3,
+        "n": 6,
+        "rate": 0.5,
+        "ci95": [
+          0.1876,
+          0.8124
+        ]
+      }
+    },
+    "mod_adverb": {
+      "format_ok": {
+        "k": 6,
+        "n": 6,
+        "rate": 1.0,
+        "ci95": [
+          0.6097,
+          1.0
+        ]
+      },
+      "key_ok": {
+        "k": 3,
+        "n": 6,
+        "rate": 0.5,
+        "ci95": [
+          0.1876,
+          0.8124
+        ]
+      },
+      "distractors_ok": {
+        "k": 1,
+        "n": 6,
+        "rate": 0.16666666666666666,
+        "ci95": [
+          0.0301,
+          0.5635
+        ]
+      },
+      "repaired": 2,
       "objective_ok": {
         "k": 3,
         "n": 6,
@@ -439,177 +536,149 @@
           0.5635
         ]
       }
-    },
-    "noun_counter": {
-      "format_ok": {
-        "k": 6,
-        "n": 6,
-        "rate": 1.0,
-        "ci95": [
-          0.6097,
-          1.0
-        ]
-      },
-      "key_ok": {
-        "k": 5,
-        "n": 6,
-        "rate": 0.8333333333333334,
-        "ci95": [
-          0.4365,
-          0.9699
-        ]
-      },
-      "distractors_ok": {
-        "k": 5,
-        "n": 6,
-        "rate": 0.8333333333333334,
-        "ci95": [
-          0.4365,
-          0.9699
-        ]
-      },
-      "repaired": 0,
-      "objective_ok": {
-        "k": 5,
-        "n": 6,
-        "rate": 0.8333333333333334,
-        "ci95": [
-          0.4365,
-          0.9699
-        ]
-      },
-      "accepted": {
-        "k": 5,
-        "n": 6,
-        "rate": 0.8333333333333334,
-        "ci95": [
-          0.4365,
-          0.9699
-        ]
-      }
-    },
-    "mod_adverb": {
-      "format_ok": {
-        "k": 6,
-        "n": 6,
-        "rate": 1.0,
-        "ci95": [
-          0.6097,
-          1.0
-        ]
-      },
-      "key_ok": {
-        "k": 4,
-        "n": 6,
-        "rate": 0.6666666666666666,
-        "ci95": [
-          0.3,
-          0.9032
-        ]
-      },
-      "distractors_ok": {
-        "k": 3,
-        "n": 6,
-        "rate": 0.5,
-        "ci95": [
-          0.1876,
-          0.8124
-        ]
-      },
-      "repaired": 2,
-      "objective_ok": {
-        "k": 4,
-        "n": 6,
-        "rate": 0.6666666666666666,
-        "ci95": [
-          0.3,
-          0.9032
-        ]
-      },
-      "accepted": {
-        "k": 3,
-        "n": 6,
-        "rate": 0.5,
-        "ci95": [
-          0.1876,
-          0.8124
-        ]
-      }
     }
   },
   "accepted_before_repair": {
-    "k": 14,
+    "k": 8,
     "n": 66,
-    "rate": 0.21212121212121213,
+    "rate": 0.12121212121212122,
     "ci95": [
-      0.1308,
-      0.3251
+      0.0627,
+      0.2214
     ]
   },
   "accepted": {
-    "k": 18,
+    "k": 11,
     "n": 66,
-    "rate": 0.2727272727272727,
+    "rate": 0.16666666666666666,
     "ci95": [
-      0.18,
-      0.3904
+      0.0957,
+      0.2743
     ]
   },
   "embeddings": {
     "intfloat/multilingual-e5-base": {
-      "distractors": 182,
+      "distractors": 168,
       "nearest_neighbour_same_mistake": {
-        "k": 25,
-        "n": 64,
-        "rate": 0.390625,
+        "k": 4,
+        "n": 37,
+        "rate": 0.10810810810810811,
         "ci95": [
-          0.2806,
-          0.5131
+          0.0429,
+          0.2471
         ]
       },
-      "mean_cos_same": 0.9132444962859154,
-      "mean_cos_different": 0.8805696789513935
+      "mean_cos_same": 0.8682136734326681,
+      "mean_cos_different": 0.8753210717022665
     }
   },
   "difficulty": {
-    "items": 18,
-    "mean": 0.017180482301502327,
-    "sd": 0.9440915716819286,
-    "at_clip": 0.05555555555555555,
+    "items": 11,
+    "mean": 5.551115123125783e-17,
+    "sd": 1.0,
+    "at_clip": 0.0,
     "key_logit_range": [
-      0.5744440929097783,
-      20.371262090343336
+      1.6607897728170509,
+      38.47327562808671
     ],
-    "corr_with_morpheme_heuristic": 0.3375173825648706,
+    "corr_with_morpheme_heuristic": 0.34120770720508287,
     "mean_by_objective": {
-      "particle_obj": -1.2438618225908968,
-      "time_range": 0.5315553637698657,
-      "tense_past": 0.33018649417631335,
-      "subj_topic": -0.3151600116602955,
-      "verb_choice": 0.979128364083236,
-      "noun_counter": 0.3363554248921911,
-      "mod_adverb": 0.16271127922577536
+      "particle_obj": -0.1441782265876678,
+      "honorific": 0.26726711924448154,
+      "time_range": 0.7433071804072497,
+      "tense_past": 1.0550380518321074,
+      "adj_relativizer": 1.0485601324657683,
+      "noun_counter": -0.8925973028017848,
+      "mod_adverb": -0.415291241613398
     }
   },
   "items": [
     {
       "objective": "particle_loc",
       "topic": "E-motor and power electronics: torque, alignment, electrical, and functional tests.",
-      "stem": "___ 팩토리에서 전기 모터 테스트를 해요.",
+      "stem": "스마트 팩토리에서 ___ 모터 테스트를 해요.",
       "sentence": "스마트 팩토리에서 전기 모터 테스트를 해요.",
-      "answer": "스마트",
+      "answer": "전기",
       "distractors": [
         {
-          "mistake": "Using '에' instead of '에서' to indicate the location of an action.",
-          "text": "스마트에"
+          "mistake": "혼용 오류: 영어 표현에 영향을 받아 잘못된 조사 사용",
+          "text": "스마트팩토리에서"
         },
         {
-          "mistake": "Confusing '에서' with '으로/로' to denote movement towards a place.",
-          "text": "스마트으로"
+          "mistake": "목적지 오해: 장소를 목적지로 오해한 경우",
+          "text": "에"
         },
         {
-          "mistake": "Misusing '에게' which is typically used for recipients, not locations.",
-          "text": "스마트에게"
+          "mistake": "형태 오류: 올바른 조사 형태를 잘못 사용한 경우",
+          "text": "에서서"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "adj_relativizer",
+      "judged_correct": [
+        "전기"
+      ],
+      "key_ok": true,
+      "objective_ok": false,
+      "rejected": {
+        "스마트팩토리에서": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 6.129901190714274
+    },
+    {
+      "objective": "particle_loc",
+      "topic": "Computer vision for defect detection.",
+      "stem": "___ 결함 검사를 해요.",
+      "sentence": "공장에서 결함 검사를 해요.",
+      "answer": "공장에서",
+      "distractors": [
+        {
+          "mistake": "영어 문장으로 오류 설명",
+          "text": "저는사무실에서결"
+        },
+        {
+          "mistake": "영어 문장으로 오류 설명",
+          "text": "저는회사로결검사"
+        },
+        {
+          "mistake": "영어 문장으로 오류 설명",
+          "text": "저는연구소에서결"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "particle_loc",
+      "judged_correct": [
+        "저는연구소에서결"
+      ],
+      "key_ok": false,
+      "objective_ok": true,
+      "rejected": {
+        "저는연구소에서결": "it also makes a correct sentence"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 32.88237167919912
+    },
+    {
+      "objective": "particle_loc",
+      "topic": "Production orders, work orders, recipes, and electronic work instructions.",
+      "stem": "___ 레시피를 확인해요.",
+      "sentence": "공장에서 레시피를 확인해요.",
+      "answer": "공장에서",
+      "distractors": [
+        {
+          "mistake": "혼재된 표현 사용 (Mixing up contextual usage)",
+          "text": "집에서"
+        },
+        {
+          "mistake": "잘못된 위치 입자 사용 (Incorrect location particle)",
+          "text": "으로서"
+        },
+        {
+          "mistake": "목적지 표시 오류 (Incorrect destination marker)",
+          "text": "까지"
         }
       ],
       "format_ok": true,
@@ -618,130 +687,66 @@
       "key_ok": false,
       "objective_ok": false,
       "rejected": {
-        "스마트에": "it is not a mistake a real learner would make",
-        "스마트으로": "it is not a mistake a real learner would make",
-        "스마트에게": "it is not a mistake a real learner would make"
+        "집에서": "a language model finds it more natural than the answer",
+        "으로서": "a language model finds it more natural than the answer",
+        "까지": "a language model finds it more natural than the answer"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 6.291337762757943
+      "key_logit": -6.822203128638236
     },
     {
       "objective": "particle_loc",
-      "topic": "Production orders, work orders, recipes, and electronic work instructions.",
-      "stem": "저는 ___ 작업 지침을 봐요.",
-      "sentence": "저는 공장에서 작업 지침을 봐요.",
-      "answer": "공장에서",
+      "topic": "Sensors, actuators, motors, drives, and machine safety.",
+      "stem": "스마트 팩토리에서 ___ 확인해요.",
+      "sentence": "스마트 팩토리에서 센서를 확인해요.",
+      "answer": "센서를",
       "distractors": [
         {
-          "mistake": "English Mistake: Using '에' instead of '에서' for indicating location of action.",
-          "text": "공장에"
+          "mistake": "혼재 (Confusion with Korean and English structure)",
+          "text": "스마트팩토리에센"
         },
         {
-          "mistake": "English Mistake: Confusing '에' for marking destination instead of action location.",
-          "text": "회사에"
+          "mistake": "위치 혼동 (Misunderstanding of Location vs. Possession)",
+          "text": "스마트팩토리에서"
         },
         {
-          "mistake": "영어에서 '에'를 사용하여 동작 장소를 나타내는 오류",
-          "text": "공장에"
+          "mistake": "형태 오류 (Grammatical Error)",
+          "text": "스마트팩토리에서"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "particle_loc",
+      "predicted_objective": "particle_obj",
       "judged_correct": [
-        "공장에서"
+        "센서를"
       ],
       "key_ok": true,
-      "objective_ok": true,
+      "objective_ok": false,
       "rejected": {
-        "공장에": "it repeats the answer or another distractor"
+        "스마트팩토리에서": "it repeats the answer or another distractor"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 2.2802609524584114,
-      "first_distractors": [
-        {
-          "mistake": "English Mistake: Using '에' instead of '에서' for indicating location of action.",
-          "text": "공장에"
-        },
-        {
-          "mistake": "English Mistake: Confusing '에' for marking destination instead of action location.",
-          "text": "회사에"
-        },
-        {
-          "mistake": "English Mistake: Incorrectly using '로' instead of '에서' for indicating where an action takes place.",
-          "text": "공장으로"
-        }
-      ],
-      "repaired": true
+      "key_logit": 4.340366364862106
     },
     {
       "objective": "particle_loc",
-      "topic": "Battery manufacturing and pack assembly: thermal, electrical, and process safety.",
-      "stem": "배터리 ___ 작업해요.",
-      "sentence": "배터리 공장에서 작업해요.",
+      "topic": "EV architecture: battery, electric motor, inverter, power electronics, thermal management, and vehicle control systems.",
+      "stem": "___ 배터리를 공부해요.",
+      "sentence": "공장에서 배터리를 공부해요.",
       "answer": "공장에서",
       "distractors": [
         {
-          "mistake": "입니까? 입자를 잘못 사용함",
-          "text": "공장에"
+          "mistake": "영어 문장으로 설명된 오류",
+          "text": "저는배터리공장에"
         },
         {
-          "mistake": "목적어를 직접적으로 언급함",
-          "text": "공장에서의"
+          "mistake": "장소를 잘못 나타내는 표현 오류",
+          "text": "저는배터리창고에"
         },
         {
-          "mistake": "영어식 오류: 공장으로에",
-          "text": "공장으로에"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "particle_loc",
-      "judged_correct": [
-        "공장에서"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {
-        "공장에서의": "it is not a mistake a real learner would make"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 3.4151845373117142,
-      "first_distractors": [
-        {
-          "mistake": "입니까? 입자를 잘못 사용함",
-          "text": "공장에"
-        },
-        {
-          "mistake": "목적어를 직접적으로 언급함",
-          "text": "공장에서의"
-        },
-        {
-          "mistake": "목적지 표시를 혼동함",
+          "mistake": "영어 문장으로 설명된 오류: '공장에서' 대신 '공장으로'를 사용해야 하는 경우를 잘못 이해하고 있다.",
           "text": "공장으로"
-        }
-      ],
-      "repaired": true
-    },
-    {
-      "objective": "particle_loc",
-      "topic": "Predictive maintenance using sensor data.",
-      "stem": "___ 센서 데이터 분석해요.",
-      "sentence": "공장에서 센서 데이터 분석해요.",
-      "answer": "공장에서",
-      "distractors": [
-        {
-          "mistake": "Mistake: Incorrect use of form, mixing '에서' with '으로'.",
-          "text": "공장으로"
-        },
-        {
-          "mistake": "영어식 표현 오류 (Misuse of English structure)",
-          "text": "공장에서분석해요"
-        },
-        {
-          "mistake": "위치 표시 오류 (Incorrect use of location particle)",
-          "text": "공장으로분석해요"
         }
       ],
       "format_ok": true,
@@ -756,106 +761,56 @@
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 9.393329833625073,
+      "key_logit": 9.557700656648532,
       "first_distractors": [
         {
-          "mistake": "English mistake: Using '에' instead of '에서' to indicate location.",
-          "text": "공장에"
+          "mistake": "영어 문장으로 설명된 오류",
+          "text": "저는배터리공장에"
         },
         {
-          "mistake": "Mistake: Incorrect use of form, mixing '에서' with '으로'.",
-          "text": "공장으로"
+          "mistake": "장소를 잘못 나타내는 표현 오류",
+          "text": "저는배터리창고에"
         },
         {
-          "mistake": "Mistake: Applying '에' for actions rather than destinations/locations incorrectly.",
-          "text": "공장에"
+          "mistake": "목적이나 상태를 나타내는 데 잘못 사용된 표현 오류",
+          "text": "저는배터리안에"
         }
       ],
       "repaired": true
     },
     {
       "objective": "particle_loc",
-      "topic": "Sensors, actuators, motors, drives, and machine safety.",
-      "stem": "___ 팩토리에서 센서를 확인해요.",
-      "sentence": "스마트 팩토리에서 센서를 확인해요.",
-      "answer": "스마트",
-      "distractors": [
-        {
-          "mistake": "Using English preposition instead of Korean particle",
-          "text": "스마트에서"
-        },
-        {
-          "mistake": "Confusing '에' for marking existence rather than location",
-          "text": "스마트에"
-        },
-        {
-          "mistake": "Incorrect use of location particle with wrong context",
-          "text": "스마트로"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "particle_loc",
-      "judged_correct": [
-        "스마트에서"
-      ],
-      "key_ok": false,
-      "objective_ok": true,
-      "rejected": {
-        "스마트에서": "it also makes a correct sentence",
-        "스마트로": "it is not a mistake a real learner would make"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 4.398606932850549
-    },
-    {
-      "objective": "particle_loc",
-      "topic": "OT (Operational Technology) versus IT (Information Technology).",
-      "stem": "___ 자동화 시스템을 배웁니다.",
-      "sentence": "공장에서 자동화 시스템을 배웁니다.",
+      "topic": "IIoT gateways, edge computing, and industrial data pipelines.",
+      "stem": "___ 로봇을 작동시켜요.",
+      "sentence": "공장에서 로봇을 작동시켜요.",
       "answer": "공장에서",
       "distractors": [
         {
-          "mistake": "English Mistake: Confusing '에서' with '에' for actions generally occurring inside a place.",
-          "text": "공장에"
+          "mistake": "영어 구문 오류로 인한 오해",
+          "text": "집에서"
         },
         {
-          "mistake": "English Mistake: Employing an incorrect particle that doesn't denote location but rather direction.",
-          "text": "공장으로부터"
+          "mistake": "목적지나 장소 표시 오류",
+          "text": "으로"
         },
         {
-          "mistake": "영어에서 '에서'를 항상 '에'로 바꾸는 오류",
-          "text": "공장에서"
+          "mistake": "잘못된 장소 선택 (학습자의 일반적인 혼동)",
+          "text": "에서"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "particle_loc",
-      "judged_correct": [
-        "공장에서"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
       "rejected": {
-        "공장에서": "it repeats the answer or another distractor"
+        "집에서": "it is not a mistake a real learner would make",
+        "으로": "a language model finds it more natural than the answer",
+        "에서": "a language model finds it more natural than the answer"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": -0.00112640174254228,
-      "first_distractors": [
-        {
-          "mistake": "English Mistake: Confusing '에서' with '에' for actions generally occurring inside a place.",
-          "text": "공장에"
-        },
-        {
-          "mistake": "English Mistake: Using '에' incorrectly when referring to the location where an action takes place.",
-          "text": "공장으로"
-        },
-        {
-          "mistake": "English Mistake: Employing an incorrect particle that doesn't denote location but rather direction.",
-          "text": "공장으로부터"
-        }
-      ],
-      "repaired": true
+      "key_logit": -3.557300148332827
     },
     {
       "objective": "particle_obj",
@@ -865,148 +820,148 @@
       "answer": "데이터를",
       "distractors": [
         {
-          "mistake": "English Mistake: Using '를' even when it's not appropriate (Final Consonant Rule Violation)",
-          "text": "데이터를를"
+          "mistake": "The learner mistakenly applies English grammar rules instead of Korean particles.",
+          "text": "데이터를분석해요"
         },
         {
-          "mistake": "Korean Mistake: Incorrect Particle Usage (Vowel Rule Violation)",
-          "text": "데이터에"
+          "mistake": "Confuses the particle placement rule based on initial vowels rather than consonants.",
+          "text": "데이터를분석해요"
         },
         {
-          "mistake": "Korean Mistake: Wrong Verb Form (Incorrect Verb Conjugation)",
-          "text": "데이터분석해요"
+          "mistake": "Incorrectly uses the wrong object marker '을' regardless of the verb's ending, showing a general misunderstanding of Korean grammar rules.",
+          "text": "데이터를분석해요"
         }
       ],
       "format_ok": true,
       "predicted_objective": "particle_obj",
       "judged_correct": [
-        "데이터를"
+        "데이터를분석해요"
       ],
-      "key_ok": true,
+      "key_ok": false,
       "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 9.660750404898447,
-      "difficulty_mu": -0.9264853865646758,
-      "difficulty_sigma2": 1.0
+      "rejected": {
+        "데이터를분석해요": "it repeats the answer or another distractor"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 18.95547248916392
     },
     {
       "objective": "particle_obj",
-      "topic": "SQL and Python for manufacturing data analysis.",
-      "stem": "공장에서 ___ 분석해요.",
-      "sentence": "공장에서 데이터를 분석해요.",
-      "answer": "데이터를",
+      "topic": "Introduction to Lean Manufacturing, 5S, Kaizen, and value stream mapping.",
+      "stem": "저는 ___ 연구해요.",
+      "sentence": "저는 로봇을 연구해요.",
+      "answer": "로봇을",
       "distractors": [
         {
-          "mistake": "Replacing particle with incorrect form due to vowel rule confusion",
-          "text": "데이터에"
+          "mistake": "Confusing '을/를' with English articles, thinking 'a' or 'the' apply similarly in Korean sentence structure.",
+          "text": "로봇를연구해요"
         },
         {
-          "mistake": "Incorrect particle usage based on final consonant rule misunderstanding",
-          "text": "데이터을"
+          "mistake": "Incorrectly applying the '에' particle instead of '을/를', mistaking it for indicating location rather than the direct object.",
+          "text": "로봇에연구해요"
         },
         {
-          "mistake": "The learner might confuse the object particle rules when dealing with certain nouns ending in vowels, mistakenly applying the wrong particle based on a mistaken",
-          "text": "데이터을"
+          "mistake": "In confusing '을/를' with '이/가' when indicating the subject rather than the object.",
+          "text": "로봇으로연구해요"
         }
       ],
       "format_ok": true,
       "predicted_objective": "particle_obj",
       "judged_correct": [
-        "데이터를"
+        "로봇을"
       ],
       "key_ok": true,
       "objective_ok": true,
       "rejected": {
-        "데이터을": "it repeats the answer or another distractor"
+        "로봇를연구해요": "it is not a mistake a real learner would make"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 4.18456419149335,
+      "key_logit": 24.197265520000492,
       "first_distractors": [
         {
-          "mistake": "Replacing particle with incorrect form due to vowel rule confusion",
-          "text": "데이터에"
+          "mistake": "Confusing '을/를' with English articles, thinking 'a' or 'the' apply similarly in Korean sentence structure.",
+          "text": "로봇를연구해요"
         },
         {
-          "mistake": "Incorrect particle usage based on final consonant rule misunderstanding",
-          "text": "데이터을"
+          "mistake": "Incorrectly applying the '에' particle instead of '을/를', mistaking it for indicating location rather than the direct object.",
+          "text": "로봇에연구해요"
         },
         {
-          "mistake": "Using wrong particle due to confusion between '을'/'를' and '에'",
-          "text": "데이터에게"
+          "mistake": "Using the wrong ending form due to confusion between different verb conjugations and particles, thinking '-을' should always pair with a specific verb ending.",
+          "text": "로봇이연구해요"
         }
       ],
       "repaired": true
     },
     {
       "objective": "particle_obj",
-      "topic": "Dashboards using Grafana or Power BI.",
-      "stem": "저는 ___ 을 통해 분석해요.",
-      "sentence": "저는 데이터를 을 통해 분석해요.",
-      "answer": "데이터를",
+      "topic": "Interlocks, alarms, emergency stops, and safety systems.",
+      "stem": "저는 안전 ___ 확인해요.",
+      "sentence": "저는 안전 시스템을 확인해요.",
+      "answer": "시스템을",
       "distractors": [
         {
-          "mistake": "English mistake: Confusing '을' with '에' when placing emphasis on the action rather than the object.",
-          "text": "데이터에"
+          "mistake": "Confusing '을/를' with '에' when it comes to verbs involving actions on objects.",
+          "text": "시스템을을확인요"
         },
         {
-          "mistake": "English mistake: Incorrectly using '을어요' instead of '을' when forming the object marker in this context.",
-          "text": "데이터을어요"
+          "mistake": "Incorrectly using '을' even when the verb requires '에' due to vowel sound preceding it incorrectly (misunderstanding vowel rule)",
+          "text": "시스템를확인요"
         },
         {
-          "mistake": "데이터를 먹어요. (Data-reul meok-eoyo.)",
-          "text": "먹어요"
+          "mistake": "Confusing direct object markers with locative markers in context of actions involving objects.",
+          "text": "시스템을확인해요"
         }
       ],
       "format_ok": true,
       "predicted_objective": "particle_obj",
       "judged_correct": [
-        "데이터를"
+        "시스템을확인해요"
       ],
-      "key_ok": true,
+      "key_ok": false,
       "objective_ok": true,
       "rejected": {
-        "먹어요": "it is not a mistake a real learner would make"
+        "시스템을확인해요": "it also makes a correct sentence"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 6.654618568800934,
+      "key_logit": 16.920766569188807,
       "first_distractors": [
         {
-          "mistake": "English mistake: Confusing '을' with '에' when placing emphasis on the action rather than the object.",
-          "text": "데이터에"
+          "mistake": "Confusing '을/를' with '에' when it comes to verbs involving actions on objects.",
+          "text": "시스템을을확인요"
         },
         {
-          "mistake": "English mistake: Incorrectly using '을어요' instead of '을' when forming the object marker in this context.",
-          "text": "데이터을어요"
+          "mistake": "Incorrectly using '을' even when the verb requires '에' due to vowel sound preceding it incorrectly (misunderstanding vowel rule)",
+          "text": "시스템를확인요"
         },
         {
-          "mistake": "English mistake: Misunderstanding vowel/consonant rules and incorrectly applying '를' when it shouldn't be used here.",
-          "text": "데이터를"
+          "mistake": "Mixing up verb endings without considering the object particle rule, often applying '에' where '을/를' should be used due to a general confusion about Korean verb-",
+          "text": "시스템에확인하요"
         }
       ],
       "repaired": true
     },
     {
       "objective": "particle_obj",
-      "topic": "Quality management and end-of-line testing: Statistical Process Control (SPC).",
-      "stem": "공장에서 ___ 사용해요.",
-      "sentence": "공장에서 센서를 사용해요.",
+      "topic": "Predictive maintenance using sensor data.",
+      "stem": "저는 ___ 분석해요.",
+      "sentence": "저는 센서를 분석해요.",
       "answer": "센서를",
       "distractors": [
         {
-          "mistake": "English mistake: Using '에' instead of '를' when the object follows a verb that typically takes '를'.",
-          "text": "센서에"
+          "mistake": "Using incorrect particle placement due to confusion between English and Korean grammar rules.",
+          "text": "센서를해요"
         },
         {
-          "mistake": "English mistake: Incorrectly applying '을' even after a vowel sound, confusing particle usage.",
-          "text": "센서을"
+          "mistake": "Incorrect particle usage based on mistaken vowel/consonant rule application.",
+          "text": "센서를먹어요"
         },
         {
-          "mistake": "English mistake: Misunderstanding the rule entirely and omitting the particle, thinking it's unnecessary.",
-          "text": "센서"
+          "mistake": "Misunderstanding object particle usage by applying it incorrectly after nouns ending in a specific pattern (even though it's not applicable here but for variety",
+          "text": "센서를분석해요요"
         }
       ],
       "format_ok": true,
@@ -1019,28 +974,327 @@
       "rejected": {},
       "distractors_ok": true,
       "accepted": true,
-      "key_logit": 4.620127845869784,
-      "difficulty_mu": 0.19489991879198507,
+      "key_logit": 19.103274801701986,
+      "difficulty_mu": -0.4348803696486435,
       "difficulty_sigma2": 1.0
     },
     {
       "objective": "particle_obj",
-      "topic": "Virtual commissioning and layout planning.",
-      "stem": "저는 디지털 트윈을 ___.",
-      "sentence": "저는 디지털 트윈을 분석해요.",
-      "answer": "분석해요",
+      "topic": "EV architecture: battery, electric motor, inverter, power electronics, thermal management, and vehicle control systems.",
+      "stem": "저는 ___ 살펴봐요.",
+      "sentence": "저는 배터리를 살펴봐요.",
+      "answer": "배터리를",
       "distractors": [
         {
-          "mistake": "Mistaking particle placement based on vowels",
-          "text": "저는디지털트윈에"
+          "mistake": "The object particle is often confused with the subject marker, leading to incorrect particle usage.",
+          "text": "배터리를봐요"
         },
         {
-          "mistake": "Confusing direct object marker with possessive form",
-          "text": "저는디지털트윈을"
+          "mistake": "Learners sometimes forget the distinction between '을' and '를' based on vowels/consonants, often applying '을' incorrectly here.",
+          "text": "배터리를살펴요"
         },
         {
-          "mistake": "Incorrect particle usage without considering final consonant",
-          "text": "저는디지털트윈들"
+          "mistake": "There's confusion around verb forms where learners might incorrectly conjugate verbs instead of focusing on the object particle.",
+          "text": "배터리를확인해요"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "particle_obj",
+      "judged_correct": [
+        "배터리를"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {},
+      "distractors_ok": true,
+      "accepted": true,
+      "key_logit": 12.296770895043167,
+      "difficulty_mu": 0.14652391647330792,
+      "difficulty_sigma2": 1.0
+    },
+    {
+      "objective": "particle_obj",
+      "topic": "Production orders, work orders, recipes, and electronic work instructions.",
+      "stem": "저는 ___ 확인해요.",
+      "sentence": "저는 레시피를 확인해요.",
+      "answer": "레시피를",
+      "distractors": [
+        {
+          "mistake": "The direct object is mistakenly treated as an adjective, leading to incorrect particle usage.",
+          "text": "레시피를으로확인"
+        },
+        {
+          "mistake": "Confuses the particle placement rule based on vowels vs consonants, incorrectly using '를' regardless of the preceding consonant.",
+          "text": "레시피를확인해요"
+        },
+        {
+          "mistake": "Misinterprets verb conjugation rules, attempting to conjugate incorrectly which affects particle usage improperly.",
+          "text": "레시피를확인하였"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "particle_obj",
+      "judged_correct": [
+        "레시피를확인해요"
+      ],
+      "key_ok": false,
+      "objective_ok": true,
+      "rejected": {
+        "레시피를확인해요": "it also makes a correct sentence"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 18.924196854989702
+    },
+    {
+      "objective": "honorific",
+      "topic": "Quality management and end-of-line testing: Statistical Process Control (SPC).",
+      "stem": "___ 품질 관리를 하십니다.",
+      "sentence": "공장장님께서 품질 관리를 하십니다.",
+      "answer": "공장장님께서",
+      "distractors": [
+        {
+          "mistake": "Overlooking the honorific particle entirely, thinking it's unnecessary for titles.",
+          "text": "품질관리를하세요"
+        },
+        {
+          "mistake": "Incorrectly using '-어요' instead of '-시' when addressing a figure of respect, confusing it with casual speech forms.",
+          "text": "품질관리를해요"
+        },
+        {
+          "mistake": "Overlooking the title honorific entirely",
+          "text": "공장장님품질관리"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "honorific",
+      "judged_correct": [
+        "공장장님께서"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {
+        "공장장님품질관리": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 18.94561572897955,
+      "first_distractors": [
+        {
+          "mistake": "Overlooking the honorific particle entirely, thinking it's unnecessary for titles.",
+          "text": "품질관리를하세요"
+        },
+        {
+          "mistake": "Incorrectly using '-어요' instead of '-시' when addressing a figure of respect, confusing it with casual speech forms.",
+          "text": "품질관리를해요"
+        },
+        {
+          "mistake": "Misapplying a different honorific ending typically used for younger individuals or informal settings, like '-요' instead of '-시'.",
+          "text": "품질관리를하게요"
+        }
+      ],
+      "repaired": true
+    },
+    {
+      "objective": "honorific",
+      "topic": "Introduction to Lean Manufacturing, 5S, Kaizen, and value stream mapping.",
+      "stem": "___ 강의를 하십니다.",
+      "sentence": "공장장님께서 강의를 하십니다.",
+      "answer": "공장장님께서",
+      "distractors": [
+        {
+          "mistake": "혼잡한 표현 사용 (Misuse of cluttered expressions)",
+          "text": "사장님께서는"
+        },
+        {
+          "mistake": "형태 오류 (Morphological Error)",
+          "text": "할머니께서하시"
+        },
+        {
+          "mistake": "혼잡한 표현 사용 (Overuse of unnecessary words)",
+          "text": "공장장님께서는께"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "honorific",
+      "judged_correct": [
+        "공장장님께서"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {},
+      "distractors_ok": true,
+      "accepted": true,
+      "key_logit": 4.638881669444321,
+      "first_distractors": [
+        {
+          "mistake": "혼잡한 표현 사용 (Misuse of cluttered expressions)",
+          "text": "사장님께서는"
+        },
+        {
+          "mistake": "부적절한 존칭 사용 (Incorrect Honorific Usage)",
+          "text": "선생님께서"
+        },
+        {
+          "mistake": "형태 오류 (Morphological Error)",
+          "text": "할머니께서하시"
+        }
+      ],
+      "repaired": true,
+      "difficulty_mu": 0.800652626229069,
+      "difficulty_sigma2": 1.0
+    },
+    {
+      "objective": "honorific",
+      "topic": "PLC fundamentals and ladder logic.",
+      "stem": "___ 자동화를 설명하시네요.",
+      "sentence": "연구원님께서 자동화를 설명하시네요.",
+      "answer": "연구원님께서",
+      "distractors": [
+        {
+          "mistake": "Using informal honorific when formal respect is required",
+          "text": "연구원님이세요"
+        },
+        {
+          "mistake": "Omitting the honorific suffix '-시-' entirely",
+          "text": "연구원님이자동화"
+        },
+        {
+          "mistake": "Incorrectly attaching '-세요' without the '-시-' suffix",
+          "text": "연구원님께서자동"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "honorific",
+      "judged_correct": [
+        "연구원님께서"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {
+        "연구원님께서자동": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 12.0285357390019,
+      "first_distractors": [
+        {
+          "mistake": "Overemphasis on English Influence",
+          "text": "연구원님께서자동"
+        },
+        {
+          "mistake": "Incorrect Particle Usage",
+          "text": "연구원님께서자동"
+        },
+        {
+          "mistake": "Wrong Honorific Form",
+          "text": "연구원님께서자동"
+        }
+      ],
+      "repaired": true
+    },
+    {
+      "objective": "honorific",
+      "topic": "Time-series data and machine telemetry.",
+      "stem": "___ 데이터 분석을 하십니다.",
+      "sentence": "연구원님께서 데이터 분석을 하십니다.",
+      "answer": "연구원님께서",
+      "distractors": [
+        {
+          "mistake": "Overlooking the honorific particle requirement, focusing instead on verb tense consistency with English influence.",
+          "text": "연구원님으로서하"
+        },
+        {
+          "mistake": "Confusing the formal address with a less formal verb ending, influenced by casual Korean speech patterns.",
+          "text": "연구원님께서해요"
+        },
+        {
+          "mistake": "Incorrectly applying a different honorific form commonly used for objects or less formal contexts instead of people requiring respect.",
+          "text": "연구원님께서분석"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "honorific",
+      "judged_correct": [
+        "연구원님께서"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {},
+      "distractors_ok": true,
+      "accepted": true,
+      "key_logit": 17.12757713903459,
+      "difficulty_mu": -0.26611838774010593,
+      "difficulty_sigma2": 1.0
+    },
+    {
+      "objective": "honorific",
+      "topic": "EV architecture: battery, electric motor, inverter, power electronics, thermal management, and vehicle control systems.",
+      "stem": "___ 배터리를 연구하십니다.",
+      "sentence": "연구원님께서 배터리를 연구하십니다.",
+      "answer": "연구원님께서",
+      "distractors": [
+        {
+          "mistake": "Using informal honorific with a respected role",
+          "text": "연구원님께서연구"
+        },
+        {
+          "mistake": "Incorrect verb form without the honorific suffix",
+          "text": "연구원님이연구하"
+        },
+        {
+          "mistake": "Incorrect choice of informal title instead of respectful form",
+          "text": "친구님께서연구"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "honorific",
+      "judged_correct": [
+        "연구원님께서"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {
+        "연구원님이연구하": "it is not a mistake a real learner would make",
+        "친구님께서연구": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 15.392292488954244,
+      "first_distractors": [
+        {
+          "mistake": "Mixing English influence leading to incorrect Korean form",
+          "text": "연구원님께서연구"
+        },
+        {
+          "mistake": "Incorrect use of informal honorific",
+          "text": "연구원님께서연구"
+        },
+        {
+          "mistake": "Incorrect particle usage without proper honorific",
+          "text": "연구원님께서연구"
+        }
+      ],
+      "repaired": true
+    },
+    {
+      "objective": "honorific",
+      "topic": "Battery manufacturing and pack assembly: Battery Management System (BMS) testing.",
+      "stem": "___ 전문가께서 시스템을 테스트하십니다.",
+      "sentence": "배터리 전문가께서 시스템을 테스트하십니다.",
+      "answer": "배터리",
+      "distractors": [
+        {
+          "mistake": "Overemphasis on English Influence",
+          "text": "전문가께서시스템"
+        },
+        {
+          "mistake": "Incorrect Particle Usage",
+          "text": "전문가께서시스템"
+        },
+        {
+          "mistake": "Incorrect Verb Formation",
+          "text": "전문가께서테스트"
         }
       ],
       "format_ok": true,
@@ -1049,302 +1303,99 @@
       "key_ok": false,
       "objective_ok": false,
       "rejected": {
-        "저는디지털트윈에": "it is not a mistake a real learner would make",
-        "저는디지털트윈을": "it is not a mistake a real learner would make",
-        "저는디지털트윈들": "it is not a mistake a real learner would make"
+        "전문가께서시스템": "it repeats the answer or another distractor",
+        "전문가께서테스트": "it is not a mistake a real learner would make"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 11.686176873401637
-    },
-    {
-      "objective": "particle_obj",
-      "topic": "E-motor and power electronics: motor and inverter assembly.",
-      "stem": "저는 모터를 ___.",
-      "sentence": "저는 모터를 조립해요.",
-      "answer": "조립해요",
-      "distractors": [
-        {
-          "mistake": "영어 영향 오류 (English Influence Error)",
-          "text": "조립를조립해요"
-        },
-        {
-          "mistake": "발음 유사 오류 (Sounds Similar Error)",
-          "text": "조립을조립해요"
-        },
-        {
-          "mistake": "문법적 혼동 오류 (Grammatical Confusion Error)",
-          "text": "조립하에조립해요"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "particle_obj",
-      "judged_correct": [
-        "조립해요"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 20.371262090343336,
-      "difficulty_mu": -3.0,
-      "difficulty_sigma2": 1.0
-    },
-    {
-      "objective": "honorific",
-      "topic": "Digital twin concepts and real-time synchronization.",
-      "stem": "공장장이세요, 디지털 트윈을 잘 ___.",
-      "sentence": "공장장이세요, 디지털 트윈을 잘 관리하십니다.",
-      "answer": "관리하십니다",
-      "distractors": [
-        {
-          "mistake": "Misapplication of honorific without the appropriate particle",
-          "text": "관리받으십니다"
-        },
-        {
-          "mistake": "Using informal speech level instead of honorific form",
-          "text": "공장장이세요관리"
-        },
-        {
-          "mistake": "Incorrect particle usage without proper honorific structure",
-          "text": "공장장이세요관리"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "honorific",
-      "judged_correct": [
-        "관리하십니다"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {
-        "관리받으십니다": "it is not a mistake a real learner would make",
-        "공장장이세요관리": "it repeats the answer or another distractor"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 10.418310723594505,
-      "first_distractors": [
-        {
-          "mistake": "Overgeneralization of verb endings",
-          "text": "관리하세요"
-        },
-        {
-          "mistake": "Incorrect use of informal form",
-          "text": "관리해요"
-        },
-        {
-          "mistake": "Misapplication of honorific without the appropriate particle",
-          "text": "관리받으십니다"
-        }
-      ],
-      "repaired": true
-    },
-    {
-      "objective": "honorific",
-      "topic": "PLC fundamentals and ladder logic.",
-      "stem": "교수님께서 자동화를 ___ 설명하십니다.",
-      "sentence": "교수님께서 자동화를 잘 설명하십니다.",
-      "answer": "잘",
-      "distractors": [
-        {
-          "mistake": "Using an informal ending instead of the respectful form",
-          "text": "잘해요"
-        },
-        {
-          "mistake": "Incorrectly applying the English structure without Korean particles",
-          "text": "잘가르치세요"
-        },
-        {
-          "mistake": "Using a particle that doesn't convey respect",
-          "text": "잘봐주세요"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "mod_adverb",
-      "judged_correct": [
-        "잘"
-      ],
-      "key_ok": true,
-      "objective_ok": false,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": false,
-      "key_logit": 14.642526270141921
-    },
-    {
-      "objective": "honorific",
-      "topic": "Production planning, takt time, cycle time, throughput, OEE, scrap, and rework.",
-      "stem": "공장장이시여, 제조 공정을 잘 ___ 가십니다.",
-      "sentence": "공장장이시여, 제조 공정을 잘 이끌어 가십니다.",
-      "answer": "이끌어",
-      "distractors": [
-        {
-          "mistake": "Overuse of English articles",
-          "text": "이끌어하시니"
-        },
-        {
-          "mistake": "Incorrect honorific particle usage",
-          "text": "이끌어갑니다"
-        },
-        {
-          "mistake": "Inappropriate verb ending for formality",
-          "text": "이끌어갑니다요"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "honorific",
-      "judged_correct": [
-        "이끌어하시니"
-      ],
-      "key_ok": false,
-      "objective_ok": true,
-      "rejected": {
-        "이끌어하시니": "it also makes a correct sentence"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 17.13238781195483
-    },
-    {
-      "objective": "honorific",
-      "topic": "Production orders, work orders, recipes, and electronic work instructions.",
-      "stem": "공장장님께서 공정을 ___ 지도하십니다.",
-      "sentence": "공장장님께서 공정을 잘 지도하십니다.",
-      "answer": "잘",
-      "distractors": [
-        {
-          "mistake": "Overlooking Honorific Particle",
-          "text": "공정을잘지도하신"
-        },
-        {
-          "mistake": "Incorrect Verb Ending",
-          "text": "공장장님께서공정"
-        },
-        {
-          "mistake": "Incorrect Subject Form",
-          "text": "공장장님공정지도"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "mod_adverb",
-      "judged_correct": [
-        "잘"
-      ],
-      "key_ok": true,
-      "objective_ok": false,
-      "rejected": {
-        "공정을잘지도하신": "it is not a mistake a real learner would make"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 13.636967816671895
-    },
-    {
-      "objective": "honorific",
-      "topic": "Anomaly detection for machine behavior.",
-      "stem": "생산자동화를 잘 ___.",
-      "sentence": "생산자동화를 잘 연구하시네요.",
-      "answer": "연구하시네요",
-      "distractors": [
-        {
-          "mistake": "Incorrect verb ending without honorific",
-          "text": "연구하십니다"
-        },
-        {
-          "mistake": "Overusing English structure",
-          "text": "연구받으세요"
-        },
-        {
-          "mistake": "Incorrect honorific usage with inappropriate formality",
-          "text": "연구하시죠"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "honorific",
-      "judged_correct": [
-        "연구하시죠"
-      ],
-      "key_ok": false,
-      "objective_ok": true,
-      "rejected": {
-        "연구받으세요": "it is not a mistake a real learner would make",
-        "연구하시죠": "it also makes a correct sentence"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 1.1373877298812203,
-      "first_distractors": [
-        {
-          "mistake": "Overusing informal particles",
-          "text": "연구해요"
-        },
-        {
-          "mistake": "Incorrect honorific particle usage",
-          "text": "연구받으시네요"
-        },
-        {
-          "mistake": "Incorrect verb ending without honorific",
-          "text": "연구하십니다"
-        }
-      ],
-      "repaired": true
-    },
-    {
-      "objective": "honorific",
-      "topic": "Time-series data and machine telemetry.",
-      "stem": "공장주님께서 데이터를 잘 ___.",
-      "sentence": "공장주님께서 데이터를 잘 분석하십니다.",
-      "answer": "분석하십니다",
-      "distractors": [
-        {
-          "mistake": "Overgeneralizing English Influence",
-          "text": "분석하세요"
-        },
-        {
-          "mistake": "Incorrect Use of Informal Form",
-          "text": "분석해요"
-        },
-        {
-          "mistake": "Incorrect Honorific Particle Usage",
-          "text": "분석하시죠"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "honorific",
-      "judged_correct": [
-        "분석하시죠"
-      ],
-      "key_ok": false,
-      "objective_ok": true,
-      "rejected": {
-        "분석하세요": "a language model finds it more natural than the answer",
-        "분석해요": "a language model finds it more natural than the answer",
-        "분석하시죠": "it also makes a correct sentence"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": -4.180805508363444
+      "key_logit": -0.863377751565608
     },
     {
       "objective": "time_range",
-      "topic": "Predictive maintenance using sensor data.",
-      "stem": "___ 데이터까지 분석해요.",
-      "sentence": "센서부터 데이터까지 분석해요.",
+      "topic": "OEE analysis, downtime Pareto charts, and production trend analysis.",
+      "stem": "___ 모듈4까지 배웁니다.",
+      "sentence": "스마트팩토리부터 모듈4까지 배웁니다.",
+      "answer": "스마트팩토리부터",
+      "distractors": [
+        {
+          "mistake": "The sentence structure mixes Korean and English incorrectly, confusing the temporal marker usage.",
+          "text": "모듈부터배운다"
+        },
+        {
+          "mistake": "Incorrect use of '까지' (until) instead of '까지' marking the end correctly, leading to ambiguity.",
+          "text": "스마트팩토리까지"
+        },
+        {
+          "mistake": "Using '까지' redundantly without proper temporal context, confusing the start and end points.",
+          "text": "스마트팩토리부터"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "모듈부터배운다": "it is not a mistake a real learner would make",
+        "스마트팩토리까지": "a language model finds it more natural than the answer",
+        "스마트팩토리부터": "it repeats the answer or another distractor"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": -3.301070125625832
+    },
+    {
+      "objective": "time_range",
+      "topic": "Manufacturing data preparation and feature engineering.",
+      "stem": "다섯 시부터 일곱 시까지 ___ 준비해요.",
+      "sentence": "다섯 시부터 일곱 시까지 데이터 준비해요.",
+      "answer": "데이터",
+      "distractors": [
+        {
+          "mistake": "Confusing time markers with unrelated English words",
+          "text": "다섯시부터일곱시"
+        },
+        {
+          "mistake": "Incorrect use of Korean particles without context",
+          "text": "까지준비"
+        },
+        {
+          "mistake": "Misapplication of time span markers leading to ambiguity",
+          "text": "다섯시부터준비일"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "다섯시부터일곱시": "it is not a mistake a real learner would make",
+        "까지준비": "it is not a mistake a real learner would make",
+        "다섯시부터준비일": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 8.960710210242425
+    },
+    {
+      "objective": "time_range",
+      "topic": "Sensors, actuators, motors, drives, and machine safety.",
+      "stem": "___ 모터까지 스마트팩토리 과정에서 배웁니다.",
+      "sentence": "센서부터 모터까지 스마트팩토리 과정에서 배웁니다.",
       "answer": "센서부터",
       "distractors": [
         {
-          "mistake": "시작과 끝을 혼동하는 실수",
-          "text": "데이터부터"
+          "mistake": "Incorrect particle placement leading to ambiguity",
+          "text": "센서까지부터"
         },
         {
-          "mistake": "시간 범위의 순서를 바꾸는 실수",
-          "text": "데이터부터센서"
+          "mistake": "영어 문장 오류 설명",
+          "text": "모터까지부터"
         },
         {
           "mistake": "부적절한 조사 사용",
-          "text": "센서까지데이터"
+          "text": "센서까지까지"
         }
       ],
       "format_ok": true,
@@ -1357,396 +1408,364 @@
       "rejected": {},
       "distractors_ok": true,
       "accepted": true,
-      "key_logit": 3.106862938197737,
-      "difficulty_mu": 0.5315553637698657,
+      "key_logit": 5.310225191210918,
+      "first_distractors": [
+        {
+          "mistake": "Mixing English terminology with Korean grammar structure",
+          "text": "모터부터"
+        },
+        {
+          "mistake": "Incorrect use of time span marker",
+          "text": "까지부터"
+        },
+        {
+          "mistake": "Incorrect particle placement leading to ambiguity",
+          "text": "센서까지부터"
+        }
+      ],
+      "repaired": true,
+      "difficulty_mu": 0.7433071804072497,
       "difficulty_sigma2": 1.0
     },
     {
       "objective": "time_range",
-      "topic": "PLC fundamentals and ladder logic.",
-      "stem": "___ 자동화까지 배웁니다.",
-      "sentence": "스마트팩토리부터 자동화까지 배웁니다.",
-      "answer": "스마트팩토리부터",
+      "topic": "OT cybersecurity, network segmentation, and access control.",
+      "stem": "___ 제어까지 스마트 팩토리 과정에서 배웁니다.",
+      "sentence": "센서부터 제어까지 스마트 팩토리 과정에서 배웁니다.",
+      "answer": "센서부터",
       "distractors": [
         {
-          "mistake": "시작과 끝을 혼동하는 오류",
-          "text": "스마트팩토리까지"
+          "mistake": "Confusing '부터' with '까지' without proper context",
+          "text": "학습부터"
         },
         {
-          "mistake": "English sentence naming the mistake",
-          "text": "학습은부터까지만"
+          "mistake": "Misplacement of '까지' leading to ambiguous timeframe",
+          "text": "학습까지센서"
         },
         {
-          "mistake": "Confusing the temporal markers incorrectly while maintaining Korean context",
-          "text": "학습부터자동화까"
+          "mistake": "혼재된 시간 표현 (Ambiguous time expression due to misplaced markers)",
+          "text": "학습부터센서까지"
         }
       ],
       "format_ok": true,
       "predicted_objective": "time_range",
       "judged_correct": [
-        "스마트팩토리부터"
+        "센서부터"
       ],
       "key_ok": true,
       "objective_ok": true,
       "rejected": {
-        "스마트팩토리까지": "it is not a mistake a real learner would make",
-        "학습부터자동화까": "it is not a mistake a real learner would make"
+        "학습부터": "it is not a mistake a real learner would make",
+        "학습까지센서": "it is not a mistake a real learner would make"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 0.9970753615941788,
+      "key_logit": 1.4547014235313582,
       "first_distractors": [
         {
-          "mistake": "시작과 끝을 혼동하는 오류",
-          "text": "스마트팩토리까지"
+          "mistake": "Confusing '부터' with '까지' without proper context",
+          "text": "학습부터"
         },
         {
-          "mistake": "잘못된 시간 표현 사용",
-          "text": "스마트팩토리부터"
+          "mistake": "Incorrect use of '까지' without proper start marker",
+          "text": "센서까지"
         },
         {
-          "mistake": "부적절한 연결어 사용",
-          "text": "부터스마트팩토리"
+          "mistake": "Misplacement of '까지' leading to ambiguous timeframe",
+          "text": "학습까지센서"
         }
       ],
       "repaired": true
     },
     {
       "objective": "time_range",
-      "topic": "Time-series data and machine telemetry.",
-      "stem": "___ 생산까지 데이터 분석해요.",
-      "sentence": "센서부터 생산까지 데이터 분석해요.",
-      "answer": "센서부터",
+      "topic": "Battery manufacturing and pack assembly: cell, module, and pack manufacturing concepts.",
+      "stem": "공장부터 조립까지 ___ 셀 제작 과정 배웁니다.",
+      "sentence": "공장부터 조립까지 배터리 셀 제작 과정 배웁니다.",
+      "answer": "배터리",
       "distractors": [
         {
-          "mistake": "시작 시점만 강조하는 오류",
-          "text": "센서까지"
+          "mistake": "시간 구분 혼동 (Confusion with Time Span Markers)",
+          "text": "공장까지조립부터"
         },
         {
-          "mistake": "종료 시점만 강조하는 오류",
-          "text": "생산까지"
+          "mistake": "부적절한 연결어 사용 (Incorrect Use of Connecting Words)",
+          "text": "공장부터조립까지"
         },
         {
-          "mistake": "부적절한 연결 입자 사용 오류",
-          "text": "센서과에서"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "none",
-      "judged_correct": [],
-      "key_ok": false,
-      "objective_ok": false,
-      "rejected": {
-        "센서까지": "it is not a mistake a real learner would make",
-        "생산까지": "a language model finds it more natural than the answer",
-        "센서과에서": "it is not a mistake a real learner would make"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": -2.5926112730715807
-    },
-    {
-      "objective": "time_range",
-      "topic": "Sensors, actuators, motors, drives, and machine safety.",
-      "stem": "___ 모터까지 학습해요.",
-      "sentence": "센서부터 모터까지 학습해요.",
-      "answer": "센서부터",
-      "distractors": [
-        {
-          "mistake": "시작과 끝의 구분 오류",
-          "text": "센서까지"
-        },
-        {
-          "mistake": "시간 순서 혼동 오류",
-          "text": "모터부터"
-        },
-        {
-          "mistake": "부적절한 연결 표현 오류",
-          "text": "부터만"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "none",
-      "judged_correct": [],
-      "key_ok": false,
-      "objective_ok": false,
-      "rejected": {
-        "센서까지": "it is not a mistake a real learner would make",
-        "모터부터": "it is not a mistake a real learner would make",
-        "부터만": "it is not a mistake a real learner would make"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 6.714769921668163
-    },
-    {
-      "objective": "time_range",
-      "topic": "Quality management and end-of-line testing: functional validation and electronic test records.",
-      "stem": "___ 검사부터 출하까지 관리해요.",
-      "sentence": "품질 검사부터 출하까지 관리해요.",
-      "answer": "품질",
-      "distractors": [
-        {
-          "mistake": "Using incorrect particle placement",
-          "text": "품질부터까지관리"
-        },
-        {
-          "mistake": "Incorrect ending particle usage",
-          "text": "품질까지부터관리"
-        },
-        {
-          "mistake": "Misplacement of temporal markers",
-          "text": "품질관리부터품질"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "none",
-      "judged_correct": [],
-      "key_ok": false,
-      "objective_ok": false,
-      "rejected": {
-        "품질부터까지관리": "it is not a mistake a real learner would make",
-        "품질까지부터관리": "it is not a mistake a real learner would make",
-        "품질관리부터품질": "it is not a mistake a real learner would make"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 15.692506168707686
-    },
-    {
-      "objective": "time_range",
-      "topic": "Battery manufacturing and pack assembly: Battery Management System (BMS) testing.",
-      "stem": "___ 10시부터 오후 2시까지 배터리 테스트해요.",
-      "sentence": "오전 10시부터 오후 2시까지 배터리 테스트해요.",
-      "answer": "오전",
-      "distractors": [
-        {
-          "mistake": "English sentence naming the mistake: Incorrectly placing temporal markers without proper Korean structure.",
-          "text": "오전부터오후까지"
-        },
-        {
-          "mistake": "English sentence naming the mistake: Confusing start and end markers.",
-          "text": "오후부터오전까지"
-        },
-        {
-          "mistake": "English sentence naming the mistake: Misusing the temporal markers leading to grammatical error.",
-          "text": "오전부터까지오후"
+          "mistake": "부적절한 형태 사용 (Incorrect Form Usage)",
+          "text": "공장부터조립까지"
         }
       ],
       "format_ok": true,
       "predicted_objective": "time_range",
       "judged_correct": [
-        "오전부터오후까지"
+        "공장부터조립까지"
       ],
       "key_ok": false,
       "objective_ok": true,
       "rejected": {
-        "오전부터오후까지": "it also makes a correct sentence",
-        "오후부터오전까지": "it is not a mistake a real learner would make"
+        "공장부터조립까지": "it repeats the answer or another distractor"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 24.232542017565297
+      "key_logit": 28.198426121451607
+    },
+    {
+      "objective": "time_range",
+      "topic": "EV architecture: battery, electric motor, inverter, power electronics, thermal management, and vehicle control systems.",
+      "stem": "배터리부터 모터까지 ___ 자동차 핵심 부품을 배웁니다.",
+      "sentence": "배터리부터 모터까지 전기 자동차 핵심 부품을 배웁니다.",
+      "answer": "전기",
+      "distractors": [
+        {
+          "mistake": "혼합 문법 오류 (Mixing Grammar Error)",
+          "text": "배터리까지모터"
+        },
+        {
+          "mistake": "범위 혼동 오류 (Range Confusion Error)",
+          "text": "배터리부터마지막"
+        },
+        {
+          "mistake": "부적절한 연결어 사용 오류 (Incorrect Connector Usage Error)",
+          "text": "배터리부터그리고"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "배터리까지모터": "it is not a mistake a real learner would make",
+        "배터리부터마지막": "it is not a mistake a real learner would make",
+        "배터리부터그리고": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 24.579667083339324
     },
     {
       "objective": "tense_past",
-      "topic": "MQTT and OPC UA data integration.",
-      "stem": "저는 어제 스마트팩토리에서 데이터를 ___.",
-      "sentence": "저는 어제 스마트팩토리에서 데이터를 통합했어요.",
-      "answer": "통합했어요",
+      "topic": "Human review and safe integration into production decisions.",
+      "stem": "저는 어제 스마트팩토리에서 인공지능을 ___.",
+      "sentence": "저는 어제 스마트팩토리에서 인공지능을 검토했어요.",
+      "answer": "검토했어요",
       "distractors": [
         {
-          "mistake": "Using present tense instead of past tense",
-          "text": "통합해요"
+          "mistake": "The learner incorrectly uses the informal past tense ending '-었다' instead of the polite '-었어요'",
+          "text": "검토했다"
         },
         {
-          "mistake": "Incorrect use of informal ending",
-          "text": "통합했어"
+          "mistake": "The learner confuses the verb ending with that used for different verbs, incorrectly using '-봤어요' which is for 'to watch'",
+          "text": "검토봤어요"
         },
         {
-          "mistake": "Incorrect verb form with wrong ending particle",
-          "text": "통합했지요"
+          "mistake": "혼재했어요: Mixing up verb endings incorrectly.",
+          "text": "검토했었어요"
         }
       ],
       "format_ok": true,
       "predicted_objective": "tense_past",
       "judged_correct": [
-        "통합했어요"
+        "검토했어요"
       ],
       "key_ok": true,
       "objective_ok": true,
       "rejected": {},
       "distractors_ok": true,
       "accepted": true,
-      "key_logit": 2.9047325914989472,
-      "difficulty_mu": 0.5765232219858454,
+      "key_logit": 1.6607897728170509,
+      "first_distractors": [
+        {
+          "mistake": "The learner mistakenly uses a casual present tense form instead of the polite past tense.",
+          "text": "검토해요"
+        },
+        {
+          "mistake": "The learner incorrectly uses the informal past tense ending '-었다' instead of the polite '-었어요'",
+          "text": "검토했다"
+        },
+        {
+          "mistake": "The learner confuses the verb ending with that used for different verbs, incorrectly using '-봤어요' which is for 'to watch'",
+          "text": "검토봤어요"
+        }
+      ],
+      "repaired": true,
+      "difficulty_mu": 1.0550380518321074,
       "difficulty_sigma2": 1.0
     },
     {
       "objective": "tense_past",
-      "topic": "Production orders, work orders, recipes, and electronic work instructions.",
-      "stem": "저는 어제 스마트팩토리에서 레시피를 ___.",
-      "sentence": "저는 어제 스마트팩토리에서 레시피를 확인했어요.",
+      "topic": "OT cybersecurity, network segmentation, and access control.",
+      "stem": "저는 어제 스마트팩토리에서 보안을 ___.",
+      "sentence": "저는 어제 스마트팩토리에서 보안을 확인했어요.",
       "answer": "확인했어요",
       "distractors": [
         {
-          "mistake": "Confusing past tense with present tense usage",
-          "text": "확인해요"
+          "mistake": "The learner mistakenly uses informal past tense form instead of polite past tense.",
+          "text": "확인했어"
         },
         {
-          "mistake": "Incorrect verb ending for past tense in polite form",
+          "mistake": "The learner confuses the correct past tense ending with an incorrect verb ending, altering the tense incorrectly.",
+          "text": "확인했지"
+        },
+        {
+          "mistake": "Learners might confuse the polite past tense form with an informal continuation verb, mixing tenses incorrectly in context.",
           "text": "확인했어요요"
-        },
-        {
-          "mistake": "Confusing past tense with present tense usage in a different context",
-          "text": "확인해요"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "tense_past",
-      "judged_correct": [
-        "확인했어요"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
       "rejected": {
-        "확인해요": "it repeats the answer or another distractor"
+        "확인했어": "it is not a mistake a real learner would make",
+        "확인했지": "it is not a mistake a real learner would make",
+        "확인했어요요": "it is not a mistake a real learner would make"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 5.064238470256939,
+      "key_logit": 1.5850863646988285,
       "first_distractors": [
         {
-          "mistake": "Confusing past tense with present tense usage",
+          "mistake": "The learner mistakenly uses informal past tense form instead of polite past tense.",
+          "text": "확인했어"
+        },
+        {
+          "mistake": "The learner incorrectly uses the present tense polite form (-어요) instead of the past tense (-았/었).",
           "text": "확인해요"
         },
         {
-          "mistake": "Using incorrect polite form ending",
-          "text": "확인했습니다"
-        },
-        {
-          "mistake": "Incorrect verb ending for past tense in polite form",
-          "text": "확인했어요요"
+          "mistake": "The learner confuses the correct past tense ending with an incorrect verb ending, altering the tense incorrectly.",
+          "text": "확인했지"
         }
       ],
       "repaired": true
     },
     {
       "objective": "tense_past",
-      "topic": "Model evaluation, false positives, false negatives, and drift.",
-      "stem": "저는 어제 스마트팩토리에서 모델을 ___.",
-      "sentence": "저는 어제 스마트팩토리에서 모델을 평가했어요.",
-      "answer": "평가했어요",
+      "topic": "PLC fundamentals and ladder logic.",
+      "stem": "저는 어제 스마트팩토리에서 제어기를 ___.",
+      "sentence": "저는 어제 스마트팩토리에서 제어기를 배웠어요.",
+      "answer": "배웠어요",
       "distractors": [
         {
-          "mistake": "Using present tense instead of past tense",
-          "text": "평가해요"
+          "mistake": "혼재 (Mishmix)",
+          "text": "배웠어요요"
         },
         {
-          "mistake": "Incorrect verb ending for polite past tense",
-          "text": "평가했어요요"
+          "mistake": "단순화 (Simplification)",
+          "text": "배웠어요요"
         },
         {
-          "mistake": "Using incorrect verb ending for polite past tense",
-          "text": "평가했어요요"
+          "mistake": "오류 변형 (Misformation)",
+          "text": "학습했어요"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "tense_past",
+      "predicted_objective": "particle_obj",
       "judged_correct": [
-        "평가했어요"
+        "배웠어요"
       ],
       "key_ok": true,
-      "objective_ok": true,
+      "objective_ok": false,
       "rejected": {
-        "평가했어요요": "it repeats the answer or another distractor"
+        "배웠어요요": "it repeats the answer or another distractor",
+        "학습했어요": "a language model finds it more natural than the answer"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 6.912728435544046,
-      "first_distractors": [
-        {
-          "mistake": "Using present tense instead of past tense",
-          "text": "평가해요"
-        },
-        {
-          "mistake": "Incorrect particle usage in past tense",
-          "text": "평가했습니다"
-        },
-        {
-          "mistake": "Incorrect verb ending for polite past tense",
-          "text": "평가했어요요"
-        }
-      ],
-      "repaired": true
+      "key_logit": -0.8345048811131998
     },
     {
       "objective": "tense_past",
-      "topic": "Sensors, actuators, motors, drives, and machine safety.",
-      "stem": "저는 어제 센서를 ___.",
-      "sentence": "저는 어제 센서를 확인했어요.",
-      "answer": "확인했어요",
+      "topic": "Digital twin concepts and real-time synchronization.",
+      "stem": "저는 어제 디지털 트윈을 ___.",
+      "sentence": "저는 어제 디지털 트윈을 검토했어요.",
+      "answer": "검토했어요",
       "distractors": [
         {
-          "mistake": "Using incorrect past tense ending without '-았/었'",
-          "text": "확인했음"
+          "mistake": "혼재된 시제 사용 (Mixed Tense Usage)",
+          "text": "검토해요"
         },
         {
-          "mistake": "Using an incorrect polite form particle",
-          "text": "확인하니까요"
+          "mistake": "잘못된 어미 사용 (Incorrect Particle Usage)",
+          "text": "검토했습니다"
         },
         {
-          "mistake": "Confusing '-았/었' with present tense endings",
-          "text": "확인했어요요"
+          "mistake": "격식 없는 표현 (Informal Expression)",
+          "text": "검토했어"
         }
       ],
       "format_ok": true,
       "predicted_objective": "tense_past",
       "judged_correct": [
-        "확인했어요"
+        "검토했습니다"
       ],
-      "key_ok": true,
+      "key_ok": false,
       "objective_ok": true,
       "rejected": {
-        "확인하니까요": "it is not a mistake a real learner would make"
+        "검토해요": "it is not a mistake a real learner would make",
+        "검토했습니다": "it also makes a correct sentence",
+        "검토했어": "it is not a mistake a real learner would make"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 3.5676419830953114,
-      "first_distractors": [
-        {
-          "mistake": "Using present tense instead of past tense",
-          "text": "확인해요"
-        },
-        {
-          "mistake": "Using incorrect past tense ending without '-았/었'",
-          "text": "확인했음"
-        },
-        {
-          "mistake": "Using an incorrect polite form particle",
-          "text": "확인하니까요"
-        }
-      ],
-      "repaired": true
+      "key_logit": -2.405206869311592
     },
     {
       "objective": "tense_past",
-      "topic": "Discrete-event simulation of production lines.",
+      "topic": "Battery manufacturing and pack assembly: thermal, electrical, and process safety.",
+      "stem": "저는 어제 배터리를 ___.",
+      "sentence": "저는 어제 배터리를 검사했어요.",
+      "answer": "검사했어요",
+      "distractors": [
+        {
+          "mistake": "영어 표현의 혼동으로 인한 오류",
+          "text": "검사했어요"
+        },
+        {
+          "mistake": "과거 시제 대신 현재 시제 '-어요'를 사용하는 오류",
+          "text": "검사해요"
+        },
+        {
+          "mistake": "잘못된 조사 사용으로 인한 오류",
+          "text": "배터리를검토했어"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "검사했어요": "it repeats the answer or another distractor",
+        "검사해요": "it is not a mistake a real learner would make",
+        "배터리를검토했어": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": -0.005122139011303772
+    },
+    {
+      "objective": "tense_past",
+      "topic": "Bottleneck and capacity analysis.",
       "stem": "저는 어제 디지털 트윈을 ___.",
       "sentence": "저는 어제 디지털 트윈을 분석했어요.",
       "answer": "분석했어요",
       "distractors": [
         {
-          "mistake": "Using present tense instead of past tense",
+          "mistake": "Mixing Present Tense with Polite Form",
           "text": "분석해요"
         },
         {
-          "mistake": "Incorrect particle usage (past progressive form instead of simple past)",
-          "text": "분석하고있어요"
+          "mistake": "Using Incorrect Verb Ending for Past Actions",
+          "text": "분석했어"
         },
         {
-          "mistake": "Using present continuous tense instead of simple past tense",
-          "text": "분석하고있었어요"
+          "mistake": "Confusing past tense endings with present tense forms while maintaining incorrect verb conjugation",
+          "text": "분석했어요요"
         }
       ],
       "format_ok": true,
@@ -1756,803 +1775,861 @@
       ],
       "key_ok": true,
       "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 5.928360519066533,
+      "rejected": {
+        "분석해요": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 2.789054994571784,
       "first_distractors": [
         {
-          "mistake": "Using present tense instead of past tense",
+          "mistake": "Mixing Present Tense with Polite Form",
           "text": "분석해요"
         },
         {
-          "mistake": "Incorrect particle usage (past progressive form instead of simple past)",
-          "text": "분석하고있어요"
+          "mistake": "Incorrect Past Particle Usage",
+          "text": "분석했어요요"
         },
         {
-          "mistake": "Incorrect verb ending mimicking a different polite form",
-          "text": "분석했습니다"
+          "mistake": "Using Incorrect Verb Ending for Past Actions",
+          "text": "분석했어"
         }
       ],
-      "repaired": true,
-      "difficulty_mu": -0.09614208614499978,
-      "difficulty_sigma2": 1.0
+      "repaired": true
     },
     {
-      "objective": "tense_past",
-      "topic": "IIoT gateways, edge computing, and industrial data pipelines.",
-      "stem": "저는 어제 스마트팩토리에서 게이트웨이를 ___.",
-      "sentence": "저는 어제 스마트팩토리에서 게이트웨이를 확인했어요.",
-      "answer": "확인했어요",
+      "objective": "irregular_conj",
+      "topic": "Introduction to Lean Manufacturing, 5S, Kaizen, and value stream mapping.",
+      "stem": "공장은 ___ 정리되어 있어요.",
+      "sentence": "공장은 깨끗하게 정리되어 있어요.",
+      "answer": "깨끗하게",
       "distractors": [
         {
-          "mistake": "Incorrect use of casual form instead of polite form",
-          "text": "확인했어"
+          "mistake": "영어 구문 오류로 인한 혼동",
+          "text": "정돈되어"
         },
         {
-          "mistake": "Incorrect particle usage for past tense in polite form",
-          "text": "확인했읍니다"
+          "mistake": "동사 활용 오류: '-아/어요' 형태 대신 '-어/여' 사용",
+          "text": "깔끔하게"
         },
         {
-          "mistake": "The learner might confuse the polite form with the informal past tense structure, often seen in spoken Korean without formal markers.",
-          "text": "확인했어요요"
+          "mistake": "부적절한 형용사 활용: 형용사 대신 동사 형태를 사용",
+          "text": "완성되어"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "tense_past",
+      "predicted_objective": "mod_adverb",
       "judged_correct": [
-        "확인했어요"
+        "깔끔하게"
       ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 3.2029525463211868,
-      "first_distractors": [
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "깔끔하게": "it also makes a correct sentence",
+        "완성되어": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 0.15419386591096823
+    },
+    {
+      "objective": "irregular_conj",
+      "topic": "Industrial robots, cobots, AGVs, and AMRs.",
+      "stem": "로봇은 ___ 작동해요.",
+      "sentence": "로봇은 정밀하게 작동해요.",
+      "answer": "정밀하게",
+      "distractors": [
         {
-          "mistake": "Using present tense instead of past tense",
-          "text": "확인해요"
+          "mistake": "It confuses verb conjugation with English irregular verbs.",
+          "text": "정밀하게작동하지"
         },
         {
-          "mistake": "Incorrect use of casual form instead of polite form",
-          "text": "확인했어"
+          "mistake": "Incorrect use of a different verb ending that doesn't match Korean irregular verbs.",
+          "text": "정확하게작동해"
         },
         {
-          "mistake": "Incorrect particle usage for past tense in polite form",
-          "text": "확인했읍니다"
+          "mistake": "Misapplication of an adjective stem instead of the correct verb stem.",
+          "text": "정확하게작동하는"
         }
       ],
-      "repaired": true,
-      "difficulty_mu": 0.5101783466880945,
-      "difficulty_sigma2": 1.0
+      "format_ok": true,
+      "predicted_objective": "mod_adverb",
+      "judged_correct": [
+        "정밀하게"
+      ],
+      "key_ok": true,
+      "objective_ok": false,
+      "rejected": {
+        "정밀하게작동하지": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 15.016710282132756
+    },
+    {
+      "objective": "irregular_conj",
+      "topic": "Scenario testing before physical implementation.",
+      "stem": "___ 테스트해요.",
+      "sentence": "모델을 테스트해요.",
+      "answer": "모델을",
+      "distractors": [
+        {
+          "mistake": "Overreliance on English equivalents",
+          "text": "테스트를해요"
+        },
+        {
+          "mistake": "Confusion with different verb endings",
+          "text": "테스트르해요"
+        },
+        {
+          "mistake": "Misapplication of irregular verb forms",
+          "text": "테스트를르해요"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "테스트를해요": "it is not a mistake a real learner would make",
+        "테스트르해요": "it is not a mistake a real learner would make",
+        "테스트를르해요": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 12.796603103127099
     },
     {
       "objective": "irregular_conj",
       "topic": "Battery manufacturing and pack assembly: weld quality monitoring and inspection.",
-      "stem": "공장에서 배터리 품질 ___.",
-      "sentence": "공장에서 배터리 품질 확인해요.",
-      "answer": "확인해요",
+      "stem": "배터리 ___ 품질 꼼꼼히 살펴요.",
+      "sentence": "배터리 용접 품질 꼼꼼히 살펴요.",
+      "answer": "용접",
       "distractors": [
         {
-          "mistake": "영어 동사 사용 오류",
-          "text": "확인해요하다"
+          "mistake": "Using an English term instead of Korean:",
+          "text": "체크"
         },
         {
-          "mistake": "불규칙 동사 형태 오류",
-          "text": "확인하르어요"
+          "mistake": "Incorrect verb stem application (irregular verb form error):",
+          "text": "용접하다"
         },
         {
-          "mistake": "부적절한 어미 사용 오류",
-          "text": "확인해요서"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "honorific",
-      "judged_correct": [
-        "확인해요"
-      ],
-      "key_ok": true,
-      "objective_ok": false,
-      "rejected": {
-        "확인하르어요": "it is not a mistake a real learner would make"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 14.204997095583929
-    },
-    {
-      "objective": "irregular_conj",
-      "topic": "Quality management and end-of-line testing: Failure Mode and Effects Analysis (FMEA).",
-      "stem": "품질을 꼼꼼히 ___.",
-      "sentence": "품질을 꼼꼼히 살펴요.",
-      "answer": "살펴요",
-      "distractors": [
-        {
-          "mistake": "영어 영향 오류 (English Influence Error)",
-          "text": "확인해요"
-        },
-        {
-          "mistake": "불규칙 동사 오류 (Irregular Verb Error)",
-          "text": "살펴요요"
-        },
-        {
-          "mistake": "부적절한 어미 사용 오류 (Incorrect Suffix Usage Error)",
-          "text": "살펴봐"
+          "mistake": "Incorrect ending particle (wrong ending instead of required vowel-starting ending):",
+          "text": "점검해요"
         }
       ],
       "format_ok": true,
       "predicted_objective": "verb_choice",
       "judged_correct": [
-        "살펴요"
-      ],
-      "key_ok": true,
-      "objective_ok": false,
-      "rejected": {
-        "살펴요요": "it is not a mistake a real learner would make"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 1.9576068365847021
-    },
-    {
-      "objective": "irregular_conj",
-      "topic": "Manufacturing flow: incoming materials, component production, battery pack assembly, vehicle assembly, and end-of-line testing.",
-      "stem": "재료를 ___ 살펴요.",
-      "sentence": "재료를 꼼꼼히 살펴요.",
-      "answer": "꼼꼼히",
-      "distractors": [
-        {
-          "mistake": "영어 표현으로의 오해",
-          "text": "자세히"
-        },
-        {
-          "mistake": "불규칙 동사 형태의 오해",
-          "text": "꼼꼼히하다"
-        },
-        {
-          "mistake": "부적절한 어미 사용",
-          "text": "꼼꼼히봐"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "mod_adverb",
-      "judged_correct": [
-        "꼼꼼히"
-      ],
-      "key_ok": true,
-      "objective_ok": false,
-      "rejected": {
-        "꼼꼼히하다": "it is not a mistake a real learner would make",
-        "꼼꼼히봐": "it is not a mistake a real learner would make"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 4.797042576359793
-    },
-    {
-      "objective": "irregular_conj",
-      "topic": "Production planning, takt time, cycle time, throughput, OEE, scrap, and rework.",
-      "stem": "공장에서 ___ 높게 제작해요.",
-      "sentence": "공장에서 효율 높게 제작해요.",
-      "answer": "효율",
-      "distractors": [
-        {
-          "mistake": "영어에서의 불규칙 변화 오해",
-          "text": "효율적으로"
-        },
-        {
-          "mistake": "부사 형태의 오해 (르 형태)",
-          "text": "효율르"
-        },
-        {
-          "mistake": "잘못된 종결 어미 사용 (ᄅ 형태)",
-          "text": "효율람"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "mod_adverb",
-      "judged_correct": [
-        "효율적으로"
+        "점검해요"
       ],
       "key_ok": false,
       "objective_ok": false,
       "rejected": {
-        "효율적으로": "it also makes a correct sentence",
-        "효율르": "it is not a mistake a real learner would make",
-        "효율람": "it is not a mistake a real learner would make"
+        "용접하다": "it is not a mistake a real learner would make",
+        "점검해요": "it also makes a correct sentence"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 5.5836510363023155
+      "key_logit": 3.0297810241054735
     },
     {
       "objective": "irregular_conj",
-      "topic": "Manufacturing data preparation and feature engineering.",
-      "stem": "저는 데이터르 꼼꼼히 ___.",
-      "sentence": "저는 데이터르 꼼꼼히 분석해요.",
-      "answer": "분석해요",
+      "topic": "Computer vision for defect detection.",
+      "stem": "___ 꼼꼼히 르네요.",
+      "sentence": "결함을 꼼꼼히 르네요.",
+      "answer": "결함을",
       "distractors": [
         {
-          "mistake": "영어 동사 사용 오류",
-          "text": "분석해요요"
+          "mistake": "Mixing English grammar with Korean, leading to confusion about verb conjugation.",
+          "text": "결함을꼼꼼히따져"
         },
         {
-          "mistake": "불규칙 동사 끝말 변형 오류",
-          "text": "분석해요름"
+          "mistake": "Incorrect use of an irregular verb stem without proper ending.",
+          "text": "결함을꼼꼼히르네"
         },
         {
-          "mistake": "부적절한 조사 사용 오류",
-          "text": "분석해요께"
+          "mistake": "Using an inappropriate adjective stem that doesn't fit the grammatical structure.",
+          "text": "결함을꼼꼼히르다"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "particle_obj",
+      "predicted_objective": "irregular_conj",
       "judged_correct": [
-        "분석해요"
-      ],
-      "key_ok": true,
-      "objective_ok": false,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": false,
-      "key_logit": 8.812000193096697
-    },
-    {
-      "objective": "irregular_conj",
-      "topic": "Digital twin concepts and real-time synchronization.",
-      "stem": "저는 데이터르 꼼꼼히 ___.",
-      "sentence": "저는 데이터르 꼼꼼히 분석해요.",
-      "answer": "분석해요",
-      "distractors": [
-        {
-          "mistake": "English Irregular Verb Usage",
-          "text": "정리해요"
-        },
-        {
-          "mistake": "Incorrect Adjective Stem Application",
-          "text": "연구해요"
-        },
-        {
-          "mistake": "Wrong Ending Particle",
-          "text": "확인해요"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "verb_choice",
-      "judged_correct": [
-        "확인해요"
-      ],
-      "key_ok": false,
-      "objective_ok": false,
-      "rejected": {
-        "연구해요": "it is not a mistake a real learner would make",
-        "확인해요": "it also makes a correct sentence"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": -1.7776818753452495
-    },
-    {
-      "objective": "adj_relativizer",
-      "topic": "Digital twin concepts and real-time synchronization.",
-      "stem": "스마트 공장은 ___ 제조를 위해 디지털 트윈을 활용해요.",
-      "sentence": "스마트 공장은 효율적인 제조를 위해 디지털 트윈을 활용해요.",
-      "answer": "효율적인",
-      "distractors": [
-        {
-          "mistake": "Overgeneralizing '-는' usage",
-          "text": "효율로운"
-        },
-        {
-          "mistake": "Overusing '-는' suffix incorrectly with adjectives",
-          "text": "스마트한"
-        },
-        {
-          "mistake": "Confusing adjective forms with verb endings",
-          "text": "효율적인"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "none",
-      "judged_correct": [],
-      "key_ok": false,
-      "objective_ok": false,
-      "rejected": {
-        "효율로운": "it is not a mistake a real learner would make",
-        "스마트한": "a language model finds it more natural than the answer",
-        "효율적인": "it repeats the answer or another distractor"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": -4.248488367369021,
-      "first_distractors": [
-        {
-          "mistake": "Overgeneralizing '-는' usage",
-          "text": "효율로운"
-        },
-        {
-          "mistake": "Confusing '-는' with '-은'",
-          "text": "효율은"
-        },
-        {
-          "mistake": "Incorrect particle usage with adjectives",
-          "text": "효율처럼"
-        }
-      ],
-      "repaired": true
-    },
-    {
-      "objective": "adj_relativizer",
-      "topic": "Manufacturing data preparation and feature engineering.",
-      "stem": "스마트 팩토리에서 ___ 데이터는 핵심적입니다.",
-      "sentence": "스마트 팩토리에서 정확한 데이터는 핵심적입니다.",
-      "answer": "정확한",
-      "distractors": [
-        {
-          "mistake": "Incorrect use of a different ending form",
-          "text": "정확은"
-        },
-        {
-          "mistake": "Using '-는' form incorrectly when '-은' should be used for adjectives preceding nouns in Korean.",
-          "text": "정확는"
-        },
-        {
-          "mistake": "Confusing the correct use of '-은' with '-는' in adjective-noun pairing, especially when dealing with formal contexts like '스마트 팩토리'.",
-          "text": "정확는"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "adj_relativizer",
-      "judged_correct": [
-        "정확한"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {
-        "정확는": "it repeats the answer or another distractor"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 10.526523736563975,
-      "first_distractors": [
-        {
-          "mistake": "Using an incorrect particle form",
-          "text": "정확는"
-        },
-        {
-          "mistake": "Incorrect use of a different ending form",
-          "text": "정확은"
-        },
-        {
-          "mistake": "Incorrect adaptation with a wrong suffix",
-          "text": "정확는"
-        }
-      ],
-      "repaired": true
-    },
-    {
-      "objective": "adj_relativizer",
-      "topic": "Sensors, actuators, motors, drives, and machine safety.",
-      "stem": "스마트 센서는 ___ 데이터를 제공해요.",
-      "sentence": "스마트 센서는 정확한 데이터를 제공해요.",
-      "answer": "정확한",
-      "distractors": [
-        {
-          "mistake": "Overgeneralizing '-는' usage",
-          "text": "정확는"
-        },
-        {
-          "mistake": "Incorrect particle usage",
-          "text": "정확은"
-        },
-        {
-          "mistake": "Incorrect form due to plural misunderstanding",
-          "text": "정확들"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "particle_obj",
-      "judged_correct": [
-        "정확한"
-      ],
-      "key_ok": true,
-      "objective_ok": false,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": false,
-      "key_logit": 10.501063320292486
-    },
-    {
-      "objective": "adj_relativizer",
-      "topic": "Data collection, timestamps, units, validation, and missing values.",
-      "stem": "데이터 ___ 중요해요.",
-      "sentence": "데이터 정확성은 중요해요.",
-      "answer": "정확성은",
-      "distractors": [
-        {
-          "mistake": "Overgeneralization of English adjective forms",
-          "text": "정확스러운"
-        },
-        {
-          "mistake": "Incorrect use of Korean adjective endings without -(으)ᄂ",
-          "text": "정확한는"
-        },
-        {
-          "mistake": "Incorrect particle usage with adjectives",
-          "text": "정확함은"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "none",
-      "judged_correct": [],
-      "key_ok": false,
-      "objective_ok": false,
-      "rejected": {
-        "정확스러운": "it is not a mistake a real learner would make",
-        "정확한는": "it is not a mistake a real learner would make",
-        "정확함은": "it is not a mistake a real learner would make"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 7.14432826679642
-    },
-    {
-      "objective": "adj_relativizer",
-      "topic": "EV architecture: battery, electric motor, inverter, power electronics, thermal management, and vehicle control systems.",
-      "stem": "전기차 배터리는 ___.",
-      "sentence": "전기차 배터리는 강력해요.",
-      "answer": "강력해요",
-      "distractors": [
-        {
-          "mistake": "Overuse of English particle analogy",
-          "text": "강력는"
-        },
-        {
-          "mistake": "Confusion with different verb endings",
-          "text": "강력은"
-        },
-        {
-          "mistake": "Misapplication of adjective endings",
-          "text": "강력한"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "adj_relativizer",
-      "judged_correct": [
-        "강력한"
+        "결함을꼼꼼히르네"
       ],
       "key_ok": false,
       "objective_ok": true,
       "rejected": {
-        "강력한": "it also makes a correct sentence"
+        "결함을꼼꼼히르네": "it also makes a correct sentence"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 4.63471816397254
+      "key_logit": 22.348287331753493
     },
     {
-      "objective": "adj_relativizer",
-      "topic": "MES (Manufacturing Execution System), ERP, SCADA, PLC, and CMMS.",
-      "stem": "스마트 공장은 ___ 생산을 위해 첨단 기술을 활용해요.",
-      "sentence": "스마트 공장은 효율적인 생산을 위해 첨단 기술을 활용해요.",
-      "answer": "효율적인",
+      "objective": "irregular_conj",
+      "topic": "Virtual commissioning and layout planning.",
+      "stem": "가상 시뮬레이션으로 ___ 레이아웃 최적화해요.",
+      "sentence": "가상 시뮬레이션으로 공장 레이아웃 최적화해요.",
+      "answer": "공장",
       "distractors": [
         {
-          "mistake": "Overgeneralizing '-는' usage",
-          "text": "효율로운"
+          "mistake": "Using English terminology incorrectly",
+          "text": "레이아웃을분해하"
         },
         {
-          "mistake": "Incorrect particle attachment",
-          "text": "효율적인은"
+          "mistake": "Incorrect verb stem transformation",
+          "text": "레이아웃을정리"
         },
         {
-          "mistake": "Incorrect adjective form",
-          "text": "효율적인을"
+          "mistake": "Incorrect ending particle usage",
+          "text": "레이아웃을정리해"
         }
       ],
       "format_ok": true,
       "predicted_objective": "particle_obj",
       "judged_correct": [
-        "효율적인을"
+        "레이아웃을정리해"
       ],
       "key_ok": false,
       "objective_ok": false,
       "rejected": {
-        "효율적인을": "it also makes a correct sentence"
+        "레이아웃을정리해": "it also makes a correct sentence"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 10.558904354514047
+      "key_logit": 24.198932231290556
     },
     {
-      "objective": "subj_topic",
-      "topic": "Scenario testing before physical implementation.",
-      "stem": "___ 디지털 트윈으로 효율을 테스트합니다.",
-      "sentence": "공장은 디지털 트윈으로 효율을 테스트합니다.",
-      "answer": "공장은",
-      "distractors": [
-        {
-          "mistake": "Using '이/가' instead of '은/는'",
-          "text": "공장이"
-        },
-        {
-          "mistake": "Confusing '은/는' with '을/를'",
-          "text": "공장을"
-        },
-        {
-          "mistake": "Confusing subject markers with object markers in context",
-          "text": "공장을"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "none",
-      "judged_correct": [],
-      "key_ok": false,
-      "objective_ok": false,
-      "rejected": {
-        "공장이": "it is not a mistake a real learner would make",
-        "공장을": "it repeats the answer or another distractor"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": -0.22287703450110408,
-      "first_distractors": [
-        {
-          "mistake": "Using '이/가' instead of '은/는'",
-          "text": "공장이"
-        },
-        {
-          "mistake": "Confusing '은/는' with '을/를'",
-          "text": "공장을"
-        },
-        {
-          "mistake": "Incorrectly using plural marker '-들' instead of focusing on particles",
-          "text": "공장들은"
-        }
-      ],
-      "repaired": true
-    },
-    {
-      "objective": "subj_topic",
+      "objective": "adj_relativizer",
       "topic": "Quality management and end-of-line testing: root cause analysis and corrective actions.",
-      "stem": "___ 뿌리 원인 분석으로 개선된다.",
-      "sentence": "품질은 뿌리 원인 분석으로 개선된다.",
-      "answer": "품질은",
+      "stem": "___ 높은 공장을 선호해요.",
+      "sentence": "품질 높은 공장을 선호해요.",
+      "answer": "품질",
       "distractors": [
         {
-          "mistake": "Treating particles as if they always indicate the subject directly (English Mistake: Overusing 'is/are' in subject constructions)",
-          "text": "품질뿌리"
+          "mistake": "Using an English word structure mistakenly",
+          "text": "높은공장품질"
         },
         {
-          "mistake": "Confusing topic particle '은/는' with subject particle '이/가' (English Mistake: Incorrect particle usage leading to grammatical inaccuracy)",
-          "text": "품질은뿌리원인"
+          "mistake": "Incorrect particle usage mimicking Korean but incorrectly",
+          "text": "높은공장질"
         },
         {
-          "mistake": "Incorrectly using verb endings without proper particles (English Mistake: Forgetting necessary Korean grammatical elements)",
-          "text": "품질원인분석개선"
+          "mistake": "Incorrect adjective ending mimicking a different Korean adjective pattern",
+          "text": "높은공장높은"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "verb_choice",
-      "judged_correct": [
-        "품질은"
-      ],
-      "key_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
       "objective_ok": false,
       "rejected": {
-        "품질뿌리": "it is not a mistake a real learner would make",
-        "품질원인분석개선": "it is not a mistake a real learner would make"
+        "높은공장품질": "it is not a mistake a real learner would make",
+        "높은공장질": "it is not a mistake a real learner would make",
+        "높은공장높은": "it is not a mistake a real learner would make"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 14.439079318920141
+      "key_logit": 15.923492491282639
     },
     {
-      "objective": "subj_topic",
-      "topic": "Production orders, work orders, recipes, and electronic work instructions.",
-      "stem": "___ 전자 작업 지침으로 관리된다.",
-      "sentence": "생산은 전자 작업 지침으로 관리된다.",
-      "answer": "생산은",
+      "objective": "adj_relativizer",
+      "topic": "OEE analysis, downtime Pareto charts, and production trend analysis.",
+      "stem": "___ 공장은 효율적인 생산을 위해 중요해요.",
+      "sentence": "스마트 공장은 효율적인 생산을 위해 중요해요.",
+      "answer": "스마트",
       "distractors": [
         {
-          "mistake": "Using '은/는' instead of '이/가' when marking the topic for emphasis",
-          "text": "생산은은"
+          "mistake": "Incorrect morphological adaptation, mixing up different Korean adjective endings",
+          "text": "스마트를"
         },
         {
-          "mistake": "Confusing subject particle with object marker",
-          "text": "생산을이"
+          "mistake": "Mixing '-는' ending with incorrect adjective choice",
+          "text": "효율적인공장은큰"
         },
         {
-          "mistake": "Incorrect particle usage leading to grammatical error",
-          "text": "생산는에"
+          "mistake": "Incorrect use of '-은/는' ending with an ill-fitting adjective",
+          "text": "스마트는공장"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "subj_topic",
+      "predicted_objective": "adj_relativizer",
       "judged_correct": [
-        "생산은"
+        "스마트"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {
+        "스마트를": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 8.92334033829213,
+      "first_distractors": [
+        {
+          "mistake": "Using an incorrect particle form due to confusion with English adjectives",
+          "text": "큰"
+        },
+        {
+          "mistake": "Misapplying the correct ending particle in a context-specific error",
+          "text": "스마트는"
+        },
+        {
+          "mistake": "Incorrect morphological adaptation, mixing up different Korean adjective endings",
+          "text": "스마트를"
+        }
+      ],
+      "repaired": true
+    },
+    {
+      "objective": "adj_relativizer",
+      "topic": "Anomaly detection for machine behavior.",
+      "stem": "___ 공장에서 정확한 데이터를 분석해요.",
+      "sentence": "스마트 공장에서 정확한 데이터를 분석해요.",
+      "answer": "스마트",
+      "distractors": [
+        {
+          "mistake": "Over-reliance on English particle translation",
+          "text": "정확한스마트공장"
+        },
+        {
+          "mistake": "Incorrect use of comparative form",
+          "text": "더스마트공장"
+        },
+        {
+          "mistake": "Incorrect use of plural form misunderstanding",
+          "text": "스마트공장들"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "정확한스마트공장": "it is not a mistake a real learner would make",
+        "더스마트공장": "it is not a mistake a real learner would make",
+        "스마트공장들": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 13.731129529636645
+    },
+    {
+      "objective": "adj_relativizer",
+      "topic": "Production orders, work orders, recipes, and electronic work instructions.",
+      "stem": "스마트 공장은 ___ 작업을 위해 설계되었어요.",
+      "sentence": "스마트 공장은 효율적인 작업을 위해 설계되었어요.",
+      "answer": "효율적인",
+      "distractors": [
+        {
+          "mistake": "부적절한 형용사 사용",
+          "text": "빠른"
+        },
+        {
+          "mistake": "잘못된 어미 사용 오류",
+          "text": "효율한"
+        },
+        {
+          "mistake": "Using an incorrect adjective form influenced by English grammar patterns",
+          "text": "빠른설계"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "adj_relativizer",
+      "judged_correct": [
+        "효율적인"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {
+        "빠른설계": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 3.338861447854032,
+      "first_distractors": [
+        {
+          "mistake": "혼종된 언어 사용으로 인한 오류",
+          "text": "효율적인"
+        },
+        {
+          "mistake": "부적절한 형용사 사용",
+          "text": "빠른"
+        },
+        {
+          "mistake": "잘못된 어미 사용 오류",
+          "text": "효율한"
+        }
+      ],
+      "repaired": true
+    },
+    {
+      "objective": "adj_relativizer",
+      "topic": "Bottleneck and capacity analysis.",
+      "stem": "디지털 트윈은 ___ 생산을 위해 중요해요.",
+      "sentence": "디지털 트윈은 효율적인 생산을 위해 중요해요.",
+      "answer": "효율적인",
+      "distractors": [
+        {
+          "mistake": "Overemphasis on distracting elements leads to confusion in technical contexts.",
+          "text": "효과적인"
+        },
+        {
+          "mistake": "Confusion from mixing English influence; incorrect particle usage.",
+          "text": "효율적인는"
+        },
+        {
+          "mistake": "Incorrect form due to misunderstanding of adjective endings in Korean.",
+          "text": "효율적인들"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "adj_relativizer",
+      "judged_correct": [
+        "효율적인"
       ],
       "key_ok": true,
       "objective_ok": true,
       "rejected": {},
       "distractors_ok": true,
       "accepted": true,
-      "key_logit": 10.264271093669311,
-      "difficulty_mu": -1.06075039528947,
+      "key_logit": 1.7366268186154359,
+      "difficulty_mu": 1.0485601324657683,
       "difficulty_sigma2": 1.0
+    },
+    {
+      "objective": "adj_relativizer",
+      "topic": "Manufacturing flow: incoming materials, component production, battery pack assembly, vehicle assembly, and end-of-line testing.",
+      "stem": "스마트 공장에서 ___ 부품 생산이 중요해요.",
+      "sentence": "스마트 공장에서 정밀한 부품 생산이 중요해요.",
+      "answer": "정밀한",
+      "distractors": [
+        {
+          "mistake": "The mistake stems from confusing Korean particles with English articles.",
+          "text": "정확한"
+        },
+        {
+          "mistake": "Confusing '-는' with '-은/는' suffix for subject markers instead of adjective endings",
+          "text": "정밀한스"
+        },
+        {
+          "mistake": "Misusing '-는' form instead of the correct '-은' for adjectives following nouns",
+          "text": "정밀한스"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "adj_relativizer",
+      "judged_correct": [
+        "정밀한"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {
+        "정확한": "it is not a mistake a real learner would make",
+        "정밀한스": "it repeats the answer or another distractor"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 0.5197753901942519,
+      "first_distractors": [
+        {
+          "mistake": "The mistake stems from confusing Korean particles with English articles.",
+          "text": "정확한"
+        },
+        {
+          "mistake": "This error arises from incorrectly applying an English adjective form instead of the Korean appropriate ending.",
+          "text": "정밀한스"
+        },
+        {
+          "mistake": "This mistake occurs due to misapplying a different Korean adjective ending, akin to using an incorrect suffix for adjectives.",
+          "text": "정밀한는"
+        }
+      ],
+      "repaired": true
+    },
+    {
+      "objective": "subj_topic",
+      "topic": "Interlocks, alarms, emergency stops, and safety systems.",
+      "stem": "___ 안전 시스템을 갖추고 있다.",
+      "sentence": "공장은 안전 시스템을 갖추고 있다.",
+      "answer": "공장은",
+      "distractors": [
+        {
+          "mistake": "Confusing '이/가' with '은/는' when emphasizing specificity rather than topic introduction.",
+          "text": "공장는"
+        },
+        {
+          "mistake": "Incorrect use of subject marker '이/가' instead of topic marker '은/는', leading to grammatical inaccuracy.",
+          "text": "공장이"
+        },
+        {
+          "mistake": "Misunderstanding particle usage by incorrectly applying object markers instead of topic markers, altering sentence structure incorrectly.",
+          "text": "공장을"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "공장는": "it is not a mistake a real learner would make",
+        "공장이": "it is not a mistake a real learner would make",
+        "공장을": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 1.9615343796833358
+    },
+    {
+      "objective": "subj_topic",
+      "topic": "Introduction to Lean Manufacturing, 5S, Kaizen, and value stream mapping.",
+      "stem": "___ 혁신적인 시스템은 효율성을 강조한다.",
+      "sentence": "공장의  혁신적인 시스템은 효율성을 강조한다.",
+      "answer": "공장의",
+      "distractors": [
+        {
+          "mistake": "Confusing '이/가' (subject marker) with '은/는' (topic marker) when specifying the subject directly.",
+          "text": "혁신적인이효율성"
+        },
+        {
+          "mistake": "Incorrect use of '은/는' to mark the subject instead of its appropriate context, leading to ambiguity.",
+          "text": "공장은혁신적인"
+        },
+        {
+          "mistake": "Misapplying '이/가' as the topic marker instead of the subject marker when referring to a specific noun without emphasizing the action towards it.",
+          "text": "효율성은혁신적인"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "혁신적인이효율성": "it is not a mistake a real learner would make",
+        "공장은혁신적인": "it is not a mistake a real learner would make",
+        "효율성은혁신적인": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 18.797415031101824,
+      "first_distractors": [
+        {
+          "mistake": "Confusing subject markers with English articles",
+          "text": "공장은"
+        },
+        {
+          "mistake": "Using the wrong topic marker in a subject context",
+          "text": "은효율성"
+        },
+        {
+          "mistake": "Incorrect particle usage due to mixing Korean grammar rules with English structure",
+          "text": "가혁신적인"
+        }
+      ],
+      "repaired": true
+    },
+    {
+      "objective": "subj_topic",
+      "topic": "Time-series data and machine telemetry.",
+      "stem": "___ 공장의 효율성을 보여줍니다.",
+      "sentence": "데이터는 공장의 효율성을 보여줍니다.",
+      "answer": "데이터는",
+      "distractors": [
+        {
+          "mistake": "Confusing '이/가' with '은/는' when specifying the subject instead of emphasizing the topic.",
+          "text": "데이터가"
+        },
+        {
+          "mistake": "Incorrect use of particles by mixing Korean sentence structure errors; using '를' instead of focusing on the correct particle usage.",
+          "text": "데이터를"
+        },
+        {
+          "mistake": "Misunderstanding the role of particles by incorrectly applying '이/가' as if it were solely for emphasis without recognizing its role in marking the subject.",
+          "text": "데이터이"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "subj_topic",
+      "judged_correct": [
+        "데이터가"
+      ],
+      "key_ok": false,
+      "objective_ok": true,
+      "rejected": {
+        "데이터가": "it also makes a correct sentence",
+        "데이터를": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 1.59588088389314
     },
     {
       "objective": "subj_topic",
       "topic": "Computer vision for defect detection.",
-      "stem": "___ 비전이 결함을 찾아냅니다.",
-      "sentence": "컴퓨터 비전이 결함을 찾아냅니다.",
+      "stem": "___ 비전은 결함 탐지에서 핵심 역할을 합니다.",
+      "sentence": "컴퓨터 비전은 결함 탐지에서 핵심 역할을 합니다.",
       "answer": "컴퓨터",
       "distractors": [
         {
-          "mistake": "Using '은/는' instead of '이/가' to mark the subject",
-          "text": "컴퓨터는"
+          "mistake": "Confusing subject markers with English sentence structure",
+          "text": "컴퓨터이"
         },
         {
-          "mistake": "Incorrectly using '이/가' with a wrong noun form",
-          "text": "컴퓨터비전"
+          "mistake": "Misusing topic particle instead of subject particle",
+          "text": "비전은을"
         },
         {
-          "mistake": "Confusing '이/가' with '을/를' (object particle)",
-          "text": "컴퓨터에"
+          "mistake": "Incorrectly applying particles without context understanding",
+          "text": "비전은는"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "particle_obj",
-      "judged_correct": [
-        "컴퓨터비전"
-      ],
+      "predicted_objective": "none",
+      "judged_correct": [],
       "key_ok": false,
       "objective_ok": false,
       "rejected": {
-        "컴퓨터비전": "it also makes a correct sentence",
-        "컴퓨터에": "it is not a mistake a real learner would make"
+        "컴퓨터이": "it is not a mistake a real learner would make",
+        "비전은을": "it is not a mistake a real learner would make",
+        "비전은는": "it is not a mistake a real learner would make"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 6.5142169967755255
+      "key_logit": 10.529741476836136
     },
     {
       "objective": "subj_topic",
-      "topic": "OEE analysis, downtime Pareto charts, and production trend analysis.",
-      "stem": "___ 은 데이터 분석으로 효율을 향상시킵니다.",
-      "sentence": "공장에서 은 데이터 분석으로 효율을 향상시킵니다.",
-      "answer": "공장에서",
+      "topic": "MES (Manufacturing Execution System), ERP, SCADA, PLC, and CMMS.",
+      "stem": "___ 은 자동화 시스템이 효율성을 높입니다.",
+      "sentence": "스마트팩토리에서는 은  자동화 시스템이 효율성을 높입니다.",
+      "answer": "스마트팩토리에서는",
       "distractors": [
         {
-          "mistake": "Using '은' instead of '가' when marking the subject",
-          "text": "공장은에서"
+          "mistake": "Confusing subject markers with English influence",
+          "text": "스마트팩토리에서"
         },
         {
-          "mistake": "Confusing '은/는' with '이/가' in topic role",
-          "text": "공장는에서"
+          "mistake": "Using incorrect Korean particles due to topic confusion",
+          "text": "스마트팩토리가"
         },
         {
-          "mistake": "Incorrect particle usage with '공장'",
-          "text": "공장에서로"
+          "mistake": "Incorrect use of honorifics without context",
+          "text": "스마트팩토리는께"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "particle_loc",
-      "judged_correct": [
-        "공장에서"
-      ],
-      "key_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
       "objective_ok": false,
       "rejected": {
-        "공장에서로": "it is not a mistake a real learner would make"
+        "스마트팩토리에서": "a language model finds it more natural than the answer",
+        "스마트팩토리가": "a language model finds it more natural than the answer",
+        "스마트팩토리는께": "it is not a mistake a real learner would make"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 6.771504207229818
+      "key_logit": -4.843845435259265
     },
     {
       "objective": "subj_topic",
-      "topic": "Bottleneck and capacity analysis.",
-      "stem": "___ 은 효율 향상에 핵심이다.",
-      "sentence": "데이터는 은 효율 향상에 핵심이다.",
-      "answer": "데이터는",
-      "distractors": [
-        {
-          "mistake": "Using '이/가' instead of '은/는' to indicate topic",
-          "text": "데이터는이"
-        },
-        {
-          "mistake": "Confusing '은/는' with '이/가' for subject marker",
-          "text": "데이터가은"
-        },
-        {
-          "mistake": "Confusing subject and topic markers within Korean context",
-          "text": "데이터가효율은"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "subj_topic",
-      "judged_correct": [
-        "데이터는"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 3.561419380589783,
-      "first_distractors": [
-        {
-          "mistake": "Using '이/가' instead of '은/는' to indicate topic",
-          "text": "데이터는이"
-        },
-        {
-          "mistake": "Using '는' incorrectly with an incorrect noun form",
-          "text": "데이터는것"
-        },
-        {
-          "mistake": "Confusing '은/는' with '이/가' for subject marker",
-          "text": "데이터가은"
-        }
-      ],
-      "repaired": true,
-      "difficulty_mu": 0.43043037196887896,
-      "difficulty_sigma2": 1.0
-    },
-    {
-      "objective": "verb_choice",
       "topic": "Industrial communication: OPC UA, Modbus TCP, and PROFINET.",
-      "stem": "공장에서 자동화를 ___.",
-      "sentence": "공장에서 자동화를 배워요.",
-      "answer": "배워요",
+      "stem": "공장에서는 이 자동화 시스템이 ___ 높입니다.",
+      "sentence": "공장에서는 이 자동화 시스템이 효율성을 높입니다.",
+      "answer": "효율성을",
       "distractors": [
         {
-          "mistake": "English Mistake: Overgeneralizing verb forms",
-          "text": "봐요"
+          "mistake": "Confusing subject markers with English articles",
+          "text": "효율성들을"
         },
         {
-          "mistake": "English Mistake: Confusing verbs with different functions",
-          "text": "학습해요"
+          "mistake": "Using the wrong topic marker instead of the subject marker",
+          "text": "공장은"
         },
         {
-          "mistake": "English Mistake: Using verbs inappropriate for the context",
-          "text": "사용해요"
+          "mistake": "Incorrect particle usage, mixing '이/가' incorrectly with a verb form",
+          "text": "작업효율성을"
         }
       ],
       "format_ok": true,
       "predicted_objective": "verb_choice",
       "judged_correct": [
-        "사용해요"
+        "효율성을"
+      ],
+      "key_ok": true,
+      "objective_ok": false,
+      "rejected": {
+        "공장은": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 12.367332900399866
+    },
+    {
+      "objective": "verb_choice",
+      "topic": "OEE analysis, downtime Pareto charts, and production trend analysis.",
+      "stem": "공장에서 데이터를 ___.",
+      "sentence": "공장에서 데이터를 분석해요.",
+      "answer": "분석해요",
+      "distractors": [
+        {
+          "mistake": "혼란스럽게 작업해요.",
+          "text": "혼란스럽다"
+        },
+        {
+          "mistake": "효율적으로 정리해요.",
+          "text": "정리하다"
+        },
+        {
+          "mistake": "자동으로 생성해요.",
+          "text": "생성하다"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "particle_obj",
+      "judged_correct": [
+        "분석해요"
+      ],
+      "key_ok": true,
+      "objective_ok": false,
+      "rejected": {
+        "혼란스럽다": "it is not a mistake a real learner would make",
+        "정리하다": "it is not a mistake a real learner would make",
+        "생성하다": "a language model finds it more natural than the answer"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": -0.04294754103452418
+    },
+    {
+      "objective": "verb_choice",
+      "topic": "Sensors, actuators, motors, drives, and machine safety.",
+      "stem": "센서를 ___.",
+      "sentence": "센서를 확인해요.",
+      "answer": "확인해요",
+      "distractors": [
+        {
+          "mistake": "혼합된 동사 사용 오류",
+          "text": "확인해요"
+        },
+        {
+          "mistake": "잘못된 활용형 오류",
+          "text": "확인합니다"
+        },
+        {
+          "mistake": "부적절한 동사 선택 오류",
+          "text": "점검해요"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "확인해요": "it repeats the answer or another distractor",
+        "확인합니다": "a language model finds it more natural than the answer",
+        "점검해요": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": -4.56424748650049
+    },
+    {
+      "objective": "verb_choice",
+      "topic": "Manufacturing flow: incoming materials, component production, battery pack assembly, vehicle assembly, and end-of-line testing.",
+      "stem": "배터리를 ___.",
+      "sentence": "배터리를 조립해요.",
+      "answer": "조립해요",
+      "distractors": [
+        {
+          "mistake": "The verb is confused with an action typically performed with electronics rather than assembling.",
+          "text": "조립해요"
+        },
+        {
+          "mistake": "Confusing the correct collocation with a verb that doesn't fit the context of handling or managing a battery.",
+          "text": "수리해요"
+        },
+        {
+          "mistake": "Using a verb that implies a different action, such as consumption rather than assembly.",
+          "text": "먹어요"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "verb_choice",
+      "judged_correct": [
+        "수리해요"
       ],
       "key_ok": false,
       "objective_ok": true,
       "rejected": {
-        "봐요": "it is not a mistake a real learner would make",
-        "학습해요": "a language model finds it more natural than the answer",
-        "사용해요": "it also makes a correct sentence"
+        "조립해요": "it repeats the answer or another distractor",
+        "수리해요": "it also makes a correct sentence",
+        "먹어요": "a language model finds it more natural than the answer"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": -7.155989681126836
+      "key_logit": -2.0066657830992094
     },
     {
       "objective": "verb_choice",
-      "topic": "Digital twin concepts and real-time synchronization.",
-      "stem": "공장에서 디지털 트윈을 ___.",
-      "sentence": "공장에서 디지털 트윈을 생성해요.",
-      "answer": "생성해요",
+      "topic": "Introduction to Lean Manufacturing, 5S, Kaizen, and value stream mapping.",
+      "stem": "공장에서 부품을 ___.",
+      "sentence": "공장에서 부품을 조립해요.",
+      "answer": "조립해요",
       "distractors": [
         {
-          "mistake": "Using a viewing verb instead of an action verb",
-          "text": "봐요"
+          "mistake": "혼합형 동사 사용 오류",
+          "text": "조립해요보세요"
         },
         {
-          "mistake": "Using a verb that doesn't align with the action typically performed on digital twins",
-          "text": "생성해요"
+          "mistake": "부적절한 동작 동사 사용 오류",
+          "text": "조립파세요"
         },
         {
-          "mistake": "Confusing verbs related to interaction or observation rather than creation or manipulation",
+          "mistake": "동사의 잘못된 활용 오류",
+          "text": "공장에서부품을만"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "particle_obj",
+      "judged_correct": [
+        "공장에서부품을만"
+      ],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "공장에서부품을만": "it also makes a correct sentence"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 8.572345465191423
+    },
+    {
+      "objective": "verb_choice",
+      "topic": "IIoT gateways, edge computing, and industrial data pipelines.",
+      "stem": "저는 데이터를 ___.",
+      "sentence": "저는 데이터를 분석해요.",
+      "answer": "분석해요",
+      "distractors": [
+        {
+          "mistake": "Using an English verb structure mistakenly",
+          "text": "읽어요"
+        },
+        {
+          "mistake": "Choosing a verb that doesn't collocate with the noun in Korean",
+          "text": "정리해요"
+        },
+        {
+          "mistake": "English verb structure directly applied",
           "text": "확인해요"
         }
       ],
@@ -2562,416 +2639,47 @@
       "key_ok": false,
       "objective_ok": false,
       "rejected": {
-        "봐요": "it is not a mistake a real learner would make",
-        "생성해요": "it repeats the answer or another distractor",
+        "읽어요": "it is not a mistake a real learner would make",
+        "정리해요": "it is not a mistake a real learner would make",
         "확인해요": "it is not a mistake a real learner would make"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": -0.0037028712992407463,
+      "key_logit": 4.042332717113758,
       "first_distractors": [
         {
-          "mistake": "Using a viewing verb instead of an action verb",
-          "text": "봐요"
+          "mistake": "Using an English verb structure mistakenly",
+          "text": "읽어요"
         },
         {
-          "mistake": "Incorrectly using a drinking verb",
-          "text": "마셔요"
+          "mistake": "Choosing a verb that doesn't collocate with the noun in Korean",
+          "text": "정리해요"
         },
         {
-          "mistake": "Inappropriately applying a consumption verb",
-          "text": "먹어요"
+          "mistake": "Selecting an inappropriate Korean verb that doesn't fit the context",
+          "text": "공유해요"
         }
       ],
       "repaired": true
     },
     {
       "objective": "verb_choice",
-      "topic": "Anomaly detection for machine behavior.",
-      "stem": "저는 데이터를 ___.",
-      "sentence": "저는 데이터를 분석해요.",
+      "topic": "Energy consumption and resource optimization.",
+      "stem": "저는 에너지를 ___.",
+      "sentence": "저는 에너지를 분석해요.",
       "answer": "분석해요",
       "distractors": [
         {
-          "mistake": "Verb Confusion with Observation",
-          "text": "봅니다"
-        },
-        {
-          "mistake": "Incorrect Verb Usage with Action",
-          "text": "합니다"
-        },
-        {
-          "mistake": "Misapplication of Verb with Context",
-          "text": "사용합니다"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "verb_choice",
-      "judged_correct": [
-        "사용합니다"
-      ],
-      "key_ok": false,
-      "objective_ok": true,
-      "rejected": {
-        "합니다": "it is not a mistake a real learner would make",
-        "사용합니다": "it also makes a correct sentence"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 0.8400414184061218
-    },
-    {
-      "objective": "verb_choice",
-      "topic": "E-motor and power electronics: process parameters and component genealogy.",
-      "stem": "저는 모터를 ___.",
-      "sentence": "저는 모터를 분석해요.",
-      "answer": "분석해요",
-      "distractors": [
-        {
-          "mistake": "Misunderstanding verb collocations",
-          "text": "듣어요"
-        },
-        {
-          "mistake": "English sentence naming the mistake",
-          "text": "저은모터를보세요"
-        },
-        {
-          "mistake": "Learner mistake not listed above",
-          "text": "저은모터를돌려요"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "particle_obj",
-      "judged_correct": [
-        "분석해요"
-      ],
-      "key_ok": true,
-      "objective_ok": false,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": false,
-      "key_logit": 6.793436527245943,
-      "first_distractors": [
-        {
-          "mistake": "Overgeneralization from English",
+          "mistake": "The learner confuses verbs related to physical actions instead of analytical ones.",
           "text": "보세요"
         },
         {
-          "mistake": "Confusing verbs with viewing actions",
+          "mistake": "The learner incorrectly uses a verb that typically involves consumption rather than analysis.",
           "text": "먹어요"
         },
         {
-          "mistake": "Misunderstanding verb collocations",
-          "text": "듣어요"
-        }
-      ],
-      "repaired": true
-    },
-    {
-      "objective": "verb_choice",
-      "topic": "Bottleneck and capacity analysis.",
-      "stem": "저는 데이터를 ___.",
-      "sentence": "저는 데이터를 분석해요.",
-      "answer": "분석해요",
-      "distractors": [
-        {
-          "mistake": "Using an inappropriate action verb with the noun",
-          "text": "해요보기"
-        },
-        {
-          "mistake": "Confusing verbs with different meanings or collocations",
-          "text": "분석먹다"
-        },
-        {
-          "mistake": "Misunderstanding verb forms and using an incorrect one",
-          "text": "분석해다"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "tense_past",
-      "judged_correct": [
-        "분석해요"
-      ],
-      "key_ok": true,
-      "objective_ok": false,
-      "rejected": {
-        "해요보기": "it is not a mistake a real learner would make"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 10.424622420532868
-    },
-    {
-      "objective": "verb_choice",
-      "topic": "OEE analysis, downtime Pareto charts, and production trend analysis.",
-      "stem": "저는 데이터를 ___.",
-      "sentence": "저는 데이터를 분석해요.",
-      "answer": "분석해요",
-      "distractors": [
-        {
-          "mistake": "Overgeneralization from English verbs",
-          "text": "봅니다"
-        },
-        {
-          "mistake": "Misunderstanding verb forms",
-          "text": "합니다"
-        },
-        {
-          "mistake": "Overgeneralization from English verbs",
-          "text": "확인해요"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "verb_choice",
-      "judged_correct": [
-        "분석해요"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 1.095024053369321,
-      "first_distractors": [
-        {
-          "mistake": "Overgeneralization from English verbs",
-          "text": "봅니다"
-        },
-        {
-          "mistake": "Incorrect verb collocation with nouns",
-          "text": "사용해요"
-        },
-        {
-          "mistake": "Misunderstanding verb forms",
-          "text": "합니다"
-        }
-      ],
-      "repaired": true,
-      "difficulty_mu": 0.979128364083236,
-      "difficulty_sigma2": 1.0
-    },
-    {
-      "objective": "noun_counter",
-      "topic": "Manufacturing flow: incoming materials, component production, battery pack assembly, vehicle assembly, and end-of-line testing.",
-      "stem": "배터리는 다섯 ___ 필요해요.",
-      "sentence": "배터리는 다섯 개 필요해요.",
-      "answer": "개",
-      "distractors": [
-        {
-          "mistake": "혼동하는 경우: 명사와 명사를 연결하는 방법을 잘못 이해함",
-          "text": "명"
-        },
-        {
-          "mistake": "잘못된 수량 표현: 숫자에 따른 적절한 표현을 모름",
-          "text": "장"
-        },
-        {
-          "mistake": "잘못된 사람 수 표현: 사람을 세는 데 사용되는 표현을 오해함",
-          "text": "분"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "noun_counter",
-      "judged_correct": [
-        "개"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 5.460487480861567,
-      "difficulty_mu": 0.00794544345505995,
-      "difficulty_sigma2": 1.0
-    },
-    {
-      "objective": "noun_counter",
-      "topic": "PLC fundamentals and ladder logic.",
-      "stem": "공장은 다섯 개의 ___ 필요해요.",
-      "sentence": "공장은 다섯 개의 센서 필요해요.",
-      "answer": "센서",
-      "distractors": [
-        {
-          "mistake": "혼동된 명사 사용 (Misuse of Noun)",
-          "text": "센서들"
-        },
-        {
-          "mistake": "잘못된 수사 사용 (Incorrect Counter)",
-          "text": "센서만"
-        },
-        {
-          "mistake": "부적절한 개체 분류 (Incorrect Classification)",
-          "text": "센서인"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "particle_obj",
-      "judged_correct": [
-        "센서들"
-      ],
-      "key_ok": false,
-      "objective_ok": false,
-      "rejected": {
-        "센서들": "it also makes a correct sentence"
-      },
-      "distractors_ok": false,
-      "accepted": false,
-      "key_logit": 3.457048040053169
-    },
-    {
-      "objective": "noun_counter",
-      "topic": "Scenario testing before physical implementation.",
-      "stem": "디지털 쌍둥이 다섯 ___ 필요해요.",
-      "sentence": "디지털 쌍둥이 다섯 개 필요해요.",
-      "answer": "개",
-      "distractors": [
-        {
-          "mistake": "혼동된 명사 사용 오류",
-          "text": "명"
-        },
-        {
-          "mistake": "동사 활용 오류 (명사로 잘못 사용)",
-          "text": "인"
-        },
-        {
-          "mistake": "잘못된 수 표현 오류",
-          "text": "장"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "noun_counter",
-      "judged_correct": [
-        "개"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 1.788497912326655,
-      "difficulty_mu": 0.8248515091953773,
-      "difficulty_sigma2": 1.0
-    },
-    {
-      "objective": "noun_counter",
-      "topic": "OEE analysis, downtime Pareto charts, and production trend analysis.",
-      "stem": "공장은 다섯 ___ 센서가 필요해요.",
-      "sentence": "공장은 다섯 개의 센서가 필요해요.",
-      "answer": "개의",
-      "distractors": [
-        {
-          "mistake": "혼동된 수 표현 (Misunderstanding Number Expressions)",
-          "text": "명의"
-        },
-        {
-          "mistake": "잘못된 명사 사용 (Incorrect Noun Usage)",
-          "text": "장의"
-        },
-        {
-          "mistake": "잘못된 조사 사용 (Incorrect Particle Usage)",
-          "text": "분의"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "noun_counter",
-      "judged_correct": [
-        "개의"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 3.2480547354307916,
-      "difficulty_mu": 0.5001444805307613,
-      "difficulty_sigma2": 1.0
-    },
-    {
-      "objective": "noun_counter",
-      "topic": "HMI and SCADA systems.",
-      "stem": "스마트 팩토리에는 다섯 ___ 센서가 필요해요.",
-      "sentence": "스마트 팩토리에는 다섯 개의 센서가 필요해요.",
-      "answer": "개의",
-      "distractors": [
-        {
-          "mistake": "영어 단어 혼동 오류",
-          "text": "명의"
-        },
-        {
-          "mistake": "잘못된 단위 사용 오류",
-          "text": "장의"
-        },
-        {
-          "mistake": "인물 수 표현 오류",
-          "text": "분의"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "noun_counter",
-      "judged_correct": [
-        "개의"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 4.046780726360625,
-      "difficulty_mu": 0.32245222550745484,
-      "difficulty_sigma2": 1.0
-    },
-    {
-      "objective": "noun_counter",
-      "topic": "Discrete-event simulation of production lines.",
-      "stem": "공장 다섯 ___ 로봇 필요해요.",
-      "sentence": "공장 다섯 개의 로봇 필요해요.",
-      "answer": "개의",
-      "distractors": [
-        {
-          "mistake": "혼동된 명사 사용 오류",
-          "text": "명의"
-        },
-        {
-          "mistake": "잘못된 수사 사용 오류",
-          "text": "장의"
-        },
-        {
-          "mistake": "인물 수 표현 오류",
-          "text": "분의"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "noun_counter",
-      "judged_correct": [
-        "개의"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 5.3776086427028975,
-      "difficulty_mu": 0.026383465772302148,
-      "difficulty_sigma2": 1.0
-    },
-    {
-      "objective": "mod_adverb",
-      "topic": "AI-assisted root cause analysis.",
-      "stem": "공장은 ___ 분석해요.",
-      "sentence": "공장은 똑똑하게 분석해요.",
-      "answer": "똑똑하게",
-      "distractors": [
-        {
-          "mistake": "Incorrect Particle Usage",
-          "text": "조용히"
-        },
-        {
-          "mistake": "Incorrect Adjective to Adverb Conversion",
-          "text": "똑똑하게서"
-        },
-        {
-          "mistake": "The adverb form incorrectly uses '-게' with an adjective that doesn't typically modify verbs in this manner, confusing its correct usage.",
-          "text": "공장은조용히분석"
+          "mistake": "The learner mistakenly opts for a verb that denotes a different context, such as creation rather than analysis.",
+          "text": "만들어요"
         }
       ],
       "format_ok": true,
@@ -2980,47 +2688,285 @@
       "key_ok": false,
       "objective_ok": false,
       "rejected": {
-        "조용히": "it is not a mistake a real learner would make",
-        "똑똑하게서": "it is not a mistake a real learner would make",
-        "공장은조용히분석": "it is not a mistake a real learner would make"
+        "보세요": "it is not a mistake a real learner would make",
+        "먹어요": "a language model finds it more natural than the answer",
+        "만들어요": "a language model finds it more natural than the answer"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 4.406989581333389,
+      "key_logit": -3.5099884770262157
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "OT cybersecurity, network segmentation, and access control.",
+      "stem": "공장은 다섯 개 ___ 있어요.",
+      "sentence": "공장은 다섯 개 섹션 있어요.",
+      "answer": "섹션",
+      "distractors": [
+        {
+          "mistake": "혼합 오류: 영어 영향으로 잘못된 선택",
+          "text": "개"
+        },
+        {
+          "mistake": "형태 오류: 숫자에 맞지 않는 일반 명사 사용",
+          "text": "박스"
+        },
+        {
+          "mistake": "의미 오류: 문맥에 맞지 않는 단어 선택",
+          "text": "팀"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "개": "it is not a mistake a real learner would make",
+        "박스": "it is not a mistake a real learner would make",
+        "팀": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": -0.3232259347189779
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "Interlocks, alarms, emergency stops, and safety systems.",
+      "stem": "알람은 다섯 ___ 필요해요.",
+      "sentence": "알람은 다섯 개 필요해요.",
+      "answer": "개",
+      "distractors": [
+        {
+          "mistake": "혼합 오류 (Mixing Error)",
+          "text": "명"
+        },
+        {
+          "mistake": "단수 오류 (Singular Error)",
+          "text": "개들"
+        },
+        {
+          "mistake": "부적절한 명사 사용 (Inappropriate Noun Usage)",
+          "text": "장"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "명": "it is not a mistake a real learner would make",
+        "개들": "it is not a mistake a real learner would make",
+        "장": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 3.8720448928888884
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "Human review and safe integration into production decisions.",
+      "stem": "___ 개의 센서가 필요해요.",
+      "sentence": "다섯 개의 센서가 필요해요.",
+      "answer": "다섯",
+      "distractors": [
+        {
+          "mistake": "혼합 오류 (Mixed Error)",
+          "text": "다섯명의센서가"
+        },
+        {
+          "mistake": "잘못된 조사 사용 (Incorrect Particle Usage)",
+          "text": "다섯개의센서이"
+        },
+        {
+          "mistake": "부적절한 단위 사용 (Incorrect Unit Usage)",
+          "text": "다섯장의센서가"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "noun_counter",
+      "judged_correct": [
+        "다섯"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {},
+      "distractors_ok": true,
+      "accepted": true,
+      "key_logit": 30.806967281961786,
+      "difficulty_mu": -1.4345972676025796,
+      "difficulty_sigma2": 1.0
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "Virtual commissioning and layout planning.",
+      "stem": "공장은 ___ 개의 센서 필요해요.",
+      "sentence": "공장은 다섯 개의 센서 필요해요.",
+      "answer": "다섯",
+      "distractors": [
+        {
+          "mistake": "혼용 오류: 한국어와 영어 혼동",
+          "text": "공장은다섯명의센"
+        },
+        {
+          "mistake": "잘못된 명사 사용: 부적절한 명사 선택",
+          "text": "공장은다섯장의센"
+        },
+        {
+          "mistake": "부적절한 카운터 사용: 특정 물체에 맞지 않는 카운터 사용",
+          "text": "공장은다섯권의센"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "noun_counter",
+      "judged_correct": [
+        "다섯"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {},
+      "distractors_ok": true,
+      "accepted": true,
+      "key_logit": 38.47327562808671,
+      "difficulty_mu": -2.089445129631867,
+      "difficulty_sigma2": 1.0
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "Dashboards using Grafana or Power BI.",
+      "stem": "다섯 ___ 차트가 필요해요.",
+      "sentence": "다섯 개의 차트가 필요해요.",
+      "answer": "개의",
+      "distractors": [
+        {
+          "mistake": "혼용 오류 (Mixed Language Error)",
+          "text": "명의"
+        },
+        {
+          "mistake": "형태 오류 (Form Error)",
+          "text": "장의"
+        },
+        {
+          "mistake": "의미 혼동 오류 (Semantic Confusion Error)",
+          "text": "권의"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "noun_counter",
+      "judged_correct": [
+        "개의"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
+      "rejected": {},
+      "distractors_ok": true,
+      "accepted": true,
+      "key_logit": 4.10506718384342,
+      "difficulty_mu": 0.8462504888290922,
+      "difficulty_sigma2": 1.0
+    },
+    {
+      "objective": "noun_counter",
+      "topic": "Industrial robots, cobots, AGVs, and AMRs.",
+      "stem": "로봇은 다섯 ___ 있어요.",
+      "sentence": "로봇은 다섯 대 있어요.",
+      "answer": "대",
+      "distractors": [
+        {
+          "mistake": "혼합 오류 (Mixed Error)",
+          "text": "개"
+        },
+        {
+          "mistake": "형태 오류 (Form Error)",
+          "text": "명"
+        },
+        {
+          "mistake": "의미 혼동 오류 (Semantic Confusion Error)",
+          "text": "권"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
+      "rejected": {
+        "개": "a language model finds it more natural than the answer",
+        "명": "it is not a mistake a real learner would make",
+        "권": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": -5.129835052136439
+    },
+    {
+      "objective": "mod_adverb",
+      "topic": "Digital twin concepts and real-time synchronization.",
+      "stem": "공장은 ___ 조정해요.",
+      "sentence": "공장은 실시간으로 조정해요.",
+      "answer": "실시간으로",
+      "distractors": [
+        {
+          "mistake": "오류: 불필요한 수식 추가 (Unnecessary Additional Modification)",
+          "text": "정확히"
+        },
+        {
+          "mistake": "Adding an extra descriptive word before the adverb form",
+          "text": "정확히그리고조정"
+        },
+        {
+          "mistake": "Incorrect use of adjective-to-adverb conversion without proper '-게' suffix",
+          "text": "정확하게만나다"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "mod_adverb",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": true,
+      "rejected": {
+        "정확히": "it is not a mistake a real learner would make",
+        "정확히그리고조정": "it is not a mistake a real learner would make",
+        "정확하게만나다": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 0.14069557120202214,
       "first_distractors": [
         {
-          "mistake": "Overgeneralizing English Adverbs",
-          "text": "빠르게"
+          "mistake": "혼재 (Mixing Adjective and Adverb Forms)",
+          "text": "자세히"
         },
         {
-          "mistake": "Incorrect Particle Usage",
-          "text": "조용히"
+          "mistake": "오류: 불필요한 수식 추가 (Unnecessary Additional Modification)",
+          "text": "정확히"
         },
         {
-          "mistake": "Incorrect Adjective to Adverb Conversion",
-          "text": "똑똑하게서"
+          "mistake": "오류: 잘못된 접미사 사용 (Incorrect Suffix Usage)",
+          "text": "활기차게"
         }
       ],
       "repaired": true
     },
     {
       "objective": "mod_adverb",
-      "topic": "SQL and Python for manufacturing data analysis.",
-      "stem": "공장은 ___ 데이터 분석해요.",
-      "sentence": "공장은 조용히 데이터 분석해요.",
+      "topic": "ISA-95 and the manufacturing hierarchy.",
+      "stem": "공장은 ___ 모니터링해요.",
+      "sentence": "공장은 조용히 모니터링해요.",
       "answer": "조용히",
       "distractors": [
         {
-          "mistake": "English mistake: Confusing -게 with -이/가 for verb endings",
+          "mistake": "혼재하는 오류: 형용사를 직접 명사로 바꾸려는 시도",
           "text": "조용히하게"
         },
         {
-          "mistake": "English mistake: Incorrectly adding -게 without changing the adjective form",
-          "text": "조용한게"
+          "mistake": "혼용 오류 (Mixing up adjective and verb forms incorrectly)",
+          "text": "조용히하게하게"
         },
         {
-          "mistake": "English mistake: Misapplying -게 to an adjective without modifying the verb correctly",
-          "text": "조용하게게"
+          "mistake": "부적절한 어미 사용 (Incorrect particle usage)",
+          "text": "조용히로"
         }
       ],
       "format_ok": true,
@@ -3030,31 +2976,81 @@
       ],
       "key_ok": true,
       "objective_ok": true,
+      "rejected": {
+        "조용히하게하게": "it is not a mistake a real learner would make",
+        "조용히로": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": 6.489938286248702,
+      "first_distractors": [
+        {
+          "mistake": "혼재하는 오류: 형용사를 직접 명사로 바꾸려는 시도",
+          "text": "조용히하게"
+        },
+        {
+          "mistake": "혼란스러운 오류: '-게' 대신 '-는'을 사용하는 오류",
+          "text": "조용히는"
+        },
+        {
+          "mistake": "혼란스러운 오류: 잘못된 형용사 활용",
+          "text": "활기차게"
+        }
+      ],
+      "repaired": true
+    },
+    {
+      "objective": "mod_adverb",
+      "topic": "Dashboards using Grafana or Power BI.",
+      "stem": "저는 ___ 분석해요.",
+      "sentence": "저는 자세히 분석해요.",
+      "answer": "자세히",
+      "distractors": [
+        {
+          "mistake": "Confusing '-게' with '-이/가' for verb modification",
+          "text": "자세히가다"
+        },
+        {
+          "mistake": "Incorrect use of '-은' instead of '-게'",
+          "text": "자세히은분석해요"
+        },
+        {
+          "mistake": "Misapplication of adjective form without '-게'",
+          "text": "자세히분석해요요"
+        }
+      ],
+      "format_ok": true,
+      "predicted_objective": "mod_adverb",
+      "judged_correct": [
+        "자세히"
+      ],
+      "key_ok": true,
+      "objective_ok": true,
       "rejected": {},
       "distractors_ok": true,
       "accepted": true,
-      "key_logit": 4.438039890904756,
-      "difficulty_mu": 0.2354089540528152,
+      "key_logit": 18.873944747413443,
+      "difficulty_mu": -0.415291241613398,
       "difficulty_sigma2": 1.0
     },
     {
       "objective": "mod_adverb",
-      "topic": "Introduction to Lean Manufacturing, 5S, Kaizen, and value stream mapping.",
-      "stem": "공장은 ___ 작업해요.",
-      "sentence": "공장은 효율적으로 작업해요.",
-      "answer": "효율적으로",
+      "topic": "OEE analysis, downtime Pareto charts, and production trend analysis.",
+      "stem": "데이터를 ___ 분석해요.",
+      "sentence": "데이터를 실시간으로 분석해요.",
+      "answer": "실시간으로",
       "distractors": [
         {
-          "mistake": "English mistake: Confusing the correct adverbial ending with an adjective form",
-          "text": "효율한"
+          "mistake": "Over-reliance on English structure",
+          "text": "즉시로"
         },
         {
-          "mistake": "English mistake: Using an incorrect verb form without the correct adverbial ending",
-          "text": "효율하게"
+          "mistake": "Confusing '-게' with '-이/아/어서' endings",
+          "text": "정확하게"
         },
         {
-          "mistake": "English mistake: Incorrectly applying the '-게' particle to an adjective without changing its form appropriately",
-          "text": "효율적으로게"
+          "mistake": "Incorrect particle usage without context understanding",
+          "text": "자연스럽게"
         }
       ],
       "format_ok": true,
@@ -3063,130 +3059,84 @@
       "key_ok": false,
       "objective_ok": false,
       "rejected": {
-        "효율한": "it is not a mistake a real learner would make",
-        "효율하게": "it is not a mistake a real learner would make",
-        "효율적으로게": "it is not a mistake a real learner would make"
+        "즉시로": "it is not a mistake a real learner would make",
+        "정확하게": "it is not a mistake a real learner would make",
+        "자연스럽게": "it is not a mistake a real learner would make"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 4.999389843478623
+      "key_logit": 1.2400165638327048
     },
     {
       "objective": "mod_adverb",
-      "topic": "Quality management and end-of-line testing: functional validation and electronic test records.",
-      "stem": "품질은 ___ 검사해요.",
-      "sentence": "품질은 엄격하게 검사해요.",
-      "answer": "엄격하게",
+      "topic": "Industrial communication: OPC UA, Modbus TCP, and PROFINET.",
+      "stem": "공장은 ___ 제어해요.",
+      "sentence": "공장은 정밀하게 제어해요.",
+      "answer": "정밀하게",
       "distractors": [
         {
-          "mistake": "영어식 형용사 활용 오류",
-          "text": "엄격한적으로"
+          "mistake": "The mistake often arises from confusing Korean particles with English structure.",
+          "text": "정확하게"
         },
         {
-          "mistake": "English mistake: Confusing '-게' with '-은/는' for adverb formation",
-          "text": "품질은꼼꼼하게검"
+          "mistake": "Learners might incorrectly apply adjectives directly without changing them into adverbs, thinking the adjective form suffices.",
+          "text": "정밀하게"
         },
         {
-          "mistake": "English mistake: Incorrect use of '-게' without proper verb context",
-          "text": "품질은정확하게봐"
+          "mistake": "A common error is misusing the correct adverbial form by incorrectly adding '-게' directly after an adjective without ensuring grammatical correctness.",
+          "text": "정밀하게서"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "mod_adverb",
-      "judged_correct": [
-        "엄격하게"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
+      "predicted_objective": "none",
+      "judged_correct": [],
+      "key_ok": false,
+      "objective_ok": false,
       "rejected": {
-        "품질은정확하게봐": "it is not a mistake a real learner would make"
+        "정확하게": "a language model finds it more natural than the answer",
+        "정밀하게": "it repeats the answer or another distractor",
+        "정밀하게서": "it is not a mistake a real learner would make"
       },
       "distractors_ok": false,
       "accepted": false,
-      "key_logit": 12.222648858705178,
-      "first_distractors": [
-        {
-          "mistake": "영어식 형용사 활용 오류",
-          "text": "엄격한적으로"
-        },
-        {
-          "mistake": "부적절한 어미 사용 오류",
-          "text": "엄격하게서"
-        },
-        {
-          "mistake": "잘못된 접미사 추가 오류",
-          "text": "엄격하게으"
-        }
-      ],
-      "repaired": true
+      "key_logit": -7.56121703235487
     },
     {
       "objective": "mod_adverb",
-      "topic": "OEE analysis, downtime Pareto charts, and production trend analysis.",
-      "stem": "스마트 공장은 ___ 데이터 분석해요.",
-      "sentence": "스마트 공장은 효율적으로 데이터 분석해요.",
-      "answer": "효율적으로",
+      "topic": "E-motor and power electronics: motor and inverter assembly.",
+      "stem": "___ 조립해요.",
+      "sentence": "정밀하게 조립해요.",
+      "answer": "정밀하게",
       "distractors": [
         {
-          "mistake": "Overgeneralization of English Adverbs",
-          "text": "빠르게"
+          "mistake": "The learner mistakenly focuses on English grammar rules instead of Korean adverb formation.",
+          "text": "정확하게"
         },
         {
-          "mistake": "Incorrect Use of -게 Particle",
-          "text": "조용히"
+          "mistake": "The learner incorrectly adds a different Korean adverb-forming particle instead of -게 (게)",
+          "text": "신중하게"
         },
         {
-          "mistake": "Incorrect Verb Form Attachment",
-          "text": "효율하게"
+          "mistake": "The learner incorrectly modifies the adjective by changing its form without applying the correct adverb-forming particle",
+          "text": "정확한"
         }
       ],
       "format_ok": true,
-      "predicted_objective": "mod_adverb",
+      "predicted_objective": "none",
       "judged_correct": [
-        "효율적으로"
-      ],
-      "key_ok": true,
-      "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 0.5744440929097783,
-      "difficulty_mu": 1.0949415818130268,
-      "difficulty_sigma2": 1.0
-    },
-    {
-      "objective": "mod_adverb",
-      "topic": "Manufacturing flow: incoming materials, component production, battery pack assembly, vehicle assembly, and end-of-line testing.",
-      "stem": "재료가 ___ 검사해요.",
-      "sentence": "재료가 정확하게 검사해요.",
-      "answer": "정확하게",
-      "distractors": [
-        {
-          "mistake": "Turning adjective to adverb without correct particle usage",
-          "text": "정확한으로"
-        },
-        {
-          "mistake": "Incorrect verb form after adverb transformation",
-          "text": "정확하게하게"
-        },
-        {
-          "mistake": "Using an incorrect form of the verb conjugation",
-          "text": "정확하게검사해요"
-        }
-      ],
-      "format_ok": true,
-      "predicted_objective": "mod_adverb",
-      "judged_correct": [
+        "정밀하게",
         "정확하게"
       ],
       "key_ok": true,
-      "objective_ok": true,
-      "rejected": {},
-      "distractors_ok": true,
-      "accepted": true,
-      "key_logit": 9.281962980433732,
-      "difficulty_mu": -0.842216698188516,
-      "difficulty_sigma2": 1.0
+      "objective_ok": false,
+      "rejected": {
+        "정확하게": "it also makes a correct sentence",
+        "신중하게": "it is not a mistake a real learner would make",
+        "정확한": "it is not a mistake a real learner would make"
+      },
+      "distractors_ok": false,
+      "accepted": false,
+      "key_logit": -1.233930860077244
     }
   ]
 }
