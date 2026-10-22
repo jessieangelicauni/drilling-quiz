@@ -26,7 +26,7 @@ import random
 from dataclasses import asdict
 
 from eval_harness import rate
-from item_foundry import SKILLS, ExaoneChat, MisconceptionItemGenerator
+from item_foundry import Curriculum, ExaoneChat, MisconceptionItemGenerator
 from solver_check import SolverCheckProvider
 
 if __name__ == "__main__":
@@ -34,17 +34,21 @@ if __name__ == "__main__":
     parser.add_argument("--per-skill", type=int, default=20)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--skills", default="all", help="comma-separated skill ids, for a quick check")
+    parser.add_argument("--curriculum", default=None,
+                        help="admin-supplied scope material (Curriculum.from_json); default ships "
+                             "the built-in 11 grammar/vocab points with no domain setting")
     parser.add_argument("--out", default="item_foundry_results.json")
     args = parser.parse_args()
 
     rng = random.Random(args.seed)
     chat = ExaoneChat()
     solver = SolverCheckProvider()
-    gen = MisconceptionItemGenerator(chat, solver.sentence_logprob, seed=args.seed)
+    curriculum = Curriculum.from_json(args.curriculum) if args.curriculum else None
+    gen = MisconceptionItemGenerator(chat, solver.sentence_logprob, seed=args.seed, curriculum=curriculum)
 
     report = {"settings": vars(args), "per_skill": {}}
     accepted_items = []
-    for skill_id in (list(SKILLS) if args.skills == "all" else args.skills.split(",")):
+    for skill_id in (sorted(gen.curriculum.items) if args.skills == "all" else args.skills.split(",")):
         accepted, attempts = 0, args.per_skill
         for _ in range(attempts):
             item = gen.generate(skill_id)

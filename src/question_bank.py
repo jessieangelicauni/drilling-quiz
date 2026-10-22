@@ -82,12 +82,16 @@ class QuestionBank:
     def __init__(self):
         self.entries: dict[str, BankEntry] = {}
 
-    def batch_generate(self, provider: MisconceptionItemGenerator, skill_id: str,
+    def batch_generate(self, provider: MisconceptionItemGenerator, skill_id: str | None,
                         n_target: int, max_attempts: int | None = None) -> int:
         """Add up to n_target NEW validated items for skill_id as PENDING
-        (awaiting admin review). Returns how many were actually added --
-        can be less than n_target if the generator keeps failing
-        verification (item_foundry.MisconceptionItemGenerator.verify).
+        (awaiting admin review). skill_id=None picks a random item from
+        the provider's curriculum each attempt, instead of targeting one
+        grammar/vocab point -- for filling the bank from whatever the
+        active curriculum has, rather than one skill at a time. Returns
+        how many were actually added -- can be less than n_target if the
+        generator keeps failing verification
+        (item_foundry.MisconceptionItemGenerator.verify).
         """
         max_attempts = max_attempts or n_target * 10
         added, attempts = 0, 0

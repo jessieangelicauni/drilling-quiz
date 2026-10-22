@@ -63,58 +63,89 @@ BLANK = "___"
 
 
 @dataclass(frozen=True)
-class Skill:
+class CurriculumItem:
+    """One grammar/vocab point to generate exercises for -- what used to be
+    a hardcoded `Skill`. Now sourced from a `Curriculum`, so the admin's
+    uploaded material is the single source of what gets taught, not a
+    second, code-defined list that could drift from it."""
     description: str           # the grammar point, as the curriculum defines it
-    categories: frozenset      # KAGAS categories an edit of this skill may touch
+    categories: frozenset = frozenset()  # KAGAS categories an edit may touch (free-generation path only)
     level: str = "beginner (TOPIK I)"
     logprob_gate: bool = True  # key uniqueness checkable by log-probability (PRD §9.35)
 
 
-SKILLS = {
-    "particle_loc": Skill("location particles: 에서 marks where an action takes place, 에 marks a "
-                          "destination or where something is or exists", frozenset({"PART"})),
-    "particle_obj": Skill("the object particle 을/를 on the direct object of a transitive verb "
-                          "(을 after a final consonant, 를 after a vowel)", frozenset({"PART"})),
-    "honorific": Skill("the subject honorific -(으)시- on the verb when the subject is a person "
-                       "owed respect", frozenset({"END"})),
-    "time_range": Skill("부터 and 까지 marking the start and the end of a time span",
-                        frozenset({"PART"})),
-    "tense_past": Skill("the past tense -았/었- in the polite -어요 style", frozenset({"END"})),
-    "irregular_conj": Skill("irregular verb and adjective stems (르, ㅂ, ㄷ, ㅅ, ㅎ irregulars) before "
-                            "an ending that starts with a vowel", frozenset({"CONJ", "END"})),
-    "adj_relativizer": Skill("an adjective modifying a following noun with -(으)ㄴ",
-                             frozenset({"END"})),
-    "subj_topic": Skill("the subject particle 이/가 versus the topic particle 은/는",
-                        frozenset({"PART"}), logprob_gate=False),
-    "verb_choice": Skill("choosing the verb that collocates with its object noun",
-                         frozenset({"VERB"})),
-    "noun_counter": Skill("native Korean counters after a number", frozenset({"NOUN"})),
-    "mod_adverb": Skill("turning an adjective into an adverb with -게 to modify a verb",
-                        frozenset({"END"})),
+# Ships as the default item list (today's 11 grammar/vocab points) so the
+# generator works out of the box with no curriculum uploaded yet. An
+# admin-supplied Curriculum with its own "items" REPLACES this entirely
+# (PRD: curriculum is the single source, not a second list layered on top).
+_DEFAULT_ITEMS = {
+    "particle_loc": CurriculumItem("location particles: 에서 marks where an action takes place, 에 marks a "
+                                   "destination or where something is or exists", frozenset({"PART"})),
+    "particle_obj": CurriculumItem("the object particle 을/를 on the direct object of a transitive verb "
+                                   "(을 after a final consonant, 를 after a vowel)", frozenset({"PART"})),
+    "honorific": CurriculumItem("the subject honorific -(으)시- on the verb when the subject is a person "
+                                "owed respect", frozenset({"END"})),
+    "time_range": CurriculumItem("부터 and 까지 marking the start and the end of a time span",
+                                 frozenset({"PART"})),
+    "tense_past": CurriculumItem("the past tense -았/었- in the polite -어요 style", frozenset({"END"})),
+    "irregular_conj": CurriculumItem("irregular verb and adjective stems (르, ㅂ, ㄷ, ㅅ, ㅎ irregulars) before "
+                                     "an ending that starts with a vowel", frozenset({"CONJ", "END"})),
+    "adj_relativizer": CurriculumItem("an adjective modifying a following noun with -(으)ㄴ",
+                                      frozenset({"END"})),
+    "subj_topic": CurriculumItem("the subject particle 이/가 versus the topic particle 은/는",
+                                 frozenset({"PART"}), logprob_gate=False),
+    "verb_choice": CurriculumItem("choosing the verb that collocates with its object noun",
+                                  frozenset({"VERB"})),
+    "noun_counter": CurriculumItem("native Korean counters after a number", frozenset({"NOUN"})),
+    "mod_adverb": CurriculumItem("turning an adjective into an adverb with -게 to modify a verb",
+                                 frozenset({"END"})),
 }
 
 
 @dataclass(frozen=True)
 class Curriculum:
     """Admin-supplied scope material (e.g. "smart factory" course content):
-    used as a reference so generated sentences stay inside the domain a
-    course is actually teaching, rather than generic unrelated vocabulary.
-    One curriculum applies across every skill -- set/replace it on a
-    generator at any time (`gen.curriculum = ...`) when the admin uploads
-    new material; `None` (the default) means no scope material at all,
-    and generation is unaffected."""
-    context: str
-    modules: dict[str, list[str]]  # module name -> topic/description strings
+    the single source of what grammar/vocab points to generate (`items`)
+    and what domain setting to write sentences in (`context`/`modules`),
+    so generation never drifts from what a course is actually teaching.
+    Set/replace it on a generator at any time (`gen.curriculum = ...`)
+    when the admin uploads new material; the default (no curriculum
+    passed to the generator) uses `_DEFAULT_ITEMS` with no domain setting.
+    """
+    items: dict[str, CurriculumItem]
+    context: str = ""
+    modules: dict[str, list[str]] = field(default_factory=dict)  # module name -> topic strings
 
     @staticmethod
     def from_json(path: str | Path) -> "Curriculum":
+        """"items" in the JSON is optional -- a curriculum that only sets
+        context/modules (e.g. a topic-only file written before this
+        existed) still works, generating the default 11 grammar/vocab
+        points inside that domain setting. An "items" key, when present,
+        REPLACES the default list entirely (admin-authored items: {id:
+        {"description": ..., "categories": [...], "level": ..., "logprob_gate": ...}})."""
         data = json.loads(Path(path).read_text(encoding="utf-8"))
-        return Curriculum(context=data["context"], modules=data["modules"])
+        items = _DEFAULT_ITEMS
+        if "items" in data:
+            items = {item_id: CurriculumItem(description=spec["description"],
+                                             categories=frozenset(spec.get("categories", ())),
+                                             level=spec.get("level", "beginner (TOPIK I)"),
+                                             logprob_gate=spec.get("logprob_gate", True))
+                     for item_id, spec in data["items"].items()}
+        return Curriculum(items=items, context=data.get("context", ""), modules=data.get("modules", {}))
+
+    def random_item_id(self, rng: random.Random) -> str:
+        return rng.choice(sorted(self.items))
 
     def random_setting(self, rng: random.Random) -> str:
+        if not self.modules:
+            return ""
         module = rng.choice(sorted(self.modules))
         topic = rng.choice(self.modules[module])
         return f"Setting: {self.context}; {module}: {topic}. Use one word of the setting."
+
+
+DEFAULT_CURRICULUM = Curriculum(items=_DEFAULT_ITEMS)
 
 
 @dataclass
@@ -340,7 +371,7 @@ class MisconceptionItemGenerator:
         self.chat = chat
         self.sentence_logprob = sentence_logprob
         self.rng = random.Random(seed)
-        self.curriculum = curriculum
+        self.curriculum = curriculum or DEFAULT_CURRICULUM
         self.items: dict[str, GeneratedItem] = {}
         self.stats: dict[str, FoundryStats] = {}
         self._recent: dict[str, list[str]] = {}
@@ -350,7 +381,7 @@ class MisconceptionItemGenerator:
     # -- verification (free-generation path: subj_topic only) --------------
     def verify(self, skill_id: str, reply: dict):
         """(item fields, []) if the reply passes every check, else (None, reasons)."""
-        skill = SKILLS[skill_id]
+        skill = self.curriculum.items[skill_id]
         if not isinstance(reply, dict):
             return None, ["format: the reply was not a JSON object"]
         sentence, wrongs_in = reply.get("sentence"), reply.get("wrong_sentences")
@@ -428,18 +459,18 @@ class MisconceptionItemGenerator:
 
     # -- generation: free path (subj_topic only) ----------------------------
     def _prompt(self, skill_id: str) -> str:
-        skill = SKILLS[skill_id]
+        skill = self.curriculum.items[skill_id]
         recent = self._recent.get(skill_id, [])[-8:]
         avoid = f" Use a different sentence from these: {'; '.join(recent)}" if recent else ""
         example = self._example.get(skill_id)
         note = ("A good exercise for this grammar point:" if example else
                 "Example of the output shape only (it tests a different grammar point):")
-        setting = self.curriculum.random_setting(self.rng) if self.curriculum else ""
+        setting = self.curriculum.random_setting(self.rng)
         return _ITEM_PROMPT.format(description=skill.description, setting=setting,
                                    avoid=avoid, example_note=note, example=example or _FORMAT_EXAMPLE)
 
     def _system(self, skill_id: str) -> str:
-        return _SYSTEM_PROMPT.format(level=SKILLS[skill_id].level)
+        return _SYSTEM_PROMPT.format(level=self.curriculum.items[skill_id].level)
 
     def _generate_free(self, skill_id: str) -> GeneratedItem | None:
         stats = self.stats.setdefault(skill_id, FoundryStats())
@@ -469,11 +500,12 @@ class MisconceptionItemGenerator:
         """(item, "") on success, else (None, reason) -- same shape as
         verify(), so FoundryStats stays as diagnosable as the free-
         generation path."""
-        skill = SKILLS[skill_id]
+        skill = self.curriculum.items[skill_id]
         recent = self._recent.get(skill_id, [])[-8:]
         avoid = f" Use a different sentence from these: {'; '.join(recent)}" if recent else ""
         description = sentence_constraint(skill_id, skill.description, self.rng)
-        setting = f"\n{self.curriculum.random_setting(self.rng)}" if self.curriculum else ""
+        random_setting = self.curriculum.random_setting(self.rng)
+        setting = f"\n{random_setting}" if random_setting else ""
         messages = [{"role": "system", "content": _SENTENCE_ONLY_PROMPT.format(level=skill.level)},
                     {"role": "user", "content": f"Grammar point: {description}{setting}\n"
                                                 f"Write one sentence.{avoid}"}]
@@ -519,8 +551,14 @@ class MisconceptionItemGenerator:
                 stats.rejected.append({"reply": "", "reasons": [reason]})
         return None
 
-    def generate(self, skill_id: str) -> GeneratedItem | None:
-        if skill_id not in SKILLS:
+    def generate(self, skill_id: str | None = None) -> GeneratedItem | None:
+        """skill_id=None picks a random item from the curriculum (the
+        "just take something from the curriculum" mode) -- give one to
+        target a specific grammar/vocab point instead (e.g. mastery-driven
+        practice selection, or an admin filling bank gaps)."""
+        if skill_id is None:
+            skill_id = self.curriculum.random_item_id(self.rng)
+        elif skill_id not in self.curriculum.items:
             return None
         if skill_id in DETERMINISTIC_SKILLS:
             return self._generate_deterministic(skill_id)
@@ -560,12 +598,12 @@ class MisconceptionItemGenerator:
         reasoning = self._reasoning(stem, options, answer)
         return GeneratedItem(skill_id, stem, BLANK, options, answer, reasoning)
 
-    def next_new_grammar_item(self, skill_id: str, learner_urn=None,
+    def next_new_grammar_item(self, skill_id: str | None = None, learner_urn=None,
                               exclude: set[str] = frozenset()) -> str | None:
         item = self.generate(skill_id)
         if item is None:
             return None
-        item_id = f"grammar-{skill_id}-{self._counter}"
+        item_id = f"grammar-{item.skill_id}-{self._counter}"
         self._counter += 1
         self.items[item_id] = item
         return item_id
@@ -661,7 +699,7 @@ if __name__ == "__main__":
 
     # Curriculum (admin-supplied scope material): the chosen setting line must actually
     # reach the model's prompt, for both the deterministic and the free-generation path.
-    curriculum = Curriculum(context="a smart factory course", modules={
+    curriculum = Curriculum(items=_DEFAULT_ITEMS, context="a smart factory course", modules={
         "Module 1": ["predictive maintenance using sensor data"]})
     cur_chat = _make_chat({"sentence": "동생이 공원에서 축구를 해요."})
     cur_gen = MisconceptionItemGenerator(cur_chat, lambda s: 0.0 if "공원에서" in s else -5.0,
@@ -678,6 +716,37 @@ if __name__ == "__main__":
         "the curriculum's setting line must reach the free-generation path's prompt too")
     no_curriculum_prompt = MisconceptionItemGenerator(lambda m: "", None)._prompt("subj_topic")
     assert "Setting:" not in no_curriculum_prompt, "no curriculum set must mean no setting line at all"
+
+    # generate(skill_id=None): "just pick randomly from the curriculum" mode. A curriculum
+    # with only ONE item makes the pick deterministic, so this is checkable without flakiness.
+    one_item = Curriculum(items={"particle_loc": _DEFAULT_ITEMS["particle_loc"]})
+    random_gen = MisconceptionItemGenerator(_make_chat({"sentence": "동생이 공원에서 축구를 해요."}),
+                                            lambda s: 0.0 if "공원에서" in s else -5.0,
+                                            seed=0, curriculum=one_item)
+    picked_id = random_gen.next_new_grammar_item()  # no skill_id at all
+    assert picked_id is not None and random_gen.items[picked_id].skill_id == "particle_loc", (
+        "with a single-item curriculum, the random pick has only one possible answer")
+    assert random_gen.generate("not_in_this_curriculum") is None, (
+        "a skill_id outside the active curriculum's items must be rejected, not silently generated"
+    )
+
+    # Curriculum.from_json: an "items" key replaces the default list entirely; its absence
+    # keeps the default list (so an old, topic-only curriculum file still works unchanged).
+    import tempfile
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
+        json.dump({"context": "a bakery", "modules": {"M": ["bread"]},
+                  "items": {"only_skill": {"description": "a made-up grammar point"}}}, f)
+        custom_path = f.name
+    custom_curriculum = Curriculum.from_json(custom_path)
+    assert set(custom_curriculum.items) == {"only_skill"}, (
+        "an \"items\" key in the JSON must REPLACE the default list, not add to it")
+    assert custom_curriculum.items["only_skill"].logprob_gate is True, "missing fields must fall back to defaults"
+    topic_only_path = custom_path.replace(".json", "2.json")
+    with open(topic_only_path, "w", encoding="utf-8") as f:
+        json.dump({"context": "a bakery", "modules": {"M": ["bread"]}}, f)
+    topic_only_curriculum = Curriculum.from_json(topic_only_path)
+    assert set(topic_only_curriculum.items) == set(_DEFAULT_ITEMS), (
+        "no \"items\" key at all must keep generating the default 11 grammar/vocab points")
 
     # Ambiguity is caught by scoring: every wrong form reads as naturally as the key under
     # this scorer, so every retry fails and the attempt is given up on, not shipped anyway.
