@@ -20,10 +20,8 @@ class CombinedContentProvider:
         return self.vocab.next_new_vocab_item(user_id, exclude)
 
     def next_new_grammar_item(self, skill_id: str, learner_urn=None,
-                               exclude: set[str] = frozenset(),
-                               target_misconception: str | None = None) -> str | None:
-        return self.grammar.next_new_grammar_item(skill_id, learner_urn=learner_urn, exclude=exclude,
-                                                  target_misconception=target_misconception)
+                               exclude: set[str] = frozenset()) -> str | None:
+        return self.grammar.next_new_grammar_item(skill_id, learner_urn=learner_urn, exclude=exclude)
 
 
 if __name__ == "__main__":

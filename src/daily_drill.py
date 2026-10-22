@@ -6,9 +6,8 @@ unified concept -- see vocab_scheduler.py and grammar_scheduler.py for why:
   - Vocab: due = FSRS due-date, most overdue first.
   - Grammar: due = skill not yet mastered (Urnings), weakest/most uncertain first.
 
-Content generation/question-bank lookup (EXAONE, KLUE-RoBERTa prior
-injection, KAGAS distractors) doesn't exist in this repo yet -- that's
-Novelty 1/2's job. This module depends on it only through the
+Content generation/question-bank lookup (item_foundry.py, question_bank.py)
+is a separate module; this one depends on it only through the
 `ContentProvider` protocol below, so the assembly logic is fully testable
 with a mock today and pluggable to the real pipeline later.
 
@@ -30,7 +29,6 @@ import fsrs
 import numpy as np
 
 from grammar_scheduler import SkillPracticeLog, skills_needing_practice
-from misconception_tracker import MisconceptionProfile
 from urnings_tracker import LearnerSkillProfile, UrnState
 from vocab_scheduler import due_vocab_cards
 
@@ -40,20 +38,15 @@ class ContentProvider(Protocol):
         """A vocab item_id the user hasn't seen yet, or None if none left."""
 
     def next_new_grammar_item(self, skill_id: str, learner_urn: UrnState | None = None,
-                               exclude: set[str] = frozenset(),
-                               target_misconception: str | None = None) -> str | None:
-        """A grammar item_id targeting skill_id. Novelty 1's "Select" step
-        (PRD §9.15): when learner_urn is given, a provider that can (e.g.
+                               exclude: set[str] = frozenset()) -> str | None:
+        """A grammar item_id targeting skill_id. The "Select" step (PRD
+        §9.15): when learner_urn is given, a provider that can (e.g.
         BankContentProvider) should pick an item whose difficulty actually
         matches this learner's current ability for this skill, not just
         any valid item -- the piece of Generate-Calibrate-Select that
         §9.12's item_urn wiring made possible but never used until now.
         exclude avoids repeating an item already chosen earlier in the
-        same drill assembly call. target_misconception, when given, is the
-        misconception the learner currently holds for this skill
-        (misconception_tracker): the item should offer a distractor
-        realising it, so the drill keeps confronting it and keeps measuring
-        whether it is still held (Novelty 1, PRD §9.69).
+        same drill assembly call.
         """
 
 
@@ -70,9 +63,6 @@ class UserDrillState:
     vocab_cards: dict[str, fsrs.Card] = field(default_factory=dict)
     skill_profile: LearnerSkillProfile = None
     practice_log: SkillPracticeLog = field(default_factory=SkillPracticeLog)
-    # Which misconception the learner holds, per skill, from WHICH
-    # distractor they pick (Novelty 1, PRD §9.69).
-    misconceptions: MisconceptionProfile = field(default_factory=MisconceptionProfile)
 
     def __post_init__(self):
         if self.skill_profile is None:
@@ -104,8 +94,7 @@ def assemble_daily_drill(state: UserDrillState, provider: ContentProvider,
     while len(grammar_items) < n_grammar and due_skills and attempts < n_grammar * 10:
         skill = due_skills[attempts % len(due_skills)]
         learner_urn = state.skill_profile.get(skill)
-        item = provider.next_new_grammar_item(skill, learner_urn=learner_urn, exclude=grammar_seen,
-                                              target_misconception=state.misconceptions.dominant(skill))
+        item = provider.next_new_grammar_item(skill, learner_urn=learner_urn, exclude=grammar_seen)
         if item is not None:
             grammar_items.append(item)
             grammar_seen.add(item)
@@ -131,10 +120,8 @@ if __name__ == "__main__":
             self._vocab_counter += 1
             return f"vocab-new-{self._vocab_counter}"
 
-        def next_new_grammar_item(self, skill_id, learner_urn=None, exclude=frozenset(),
-                                  target_misconception=None):
+        def next_new_grammar_item(self, skill_id, learner_urn=None, exclude=frozenset()):
             self.received_learner_urns.append(learner_urn)
-            self.received_targets = getattr(self, "received_targets", []) + [target_misconception]
             self._grammar_counter += 1
             return f"grammar-{skill_id}-{self._grammar_counter}"
 

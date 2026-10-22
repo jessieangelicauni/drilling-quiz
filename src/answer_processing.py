@@ -81,18 +81,10 @@ def submit_grammar_answer(state: UserDrillState, item: GeneratedItem, chosen_opt
     new_learner_urn, new_item_urn = urnings_update(learner_urn, item_urn, correct, rng,
                                                    selection_prob=selection_prob)
     state.skill_profile.set(item.skill_id, new_learner_urn)
-    # Eq. 5's OTHER disjunct (PRD §9.38): previously the whole
-    # consecutive(m_j)>=2 trigger had nothing to read from anywhere in
-    # this codebase, so escalation silently only ever checked urn width.
-    # Updated unconditionally (correct answers reset the streak).
-    # The misconception a wrong answer reveals is the one realised by the
-    # option actually picked (Novelty 1, PRD §9.69); items without
-    # per-option codes fall back to the item-level KAGAS code.
-    chosen_code = item.option_codes.get(chosen_option) if item.option_codes else item.kagas_code
-    consecutive = state.skill_profile.record_outcome(item.skill_id, correct, chosen_code)
-    if not correct and item.option_codes:
-        offered = [code for label, code in item.option_codes.items() if label != item.answer]
-        state.misconceptions.record_choice(item.skill_id, chosen_code, offered)
+    # Eq. 5's OTHER disjunct (PRD §9.38): consecutive WRONG answers on this
+    # skill, regardless of which option was picked. Updated unconditionally
+    # (a correct answer resets the streak).
+    consecutive = state.skill_profile.record_outcome(item.skill_id, correct)
 
     feedback = None
     if not correct:
@@ -145,28 +137,27 @@ if __name__ == "__main__":
 
     state = UserDrillState(user_id="u1", skill_ids=["particle_loc"])
     state.skill_profile.set("particle_loc", UrnState(k=10, n=32))
-    item = GeneratedItem("particle_loc", "동생이 공원___ 축구를 해요.", "___",
-                         {"A": "에", "B": "에서", "C": "을", "D": "이"}, "B", "PART",
-                         option_codes={"A": "PART:에서>에", "B": None, "C": "PART:에서>을", "D": "PART:에서>이"})
+    item = GeneratedItem("particle_loc", "동생이 ___ 축구를 해요.", "___",
+                         {"A": "공원에", "B": "공원에서", "C": "공원을", "D": "공원이"}, "B",
+                         reasoning={"A": "'공원에' is incorrect here.", "B": "'공원에서' is correct here.",
+                                    "C": "'공원을' is incorrect here.", "D": "'공원이' is incorrect here."})
     feedback_provider = StubFeedback()
 
     result = submit_grammar_answer(state, item, "A", feedback_provider, rng, now=now)
     assert not result.correct
-    assert result.feedback and "에" in result.feedback, "feedback must use the option text, not its label"
+    assert result.feedback and "공원에" in result.feedback, "feedback must use the option text, not its label"
     urn_after_wrong = state.skill_profile.get("particle_loc")
     assert urn_after_wrong.k <= 10, "a wrong answer must not increase k"
 
-    # The chosen distractor's misconception is what gets recorded (Novelty 1, PRD §9.69).
-    assert state.misconceptions.dominant("particle_loc") == "PART:에서>에"
-    assert state.misconceptions.evidence("particle_loc") == 1
+    assert state.skill_profile.consecutive_wrong("particle_loc") == 1
     submit_grammar_answer(state, item, "A", feedback_provider, rng, now=now)
-    assert state.skill_profile.consecutive_misconceptions("particle_loc") == 2
-    assert feedback_provider.calls[-1] == "detailed", "the same misconception twice in a row must escalate"
+    assert state.skill_profile.consecutive_wrong("particle_loc") == 2
+    assert feedback_provider.calls[-1] == "detailed", "two consecutive wrong answers must escalate"
 
     result2 = submit_grammar_answer(state, item, item.answer, feedback_provider, rng, now=now)
     assert result2.correct
     assert result2.feedback is None, "a correct answer must not produce feedback"
-    assert state.misconceptions.evidence("particle_loc") == 2, "a correct answer carries no misconception evidence"
+    assert state.skill_profile.consecutive_wrong("particle_loc") == 0, "a correct answer must reset the streak"
 
     # Novelty 1 (§9.12): the ephemeral path (no item_urn given) must still
     # seed a real one, not silently skip it.

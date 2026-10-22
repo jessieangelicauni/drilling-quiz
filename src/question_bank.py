@@ -131,11 +131,8 @@ class QuestionBank:
         skill_id = entry.item.skill_id
         # Served adaptively by BankContentProvider, so the Urnings update gets
         # the selection correction. Candidates are recomputed here with no
-        # within-drill exclusions, which the serving call may have had; the
-        # target misconception is the one the drill served it for.
-        candidates = self.candidates(skill_id, target_misconception=state.misconceptions.dominant(skill_id))
-        if item_id not in candidates:
-            candidates = self.candidates(skill_id)
+        # within-drill exclusions, which the serving call may have had.
+        candidates = self.candidates(skill_id)
 
         def selection_prob(learner: UrnState, item: UrnState) -> float:
             return float(self.selection_probs(candidates, learner, (item_id, item))[candidates.index(item_id)])
@@ -146,17 +143,9 @@ class QuestionBank:
         entry.item_urn = result.updated_item_urn
         return result
 
-    def candidates(self, skill_id: str, exclude: set[str] = frozenset(),
-                   target_misconception: str | None = None) -> list[str]:
-        """Approved items for the skill; when a target misconception is given
-        (the learner's current dominant one, misconception_tracker), only the
-        items with a distractor realising it, if there are any."""
-        ids = [iid for iid in self.approved_ids(skill_id) if iid not in exclude]
-        if target_misconception is not None:
-            targeted = [iid for iid in ids
-                        if target_misconception in (self.entries[iid].item.option_codes or {}).values()]
-            ids = targeted or ids
-        return ids
+    def candidates(self, skill_id: str, exclude: set[str] = frozenset()) -> list[str]:
+        """Approved items for the skill."""
+        return [iid for iid in self.approved_ids(skill_id) if iid not in exclude]
 
     def selection_probs(self, candidates: list[str], learner_urn: UrnState,
                         override: tuple[str, UrnState] | None = None) -> np.ndarray:
@@ -184,12 +173,12 @@ class BankContentProvider:
     time. This is the fix for "starts from zero every time": the bank is
     filled by batch_generate() ahead of time, separately from serving.
 
-    next_new_grammar_item is also where Novelty 1's "Select" step actually
-    happens now (PRD §9.15): §9.12 wired item_urn seeding/persistence in,
-    but nothing used it to pick WHICH item to serve until this -- before,
-    an item's calibration existed but had zero effect on the learner's
-    actual experience. Found directly from the user's own description of
-    the behaviour they expected (an easy-for-you item should adapt harder
+    next_new_grammar_item is also where the "Select" step actually happens
+    now (PRD §9.15): §9.12 wired item_urn seeding/persistence in, but
+    nothing used it to pick WHICH item to serve until this -- before, an
+    item's calibration existed but had zero effect on the learner's actual
+    experience. Found directly from the user's own description of the
+    behaviour they expected (an easy-for-you item should adapt harder
     next, a hard-for-your-friend item should adapt easier), which is
     standard adaptive-item-selection and was simply never connected.
     """
@@ -198,9 +187,8 @@ class BankContentProvider:
         self.rng = random.Random(seed)
 
     def next_new_grammar_item(self, skill_id: str, learner_urn: UrnState | None = None,
-                               exclude: set[str] = frozenset(),
-                               target_misconception: str | None = None) -> str | None:
-        candidates = self.bank.candidates(skill_id, exclude, target_misconception)
+                               exclude: set[str] = frozenset()) -> str | None:
+        candidates = self.bank.candidates(skill_id, exclude)
         if not candidates:
             return None  # bank empty (or exhausted by exclude) for this skill
         if learner_urn is None:
@@ -285,12 +273,6 @@ if __name__ == "__main__":
         "a much longer/more complex edited stem must seed a higher (harder) item urn, "
         f"got {urn_after_edit} vs original {urn_before_edit}"
     )
-
-    # Misconception targeting: only items offering the target misconception
-    # are candidates, when the bank has any.
-    targeted = BankContentProvider(bank, seed=0).next_new_grammar_item(
-        "particle_loc", target_misconception="PART:에서>이")
-    assert "PART:에서>이" in bank.entries[targeted].item.option_codes.values()
 
     # Novelty 1's "Select" step (§9.15): adaptive item selection must
     # actually match item difficulty to the learner's ability, not serve

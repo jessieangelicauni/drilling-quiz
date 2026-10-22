@@ -35,60 +35,17 @@ Residual fixed separately (2026-10-19, audit follow-up): Qwen's own
 illustrative example sentences sometimes contained a conjugation error
 (들어요 written as 듣어요). Both fast_feedback() and detailed_feedback() now
 post-process their output through
-correct_korean_conjugation() below, a deterministic fix for this one
-error pattern, applied to free-form mixed-language text.
+distractor_validator.correct_korean_conjugation(), a deterministic fix for
+this one error pattern, applied to free-form mixed-language text.
 """
 from __future__ import annotations
 
-import re
 from typing import Literal
 
 import torch
-from kiwipiepy import Kiwi
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-_KIWI = Kiwi()
-
-_HANGUL_SPAN = re.compile(r"[가-힣](?:[가-힣\s]*[가-힣])?[.!?]?")
-_VERB_TAGS = ("VV", "VV-I", "VX", "VA", "XSV")
-
-
-def correct_korean_conjugation(text: str) -> str:
-    """Auto-corrects a specific, recurring LLM conjugation error: a bare
-    "요" ending attached directly to a verb stem instead of the proper
-    linking-vowel contraction (마시요 -> 마셔요, 보요 -> 봐요, 듣어요 ->
-    들어요, 공부하요 -> 공부해요).
-
-    Works on free-form mixed-language text (Korean example sentences
-    embedded in an English/Indonesian explanation) by finding Hangul spans
-    and correcting each one independently. Deliberately narrow: this fixes
-    ONE identified error pattern, not a general grammar checker --
-    kiwipiepy's analyzer accepts "stem+요" as one valid (if non-standard)
-    parse, which is exactly why a plain analyze-then-join round trip does
-    NOT catch it on its own; forcing the EF morph to "어요" before
-    rejoining is what makes the correction happen. Verified idempotent on
-    already-correct text (공부해요, 가요, 만나요, ...) -- kiwipiepy already
-    represents those internally as stem+"어요", never bare stem+"요", so
-    this never "fixes" something that wasn't broken.
-    """
-    def _fix_span(match: re.Match) -> str:
-        span = match.group(0)
-        try:
-            tokens = _KIWI.analyze(span)[0][0]
-        except Exception:
-            return span
-        morphs = []
-        for t in tokens:
-            if t.tag in ("EF", "EC") and t.form == "요" and morphs and morphs[-1][1] in _VERB_TAGS:
-                morphs.append(("어요", "EF"))
-            else:
-                morphs.append((t.form, t.tag))
-        try:
-            return _KIWI.join(morphs)
-        except Exception:
-            return span
-
-    return _HANGUL_SPAN.sub(_fix_span, text)
+from distractor_validator import correct_korean_conjugation
 
 
 # Qwen3-4B again (2026-10-21, PRD §9.71), after a day on EXAONE-3.5-7.8B
